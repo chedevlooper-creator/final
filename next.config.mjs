@@ -23,9 +23,6 @@ const nextConfig = {
     // Build optimizations
     reactStrictMode: true,
 
-    // Dynamic route handling
-    dynamicParams: true,
-
     // Experimental features for better performance
     experimental: {
         optimizePackageImports: [
