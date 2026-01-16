@@ -16,6 +16,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Ensure public directory exists (required for Next.js standalone builds)
+# Create it after COPY so it's guaranteed to exist
+RUN mkdir -p ./public && touch ./public/.gitkeep || true
+
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
@@ -35,7 +39,11 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Copy necessary files from builder
-COPY --from=builder /app/public ./public
+# Create public directory first
+RUN mkdir -p ./public
+
+# Copy .gitkeep file to ensure public directory is not empty
+COPY --from=builder --chown=nextjs:nodejs /app/public/.gitkeep ./public/.gitkeep
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
