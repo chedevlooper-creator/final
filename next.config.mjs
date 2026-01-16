@@ -24,8 +24,7 @@ const nextConfig = {
     reactStrictMode: true,
 
     // Output configuration for Docker deployment
-    // TEMPORARILY DISABLED to fix build error. Re-enable for Docker deployment.
-    // output: 'standalone',
+    output: 'standalone',
 
     // Experimental features for better performance
     experimental: {
@@ -34,12 +33,14 @@ const nextConfig = {
             '@radix-ui/react-icons',
             'date-fns',
             '@tanstack/react-query',
-            // '@tanstack/react-table', // REMOVED: Causes build errors
         ],
     },
 
     // Compiler optimizations
     swcMinify: true,
+
+    // FIX: Disable turbo for Windows compatibility
+    turbo: undefined,
 
     // Headers for caching and security
     async headers() {
