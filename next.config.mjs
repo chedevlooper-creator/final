@@ -21,6 +21,9 @@ const nextConfig = {
     // Build optimizations
     reactStrictMode: true,
 
+    // Output configuration for Docker deployment
+    output: 'standalone',
+
     // Experimental features for better performance
     experimental: {
         optimizePackageImports: [
