@@ -21,12 +21,6 @@ const nextConfig = {
     // Build optimizations
     reactStrictMode: true,
 
-    // Skip building static error pages - use dynamic error handling
-    generateBuildId: async () => {
-      // Use a timestamp-based build ID to ensure fresh builds
-      return `build-${Date.now()}`
-    },
-
     // Experimental features for better performance
     experimental: {
         optimizePackageImports: [
