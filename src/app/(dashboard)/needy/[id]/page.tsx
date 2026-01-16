@@ -14,14 +14,14 @@ import { FileInfoSection } from '@/components/needy/detail/FileInfoSection'
 import { BasicInfoForm } from '@/components/needy/detail/BasicInfoForm'
 import { LinkedRecordsTabs } from '@/components/needy/detail/LinkedRecordsTabs'
 import { SystemInfoPanel } from '@/components/needy/detail/SystemInfoPanel'
-import { 
-  TagsSection, 
-  SpecialConditionsSection 
+import {
+  TagsSection,
+  SpecialConditionsSection
 } from '@/components/needy/detail/MultiSelectSection'
 import { NeedyPerson } from '@/types/needy.types'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import { 
+import {
   getMockNeedyPerson,
   mockCountries,
   mockCities,
@@ -32,7 +32,7 @@ import {
 } from '@/lib/mock-data/needy'
 
 // Mock data kullanımı için flag
-const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' || true // Geçici olarak true
+const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true'
 
 // Form Schema - Genişletilmiş
 const needyFormSchema = z.object({
@@ -438,7 +438,7 @@ export default function NeedyDetailPage() {
                         photoUrl={needyData?.photo_url}
                         onPhotoChange={handlePhotoChange}
                       />
-                      
+
                       <FileInfoSection
                         control={form.control}
                         partners={partners}

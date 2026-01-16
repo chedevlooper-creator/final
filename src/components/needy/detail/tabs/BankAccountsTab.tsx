@@ -28,18 +28,18 @@ import {
 } from '@/components/ui/dialog'
 import { Plus, Search, Pencil, Trash2, Eye } from 'lucide-react'
 import { TabLayout } from './TabLayout'
-import { 
-  BankAccount, 
-  CURRENCY_OPTIONS, 
+import {
+  BankAccount,
+  CURRENCY_OPTIONS,
   TRANSACTION_TYPE_OPTIONS,
   StatusFilter,
   Currency,
-  TransactionType 
+  TransactionType
 } from '@/types/linked-records.types'
 import { getMockBankAccounts } from '@/lib/mock-data/needy'
 import { useEffect } from 'react'
 
-const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' || true // Geçici olarak true
+const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true'
 
 interface BankAccountsTabProps {
   needyPersonId: string
@@ -51,7 +51,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null)
-  
+
   // Form state
   const [formData, setFormData] = useState({
     account_holder_name: '',
@@ -231,7 +231,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
               {editingAccount ? 'Banka Hesabı Düzenle' : 'Yeni Banka Hesabı Ekle'}
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="grid grid-cols-2 gap-4 py-4">
             <div className="col-span-2">
               <Label>Alıcı Ünvanı</Label>
@@ -241,7 +241,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
                 placeholder="Hesap sahibinin adı"
               />
             </div>
-            
+
             <div>
               <Label>Döviz</Label>
               <Select
@@ -260,7 +260,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label>İşlem Türü</Label>
               <Select
@@ -279,7 +279,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="col-span-2">
               <Label>IBAN</Label>
               <Input
@@ -289,7 +289,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
                 className="font-mono"
               />
             </div>
-            
+
             <div>
               <Label>Banka</Label>
               <Input
@@ -298,7 +298,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
                 placeholder="Banka adı"
               />
             </div>
-            
+
             <div>
               <Label>Şube</Label>
               <Input
@@ -307,7 +307,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
                 placeholder="Şube adı"
               />
             </div>
-            
+
             <div>
               <Label>Şube Kodu</Label>
               <Input
@@ -316,7 +316,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
                 placeholder="Şube kodu"
               />
             </div>
-            
+
             <div>
               <Label>Hesap Numarası</Label>
               <Input
@@ -325,7 +325,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
                 placeholder="Hesap numarası"
               />
             </div>
-            
+
             <div>
               <Label>Swift Kodu</Label>
               <Input
@@ -334,7 +334,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
                 placeholder="SWIFT kodu"
               />
             </div>
-            
+
             <div className="col-span-2">
               <Label>Adres</Label>
               <Input
@@ -344,7 +344,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
               />
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>
               İptal
