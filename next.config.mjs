@@ -39,9 +39,6 @@ const nextConfig = {
     // Compiler optimizations
     swcMinify: true,
 
-    // FIX: Disable turbo for Windows compatibility
-    turbo: undefined,
-
     // Headers for caching and security
     async headers() {
         return [
