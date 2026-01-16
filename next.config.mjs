@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // Production build output - standalone for better deployment
+    output: 'standalone',
+
     // Image optimization
     images: {
         remotePatterns: [
@@ -19,6 +22,9 @@ const nextConfig = {
 
     // Build optimizations
     reactStrictMode: true,
+
+    // Dynamic route handling
+    dynamicParams: true,
 
     // Experimental features for better performance
     experimental: {
