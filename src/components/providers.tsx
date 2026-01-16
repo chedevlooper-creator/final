@@ -11,8 +11,8 @@ function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        // Cache süresi - 5 dakika (veri güncelliği için optimal)
-        staleTime: 5 * 60 * 1000,
+        // Cache süresi - 10 dakika (performans için artırıldı)
+        staleTime: 10 * 60 * 1000,
 
         // Garbage collection time - 30 dakika
         gcTime: 30 * 60 * 1000,
@@ -34,8 +34,8 @@ function makeQueryClient() {
         // Reconnect'te refetch et
         refetchOnReconnect: true,
 
-        // Mount'ta refetch etme (zaten fresh ise)
-        refetchOnMount: true,
+        // Mount'ta refetch ETME (cache'den kullan - performans artışı)
+        refetchOnMount: false,
       },
       mutations: {
         // Mutation retry

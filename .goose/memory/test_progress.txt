@@ -1,0 +1,15 @@
+# test login in_progress
+Giris sayfasi testi baslatildi. Logout butonuna tiklandi.
+
+# test needy in_progress
+İhtiyaç Sahipleri sayfasina gidildi. Liste ve form testi yapilacak.
+
+# test needy navigation
+İhtiyaç Sahipleri sayfasina gitme denemesi yapildi. Sonuc bekleniyor.
+
+# test needy form in_progress
+İhtiyaç Sahipleri sayfasi basarili. Liste goruntulendi. Yeni kayit formuna gidiliyor. Tablo yapisi: ID, Isim, Kategori, Yas, Uyruk, Kimlik No, Cep Tel, Sehir, Durum.
+
+# test form fill in_progress
+Form doldurma testi yapildi. browser_type kullanilarak Ad, Soyad ve TC alanlarina degerler girildi. Buton durumu kontrol ediliyor.
+

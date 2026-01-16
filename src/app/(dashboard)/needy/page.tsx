@@ -1,7 +1,5 @@
 'use client'
 
-export const dynamic = 'force-dynamic'
-
 import { useState, useEffect } from 'react'
 import { useNeedyList, useDeleteNeedy } from '@/hooks/queries/use-needy'
 import { PageHeader } from '@/components/common/page-header'
@@ -27,7 +25,20 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { toast } from 'sonner'
-import { AddNeedyModal } from '@/components/needy/AddNeedyModal'
+import dynamic from 'next/dynamic'
+
+// Lazy loading modal - reduces initial bundle size by ~13KB
+const AddNeedyModal = dynamic(
+  () => import('@/components/needy/AddNeedyModal').then(mod => ({ default: mod.AddNeedyModal })),
+  {
+    loading: () => (
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+      </div>
+    ),
+    ssr: false
+  }
+)
 
 type NeedyPerson = Tables<'needy_persons'> & {
   category?: { name: string } | null
@@ -96,7 +107,7 @@ export default function NeedyListPage() {
     {
       id: 'detail',
       cell: ({ row }) => (
-        <Link href={`/needy/${row.original.id}`}>
+        <Link href={`/needy/${row.original.id}`} prefetch={true}>
           <Button variant="ghost" size="icon" className="h-8 w-8">
             <Eye className="h-4 w-4 text-blue-600" />
           </Button>
@@ -218,13 +229,13 @@ export default function NeedyListPage() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <Link href={`/needy/${row.original.id}`}>
+            <Link href={`/needy/${row.original.id}`} prefetch={true}>
               <DropdownMenuItem>
                 <Eye className="mr-2 h-4 w-4" />
                 Görüntüle
               </DropdownMenuItem>
             </Link>
-            <Link href={`/needy/${row.original.id}?edit=true`}>
+            <Link href={`/needy/${row.original.id}?edit=true`} prefetch={true}>
               <DropdownMenuItem>
                 <Pencil className="mr-2 h-4 w-4" />
                 Düzenle
