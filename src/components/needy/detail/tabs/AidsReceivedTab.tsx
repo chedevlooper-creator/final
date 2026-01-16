@@ -1,0 +1,157 @@
+'use client'
+
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Plus, Eye, Gift, Truck } from 'lucide-react'
+import { TabLayout } from './TabLayout'
+import { AidReceived, AID_TYPE_OPTIONS, DELIVERY_STATUS_OPTIONS, CURRENCY_OPTIONS, AidType, DeliveryStatus } from '@/types/linked-records.types'
+import { format } from 'date-fns'
+import { tr } from 'date-fns/locale'
+
+interface AidsReceivedTabProps {
+  needyPersonId: string
+  onClose: () => void
+}
+
+export function AidsReceivedTab({ needyPersonId, onClose }: AidsReceivedTabProps) {
+  const [searchValue, setSearchValue] = useState('')
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [aids, setAids] = useState<AidReceived[]>([])
+  const [formData, setFormData] = useState({
+    aid_type: '' as AidType | '',
+    aid_category: '',
+    description: '',
+    amount: '',
+    currency: 'TRY',
+    aid_date: '',
+  })
+
+  const columns = [
+    { key: 'date', label: 'Yardım Tarihi', width: '120px' },
+    { key: 'type', label: 'Yardım Türü', width: '120px' },
+    { key: 'category', label: 'Kategori', width: '120px' },
+    { key: 'description', label: 'Açıklama' },
+    { key: 'amount', label: 'Tutar', width: '120px' },
+    { key: 'status', label: 'Teslimat', width: '100px' },
+  ]
+
+  const handleAdd = () => {
+    setFormData({ aid_type: '', aid_category: '', description: '', amount: '', currency: 'TRY', aid_date: '' })
+    setIsAddModalOpen(true)
+  }
+  const handleSave = async () => setIsAddModalOpen(false)
+
+  // Toplam tutar hesaplama
+  const totalAmount = aids.reduce((sum, aid) => sum + (aid.amount || 0), 0)
+
+  return (
+    <>
+      <TabLayout
+        showStatusFilter={false}
+        showSearch={true}
+        searchPlaceholder="Yardım ara..."
+        searchValue={searchValue}
+        onSearchChange={setSearchValue}
+        showAddButton={true}
+        addButtonLabel="Ekle"
+        onAdd={handleAdd}
+        totalRecords={aids.length}
+      >
+        {/* Özet Kartı */}
+        {aids.length > 0 && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Gift className="h-8 w-8 text-green-600" />
+              <div>
+                <p className="text-sm text-green-700">Toplam Yardım Tutarı</p>
+                <p className="text-2xl font-bold text-green-800">{totalAmount.toLocaleString('tr-TR')} ₺</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-green-700">Yardım Sayısı</p>
+              <p className="text-xl font-bold text-green-800">{aids.length}</p>
+            </div>
+          </div>
+        )}
+
+        <div className="border rounded-lg overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[50px]"></TableHead>
+                {columns.map((col) => (<TableHead key={col.key} style={{ width: col.width }}>{col.label}</TableHead>))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {aids.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length + 1} className="text-center py-8 text-muted-foreground">
+                    Yapılan yardım kaydı bulunamadı
+                  </TableCell>
+                </TableRow>
+              ) : (
+                aids.map((aid) => (
+                  <TableRow key={aid.id}>
+                    <TableCell><Button variant="ghost" size="icon" className="h-8 w-8"><Eye className="h-4 w-4" /></Button></TableCell>
+                    <TableCell>{aid.aid_date && format(new Date(aid.aid_date), 'dd.MM.yyyy', { locale: tr })}</TableCell>
+                    <TableCell>{AID_TYPE_OPTIONS.find(t => t.value === aid.aid_type)?.label}</TableCell>
+                    <TableCell>{aid.aid_category}</TableCell>
+                    <TableCell className="truncate max-w-[200px]">{aid.description}</TableCell>
+                    <TableCell className="font-medium">{aid.amount?.toLocaleString('tr-TR')} {aid.currency}</TableCell>
+                    <TableCell>
+                      <span className={`text-xs px-2 py-1 rounded flex items-center gap-1 w-fit ${
+                        aid.delivery_status === 'delivered' ? 'bg-green-100 text-green-700' : 
+                        aid.delivery_status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        <Truck className="h-3 w-3" />
+                        {DELIVERY_STATUS_OPTIONS.find(s => s.value === aid.delivery_status)?.label}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </TabLayout>
+
+      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>Yardım Kaydı Ekle</DialogTitle></DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div><Label>Yardım Tarihi *</Label><Input type="date" value={formData.aid_date} onChange={(e) => setFormData({ ...formData, aid_date: e.target.value })} /></div>
+              <div><Label>Yardım Türü *</Label>
+                <Select value={formData.aid_type} onValueChange={(v) => setFormData({ ...formData, aid_type: v as AidType })}>
+                  <SelectTrigger><SelectValue placeholder="Seçin" /></SelectTrigger>
+                  <SelectContent>{AID_TYPE_OPTIONS.map((opt) => (<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>))}</SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div><Label>Kategori</Label><Input value={formData.aid_category} onChange={(e) => setFormData({ ...formData, aid_category: e.target.value })} /></div>
+            <div><Label>Açıklama</Label><Input value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} /></div>
+            <div className="grid grid-cols-2 gap-4">
+              <div><Label>Tutar</Label><Input type="number" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} /></div>
+              <div><Label>Para Birimi</Label>
+                <Select value={formData.currency} onValueChange={(v) => setFormData({ ...formData, currency: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{CURRENCY_OPTIONS.map((opt) => (<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>))}</SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>İptal</Button>
+            <Button onClick={handleSave}>Kaydet</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}
