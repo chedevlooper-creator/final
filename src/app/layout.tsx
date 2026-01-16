@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   description: 'Sivil toplum kuruluşları için kapsamlı yardım yönetim sistemi',
 }
 
+// Force dynamic rendering to prevent prerendering issues
+export const dynamic = 'force-dynamic'
+
 export default function RootLayout({
   children,
 }: {
