@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // Production build output - standalone for better deployment
-    output: 'standalone',
-
     // Image optimization
     images: {
         remotePatterns: [
