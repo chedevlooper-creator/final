@@ -2,6 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
+import { useState, useMemo, useCallback } from 'react'
 import { StatCard } from '@/components/common/stat-card'
 import { PageHeader } from '@/components/common/page-header'
 import {
@@ -20,13 +21,17 @@ import Link from 'next/link'
 import { useNeedyList } from '@/hooks/queries/use-needy'
 import { useApplicationsList } from '@/hooks/queries/use-applications'
 import { useDonationStats } from '@/hooks/queries/use-donations'
+import type { Application, DonationStats } from '@/types/common'
 
 export default function DashboardPage() {
+  const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month'>('month')
+  
   const { data: needyData } = useNeedyList({ limit: 5 })
   const { data: applicationsData } = useApplicationsList({ limit: 5 })
   const { data: donationStats } = useDonationStats()
 
-  const stats = [
+  // Memoize stats array to prevent unnecessary recalculations
+  const stats = useMemo(() => [
     {
       title: 'Toplam İhtiyaç Sahibi',
       value: needyData?.count || 0,
@@ -36,7 +41,7 @@ export default function DashboardPage() {
     },
     {
       title: 'Bekleyen Başvuru',
-      value: applicationsData?.data?.filter((a: any) => a.status === 'new').length || 0,
+      value: applicationsData?.data?.filter((app: Application) => app.status === 'new').length || 0,
       icon: Clock,
       iconColor: 'text-orange-500',
       description: 'İşlem bekliyor',
@@ -57,7 +62,7 @@ export default function DashboardPage() {
     },
     {
       title: 'Tamamlanan Yardım',
-      value: applicationsData?.data?.filter((a: any) => a.status === 'completed').length || 0,
+      value: applicationsData?.data?.filter((app: Application) => app.status === 'completed').length || 0,
       icon: CheckCircle,
       iconColor: 'text-cyan-500',
       description: 'Bu ay tamamlanan',
@@ -69,7 +74,27 @@ export default function DashboardPage() {
       iconColor: 'text-red-500',
       description: 'Tüm zamanlar',
     },
-  ]
+  ], [needyData?.count, applicationsData?.data, donationStats])
+
+  // Memoize filtered applications to prevent recalculation on every render
+  const recentApplications = useMemo(() => {
+    return applicationsData?.data?.slice(0, 5) || []
+  }, [applicationsData?.data])
+
+  // Memoize new applications count
+  const newApplicationsCount = useMemo(() => {
+    return applicationsData?.data?.filter((app: Application) => app.status === 'new').length || 0
+  }, [applicationsData?.data])
+
+  // Memoize completed applications count
+  const completedApplicationsCount = useMemo(() => {
+    return applicationsData?.data?.filter((app: Application) => app.status === 'completed').length || 0
+  }, [applicationsData?.data])
+
+  // Callback for period change
+  const handlePeriodChange = useCallback((period: 'today' | 'week' | 'month') => {
+    setSelectedPeriod(period)
+  }, [])
 
   return (
     <div className="space-y-8">
@@ -116,35 +141,37 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {applicationsData?.data?.slice(0, 5).map((app: any) => (
-                <div
-                  key={app.id}
-                  className="flex items-center justify-between rounded-lg border p-3 hover:bg-slate-50 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-emerald-100 to-cyan-100">
-                      <FileText className="h-5 w-5 text-emerald-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">
-                        {app.needy_person?.first_name} {app.needy_person?.last_name}
-                      </p>
-                      <p className="text-xs text-slate-500">{app.application_type}</p>
-                    </div>
-                  </div>
-                  <span
-                    className={`rounded-full px-2 py-1 text-xs font-medium ${
-                      app.status === 'new'
-                        ? 'bg-blue-100 text-blue-700'
-                        : app.status === 'approved'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-slate-100 text-slate-700'
-                    }`}
+              {recentApplications.length > 0 ? (
+                recentApplications.map((app: Application) => (
+                  <div
+                    key={app.id}
+                    className="flex items-center justify-between rounded-lg border p-3 hover:bg-slate-50 transition-colors"
                   >
-                    {app.status === 'new' ? 'Yeni' : app.status === 'approved' ? 'Onaylandı' : app.status}
-                  </span>
-                </div>
-              )) || (
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-emerald-100 to-cyan-100">
+                        <FileText className="h-5 w-5 text-emerald-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">
+                          {app.needy_person?.first_name} {app.needy_person?.last_name}
+                        </p>
+                        <p className="text-xs text-slate-500">{app.application_type}</p>
+                      </div>
+                    </div>
+                    <span
+                      className={`rounded-full px-2 py-1 text-xs font-medium ${
+                        app.status === 'new'
+                          ? 'bg-blue-100 text-blue-700'
+                          : app.status === 'approved'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-slate-100 text-slate-700'
+                      }`}
+                    >
+                      {app.status === 'new' ? 'Yeni' : app.status === 'approved' ? 'Onaylandı' : app.status}
+                    </span>
+                  </div>
+                ))
+              ) : (
                 <p className="text-center text-slate-500 py-8">
                   Henüz başvuru bulunmuyor
                 </p>

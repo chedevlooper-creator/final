@@ -99,11 +99,13 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-slate-500">
-              Demo hesap: demo@example.com / demo123
-            </p>
-          </div>
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mt-6 text-center">
+              <p className="text-sm text-slate-500">
+                Demo hesap: demo@example.com / demo123
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
