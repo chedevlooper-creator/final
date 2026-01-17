@@ -4,6 +4,7 @@
  * Bu dosya, kullanıcı rolleri ve izinlerini yönetir.
  */
 
+import React from 'react'
 import type { UserRole } from '@/types/common'
 
 /**
