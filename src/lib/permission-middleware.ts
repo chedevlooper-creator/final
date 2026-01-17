@@ -11,6 +11,7 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import type { Permission, UserRole } from '@/lib/rbac'
+import { ROLE_PERMISSIONS, RESOURCE_PERMISSIONS } from '@/lib/rbac'
 
 /**
  * Kullanıcı profili ve yetkileri
@@ -91,7 +92,7 @@ export function checkPermission(
   requiredPermission: Permission,
   resource?: string
 ): boolean {
-  const { ROLE_PERMISSIONS, RESOURCE_PERMISSIONS } = require('@/lib/rbac')
+  // ROLE_PERMISSIONS and RESOURCE_PERMISSIONS are already imported at the top
 
   // Admin her şeyi yapabilir
   if (userRole === 'admin') {
