@@ -23,18 +23,7 @@ import {
 import { NeedyPerson } from '@/types/needy.types'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import {
-  getMockNeedyPerson,
-  mockCountries,
-  mockCities,
-  mockDistricts,
-  mockNeighborhoods,
-  mockCategories,
-  mockPartners,
-} from '@/lib/mock-data/needy'
 
-// Mock data kullanımı için flag
-const USE_MOCK_DATA = process.env['NEXT_PUBLIC_USE_MOCK_DATA'] === 'true'
 
 // Form Schema - Genişletilmiş
 const needyFormSchema = z.object({
@@ -183,50 +172,6 @@ export default function NeedyDetailPage() {
       try {
         // Check if it's a new record
         if (id === 'new') {
-          setIsLoading(false)
-          // Set mock lookup data for new records
-          if (USE_MOCK_DATA) {
-            setCountries(mockCountries)
-            setCities(mockCities)
-            setCategories(mockCategories)
-            setPartners(mockPartners)
-          }
-          return
-        }
-
-        // Mock data kullanılıyorsa
-        if (USE_MOCK_DATA) {
-          const person = getMockNeedyPerson(id)
-          if (!person) {
-            toast.error('Kayıt bulunamadı.')
-            router.push('/needy')
-            return
-          }
-
-          setNeedyData(person)
-          form.reset(person as NeedyFormValues)
-
-          // Set criminal_record to tags if exists
-          if (person.criminal_record) {
-            setSelectedTags(prev => [...prev, 'criminal_record'])
-          }
-
-          // Set mock lookup data
-          setCountries(mockCountries)
-          setCities(mockCities)
-          setCategories(mockCategories)
-          setPartners(mockPartners)
-
-          // Set districts if city is selected
-          if (person.city_id) {
-            setDistricts(mockDistricts.filter(d => d.city_id === person.city_id))
-          }
-
-          // Set neighborhoods if district is selected
-          if (person.district_id) {
-            setNeighborhoods(mockNeighborhoods.filter(n => n.district_id === person.district_id))
-          }
-
           setIsLoading(false)
           return
         }

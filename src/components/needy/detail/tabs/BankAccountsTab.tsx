@@ -36,10 +36,7 @@ import {
   Currency,
   TransactionType
 } from '@/types/linked-records.types'
-import { getMockBankAccounts } from '@/lib/mock-data/needy'
 import { useEffect } from 'react'
-
-const USE_MOCK_DATA = process.env['NEXT_PUBLIC_USE_MOCK_DATA'] === 'true'
 
 interface BankAccountsTabProps {
   needyPersonId: string
@@ -72,13 +69,8 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
 
   // Load data
   useEffect(() => {
-    if (USE_MOCK_DATA) {
-      setAccounts(getMockBankAccounts(needyPersonId))
-      setIsLoading(false)
-    } else {
-      // TODO: Real API call
-      setIsLoading(false)
-    }
+    // TODO: Real API call
+    setIsLoading(false)
   }, [needyPersonId])
 
   const columns = [
