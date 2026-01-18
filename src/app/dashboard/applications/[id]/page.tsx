@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -25,7 +25,6 @@ import {
   Save,
   User,
   Calendar,
-  DollarSign,
   AlertCircle,
   Package,
   FileCheck,
@@ -42,7 +41,7 @@ import { tr } from 'date-fns/locale'
 import { APPLICATION_TYPES, APPLICATION_STATUSES, PRIORITY_LEVELS } from '@/lib/validations/application'
 
 // Mock data flag
-const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true'
+const USE_MOCK_DATA = process.env['NEXT_PUBLIC_USE_MOCK_DATA'] === 'true'
 
 interface Application {
   id: string
@@ -95,8 +94,7 @@ const mockApplication: Application = {
 
 export default function ApplicationDetailPage() {
   const params = useParams()
-  const router = useRouter()
-  const id = params.id as string
+  const id = params['id'] as string
 
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)

@@ -1,0 +1,36 @@
+use-money-boxes.ts - Complete TanStack Query hooks for Money Box management with proper TypeScript types, caching, invalidation, and error handling
+
+# component form money-box turkish validation qr-code
+Created money-box-form.tsx - Comprehensive form component with:
+- 11 form fields with proper Turkish labels
+- React Hook Form + Zod validation
+- shadcn/ui components integration
+- Google Maps location picker
+- QR code generation on submit
+- Success dialog with QR code display
+- Mobile-responsive design
+- useCreateMoneyBox hook integration
+
+src/lib/inventory/inventory-service.ts - Complete inventory service layer with 7 services:
+- InventoryCategoryService: CRUD for categories (create, getById, getAll, update, delete)
+- InventoryItemService: CRUD for items with search, filtering, auto-code generation (ITM-YYYY-SEQ)
+- WarehouseService: CRUD for warehouses with location support
+- WarehouseLocationService: CRUD for warehouse locations (zones, aisles, shelves, bins)
+- InventoryStockService: Stock queries and management (getByItem, getByWarehouse, updateQuantity)
+- InventoryMovementService: Movement operations (receipt, issue, transfer) with auto-code (MOV-YYYY-SEQ)
+- StockAlertService: Alert management (create, checkLowStock, getAlerts, resolve)
+
+All services use Supabase client, proper error handling, TypeScript type safety, support for filtering/pagination/search, and stock quantity updates on movements.
+
+src/app/inventory/page.tsx - Complete inventory management page with:
+- 6 tabs: Stok Durumu, Ürünler, Kategoriler, Depolar, Hareketler, Uyarılar
+- Integrated components: StockList, ItemForm, CategoryForm, WarehouseForm, MovementForm, AlertsList
+- shadcn/ui Tabs, Card, Button, Dialog components
+- Statistics cards per tab
+- Add buttons with modals for each entity type
+- Turkish labels throughout
+- Responsive layout with sidebar and breadcrumbs
+- Page header with title and description
+
+Created src/app/inventory/page.tsx with complete tab-based layout integrating all inventory components (StockList, ItemForm, CategoryForm, WarehouseForm, MovementForm, AlertsList). Features include: 6 tabs with Turkish labels, statistics cards per tab, modal dialogs for add operations, responsive design, shadcn/ui components integration, Lucide icons, header with navigation, breadcrumb trail, and comprehensive layout management.
+

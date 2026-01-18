@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useMemo } from 'react'
 import { StatCard } from '@/components/common/stat-card'
 import { PageHeader } from '@/components/common/page-header'
 import {
@@ -21,11 +21,9 @@ import Link from 'next/link'
 import { useNeedyList } from '@/hooks/queries/use-needy'
 import { useApplicationsList } from '@/hooks/queries/use-applications'
 import { useDonationStats } from '@/hooks/queries/use-donations'
-import type { Application, DonationStats } from '@/types/common'
+import type { Application } from '@/types/common'
 
 export default function DashboardPage() {
-  const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month'>('month')
-  
   const { data: needyData } = useNeedyList({ limit: 5 })
   const { data: applicationsData } = useApplicationsList({ limit: 5 })
   const { data: donationStats } = useDonationStats()
@@ -80,21 +78,6 @@ export default function DashboardPage() {
   const recentApplications = useMemo(() => {
     return applicationsData?.data?.slice(0, 5) || []
   }, [applicationsData?.data])
-
-  // Memoize new applications count
-  const newApplicationsCount = useMemo(() => {
-    return applicationsData?.data?.filter((app: Application) => app.status === 'new').length || 0
-  }, [applicationsData?.data])
-
-  // Memoize completed applications count
-  const completedApplicationsCount = useMemo(() => {
-    return applicationsData?.data?.filter((app: Application) => app.status === 'completed').length || 0
-  }, [applicationsData?.data])
-
-  // Callback for period change
-  const handlePeriodChange = useCallback((period: 'today' | 'week' | 'month') => {
-    setSelectedPeriod(period)
-  }, [])
 
   return (
     <div className="space-y-8">

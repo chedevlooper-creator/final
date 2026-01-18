@@ -1,0 +1,2 @@
+Creating warehouse-form.tsx with auto-generated code (DEPO-YYYY-SEQ), Zod validation, Google Maps integration, and shadcn/ui components
+

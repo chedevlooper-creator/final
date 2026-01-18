@@ -28,14 +28,9 @@ import {
     Plus,
     Search,
     Eye,
-    User,
-    Calendar,
-    CheckCircle,
-    Clock,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
-import Link from 'next/link'
 
 // Mock data
 const mockCashAids = [

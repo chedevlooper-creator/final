@@ -1,0 +1,7 @@
+Created React hooks for inventory management at src/hooks/use-inventory.ts with TanStack Query for categories, items, warehouses, stock levels, movements, and alerts. Included proper caching, error handling, optimistic updates, pagination, and filter support.
+
+Creating inventory item form component at src/components/inventory/item-form.tsx with React Hook Form, Zod validation, auto-generated item codes (ITM-YYYY-SEQ), Turkish labels, and responsive grid layout
+
+# inventory page tabs integration
+Creating main inventory management page at src/app/inventory/page.tsx with 6 tabs: Stok Durumu, Ürünler, Kategoriler, Depolar, Hareketler, Uyarılar. Integrating existing components (StockList, ItemForm, CategoryForm, WarehouseForm, MovementForm, AlertsList) with shadcn/ui tabs, statistics cards, responsive layout, and Turkish labels.
+

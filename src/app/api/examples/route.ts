@@ -10,10 +10,8 @@ import {
   withAuth, 
   withAllPermissions,
   requireAdmin,
-  requireModerator,
-  type AuthenticatedUser 
+  requireModerator
 } from '@/lib/permission-middleware'
-import type { Permission } from '@/lib/rbac'
 
 // ============================================
 // ÖRNEK 1: Basit Auth Kontrolü

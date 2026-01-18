@@ -1,0 +1,6 @@
+# communication module task
+Creating comprehensive Communication Center module for Aid Management Panel with 6 main areas: database migrations, types, service, hooks, components, and pages. Includes template management, multi-provider support (SMS/Email), campaign scheduling, delivery tracking, and Turkish labels.
+
+# progress communication files
+Completed database migration SQL file with all 6 tables (templates, campaigns, logs, recipients, sms_settings, email_settings), RLS policies, indexes, and triggers. Created types file with 5 enums and 7 interfaces. Created service with 25+ methods for full CRUD operations and campaign management. Created hooks file with 20+ TanStack Query hooks.
+

@@ -7,7 +7,6 @@ import { useApplicationsList } from '@/hooks/queries/use-applications'
 import { PageHeader } from '@/components/common/page-header'
 import { DataTable } from '@/components/common/data-table'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -24,7 +23,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
-import { FileText, Plus, Search, MoreHorizontal, Eye, Pencil, CheckCircle } from 'lucide-react'
+import { FileText, Plus, MoreHorizontal, Eye, Pencil, CheckCircle } from 'lucide-react'
 import { ColumnDef } from '@tanstack/react-table'
 import Link from 'next/link'
 import {

@@ -1,0 +1,12 @@
+# typescript rbac security authorization
+Created src/lib/rbac.ts with comprehensive RBAC utility for Aid Management Panel. Includes:
+
+- 4 roles: ADMIN, COORDINATOR, VOLUNTEER, VIEWER
+- 54 permissions across 13 modules (dashboard, donations, needy_persons, categories, volunteers, inventory, money_boxes, projects, reports, communication, financial, users, settings, audit_logs)
+- Role-permission matrix with proper access levels
+- 7 exported functions: hasPermission, hasAnyPermission, hasAllPermissions, getRolePermissions, canAccessRoute, getRoleLabel, isValidRole, isValidPermissionFormat
+- TypeScript types: UserRole and Permission
+- Turkish labels for all roles
+- Route-permission mappings for 40+ routes
+- Comprehensive documentation and examples
+

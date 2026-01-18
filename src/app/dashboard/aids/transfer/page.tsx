@@ -32,11 +32,9 @@ import {
     Clock,
     CheckCircle,
     XCircle,
-    Send,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
-import Link from 'next/link'
 
 // Mock data
 const mockTransfers = [
@@ -192,7 +190,7 @@ export default function BankTransferPage() {
                                 </TableRow>
                             ) : (
                                 filteredTransfers.map((transfer) => {
-                                    const statusConfig = STATUS_CONFIG[transfer.status]
+                                    const statusConfig = STATUS_CONFIG[transfer.status] || { label: transfer.status, color: 'bg-gray-100 text-gray-700', icon: Clock }
                                     return (
                                         <TableRow key={transfer.id}>
                                             <TableCell>

@@ -1,0 +1,56 @@
+# service-layer money-box typescript supabase
+
+# Money Box Service Layer Implementation
+
+## File Created
+- `src/lib/money-box/money-box-service.ts`
+
+## Key Features Implemented
+
+### 1. Type Definitions
+- `MoneyBox` - Complete money box model with all fields
+- `Collection` - Collection record with money box reference
+- `Movement` - Movement record with money box reference
+- `ServiceResponse<T>` - Generic response wrapper
+- `MoneyBoxFilters` - Filter options for listing boxes
+
+### 2. CRUD Operations
+- `getAllMoneyBoxes(filters)` - List with optional filters (location, active status)
+- `getMoneyBoxById(id)` - Get single box with collections and movements
+- `createMoneyBox(data)` - Create with auto QR token generation
+- `updateMoneyBox(id, data)` - Update box details
+- `deleteMoneyBox(id)` - Soft delete with timestamp
+
+### 3. QR Code Management
+- `generateBoxQRCode(box)` - Generates 150x150px QR code data URL
+- `getBoxByQRToken(token)` - Find box by unique QR token
+- Uses crypto.randomUUID() for unique tokens
+
+### 4. Collection Operations
+- `createCollection(data)` - Record collection with validation
+- `getCollectionsByBox(boxId)` - Get collection history with pagination
+
+### 5. Movement Operations
+- `recordMovement(data)` - Record movement with location tracking
+- Validates movement type (COLLECTED, DEPOSITED, TRANSFERRED)
+
+### 6. Error Handling
+- Proper HTTP status codes (400, 404, 500)
+- Detailed error messages
+- Console logging for debugging
+- Type-safe error responses
+
+### 7. QR Code Generation
+- Uses QRCode library (qrcode npm package)
+- Generates data URL for direct UI embedding
+- Size: 150x150px (approximately 40x40mm at 96 DPI)
+- Error correction level: M
+
+## Technical Decisions
+1. **Soft Delete**: Boxes are marked deleted but retained for audit
+2. **Auto QR Token**: Generated on creation using crypto.randomUUID()
+3. **Relations**: Collections and movements fetched separately for flexibility
+4. **Pagination**: Support for limit/offset on collections
+5. **Validation**: Checks for required fields and business rules
+
+

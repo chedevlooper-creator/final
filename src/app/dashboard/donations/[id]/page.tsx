@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -22,11 +22,6 @@ import {
     ArrowLeft,
     Save,
     User,
-    Calendar,
-    CreditCard,
-    Receipt,
-    CheckCircle,
-    Clock,
 } from 'lucide-react'
 import Link from 'next/link'
 import { format } from 'date-fns'
@@ -73,12 +68,11 @@ const PAYMENT_STATUSES = [
 
 export default function DonationDetailPage() {
     const params = useParams()
-    const router = useRouter()
-    const id = params.id as string
+    const id = params['id'] as string
 
     const [isLoading, setIsLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)
-    const [donation, setDonation] = useState(mockDonation)
+    const [donation] = useState(mockDonation)
 
     useEffect(() => {
         // Simulate loading

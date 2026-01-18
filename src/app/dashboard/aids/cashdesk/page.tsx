@@ -25,18 +25,13 @@ import {
 } from '@/components/ui/select'
 import {
     Banknote,
-    Plus,
     Search,
-    Eye,
     Printer,
-    Calendar,
-    User,
     ArrowUpRight,
     ArrowDownLeft,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
-import Link from 'next/link'
 
 // Mock data
 const mockTransactions = [

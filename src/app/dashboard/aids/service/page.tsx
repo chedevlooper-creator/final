@@ -29,9 +29,6 @@ import {
     Search,
     Eye,
     Hospital,
-    Calendar,
-    CheckCircle,
-    Clock,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
@@ -187,7 +184,7 @@ export default function ServicePage() {
                                 </TableRow>
                             ) : (
                                 filteredServices.map((service) => {
-                                    const statusConfig = STATUS_CONFIG[service.status]
+                                    const statusConfig = STATUS_CONFIG[service.status] || { label: service.status, color: 'bg-gray-100 text-gray-700' }
                                     const serviceConfig = SERVICE_TYPE_CONFIG[service.service_type]
                                     return (
                                         <TableRow key={service.id}>

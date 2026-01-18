@@ -1,0 +1,146 @@
+# checklist migration verification testing
+WEBPACK TO TURBOPACK MIGRATION CHECKLIST
+
+## PRE-MIGRATION CHECKS:
+- [ ] Backup current next.config.js
+- [ ] Backup webpack.config.js
+- [ ] Backup package.json
+- [ ] Document any custom webpack loaders
+- [ ] Document any custom webpack plugins
+- [ ] List all image imports (will convert to next/image)
+- [ ] List all font imports (will convert to next/font)
+- [ ] Note any special webpack configurations
+
+## MIGRATION STEPS:
+### Phase 1: Remove Webpack Configuration
+- [ ] Delete next.config.js
+- [ ] Delete webpack.config.js
+- [ ] Remove webpack from package.json devDependencies
+- [ ] Remove webpack-cli from package.json devDependencies
+- [ ] Remove @svgr/webpack from package.json devDependencies
+- [ ] Remove webpack-bundle-analyzer from package.json devDependencies
+- [ ] Remove webpack-dev-server from package.json devDependencies
+
+### Phase 2: Create Modern Configuration
+- [ ] Create next.config.ts
+- [ ] Add TypeScript NextConfig type
+- [ ] Configure images optimization
+- [ ] Enable compression
+- [ ] Enable swcMinify (should be default)
+- [ ] Add experimental features (optimizePackageImports)
+- [ ] Test configuration file compiles
+
+### Phase 3: Update Package.json Scripts
+- [ ] Update "dev" script: add --turbo flag
+- [ ] Add "dev:legacy" script (for fallback)
+- [ ] Add "build:profile" script
+- [ ] Add "build:debug" script
+- [ ] Keep "build" script unchanged
+- [ ] Keep "start" script unchanged
+- [ ] Keep "lint" script unchanged
+
+### Phase 4: Update Image Handling
+- [ ] Find all <img> tags
+- [ ] Convert to next/image for static images
+- [ ] Add width/height props to next/image
+- [ ] Add priority prop to above-fold images
+- [ ] Update image paths if needed
+- [ ] Test images display correctly
+
+### Phase 5: Update Font Handling
+- [ ] Find all CSS @import font statements
+- [ ] Convert to next/font/google imports
+- [ ] Add font to rootLayout
+- [ ] Configure font subsets
+- [ ] Add display swap strategy
+- [ ] Test fonts load correctly
+
+### Phase 6: Update SVG Handling
+- [ ] Test SVG imports as components
+- [ ] Add SVG type definitions if needed
+- [ ] Update SVG usage (className instead of class)
+- [ ] Test SVG rendering
+- [ ] Check SVG animations work
+
+### Phase 7: Update CSS Handling
+- [ ] Verify CSS Modules work
+- [ ] Verify Tailwind CSS works
+- [ ] Verify global CSS loads
+- [ ] Test CSS-in-JS solutions (if using)
+- [ ] Check for any webpack-specific CSS loaders
+
+### Phase 8: Clean and Rebuild
+- [ ] Delete node_modules
+- [ ] Delete .next directory
+- [ ] Clear npm cache: npm cache clean --force
+- [ ] Run npm install
+- [ ] Run npm run dev (test Turbopack starts)
+- [ ] Run npm run build (test production build)
+- [ ] Check build logs for errors
+- [ ] Verify build time improved
+
+### Phase 9: Testing
+- [ ] Run all unit tests: npm test
+- [ ] Run all E2E tests: npm run test:e2e
+- [ ] Test application loads in browser
+- [ ] Test all pages render correctly
+- [ ] Test all images load
+- [ ] Test all fonts load
+- [ ] Test HMR works (modify component)
+- [ ] Test production build runs locally
+- [ ] Test bundle size is reasonable
+
+### Phase 10: Performance Verification
+- [ ] Measure dev server start time
+- [ ] Measure HMR update speed
+- [ ] Measure production build time
+- [ ] Check bundle size (should be similar or smaller)
+- [ ] Verify page load times (Lighthouse)
+- [ ] Check Core Web Vitals
+- [ ] Verify SWC minification used
+- [ ] Verify tree shaking works
+
+### Phase 11: Documentation
+- [ ] Document migration changes
+- [ ] Update README.md
+- [ ] Update team documentation
+- [ ] Create rollback guide
+- [ ] Document any workarounds
+- [ ] Share migration results with team
+
+## POST-MIGRATION VERIFICATION:
+- [ ] Dev server starts with --turbo flag
+- [ ] HMR updates are fast (<100ms)
+- [ ] Production build completes successfully
+- [ ] Production build faster than before
+- [ ] All pages load correctly
+- [ ] All images optimized
+- [ ] All fonts optimized
+- [ ] No console errors
+- [ ] Lighthouse score maintained or improved
+- [ ] Bundle size reasonable
+- [ ] TypeScript compilation works
+- [ ] ESLint passes
+- [ ] All tests pass
+
+## ROLLBACK INDICATORS:
+If any of these occur, consider rollback:
+- Dev server fails to start
+- Critical pages don't render
+- Images don't load
+- Fonts don't load
+- Build time much slower
+- Bundle size significantly larger
+- Tests fail due to build issues
+- Production errors increase
+
+## SUCCESS METRICS:
+- ✅ Dev server starts in <500ms
+- ✅ HMR updates in <100ms
+- ✅ Production build in <30s
+- ✅ Build time reduced by >50%
+- ✅ Bundle size similar or smaller
+- ✅ All tests pass
+- ✅ Lighthouse score maintained
+- ✅ No production errors
+

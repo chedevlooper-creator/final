@@ -1,0 +1,1657 @@
+Started creating production readiness documentation: 1) Production Monitoring Guide, 2) Rollback Plan, 3) Performance Budget, 4) Backup Strategy
+
+**Production Monitoring Guide (docs/monitoring/PRODUCTION-MONITORING.md)**:
+
+# Production Monitoring Guide
+
+## Overview
+Comprehensive monitoring setup for Aid Management Panel production environment.
+
+## Metrics to Track
+
+### Application Metrics
+- **Response Time**: P50 < 200ms, P95 < 500ms, P99 < 1000ms
+- **Error Rate**: < 0.1% (4xx), < 0.01% (5xx)
+- **Request Rate**: RPS, QPS tracking
+- **CPU Usage**: < 70% average, < 90% peak
+- **Memory Usage**: < 80% average, < 95% peak
+- **Active Users**: Concurrent sessions
+- **Queue Depth**: Background job queue length
+
+### Database Metrics (Supabase/PostgreSQL)
+- **Connection Pool**: Active/Idle connections (< 80% used)
+- **Query Performance**: Slow queries (> 1000ms)
+- **Database Size**: Growth trends
+- **Cache Hit Ratio**: > 95%
+- **Deadlocks**: Count per hour
+- **Transaction Duration**: P95 < 500ms
+- **Row Lock Waits**: Count and duration
+
+### Infrastructure Metrics
+- **Server Health**: CPU, Memory, Disk, Network
+- **Disk I/O**: Read/Write operations, latency
+- **Network Traffic**: In/Out bandwidth
+- **Load Average**: < 4x CPU cores
+- **SSL Certificate**: Expiry monitoring
+
+## Alert Thresholds
+
+### Critical (P0) - Immediate Response
+- Application down (> 5 min)
+- Error rate > 5%
+- Database connection failures
+- Security breach detected
+- Data corruption detected
+- RTO violated (recovery time)
+
+### High (P1) - Response within 15 min
+- P95 response time > 1000ms
+- Error rate > 1%
+- Database query performance > 2000ms
+- Memory usage > 90%
+- Disk space < 10%
+- Authentication failures > 10/min
+
+### Medium (P2) - Response within 1 hour
+- P95 response time > 500ms
+- Error rate > 0.5%
+- CPU usage > 80% (sustained)
+- Cache hit ratio < 90%
+- Slow database queries (> 1000ms)
+- Queue depth > 100
+
+### Low (P3) - Response within 4 hours
+- Gradual performance degradation
+- Minor UI issues
+- Non-critical feature failures
+
+## Dashboard Setup (Grafana)
+
+### Dashboard 1: Application Overview
+```
+- Response Time (P50, P95, P99)
+- Request Rate (RPS)
+- Error Rate (4xx, 5xx)
+- Active Users
+- CPU/Memory Usage
+```
+
+### Dashboard 2: Database Health
+```
+- Connection Pool Usage
+- Query Performance (P95, P99)
+- Cache Hit Ratio
+- Transaction Duration
+- Database Size
+- Slow Queries
+```
+
+### Dashboard 3: Infrastructure
+```
+- Server CPU/Memory/Disk
+- Network Traffic
+- Load Average
+- SSL Certificate Status
+- Uptime
+```
+
+### Dashboard 4: Business Metrics
+```
+- Active Donors
+- Active Volunteers
+- Money Boxes in Use
+- Inventory Value
+- Collections Today
+```
+
+## Incident Response Procedures
+
+### Step 1: Detection & Acknowledgement
+```bash
+# Acknowledge alert in monitoring system
+# Check severity level and assign owner
+# Create incident ticket
+
+# Example: Check system health
+curl -f http://api:3000/health || echo "Health check failed"
+```
+
+### Step 2: Initial Assessment
+```bash
+# Check application logs
+kubectl logs -f deployment/aid-panel --tail=500
+
+# Check database status
+supabase status
+
+# Check resource usage
+kubectl top pods
+kubectl top nodes
+```
+
+### Step 3: Mitigation
+```bash
+# If needed, restart services
+kubectl rollout restart deployment/aid-panel
+
+# Scale up if resource constrained
+kubectl scale deployment/aid-panel --replicas=4
+
+# Enable maintenance mode if critical
+kubectl set env deployment/aid-panel MAINTENANCE_MODE=true
+```
+
+### Step 4: Resolution & Verification
+```bash
+# Run health checks
+./scripts/health-check.sh
+
+# Verify key functionalities
+./scripts/smoke-test.sh
+
+# Monitor metrics for 30 min post-resolution
+```
+
+### Step 5: Post-Incident
+```bash
+# Create post-mortem document
+# Update runbook if needed
+# Schedule follow-up actions
+```
+
+## On-Call Rotation Setup
+
+### Rotation Structure
+- **Primary On-Call**: 1 week rotation
+- **Secondary On-Call**: Backup for 1 week
+- **Escalation Lead**: Engineering Manager
+
+### Responsibilities
+- Monitor alerts 24/7
+- Respond within SLA (P0: 5min, P1: 15min, P2: 1hr)
+- Document all incidents
+- Handoff checklist:
+  ```bash
+  # View active incidents
+  kubectl get incidents
+  
+  # Check system health
+  ./scripts/health-check.sh
+  
+  # Review recent alerts
+  ./scripts/recent-alerts.sh --hours=24
+  ```
+
+### Contact Information
+- Primary: [Phone/Slack]
+- Secondary: [Phone/Slack]
+- Escalation: [Manager/CTO]
+- Emergency: [24/7 Hotline]
+
+## Escalation Matrix
+
+### Level 1: On-Call Engineer
+**Escalate to Level 2 if:**
+- Incident unresolved after 30 min
+- Multiple systems affected
+- Unclear root cause
+
+### Level 2: Senior Engineer / Tech Lead
+**Escalate to Level 3 if:**
+- Incident unresolved after 1 hour
+- Critical business impact
+- Data loss suspected
+
+### Level 3: Engineering Manager
+**Escalate to Level 4 if:**
+- Production down > 30 min
+- Security breach confirmed
+- Legal/Compliance issue
+
+### Level 4: CTO / Executive Team
+**Trigger for:**
+- Extended outage > 2 hours
+- Major data breach
+- PR crisis
+
+## Monitoring Commands
+
+```bash
+# Health check
+curl -f http://api:3000/health
+
+# Check Prometheus metrics
+curl http://prometheus:9090/api/v1/query?query=up
+
+# Database performance
+supabase db inspect --slow-queries
+
+# Application logs with errors
+kubectl logs -f deployment/aid-panel | grep ERROR
+
+# Resource usage
+kubectl top pods -l app=aid-panel
+
+# Alert status
+./scripts/check-alerts.sh
+```
+
+## Runbooks
+
+### High CPU Usage
+```bash
+# Identify cause
+kubectl top pods
+kubectl logs deployment/aid-panel --tail=1000
+
+# Actions
+1. Scale horizontally: kubectl scale --replicas=4
+2. Check for memory leaks
+3. Review recent deployments
+4. Profile application
+```
+
+### Database Slow Queries
+```bash
+# Identify slow queries
+supabase db inspect --slow-queries --threshold=1000
+
+# Actions
+1. Add indexes to slow query columns
+2. Optimize query structure
+3. Increase connection pool if needed
+4. Consider read replicas
+```
+
+### Memory Issues
+```bash
+# Check memory usage
+kubectl top pods
+
+# Actions
+1. Restart deployment: kubectl rollout restart
+2. Increase memory limits
+3. Check for memory leaks
+4. Review caching strategy
+```
+
+## Notification Channels
+
+- **P0/P1**: PagerDuty + Slack + Phone call
+- **P2**: Slack + Email
+- **P3**: Email only
+- **Weekly Summary**: Slack digest
+- **Monthly Report**: Email to stakeholders
+
+**Rollback Plan (docs/emergency/ROLLBACK-PLAN.md)**:
+
+# Rollback Plan
+
+## Overview
+Emergency rollback procedures for Aid Management Panel production environment.
+
+## Rollback Scenarios
+
+### Scenario 1: Database Corruption
+**Symptoms:**
+- Data integrity errors
+- Missing/incorrect records
+- Query failures
+
+**Recovery Strategy:**
+1. Identify corruption extent
+2. Restore from most recent clean backup
+3. Replay transaction logs if available
+4. Verify data integrity
+
+**Rollback Procedure:**
+```bash
+# Step 1: Stop application writes
+kubectl set env deployment/aid-panel MAINTENANCE_MODE=true
+kubectl scale deployment/aid-panel --replicas=0
+
+# Step 2: Identify last good backup
+ls -lh /backups/database/ | grep -E "db_backup_.*sql.gz"
+
+# Step 3: Restore database
+supabase db restore --file=/backups/database/db_backup_20260117_0800.sql.gz
+
+# Step 4: Verify data integrity
+supabase db inspect --check-integrity
+./scripts/verify-data.sh
+
+# Step 5: Restart application
+kubectl scale deployment/aid-panel --replicas=3
+kubectl set env deployment/aid-panel MAINTENANCE_MODE=false
+kubectl rollout status deployment/aid-panel
+```
+
+**RTO:** 30 minutes
+**RPO:** 15 minutes (last backup)
+
+### Scenario 2: Deployment Failure
+**Symptoms:**
+- Application crashes on startup
+- Critical feature failures
+- Performance degradation > 50%
+
+**Recovery Strategy:**
+1. Identify problematic deployment
+2. Roll back to previous stable version
+3. Verify functionality
+4. Investigate root cause
+
+**Rollback Procedure:**
+```bash
+# Step 1: Check deployment history
+kubectl rollout history deployment/aid-panel
+
+# Step 2: Identify last stable version
+kubectl rollout history deployment/aid-panel --revision=10
+
+# Step 3: Rollback immediately
+kubectl rollout undo deployment/aid-panel --to-revision=10
+
+# Step 4: Verify rollout
+kubectl rollout status deployment/aid-panel
+
+# Step 5: Run smoke tests
+./scripts/smoke-test.sh
+
+# Step 6: Monitor metrics
+./scripts/monitor-metrics.sh --duration=15
+```
+
+**Rollback Command (One-liner):**
+```bash
+kubectl rollout undo deployment/aid-panel && kubectl rollout status deployment/aid-panel && ./scripts/smoke-test.sh
+```
+
+**RTO:** 5 minutes
+**RPO:** 0 minutes (no data loss)
+
+### Scenario 3: Security Breach
+**Symptoms:**
+- Unauthorized access detected
+- Data exfiltration suspected
+- Malware detected
+
+**Recovery Strategy:**
+1. Isolate affected systems
+2. Preserve forensic evidence
+3. Restore from pre-breach backup
+4. Patch vulnerabilities
+5. Audit all access logs
+
+**Rollback Procedure:**
+```bash
+# Step 1: IMMEDIATE ISOLATION
+kubectl scale deployment/aid-panel --replicas=0
+kubectl scale deployment/supabase --replicas=0
+
+# Step 2: Preserve evidence
+./scripts/preserve-forensics.sh --output=/forensics/breach_$(date +%Y%m%d_%H%M%S)
+
+# Step 3: Rotate all credentials
+./scripts/rotate-secrets.sh --all
+
+# Step 4: Restore from pre-breach backup
+# Determine breach time from logs
+BREACH_TIME="2026-01-17 18:00:00"
+BACKUP_FILE="/backups/database/db_backup_20260117_1600.sql.gz"
+supabase db restore --file=$BACKUP_FILE
+
+# Step 5: Apply security patches
+./scripts/apply-security-patches.sh
+
+# Step 6: Verify no backdoors
+./scripts/security-scan.sh --full
+
+# Step 7: Gradual restart
+kubectl scale deployment/aid-panel --replicas=1
+./scripts/health-check.sh
+kubectl scale deployment/aid-panel --replicas=3
+```
+
+**RTO:** 2 hours
+**RPO:** 4 hours (pre-breach backup)
+
+**Security Response:**
+```bash
+# Audit all recent access
+supabase db exec "SELECT * FROM audit_logs WHERE created_at > NOW() - INTERVAL '24 hours';"
+
+# Check for new admin users
+supabase db exec "SELECT * FROM profiles WHERE role = 'admin' AND created_at > NOW() - INTERVAL '24 hours';"
+
+# Verify no unauthorized changes
+./scripts/security-audit.sh
+```
+
+## Data Recovery Strategies
+
+### Database Point-in-Time Recovery
+```bash
+# List available backups
+supabase db backups list
+
+# Restore to specific point
+supabase db restore --to="2026-01-17 14:30:00" --file=latest_backup.sql.gz
+```
+
+### Selective Data Recovery
+```bash
+# Restore specific tables
+supabase db exec -f /backups/restore_donors_table.sql
+
+# Verify restored data
+supabase db exec "SELECT COUNT(*) FROM donors;"
+```
+
+### Data Verification
+```bash
+#!/bin/bash
+# scripts/verify-data.sh
+
+echo "Verifying data integrity..."
+
+# Check row counts
+supabase db exec "
+SELECT 
+  'donors' as table_name, COUNT(*) as count FROM donors
+UNION ALL SELECT 'volunteers', COUNT(*) FROM volunteers
+UNION ALL SELECT 'money_boxes', COUNT(*) FROM money_boxes
+UNION ALL SELECT 'inventory_items', COUNT(*) FROM inventory_items;
+"
+
+# Check data consistency
+supabase db exec "
+SELECT COUNT(*) FROM inventory_movements 
+WHERE item_id NOT IN (SELECT id FROM inventory_items);
+"
+
+# Check referential integrity
+supabase db exec "
+SELECT COUNT(*) FROM collections 
+WHERE money_box_id NOT IN (SELECT id FROM money_boxes);
+"
+
+echo "Data verification complete"
+```
+
+## Communication Plan
+
+### Internal Stakeholders
+**Timeline: Immediate**
+- **Engineering Team**: Slack #incidents
+- **Product Team**: Email + Slack
+- **Support Team**: Email for customer inquiries
+
+**Template:**
+```
+URGENT: Production Incident - [INCIDENT-ID]
+
+Severity: [P0/P1/P2/P3]
+Status: [Investigating/Mitigated/Resolved]
+Impact: [Description]
+Current Action: [What we're doing]
+ETA: [Estimated resolution]
+Next Update: [Time]
+```
+
+### External Users
+**Timeline: Within 15 minutes for P0/P1**
+
+**Template (Turkish):**
+```
+⚠️ SİSTEM BAKIM DUYURUSU
+
+Değerli kullanıcılarımız,
+
+Şu anda teknik bir sorun yaşıyoruz. 
+Ekiplerimiz sorunu inceliyor ve çözüyor.
+
+Tahmini çözüm süresi: [X] dakika
+
+Verileriniz güvende. Anlayışınız için teşekkürler.
+
+Aid Management Panel Ekibi
+```
+
+### Executive Communication
+**Timeline: Within 30 minutes for P0**
+
+**Template:**
+```
+EXECUTIVE SUMMARY - Production Incident
+
+Incident ID: INC-2026-001
+Severity: P0 - Critical
+Start Time: [Timestamp]
+Impact: [Users affected, Revenue impact]
+Root Cause: [Brief description]
+Resolution: [Actions taken]
+Prevention: [Future measures]
+Business Impact: [Financial/Reputation]
+```
+
+## Post-Mortem Process
+
+### Post-Mortem Template
+```markdown
+# Incident Post-Mortem: [INCIDENT-ID]
+
+## Summary
+[One-paragraph executive summary]
+
+## Timeline
+- **00:00** - Incident detected
+- **00:05** - Initial investigation started
+- **00:15** - Root cause identified
+- **00:30** - Mitigation implemented
+- **01:00** - Incident resolved
+
+## Root Cause Analysis
+- **Primary Cause**: [What happened]
+- **Contributing Factors**: [Why it happened]
+- **Detection**: [How we found it]
+
+## Impact Assessment
+- **Users Affected**: [Number]
+- **Duration**: [Time]
+- **Data Loss**: [Yes/No - Details]
+- **Financial Impact**: [If applicable]
+
+## Resolution Steps
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
+
+## Action Items
+- [ ] [Owner] - Action item 1 - Due date
+- [ ] [Owner] - Action item 2 - Due date
+
+## Prevention Measures
+- [ ] [Owner] - Monitor addition - Due date
+- [ ] [Owner] - Process change - Due date
+- [ ] [Owner] - Code change - Due date
+
+## Lessons Learned
+- [What went well]
+- [What could be improved]
+- [Knowledge gaps]
+
+## Follow-Up
+- Review date: [Date]
+- Metric to track: [KPI]
+```
+
+### Post-Mortem Meeting
+- **Timeline**: Within 5 business days
+- **Attendees**: Engineering, Product, Support
+- **Duration**: 60 minutes
+- **Output**: Action items with owners and due dates
+
+## Rollback Verification Checklist
+
+```bash
+#!/bin/bash
+# scripts/rollback-verify.sh
+
+echo "Rollback Verification Checklist"
+echo "================================"
+
+# 1. Application Health
+echo "[1/10] Checking application health..."
+curl -f http://api:3000/health || exit 1
+
+# 2. Database Connectivity
+echo "[2/10] Checking database connectivity..."
+supabase status || exit 1
+
+# 3. Critical Endpoints
+echo "[3/10] Testing critical endpoints..."
+./scripts/smoke-test.sh || exit 1
+
+# 4. Data Integrity
+echo "[4/10] Verifying data integrity..."
+supabase db exec "SELECT COUNT(*) FROM donors;" > /dev/null || exit 1
+
+# 5. Authentication
+echo "[5/10] Testing authentication..."
+curl -X POST http://api:3000/auth/login -d '{"email":"test@test.com","password":"test"}' || exit 1
+
+# 6. Performance Baselines
+echo "[6/10] Checking performance..."
+./scripts/performance-check.sh || exit 1
+
+# 7. Error Rates
+echo "[7/10] Checking error rates..."
+./scripts/check-errors.sh --threshold=0.1 || exit 1
+
+# 8. Resource Usage
+echo "[8/10] Checking resource usage..."
+kubectl top pods || exit 1
+
+# 9. Background Jobs
+echo "[9/10] Verifying background jobs..."
+kubectl get jobs || exit 1
+
+# 10. Security Checks
+echo "[10/10] Running security checks..."
+./scripts/quick-security-scan.sh || exit 1
+
+echo "All checks passed! Rollback verified."
+```
+
+## Lessons Learned Template
+
+```markdown
+# Lessons Learned: [INCIDENT-TITLE]
+
+## What Happened
+[Brief description of the incident]
+
+## Timeline of Events
+| Time | Event | Owner |
+|------|-------|-------|
+| 00:00 | Detection | [Name] |
+| 00:05 | Investigation started | [Name] |
+| 00:15 | Root cause identified | [Name] |
+| 00:30 | Mitigation implemented | [Name] |
+| 01:00 | Resolution confirmed | [Name] |
+
+## What Went Well
+- [Positive aspect 1]
+- [Positive aspect 2]
+
+## What Could Be Improved
+- [Improvement area 1]
+- [Improvement area 2]
+
+## Action Items
+| # | Action | Owner | Priority | Due Date |
+|---|--------|-------|----------|----------|
+| 1 | [Description] | [Name] | [P1/P2/P3] | [Date] |
+| 2 | [Description] | [Name] | [P1/P2/P3] | [Date] |
+
+## Prevention Measures
+- [Measure 1]
+- [Measure 2]
+
+## Follow-Up
+- Review date: [Date]
+- Success metric: [KPI]
+```
+
+**Performance Budget (docs/performance/PERFORMANCE-BUDGET.md)**:
+
+# Performance Budget
+
+## Overview
+Performance targets and resource budgets for Aid Management Panel production environment.
+
+## Core Web Vitals Targets
+
+### First Contentful Paint (FCP)
+- **Target**: < 1.5 seconds
+- **Current**: 1.2 seconds
+- **Measurement**: Lighthouse, Web Vitals
+- **Budget Alert**: > 1.8 seconds (20% buffer)
+
+```bash
+# Measure FCP
+npx lighthouse http://localhost:3000 --view --only-categories=performance --output=json
+
+# CI Check
+if FCP > 1.8; then
+  echo "Performance budget exceeded: FCP = $FCP"
+  exit 1
+fi
+```
+
+### Largest Contentful Paint (LCP)
+- **Target**: < 2.5 seconds
+- **Current**: 2.1 seconds
+- **Measurement**: Lighthouse, Web Vitals
+- **Budget Alert**: > 3.0 seconds (20% buffer)
+
+### Time to Interactive (TTI)
+- **Target**: < 3.5 seconds
+- **Current**: 3.0 seconds
+- **Measurement**: Lighthouse
+- **Budget Alert**: > 4.2 seconds (20% buffer)
+
+### Total Blocking Time (TBT)
+- **Target**: < 200 milliseconds
+- **Current**: 150 milliseconds
+- **Measurement**: Lighthouse
+- **Budget Alert**: > 240 milliseconds (20% buffer)
+
+### Cumulative Layout Shift (CLS)
+- **Target**: < 0.1
+- **Current**: 0.05
+- **Measurement**: Web Vitals
+- **Budget Alert**: > 0.12 (20% buffer)
+
+### First Input Delay (FID)
+- **Target**: < 100 milliseconds
+- **Current**: 50 milliseconds
+- **Measurement**: Web Vitals
+- **Budget Alert**: > 120 milliseconds (20% buffer)
+
+## Bundle Size Limits
+
+### Initial Page Load
+- **JavaScript**: < 200 KB (gzipped)
+- **CSS**: < 50 KB (gzipped)
+- **Total**: < 250 KB (gzipped)
+
+### Per-Route Budgets
+```javascript
+// next.config.js
+module.exports = {
+  experimental: {
+    optimizePackageImports: ['@radix-ui/react-icons']
+  }
+}
+
+// Budget thresholds (gzip)
+const BUDGETS = {
+  '/dashboard': { js: 150, css: 30 },
+  '/inventory': { js: 180, css: 40 },
+  '/money-boxes': { js: 160, css: 35 },
+  '/volunteers': { js: 170, css: 38 },
+  '/reporting': { js: 200, css: 45 } // Charts library
+}
+```
+
+### Bundle Analysis
+```bash
+# Analyze bundle sizes
+npx @next/bundle-analyzer
+
+# Check current sizes
+npm run build -- --profile
+
+# CI Bundle size check
+#!/bin/bash
+# scripts/check-bundle-size.sh
+
+BUNDLE_SIZE=$(cat .next/analyze.js | gzip | wc -c)
+MAX_SIZE=204800  # 200 KB in bytes
+
+if [ $BUNDLE_SIZE -gt $MAX_SIZE ]; then
+  echo "Bundle size exceeds budget: $(($BUNDLE_SIZE / 1024)) KB"
+  exit 1
+fi
+```
+
+### Code Splitting Strategy
+```javascript
+// Dynamic imports for heavy components
+const ChartComponent = dynamic(() => import('./charts/ChartComponent'), {
+  loading: () => <ChartSkeleton />
+})
+
+const MapPicker = dynamic(() => import('./maps/MapPicker'), {
+  loading: () => <MapSkeleton />
+})
+
+// Route-based splitting
+// Next.js 14 automatically splits by route
+```
+
+## API Response Time Limits
+
+### Endpoint Performance Targets
+```javascript
+// API Response Time Budgets (P95)
+const API_BUDGETS = {
+  // Authentication
+  'POST /api/auth/login': 500,
+  'POST /api/auth/refresh': 200,
+  
+  // Donors
+  'GET /api/donors': 300,
+  'GET /api/donors/:id': 200,
+  'POST /api/donors': 500,
+  
+  // Volunteers
+  'GET /api/volunteers': 300,
+  'GET /api/volunteers/:id': 200,
+  'POST /api/volunteers': 500,
+  
+  // Inventory
+  'GET /api/inventory/items': 400, // Includes joins
+  'GET /api/inventory/stock': 300,
+  'POST /api/inventory/movements': 500,
+  
+  // Money Boxes
+  'GET /api/money-boxes': 300,
+  'GET /api/money-boxes/:id': 250,
+  'POST /api/money-boxes/collections': 500,
+  
+  // Reporting (Heavy queries)
+  'GET /api/reports/donations': 2000,
+  'GET /api/reports/volunteers': 2000,
+  'GET /api/reports/inventory': 2000,
+  'POST /api/reports/export': 5000  // PDF/Excel generation
+}
+```
+
+### API Monitoring
+```bash
+# Check API performance
+#!/bin/bash
+# scripts/check-api-performance.sh
+
+for endpoint in "${!API_BUDGETS[@]}"; do
+  budget=${API_BUDGETS[$endpoint]}
+  start=$(date +%s%N)
+  
+  # Make request
+  response=$(curl -s -w "\n%{http_code}" -X GET "http://localhost:3000$endpoint")
+  http_code=$(echo "$response" | tail -n1)
+  
+  end=$(date +%s%N)
+  duration=$((($end - $start) / 1000000))  # Convert to ms
+  
+  if [ $duration -gt $budget ]; then
+    echo "❌ $endpoint: ${duration}ms (budget: ${budget}ms)"
+  else
+    echo "✅ $endpoint: ${duration}ms"
+  fi
+done
+```
+
+## Database Query Limits
+
+### Query Performance Budgets
+```sql
+-- Query Time Limits (P95)
+SELECT 
+  query_type,
+  percentile_cont(0.95) WITHIN GROUP (ORDER BY duration_ms) as p95_ms
+FROM query_performance_log
+WHERE timestamp > NOW() - INTERVAL '1 hour'
+GROUP BY query_type;
+
+-- Targets
+-- Simple SELECT by ID: < 50ms
+-- SELECT with joins: < 100ms
+-- SELECT with aggregations: < 500ms
+-- INSERT operations: < 100ms
+-- UPDATE operations: < 100ms
+-- DELETE operations: < 100ms
+-- Complex reports: < 2000ms
+```
+
+### Query Optimization Rules
+```bash
+# Identify slow queries
+supabase db inspect --slow-queries --threshold=100
+
+# Query analysis script
+#!/bin/bash
+# scripts/analyze-queries.sh
+
+echo "Analyzing database queries..."
+
+# Check query performance
+supabase db exec "
+SELECT 
+  schemaname,
+  tablename,
+  attname as column_name,
+  n_distinct,
+  correlation
+FROM pg_stats
+WHERE schemaname = 'public'
+ORDER BY n_distinct DESC;
+"
+
+# Check missing indexes
+supabase db exec "
+SELECT 
+  schemaname,
+  tablename,
+  attname,
+  n_distinct,
+  correlation
+FROM pg_stats
+WHERE schemaname = 'public' 
+  AND n_distinct > 100
+  AND attname NOT IN (
+    SELECT indexname FROM pg_indexes
+  );
+"
+```
+
+### N+1 Query Prevention
+```typescript
+// ❌ BAD: N+1 queries
+const donors = await db.query('donors');
+for (const donor of donors) {
+  const donations = await db.query('donations', { donorId: donor.id });
+  donor.donations = donations;
+}
+
+// ✅ GOOD: Single query with joins
+const donors = await db.query(`
+  SELECT d.*, 
+    json_agg(
+      json_build_object('id', don.id, 'amount', don.amount)
+    ) as donations
+  FROM donors d
+  LEFT JOIN donations don ON don.donor_id = d.id
+  GROUP BY d.id
+`);
+```
+
+## Resource Utilization Limits
+
+### CPU Usage
+```javascript
+// CPU Budget: Single core
+// - Normal operation: < 50%
+// - Peak load: < 70%
+// - Alert threshold: > 80% for 5 min
+// - Critical: > 90% for 2 min
+
+// Monitoring
+const cpuBudget = {
+  normal: 50,    // Percent
+  peak: 70,      // Percent
+  alert: 80,     // Percent (5 min)
+  critical: 90   // Percent (2 min)
+}
+```
+
+### Memory Usage
+```javascript
+// Memory Budget: Per container
+// - Normal operation: < 512 MB
+// - Peak load: < 768 MB
+// - Alert threshold: > 900 MB
+// - Container limit: 1 GB
+
+const memoryBudget = {
+  normal: 512,    // MB
+  peak: 768,      // MB
+  alert: 900,     // MB
+  limit: 1024     // MB (hard limit)
+}
+
+// Kubernetes limits
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "500m"
+  limits:
+    memory: "1Gi"
+    cpu: "1000m"
+```
+
+### Database Connections
+```javascript
+// Connection Pool Budget
+const connectionBudget = {
+  maxConnections: 50,        // Per instance
+  idleConnections: 10,       // Keep alive
+  alertThreshold: 40,        // 80% usage
+  criticalThreshold: 45      // 90% usage
+}
+
+// Supabase configuration
+DATABASE_URL="postgresql://user:pass@host:5432/db?pooler=true&connection_limit=50"
+```
+
+## Performance Monitoring Commands
+
+```bash
+# Web Vitals measurement
+npx vitest run src/tests/performance/web-vitals.test.ts
+
+# Bundle size check
+npm run build && npx bundle-wizard ./dist
+
+# API performance test
+npm run test:performance
+
+# Database query analysis
+supabase db inspect --slow-queries
+
+# Full performance audit
+./scripts/performance-audit.sh
+```
+
+## Performance Budget Enforcement
+
+### CI/CD Integration
+```yaml
+# .github/workflows/performance.yml
+name: Performance Budget
+
+on: [pull_request]
+
+jobs:
+  check-budget:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Bundle Size
+        run: |
+          npm run build
+          npx bundlesize
+
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli
+          lhci autorun
+```
+
+### Bundle Size Configuration
+```json
+// package.json
+{
+  "bundlesize": [
+    {
+      "path": "./dist/js/*.js",
+      "maxSize": "200 kB"
+    },
+    {
+      "path": "./dist/css/*.css",
+      "maxSize": "50 kB"
+    }
+  ]
+}
+```
+
+## Performance Regression Detection
+
+```bash
+# Baseline comparison script
+#!/bin/bash
+# scripts/performance-regression.sh
+
+# Load baseline
+BASELINE_FCP=$(cat baseline.json | jq '.performance.fcp')
+BASELINE_LCP=$(cat baseline.json | jq '.performance.lcp')
+
+# Measure current
+CURRENT_FCP=$(npx lighthouse --output=json | jq '.audits["first-contentful-paint"].numericValue')
+CURRENT_LCP=$(npx lighthouse --output=json | jq '.audits["largest-contentful-paint"].numericValue')
+
+# Check for regression (20% threshold)
+FCP_REGRESSION=$(echo "$CURRENT_FCP > $BASELINE_FCP * 1.2" | bc -l)
+
+if [ "$FCP_REGRESSION" -eq 1 ]; then
+  echo "Performance regression detected: FCP increased by > 20%"
+  exit 1
+fi
+```
+
+## Optimization Checklist
+
+- [ ] Code splitting implemented
+- [ ] Tree shaking enabled
+- [ ] Image optimization (WebP, lazy loading)
+- [ ] Font optimization (subsetting, preload)
+- [ ] CDN configured for static assets
+- [ ] Database indexes optimized
+- [ ] Query caching implemented (Redis)
+- [ ] API response compression enabled
+- [ ] Browser caching headers configured
+- [ ] Minification enabled (JS/CSS)
+
+**Backup Strategy (docs/backup/BACKUP-STRATEGY.md)**:
+
+# Backup Strategy
+
+## Overview
+Comprehensive backup and recovery strategy for Aid Management Panel production environment.
+
+## Database Backup Schedule
+
+### Automated Backups
+
+**Daily Full Backups**
+- **Schedule**: 02:00 AM UTC (9:00 PM Turkey)
+- **Retention**: 30 days
+- **Format**: Compressed SQL dump (.sql.gz)
+- **Location**: Primary (S3), Secondary (GCS)
+
+```bash
+#!/bin/bash
+# scripts/backup-db.sh
+
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/database"
+BACKUP_FILE="db_backup_${DATE}.sql.gz"
+
+echo "Starting database backup: $DATE"
+
+# Create backup directory
+mkdir -p $BACKUP_DIR
+
+# Dump database
+supabase db dump --compress --file=$BACKUP_DIR/$BACKUP_FILE
+
+# Upload to S3
+aws s3 cp $BACKUP_DIR/$BACKUP_FILE s3://aid-panel-backups/database/$BACKUP_FILE
+
+# Upload to GCS (secondary)
+gsutil cp $BACKUP_DIR/$BACKUP_FILE gs://aid-panel-backups/database/$BACKUP_FILE
+
+# Log backup
+echo "$(date): Backup completed: $BACKUP_FILE" >> /var/log/backups.log
+
+# Cleanup old backups (> 30 days)
+find $BACKUP_DIR -name "db_backup_*.sql.gz" -mtime +30 -delete
+
+# Verify backup
+if [ -f "$BACKUP_DIR/$BACKUP_FILE" ]; then
+  echo "Backup verified successfully"
+else
+  echo "Backup verification failed" >&2
+  exit 1
+fi
+```
+
+**Hourly Incremental Backups**
+- **Schedule**: Every hour at :00
+- **Retention**: 7 days
+- **Format**: WAL (Write-Ahead Logs)
+- **Location**: Local + S3
+
+```bash
+#!/bin/bash
+# scripts/backup-incremental.sh
+
+DATE=$(date +%Y%m%d_%H%M%S)
+WAL_DIR="/backups/wal"
+
+# Archive WAL files
+supabase db wal-archive --output=$WAL_DIR/wal_$DATE.tar.gz
+
+# Upload to S3
+aws s3 cp $WAL_DIR/wal_$DATE.tar.gz s3://aid-panel-backups/wal/
+
+# Cleanup old WAL files (> 7 days)
+find $WAL_DIR -name "wal_*.tar.gz" -mtime +7 -delete
+```
+
+### On-Demand Backups
+
+**Pre-Deployment Backups**
+```bash
+#!/bin/bash
+# scripts/backup-before-deploy.sh
+
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_FILE="pre_deploy_${DATE}.sql.gz"
+
+echo "Creating pre-deployment backup..."
+
+# Backup
+supabase db dump --compress --file=/backups/deployment/$BACKUP_FILE
+
+# Upload to deployment bucket
+aws s3 cp /backups/deployment/$BACKUP_FILE s3://aid-panel-deployments/$BACKUP_FILE
+
+# Tag deployment
+aws s3api put-object-tagging \
+  --bucket aid-panel-deployments \
+  --key $BACKUP_FILE \
+  --tagging 'TagSet=[{Key=DeploymentType,Value=Pre}]'
+```
+
+**Manual Backup Command**
+```bash
+# Trigger immediate backup
+./scripts/backup-db.sh
+
+# With custom name
+supabase db dump --compress --file=/backups/manual/custom_backup.sql.gz
+```
+
+## Recovery Time Objective (RTO)
+
+### RTO Targets
+
+**Critical Systems**
+- **Database**: 30 minutes
+- **Application**: 15 minutes
+- **Authentication**: 10 minutes
+
+**Non-Critical Systems**
+- **Reporting**: 4 hours
+- **Analytics**: 8 hours
+- **Archived Data**: 24 hours
+
+### RTO Achievement Strategy
+
+```bash
+#!/bin/bash
+# scripts/restore-db.sh
+
+# Start time
+START_TIME=$(date +%s)
+
+# Step 1: Stop application (2 min)
+echo "Stopping application..."
+kubectl scale deployment/aid-panel --replicas=0
+
+# Step 2: Download backup (5 min)
+echo "Downloading backup..."
+aws s3 cp s3://aid-panel-backups/database/db_backup_20260117_0200.sql.gz /tmp/
+
+# Step 3: Restore database (15 min)
+echo "Restoring database..."
+supabase db restore --file=/tmp/db_backup_20260117_0200.sql.gz
+
+# Step 4: Verify data (5 min)
+echo "Verifying data..."
+./scripts/verify-data.sh
+
+# Step 5: Restart application (3 min)
+echo "Restarting application..."
+kubectl scale deployment/aid-panel --replicas=3
+kubectl rollout status deployment/aid-panel
+
+# Step 6: Health check (5 min)
+echo "Running health checks..."
+./scripts/health-check.sh
+
+# Calculate RTO
+END_TIME=$(date +%s)
+RTO=$((END_TIME - START_TIME))
+
+echo "Recovery completed in $RTO seconds"
+
+# Alert if RTO exceeded
+if [ $RTO -gt 1800 ]; then  # 30 minutes
+  echo "WARNING: RTO exceeded (30 min target)"
+fi
+```
+
+## Recovery Point Objective (RPO)
+
+### RPO Targets
+
+**Critical Data**
+- **Donors**: 15 minutes
+- **Volunteers**: 15 minutes
+- **Money Boxes**: 15 minutes
+- **Inventory**: 15 minutes
+
+**Transactional Data**
+- **Collections**: 1 hour
+- **Donations**: 1 hour
+- **Inventory Movements**: 1 hour
+
+**Reporting Data**
+- **Analytics**: 24 hours
+- **Historical Reports**: 7 days
+
+### RPO Achievement Strategy
+
+**Real-Time Replication**
+```bash
+# Enable streaming replication
+supabase replication create --name=standby --host=standby-db.internal
+
+# Monitor replication lag
+supabase replication status --watch
+
+# Alert if lag > 5 minutes
+if [ $(replication_lag) -gt 300 ]; then
+  echo "Replication lag exceeds RPO target"
+fi
+```
+
+**Point-in-Time Recovery**
+```sql
+-- Enable PITR in PostgreSQL
+ALTER SYSTEM SET wal_level = replica;
+ALTER SYSTEM SET archive_mode = on;
+ALTER SYSTEM SET archive_command = 'aws s3 cp %p s3://aid-panel-backups/wal/%f';
+
+-- Reload configuration
+SELECT pg_reload_conf();
+
+-- Restore to specific point
+supabase db restore --to="2026-01-17 14:30:00" --file=latest_backup.sql.gz
+```
+
+## Backup Retention Policy
+
+### Retention Schedule
+
+**Database Backups**
+- **Hourly**: 7 days (168 files)
+- **Daily**: 30 days (30 files)
+- **Weekly**: 12 weeks (12 files)
+- **Monthly**: 12 months (12 files)
+- **Yearly**: 7 years (7 files)
+
+**Total Storage Estimate**
+```
+Hourly: 168 × 50 MB = 8.4 GB
+Daily: 30 × 500 MB = 15 GB
+Weekly: 12 × 2 GB = 24 GB
+Monthly: 12 × 10 GB = 120 GB
+Yearly: 7 × 50 GB = 350 GB
+Total: ~517 GB
+```
+
+### Automated Retention
+
+```bash
+#!/bin/bash
+# scripts/retention-policy.sh
+
+# Cleanup hourly backups (> 7 days)
+find /backups/hourly -name "db_backup_*.sql.gz" -mtime +7 -delete
+
+# Cleanup daily backups (> 30 days), keep first of month
+find /backups/daily -name "db_backup_*.sql.gz" -mtime +30 ! -name "db_backup_01_*" -delete
+
+# Cleanup weekly backups (> 12 weeks)
+find /backups/weekly -name "weekly_backup_*.sql.gz" -mtime +84 -delete
+
+# Cleanup monthly backups (> 12 months)
+find /backups/monthly -name "monthly_backup_*.sql.gz" -mtime +365 -delete
+
+# Log cleanup
+echo "$(date): Retention policy executed" >> /var/log/backups.log
+```
+
+## Disaster Recovery Plan
+
+### Disaster Scenarios
+
+**Scenario 1: Complete Datacenter Failure**
+```bash
+#!/bin/bash
+# scripts/disaster-recovery-datacenter.sh
+
+echo "Executing datacenter disaster recovery..."
+
+# Step 1: Activate disaster recovery environment
+aws ec2 start-instances --instance-ids i-dr-primary
+
+# Step 2: Route DNS to DR site
+aws route53 change-resource-record-sets \
+  --hosted-zone-id Z1234567890ABC \
+  --change-batch file://dns-dr.json
+
+# Step 3: Restore from latest backup
+aws s3 cp s3://aid-panel-backups/database/latest.sql.gz /tmp/
+supabase db restore --file=/tmp/latest.sql.gz
+
+# Step 4: Verify and monitor
+./scripts/verify-data.sh
+./scripts/monitor-dr.sh --duration=60
+
+echo "Disaster recovery completed"
+```
+
+**Scenario 2: Database Corruption**
+```bash
+#!/bin/bash
+# scripts/disaster-recovery-corruption.sh
+
+echo "Recovering from database corruption..."
+
+# Step 1: Identify corruption point
+CORRUPTION_LOG="/var/log/db_corruption.log"
+
+# Step 2: Restore from last known good backup
+LAST_GOOD_BACKUP=$(grep "GOOD_BACKUP" $CORRUPTION_LOG | tail -1 | awk '{print $2}')
+supabase db restore --file=$LAST_GOOD_BACKUP
+
+# Step 3: Replay WAL files to recovery point
+supabase db wal-replay --until="2026-01-17 18:00:00"
+
+# Step 4: Verify data integrity
+supabase db inspect --check-integrity
+
+echo "Database recovery completed"
+```
+
+**Scenario 3: Ransomware Attack**
+```bash
+#!/bin/bash
+# scripts/disaster-recovery-ransomware.sh
+
+echo "Executing ransomware recovery..."
+
+# Step 1: Isolate infected systems
+aws ec2 stop-instances --instance-ids i-primary-1 i-primary-2
+
+# Step 2: Spin up clean infrastructure
+terraform apply -var="environment=clean_recover"
+
+# Step 3: Restore from pre-infection backup
+aws s3 cp s3://aid-panel-backups/offline/db_clean_backup.sql.gz /tmp/
+supabase db restore --file=/tmp/db_clean_backup.sql.gz
+
+# Step 4: Security scan
+./scripts/security-scan.sh --full
+
+# Step 5: Change all credentials
+./scripts/rotate-secrets.sh --all
+
+# Step 6: Gradual restoration
+kubectl scale deployment/aid-panel --replicas=1
+./scripts/health-check.sh
+kubectl scale deployment/aid-panel --replicas=3
+
+echo "Ransomware recovery completed"
+```
+
+## Multi-Region Backup Strategy
+
+### Primary Region: eu-west-1 (Ireland)
+- **Active application**
+- **Primary database**
+- **Real-time backups**
+
+### Secondary Region: eu-central-1 (Frankfurt)
+- **Standby application**
+- **Read replica database**
+- **Replicated backups**
+
+### Backup Replication
+
+```bash
+#!/bin/bash
+# scripts/replicate-backups.sh
+
+# Replicate backups to secondary region
+for backup in $(aws s3 ls s3://aid-panel-backups/database/ | awk '{print $2}'); do
+  echo "Replicating $backup to secondary region..."
+  
+  # Copy to secondary region
+  aws s3 cp s3://aid-panel-backups/database/$backup \
+    s3://aid-panel-backups-eu-central/database/$backup \
+    --source-region eu-west-1 \
+    --region eu-central-1
+done
+
+echo "Backup replication completed"
+```
+
+## Backup Verification
+
+### Automated Verification
+
+```bash
+#!/bin/bash
+# scripts/verify-backups.sh
+
+echo "Verifying backups..."
+
+# Get latest backup
+LATEST_BACKUP=$(aws s3 ls s3://aid-panel-backups/database/ | tail -1 | awk '{print $2}')
+
+# Download to temp
+aws s3 cp s3://aid-panel-backups/database/$LATEST_BACKUP /tmp/
+
+# Verify file integrity
+if gzip -t /tmp/$LATEST_BACKUP; then
+  echo "✅ Backup file integrity verified"
+else
+  echo "❌ Backup file corrupted"
+  exit 1
+fi
+
+# Restore to test database
+supabase db restore --file=/tmp/$LATEST_BACKUP --database=test_restore
+
+# Run data integrity checks
+supabase db exec -d test_restore -c "
+SELECT COUNT(*) FROM donors;
+SELECT COUNT(*) FROM volunteers;
+SELECT COUNT(*) FROM money_boxes;
+"
+
+# Cleanup
+supabase db drop --database=test_restore
+rm /tmp/$LATEST_BACKUP
+
+echo "Backup verification completed"
+```
+
+### Weekly Backup Tests
+```yaml
+# .github/workflows/backup-test.yml
+name: Backup Test
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'  # Every Monday 3 AM
+
+jobs:
+  test-restore:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download latest backup
+        run: |
+          aws s3 cp s3://aid-panel-backups/database/latest.sql.gz /tmp/
+      
+      - name: Restore to test database
+        run: |
+          supabase db restore --file=/tmp/latest.sql.gz --database=test
+      
+      - name: Verify data
+        run: ./scripts/verify-data.sh
+      
+      - name: Cleanup
+        run: supabase db drop --database=test
+```
+
+## Backup Monitoring
+
+```bash
+#!/bin/bash
+# scripts/monitor-backups.sh
+
+# Check last successful backup
+LAST_BACKUP=$(aws s3 ls s3://aid-panel-backups/database/ | tail -1)
+LAST_BACKUP_TIME=$(echo $LAST_BACKUP | awk '{print $1" "$2}')
+
+# Alert if backup > 26 hours old
+BACKUP_AGE=$(($(date +%s) - $(date -d "$LAST_BACKUP_TIME" +%s)))
+MAX_AGE=93600  # 26 hours in seconds
+
+if [ $BACKUP_AGE -gt $MAX_AGE ]; then
+  echo "WARNING: Last backup is older than 26 hours"
+  # Send alert
+  curl -X POST $SLACK_WEBHOOK -d "{\"text\":\"Backup age warning: $LAST_BACKUP_TIME\"}"
+fi
+
+# Check backup size
+BACKUP_SIZE=$(echo $LAST_BACKUP | awk '{print $3}')
+MIN_SIZE=104857600  # 100 MB in bytes
+
+if [ $BACKUP_SIZE -lt $MIN_SIZE ]; then
+  echo "WARNING: Backup size suspiciously small: $BACKUP_SIZE"
+fi
+
+# Check backup count in S3
+BACKUP_COUNT=$(aws s3 ls s3://aid-panel-backups/database/ | wc -l)
+
+if [ $BACKUP_COUNT -lt 30 ]; then
+  echo "WARNING: Backup count below 30 days: $BACKUP_COUNT backups"
+fi
+```
+
+## Backup Documentation
+
+### Backup Inventory
+```bash
+# Generate backup inventory
+#!/bin/bash
+# scripts/backup-inventory.sh
+
+echo "Backup Inventory - $(date)" > backup-inventory.txt
+echo "=========================" >> backup-inventory.txt
+
+echo ""
+echo "Daily Backups (30 days):" >> backup-inventory.txt
+aws s3 ls s3://aid-panel-backups/database/ | tail -30 >> backup-inventory.txt
+
+echo ""
+echo "Total Size:" >> backup-inventory.txt
+aws s3 ls s3://aid-panel-backups/database/ --recursive --human-readable --summarize | tail -1 >> backup-inventory.txt
+
+echo ""
+echo "Latest Backup:" >> backup-inventory.txt
+aws s3 ls s3://aid-panel-backups/database/ | tail -1 >> backup-inventory.txt
+
+# Email inventory
+mail -s "Backup Inventory Report" admin@aidpanel.com < backup-inventory.txt
+```
+
+### Backup Restoration Guide
+```markdown
+# Backup Restoration Guide
+
+## Quick Restoration (Last Daily Backup)
+\`\`\`bash
+./scripts/restore-db.sh
+\`\`\`
+
+## Point-in-Time Recovery
+\`\`\`bash
+supabase db restore --to="2026-01-17 14:30:00" --file=latest_backup.sql.gz
+\`\`\`
+
+## Verify Restoration
+\`\`\`bash
+./scripts/verify-data.sh
+./scripts/health-check.sh
+\`\`\`
+
+## Common Issues
+
+### Issue: Restoration Fails
+**Solution**: Check backup integrity with \`gzip -t backup.sql.gz\`
+
+### Issue: Data Inconsistency
+**Solution**: Run \`supabase db inspect --check-integrity\`
+
+### Issue: Slow Restoration
+**Solution**: Ensure adequate I/O and network bandwidth
+```
+
+Completed all four production readiness documents:
+1. Production Monitoring Guide (docs/monitoring/PRODUCTION-MONITORING.md) - Metrics, alerts, dashboards, incident response, on-call procedures
+2. Rollback Plan (docs/emergency/ROLLBACK-PLAN.md) - 3 scenarios, step-by-step procedures, communication, post-mortem templates
+3. Performance Budget (docs/performance/PERFORMANCE-BUDGET.md) - Core Web Vitals, bundle size limits, API/DB query budgets
+4. Backup Strategy (docs/backup/BACKUP-STRATEGY.md) - Backup schedules, RTO/RPO targets, disaster recovery plans
+
+All documents include specific commands, scripts, and verification steps for production operations.
+

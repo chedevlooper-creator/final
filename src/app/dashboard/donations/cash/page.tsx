@@ -130,7 +130,7 @@ export default function CashDonationsPage() {
     },
     {
       id: 'actions',
-      cell: ({ row }) => (
+      cell: () => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">

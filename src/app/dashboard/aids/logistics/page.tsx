@@ -28,10 +28,7 @@ import {
     Plus,
     Search,
     Eye,
-    Truck,
     MapPin,
-    CheckCircle,
-    Clock,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
@@ -188,7 +185,7 @@ export default function LogisticsPage() {
                                 </TableRow>
                             ) : (
                                 filteredItems.map((item) => {
-                                    const statusConfig = STATUS_CONFIG[item.status]
+                                    const statusConfig = STATUS_CONFIG[item.status] || { label: item.status, color: 'bg-gray-100 text-gray-700' }
                                     return (
                                         <TableRow key={item.id}>
                                             <TableCell>
