@@ -6,7 +6,7 @@
  * Slack'ten gelen mesajları workflow'a iletir
  */
 
-import { resume } from 'workflow/api'
+import { resumeHook } from 'workflow/api'
 import { NextResponse } from 'next/server'
 
 // Slack Events API için
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
         
         try {
           // Workflow'a mesajı ilet
-          await resume(hookToken, message)
+          await resumeHook(hookToken, message)
           
           return NextResponse.json({
             success: true,

@@ -7,7 +7,7 @@
  * Örneğin: Onay bekleyen bir başvuruyu onaylamak veya reddetmek
  */
 
-import { resume } from 'workflow/api'
+import { resumeHook } from 'workflow/api'
 import { NextResponse } from 'next/server'
 import { withAuth } from '@/lib/permission-middleware'
 
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     }
     
     // Hook'u resume et
-    await resume(token, enrichedPayload)
+    await resumeHook(token, enrichedPayload)
     
     return NextResponse.json({
       success: true,
