@@ -77,7 +77,7 @@ export interface EmailConfig {
     };
     
     // SendGrid ayarları
-    apiKey?: string;
+    sendGridApiKey?: string;
     
     // AWS SES ayarları
     accessKeyId?: string;
@@ -86,7 +86,7 @@ export interface EmailConfig {
     
     // Mailgun ayarları
     domain?: string;
-    apiKey?: string;
+    mailgunApiKey?: string;
     
     // Postmark ayarları
     serverToken?: string;

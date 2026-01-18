@@ -4,7 +4,14 @@
  */
 
 // Base types - define here to avoid circular dependency
-export type LogLevel = 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL';
+export enum LogLevel {
+  INFO = 'INFO',
+  WARNING = 'WARNING',
+  ERROR = 'ERROR',
+  CRITICAL = 'CRITICAL'
+}
+
+export type LogLevelType = 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL';
 
 export interface AuditLog {
   id: string;
@@ -16,7 +23,7 @@ export interface AuditLog {
   new_values?: Record<string, any>;
   ip_address?: string;
   user_agent?: string;
-  level: LogLevel;
+  level: LogLevelType;
   created_at: string;
 }
 
@@ -65,7 +72,7 @@ export interface LogFilterOptions {
   eventType?: AuditEventType;
   entityType?: EntityType;
   priority?: EventPriority;
-  level?: LogLevel;
+  level?: LogLevelType;
   startDate?: Date;
   endDate?: Date;
   searchTerm?: string;

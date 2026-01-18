@@ -3,29 +3,14 @@
  * Denetim ve log sistemi
  */
 
-import { createClient } from './supabase';
-
-export type LogLevel = 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL';
-
-export interface AuditLog {
-  id: string;
-  user_id?: string;
-  action: string;
-  entity_type: string;
-  entity_id?: string;
-  old_values?: Record<string, any>;
-  new_values?: Record<string, any>;
-  ip_address?: string;
-  user_agent?: string;
-  level: LogLevel;
-  created_at: string;
-}
+import { createClient } from './supabase/client';
+import type { AuditLog, LogLevelType } from './audit.types';
 
 export interface LogOptions {
   userId?: string;
   ipAddress?: string;
   userAgent?: string;
-  level?: LogLevel;
+  level?: LogLevelType;
 }
 
 class AuditLogger {
@@ -111,7 +96,7 @@ class AuditLogger {
     entityType?: string;
     entityId?: string;
     action?: string;
-    level?: LogLevel;
+    level?: LogLevelType;
     startDate?: Date;
     endDate?: Date;
     limit?: number;

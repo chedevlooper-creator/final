@@ -7,25 +7,25 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { auditLogger } from './audit';
-import type {
-  AuditLog,
+import {
+  type AuditLog,
+  type LogFilterOptions,
+  type LogPaginationOptions,
+  type LogQueryResult,
+  type AuditStatistics,
+  type SecurityAnalytics,
+  type SecurityAlert,
+  type LogExportOptions,
+  type RetentionPolicy,
+  type AuditReport,
+  type EventContext,
+  type LoggingOptions,
+  type AuditChanges,
+  type LogSearchResult,
   LogLevel,
   AuditEventType,
   EntityType,
-  EventPriority,
-  LogFilterOptions,
-  LogPaginationOptions,
-  LogQueryResult,
-  AuditStatistics,
-  SecurityAnalytics,
-  SecurityAlert,
-  LogExportOptions,
-  RetentionPolicy,
-  AuditReport,
-  EventContext,
-  LoggingOptions,
-  AuditChanges,
-  LogSearchResult
+  EventPriority
 } from './audit.types';
 
 /**
@@ -45,7 +45,7 @@ export function useAuditLogs(
     refetch
   } = useQuery({
     queryKey: ['audit-logs', filters, pagination],
-    queryFn: () => auditLogger.queryLogs(filters, pagination),
+    queryFn: () => auditLogger.getLogs(filters),
     staleTime: 30000, // 30 saniye
     gcTime: 300000 // 5 dakika
   });
@@ -56,12 +56,12 @@ export function useAuditLogs(
   }, [queryClient]);
 
   return {
-    logs: queryResult?.logs || [],
-    total: queryResult?.total || 0,
-    page: queryResult?.page || 1,
-    limit: queryResult?.limit || 50,
-    totalPages: queryResult?.totalPages || 0,
-    searchTime: queryResult?.searchTime || 0,
+    logs: queryResult?.data || [],
+    total: queryResult?.data?.length || 0,
+    page: 1,
+    limit: 50,
+    totalPages: 1,
+    searchTime: 0,
     isLoading,
     error: error as Error,
     refetch,
@@ -633,8 +633,8 @@ export function useSecurityAlerts() {
       // Supabase'den güvenlik uyarılarını çek
       const { createClient } = await import('@supabase/supabase-js');
       const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+        process.env['NEXT_PUBLIC_SUPABASE_URL'] || '',
+        process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'] || ''
       );
 
       const { data, error } = await supabase
@@ -660,8 +660,8 @@ export function useSecurityAlerts() {
     mutationFn: async (alertId: string) => {
       const { createClient } = await import('@supabase/supabase-js');
       const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+        process.env['NEXT_PUBLIC_SUPABASE_URL'] || '',
+        process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'] || ''
       );
 
       const { error } = await supabase
@@ -728,8 +728,8 @@ export function useAuditLogDetail(logId: string) {
     queryFn: async () => {
       const { createClient } = await import('@supabase/supabase-js');
       const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+        process.env['NEXT_PUBLIC_SUPABASE_URL'] || '',
+        process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'] || ''
       );
 
       const { data, error } = await supabase
