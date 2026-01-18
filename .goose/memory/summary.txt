@@ -1,2 +1,0 @@
-Test suite structure: 5 main test files (API integration, component, E2E, database migration, performance) + configuration files (vitest.config.ts, playwright.config.ts, test-setup.ts) + supporting utilities (mock-data.ts, test-utils.tsx) + CI/CD workflow + documentation
-

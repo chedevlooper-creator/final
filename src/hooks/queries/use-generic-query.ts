@@ -5,7 +5,7 @@
  * to reduce code duplication and ensure consistent behavior.
  */
 
-import { useQuery, UseQueryOptions, useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useQuery, useQueryClient, UseQueryOptions, useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { ErrorHandler } from '@/lib/errors'
 import { toast } from 'sonner'
 import type { QueryOptions, PaginatedResponse } from '@/types/common'
@@ -111,8 +111,11 @@ export function createQueryHook<T>(
   return (queryOptions: QueryOptions = {}) => {
     const { limit, offset, page, search, status, sortBy, sortOrder } = queryOptions
     
+    // Create a stable key from options
+    const optionsKey = JSON.stringify(queryOptions)
+    
     return useGenericQuery<T>({
-      queryKey: [resource, 'list', queryOptions],
+      queryKey: [resource, 'list', optionsKey],
       queryFn: () => defaultQueryFn(queryOptions),
       options: {
         enabled: true, // Always enabled by default
@@ -141,18 +144,20 @@ export function createMutationHook<TData, TVariables>(
 }
 
 /**
- * Optimistic Update Helper
+ * Optimistic Update Hook
  * Automatically updates cache before mutation completes
+ * 
+ * This is a hook that must be called within a React component or another hook.
  */
-export function createOptimisticMutation<TData, TVariables>(
+export function useOptimisticMutation<TData, TVariables>(
   queryKey: string[],
+  mutationFn: (variables: TVariables) => Promise<TData[]>,
   updateFn: (oldData: TData[], variables: TVariables) => TData[]
 ) {
-  return useMutation<TData[], Error, TVariables>({
-    mutationFn: async (variables) => {
-      // This would be your actual mutation
-      return [] as TData[]
-    },
+  const queryClient = useQueryClient()
+  
+  return useMutation<TData[], Error, TVariables, { previousData: TData[] | undefined }>({
+    mutationFn,
     onMutate: async (variables) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey })
@@ -166,9 +171,11 @@ export function createOptimisticMutation<TData, TVariables>(
       // Return context with previous value
       return { previousData }
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       // Rollback to previous value
-      queryClient.setQueryData<TData[]>(queryKey, context?.previousData || [])
+      if (context?.previousData) {
+        queryClient.setQueryData<TData[]>(queryKey, context.previousData)
+      }
     },
     onSettled: () => {
       // Refetch to ensure server state

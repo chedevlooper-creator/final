@@ -1,2 +1,0 @@
-Task: Create warehouse form component at src/components/inventory/warehouse-form.tsx with React Hook Form, Zod validation, shadcn/ui components, Turkish labels, and Google Maps integration
-

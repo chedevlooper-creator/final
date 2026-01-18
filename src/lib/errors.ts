@@ -1,9 +1,47 @@
 /**
  * Custom Error Classes
- * 
+ *
  * These error classes provide structured error handling throughout
- * the application with specific error types and logging.
+ * the application with specific error types, recovery actions, and Turkish messages.
+ *
+ * @version 2.0.0 - Enhanced Error Handling System
+ * @since 2026-01-18
  */
+
+/**
+ * Error Severity Levels
+ */
+export enum ErrorSeverity {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical'
+}
+
+/**
+ * Error Types
+ */
+export enum ErrorType {
+  NETWORK = 'network',
+  VALIDATION = 'validation',
+  NOT_FOUND = 'not_found',
+  PERMISSION = 'permission',
+  SERVER = 'server',
+  UNKNOWN = 'unknown',
+  AUTHENTICATION = 'authentication',
+  DATABASE = 'database',
+  CONFLICT = 'conflict',
+  RATE_LIMIT = 'rate_limit'
+}
+
+/**
+ * Recovery Actions
+ */
+export interface RecoveryAction {
+  label: string;
+  action: () => void | Promise<void>;
+  icon?: string;
+}
 
 /**
  * Base Application Error
@@ -13,11 +51,35 @@ export class AppError extends Error {
     message: string,
     public code: string,
     public statusCode: number = 500,
-    public details?: Record<string, unknown>
+    public details?: Record<string, unknown>,
+    public severity: ErrorSeverity = ErrorSeverity.MEDIUM,
+    public recoveryActions?: RecoveryAction[],
+    public errorType: ErrorType = ErrorType.UNKNOWN
   ) {
     super(message)
     this.name = this.constructor.name
     Error.captureStackTrace(this, this.constructor)
+  }
+
+  /**
+   * Get user-friendly Turkish message
+   */
+  getUserMessage(): string {
+    return ErrorHandler.getUserMessage(this)
+  }
+
+  /**
+   * Get recovery actions
+   */
+  getRecoveryActions(): RecoveryAction[] {
+    return this.recoveryActions || ErrorHandler.getDefaultRecoveryActions(this)
+  }
+
+  /**
+   * Get error type
+   */
+  getErrorType(): ErrorType {
+    return this.errorType
   }
 }
 
@@ -31,7 +93,18 @@ export class AuthError extends AppError {
     public authCode: string = 'AUTH_FAILED',
     details?: Record<string, unknown>
   ) {
-    super(message, authCode, 401, details)
+    super(
+      message,
+      authCode,
+      401,
+      details,
+      ErrorSeverity.HIGH,
+      [
+        { label: 'Tekrar Giriş Yap', action: () => window.location.href = '/login', icon: '🔐' },
+        { label: 'Ana Sayfaya Dön', action: () => window.location.href = '/', icon: '🏠' }
+      ],
+      ErrorType.AUTHENTICATION
+    )
     this.name = 'AuthError'
   }
 }
@@ -45,7 +118,18 @@ export class AuthorizationError extends AppError {
     message: string = 'You do not have permission to perform this action',
     details?: Record<string, unknown>
   ) {
-    super(message, 'FORBIDDEN', 403, details)
+    super(
+      message,
+      'FORBIDDEN',
+      403,
+      details,
+      ErrorSeverity.MEDIUM,
+      [
+        { label: 'Geri Dön', action: () => window.history.back(), icon: '↩️' },
+        { label: 'Ana Sayfaya Dön', action: () => window.location.href = '/', icon: '🏠' }
+      ],
+      ErrorType.PERMISSION
+    )
     this.name = 'AuthorizationError'
   }
 }
@@ -61,11 +145,21 @@ export class ValidationError extends AppError {
     public value: unknown,
     details?: Record<string, unknown>
   ) {
-    super(message, 'VALIDATION_ERROR', 400, {
-      field,
-      value,
-      ...details,
-    })
+    super(
+      message,
+      'VALIDATION_ERROR',
+      400,
+      {
+        field,
+        value,
+        ...details,
+      },
+      ErrorSeverity.LOW,
+      [
+        { label: 'Formu Düzenle', action: () => {}, icon: '✏️' }
+      ],
+      ErrorType.VALIDATION
+    )
     this.name = 'ValidationError'
   }
 }
@@ -80,7 +174,17 @@ export class NetworkError extends AppError {
     public httpStatusCode?: number,
     details?: Record<string, unknown>
   ) {
-    super(message, 'NETWORK_ERROR', httpStatusCode || 500, details)
+    super(
+      message,
+      'NETWORK_ERROR',
+      httpStatusCode || 500,
+      details,
+      ErrorSeverity.MEDIUM,
+      [
+        { label: 'Tekrar Dene', action: () => window.location.reload(), icon: '🔄' }
+      ],
+      ErrorType.NETWORK
+    )
     this.name = 'NetworkError'
   }
 }
@@ -95,11 +199,22 @@ export class NotFoundError extends AppError {
     identifier?: string,
     details?: Record<string, unknown>
   ) {
-    const message = identifier 
+    const message = identifier
       ? `${resource} with identifier '${identifier}' not found`
       : `${resource} not found`
-    
-    super(message, 'NOT_FOUND', 404, { resource, identifier, ...details })
+
+    super(
+      message,
+      'NOT_FOUND',
+      404,
+      { resource, identifier, ...details },
+      ErrorSeverity.LOW,
+      [
+        { label: 'Geri Dön', action: () => window.history.back(), icon: '↩️' },
+        { label: 'Ana Sayfaya Dön', action: () => window.location.href = '/', icon: '🏠' }
+      ],
+      ErrorType.NOT_FOUND
+    )
     this.name = 'NotFoundError'
   }
 }
@@ -113,7 +228,17 @@ export class ConflictError extends AppError {
     message: string,
     details?: Record<string, unknown>
   ) {
-    super(message, 'CONFLICT', 409, details)
+    super(
+      message,
+      'CONFLICT',
+      409,
+      details,
+      ErrorSeverity.MEDIUM,
+      [
+        { label: 'Verileri Kontrol Et', action: () => {}, icon: '🔍' }
+      ],
+      ErrorType.CONFLICT
+    )
     this.name = 'ConflictError'
   }
 }
@@ -128,7 +253,17 @@ export class RateLimitError extends AppError {
     public retryAfter?: number,
     details?: Record<string, unknown>
   ) {
-    super(message, 'RATE_LIMIT_EXCEEDED', 429, { retryAfter, ...details })
+    super(
+      message,
+      'RATE_LIMIT_EXCEEDED',
+      429,
+      { retryAfter, ...details },
+      ErrorSeverity.MEDIUM,
+      [
+        { label: `${retryAfter || 60} saniye bekleyin`, action: () => {}, icon: '⏳' }
+      ],
+      ErrorType.RATE_LIMIT
+    )
     this.name = 'RateLimitError'
   }
 }
@@ -142,7 +277,18 @@ export class DatabaseError extends AppError {
     message: string = 'Database operation failed',
     details?: Record<string, unknown>
   ) {
-    super(message, 'DATABASE_ERROR', 500, details)
+    super(
+      message,
+      'DATABASE_ERROR',
+      500,
+      details,
+      ErrorSeverity.HIGH,
+      [
+        { label: 'Tekrar Dene', action: () => window.location.reload(), icon: '🔄' },
+        { label: 'Destek ile İletişime Geç', action: () => window.location.href = '/support', icon: '📞' }
+      ],
+      ErrorType.DATABASE
+    )
     this.name = 'DatabaseError'
   }
 }
@@ -152,7 +298,7 @@ export class DatabaseError extends AppError {
  * Logs errors with appropriate severity levels
  */
 export class ErrorLogger {
-  private static isDevelopment = process.env.NODE_ENV === 'development'
+  private static isDevelopment = process.env['NODE_ENV'] === 'development'
 
   /**
    * Log error with context
@@ -166,6 +312,8 @@ export class ErrorLogger {
         code: error.code,
         statusCode: error.statusCode,
         details: error.details,
+        severity: error.severity,
+        errorType: error.errorType,
       }),
       context,
       timestamp: new Date().toISOString(),
@@ -213,6 +361,21 @@ export class ErrorLogger {
  */
 export class ErrorHandler {
   /**
+   * Turkish error messages mapping
+   */
+  private static turkishMessages: Record<string, string> = {
+    'AUTH_FAILED': 'Geçersiz kullanıcı adı veya şifre',
+    'FORBIDDEN': 'Bu işlem için yetkiniz yok',
+    'VALIDATION_ERROR': 'Lütfen girdiğiniz bilgileri kontrol edin',
+    'NETWORK_ERROR': 'Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin',
+    'NOT_FOUND': 'Sayfa veya kayıt bulunamadı',
+    'CONFLICT': 'Bu kayıt zaten mevcut',
+    'RATE_LIMIT_EXCEEDED': 'Çok fazla deneme yaptınız. Lütfen bir süre bekleyin',
+    'DATABASE_ERROR': 'Veritabanı hatası. Lütfen daha sonra tekrar deneyin',
+    'UNKNOWN_ERROR': 'Beklenmeyen bir hata oluştu',
+  }
+
+  /**
    * Handle error and return user-friendly message
    */
   static handle(error: unknown, context?: Record<string, unknown>): string {
@@ -224,32 +387,65 @@ export class ErrorHandler {
     }
 
     // Return user-friendly message
+    return this.getUserMessage(error)
+  }
+
+  /**
+   * Get user-friendly Turkish message
+   */
+  static getUserMessage(error: unknown): string {
     if (error instanceof AuthError) {
-      return 'Geçersiz kullanıcı adı veya şifre'
+      return this.turkishMessages['AUTH_FAILED']
     } else if (error instanceof AuthorizationError) {
-      return 'Bu işlem için yetkiniz yok'
+      return this.turkishMessages['FORBIDDEN']
     } else if (error instanceof ValidationError) {
-      return error.message
+      return this.turkishMessages['VALIDATION_ERROR']
     } else if (error instanceof NetworkError) {
-      return 'Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin'
+      return this.turkishMessages['NETWORK_ERROR']
     } else if (error instanceof NotFoundError) {
-      return error.message
+      return this.turkishMessages['NOT_FOUND']
     } else if (error instanceof RateLimitError) {
-      return 'Ç fazla deneme yaptınız. Lütfen bir süre bekleyin'
+      return this.turkishMessages['RATE_LIMIT_EXCEEDED']
     } else if (error instanceof DatabaseError) {
-      return 'Veritabanı hatası. Lütfen daha sonra tekrar deneyin'
+      return this.turkishMessages['DATABASE_ERROR']
+    } else if (error instanceof ConflictError) {
+      return this.turkishMessages['CONFLICT']
     } else if (error instanceof Error) {
-      return this.isDevelopment() ? error.message : 'Beklenmeyen bir hata oluştu'
+      return this.isDevelopment() ? error.message : this.turkishMessages['UNKNOWN_ERROR']
     } else {
-      return 'Beklenmeyen bir hata oluştu'
+      return this.turkishMessages['UNKNOWN_ERROR']
     }
+  }
+
+  /**
+   * Get default recovery actions for error type
+   */
+  static getDefaultRecoveryActions(error: unknown): RecoveryAction[] {
+    if (error instanceof NetworkError) {
+      return [
+        { label: 'Tekrar Dene', action: () => window.location.reload(), icon: '🔄' }
+      ]
+    } else if (error instanceof NotFoundError) {
+      return [
+        { label: 'Geri Dön', action: () => window.history.back(), icon: '↩️' },
+        { label: 'Ana Sayfaya Dön', action: () => window.location.href = '/', icon: '🏠' }
+      ]
+    } else if (error instanceof AuthError) {
+      return [
+        { label: 'Tekrar Giriş Yap', action: () => window.location.href = '/login', icon: '🔐' }
+      ]
+    }
+
+    return [
+      { label: 'Ana Sayfaya Dön', action: () => window.location.href = '/', icon: '🏠' }
+    ]
   }
 
   /**
    * Check if running in development
    */
   private static isDevelopment(): boolean {
-    return process.env.NODE_ENV === 'development'
+    return process.env['NODE_ENV'] === 'development'
   }
 
   /**
@@ -273,5 +469,56 @@ export class ErrorHandler {
           details: error.details,
         })
     }
+  }
+
+  /**
+   * Create error from error type
+   */
+  static createError(type: ErrorType, message: string, context?: Record<string, unknown>): AppError {
+    switch (type) {
+      case ErrorType.NETWORK:
+        return new NetworkError(message)
+      case ErrorType.VALIDATION:
+        return new ValidationError(message, context?.field as string || 'unknown', context?.value)
+      case ErrorType.NOT_FOUND:
+        return new NotFoundError(context?.resource as string || 'Resource', context?.identifier as string)
+      case ErrorType.PERMISSION:
+        return new AuthorizationError(message)
+      case ErrorType.AUTHENTICATION:
+        return new AuthError(message)
+      case ErrorType.DATABASE:
+        return new DatabaseError(message)
+      case ErrorType.CONFLICT:
+        return new ConflictError(message)
+      case ErrorType.RATE_LIMIT:
+        return new RateLimitError(message, context?.retryAfter as number)
+      default:
+        return new AppError(message, 'UNKNOWN_ERROR', 500, context)
+    }
+  }
+
+  /**
+   * Get error type from error
+   */
+  static getErrorType(error: unknown): ErrorType {
+    if (error instanceof NetworkError) return ErrorType.NETWORK
+    if (error instanceof ValidationError) return ErrorType.VALIDATION
+    if (error instanceof NotFoundError) return ErrorType.NOT_FOUND
+    if (error instanceof AuthorizationError) return ErrorType.PERMISSION
+    if (error instanceof AuthError) return ErrorType.AUTHENTICATION
+    if (error instanceof DatabaseError) return ErrorType.DATABASE
+    if (error instanceof ConflictError) return ErrorType.CONFLICT
+    if (error instanceof RateLimitError) return ErrorType.RATE_LIMIT
+    return ErrorType.UNKNOWN
+  }
+
+  /**
+   * Get severity level for error
+   */
+  static getSeverity(error: unknown): ErrorSeverity {
+    if (error instanceof AppError) {
+      return error.severity
+    }
+    return ErrorSeverity.MEDIUM
   }
 }

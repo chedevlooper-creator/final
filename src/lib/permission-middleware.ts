@@ -39,10 +39,10 @@ export interface MiddlewareResult {
  */
 export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      process.env['NEXT_PUBLIC_SUPABASE_URL']!,
+      process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY']!,
       {
         cookies: {
           get(name: string) {
@@ -74,9 +74,9 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
     return {
       id: user.id,
       email: user.email!,
-      role: profile?.role || user.user_metadata?.role || 'viewer',
-      name: profile?.name || user.user_metadata?.name,
-      avatar_url: profile?.avatar_url || user.user_metadata?.avatar_url
+      role: profile?.['role'] || user.user_metadata?.['role'] || 'viewer',
+      name: profile?.['name'] || user.user_metadata?.['name'],
+      avatar_url: profile?.['avatar_url'] || user.user_metadata?.['avatar_url']
     }
   } catch (error) {
     console.error('Auth middleware error:', error)
@@ -92,8 +92,6 @@ export function checkPermission(
   requiredPermission: Permission,
   resource?: string
 ): boolean {
-  // ROLE_PERMISSIONS and RESOURCE_PERMISSIONS are already imported at the top
-
   // Admin her şeyi yapabilir
   if (userRole === 'admin') {
     return true
@@ -102,10 +100,12 @@ export function checkPermission(
   // Rolün genel yetkilerini kontrol et
   const rolePermissions = ROLE_PERMISSIONS[userRole] || []
   
-  if (resource) {
+  if (resource && resource in RESOURCE_PERMISSIONS) {
     // Kaynak özelinde yetki kontrolü
-    const resourcePerms = RESOURCE_PERMISSIONS[resource]
-    if (resourcePerms && resourcePerms[userRole]?.includes(requiredPermission)) {
+    const resourceKey = resource as keyof typeof RESOURCE_PERMISSIONS
+    const resourcePerms = RESOURCE_PERMISSIONS[resourceKey]
+    const userResourcePerms = resourcePerms?.[userRole] as readonly string[] | undefined
+    if (userResourcePerms?.includes(requiredPermission)) {
       return true
     }
   }

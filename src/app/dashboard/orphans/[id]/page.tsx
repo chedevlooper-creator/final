@@ -51,7 +51,7 @@ import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 
 // Mock data flag
-const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true'
+const USE_MOCK_DATA = process.env['NEXT_PUBLIC_USE_MOCK_DATA'] === 'true'
 
 const ORPHAN_TYPES = [
     { value: 'ihh_orphan', label: 'İHH Yetimi' },
@@ -169,7 +169,7 @@ const mockOrphan: Orphan = {
 export default function OrphanDetailPage() {
     const params = useParams()
     const router = useRouter()
-    const id = params.id as string
+    const id = params['id'] as string
 
     const [isLoading, setIsLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)

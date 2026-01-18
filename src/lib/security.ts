@@ -39,7 +39,7 @@ export const securityHeaders = {
    * Forces HTTPS connections for the specified duration
    * Only enable in production with HTTPS
    */
-  ...(process.env.NODE_ENV === 'production' ? {
+  ...(process.env['NODE_ENV'] === 'production' ? {
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload'
   } : {}),
 
@@ -50,7 +50,7 @@ export const securityHeaders = {
    * Note: This is a basic CSP. You may need to customize it based on your needs
    * especially if you're using external services like analytics, fonts, etc.
    */
-  ...(process.env.NODE_ENV === 'production' ? {
+  ...(process.env['NODE_ENV'] === 'production' ? {
     'Content-Security-Policy': [
       "default-src 'self'",
       "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
@@ -76,7 +76,7 @@ export const securityHeaders = {
  */
 export const corsConfig = {
   // In production, replace with your actual domain
-  origin: process.env.NODE_ENV === 'production'
+  origin: process.env['NODE_ENV'] === 'production'
     ? 'https://yourdomain.com'
     : '*', // Allow all origins in development
 

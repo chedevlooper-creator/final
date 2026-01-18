@@ -65,7 +65,7 @@ const STATUS_OPTIONS = [
 export default function EventDetailPage() {
     const params = useParams()
     const router = useRouter()
-    const id = params.id as string
+    const id = params['id'] as string
 
     const [isLoading, setIsLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)

@@ -27,8 +27,8 @@ export function useAuth() {
   // Get user role from metadata or profile
   const userRole: UserRole = useMemo(() => {
     // First check user metadata (for quick access)
-    if (user?.user_metadata?.role) {
-      return user.user_metadata.role as UserRole
+    if (user?.user_metadata?.['role']) {
+      return user.user_metadata['role'] as UserRole
     }
     
     // Then check profile state
@@ -48,7 +48,14 @@ export function useAuth() {
       try {
         const { data: { user }, error } = await supabase.auth.getUser()
         
+        // Auth session missing is expected when user is not logged in
         if (error) {
+          // Don't show error for missing session - this is expected on login page
+          if (error.message?.includes('session') || error.code === 'session_not_found') {
+            setUser(null)
+            setLoading(false)
+            return
+          }
           throw ErrorHandler.fromSupabaseError(error)
         }
         
@@ -66,15 +73,18 @@ export function useAuth() {
             setProfile({
               id: profileData.id,
               email: profileData.email || user.email || '',
-              role: profileData.role || 'viewer',
-              name: profileData.name,
-              avatar_url: profileData.avatar_url
+              role: profileData['role'] || 'viewer',
+              name: profileData['name'],
+              avatar_url: profileData['avatar_url']
             })
           }
         }
       } catch (error) {
-        const message = ErrorHandler.handle(error, { action: 'getUser' })
-        toast.error(message)
+        // Only show error toast for unexpected errors
+        if (error instanceof Error && !error.message?.includes('session')) {
+          const message = ErrorHandler.handle(error, { action: 'getUser' })
+          toast.error(message)
+        }
       } finally {
         setLoading(false)
       }

@@ -1,0 +1,868 @@
+# SKILLS
+
+Bu dosya, AI asistanların bu proje üzerinde çalışırken kullanacağı kapsamlı beceri talimatları içerir.
+
+---
+
+## PROJE GENEL BAKIŞ
+
+**Yardım Yönetim Paneli** - Dernek ve vakıflar için kapsamlı yardım yönetim sistemi
+
+### Ana Domain Alanları
+- **İhtiyaç Sahipleri (Needy)** - Yardım alan kişilerin kaydı ve yönetimi
+- **Bağışlar (Donations)** - Para, gıda, eşya bağışlarının takibi
+- **Başvurular (Applications)** - Yardım başvurularının değerlendirilmesi
+- **Etkinlikler (Events)** - Organizasyon ve etkinlik yönetimi
+- **Gönüllüler (Volunteers)** - Gönüllü personel yönetimi
+- **Yetimler (Orphans)** - Yetim çocukların takibi
+- **Finans (Finance)** - Gelir-gider takibi, bütçe yönetimi
+- **Raporlar (Reports)** - PDF rapor oluşturma
+- **Takvim (Calendar)** - Etkinlik ve randevu takibi
+- **Mesajlar (Messages)** - İletişim yönetimi
+- **Satın Alımlar (Purchases)** - Malzeme alım takibi
+
+### Teknik Mimari
+```
+├── Next.js 16 (App Router) + TypeScript
+├── Supabase (PostgreSQL) - RLS ile güvenlik
+├── TanStack Query - Server state yönetimi
+├── Zustand - Client state yönetimi
+├── shadcn/ui + Tailwind CSS - UI kütüphanesi
+├── React Hook Form + Zod - Form validasyonu
+├── Sonner - Toast bildirimleri
+└── Lucide React - İkonlar
+```
+
+---
+
+## 1. COMPONENT GELİŞTİRME
+
+### Temel Kurallar
+- `'use client'` yönergesi tüm client component'lerin başında olmalı
+- Server Components varsayılan - sadece gerekirse Client Component kullan
+- Function components kullan, class component kullanma
+- `React.forwardRef` ile ref forwarding
+- `cn()` utility'si conditional Tailwind class'ları için
+
+### Component Yapısı
+```typescript
+'use client'
+
+import { useState } from 'react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+
+interface MyComponentProps {
+  title: string
+  variant?: 'default' | 'outline'
+  className?: string
+  children?: React.ReactNode
+}
+
+export function MyComponent({ 
+  title, 
+  variant = 'default', 
+  className,
+  children 
+}: MyComponentProps) {
+  return (
+    <div className={cn('base-classes', variant === 'default' && 'default-classes', className)}>
+      {title}
+      {children}
+    </div>
+  )
+}
+```
+
+### shadcn/ui Component'leri
+- **Kullan**: Asla custom component yerine shadcn/ui kullan
+- **Düzenleme**: shadcn/ui component'lerini doğrudan değiştirme - regenerate et
+- **Import**: `@/components/ui/` path'inden import et
+
+### UI Renk Paleti
+- Primary: `emerald-500` → `cyan-500` gradient
+- Success: `green-500`
+- Error: `red-500`
+- Warning: `yellow-500`
+- Info: `blue-500`
+
+---
+
+## 2. DATA FETCHING & QUERIES
+
+### TanStack Query Kullanımı
+- Tüm data fetching işlemleri `src/hooks/queries/` içinde
+- Hook isimleri: `use[Entity]List`, `use[Entity]Detail`, `useCreate[Entity]`, `useUpdate[Entity]`, `useDelete[Entity]`
+- Query key arrays cache invalidation için kritik
+
+### Query Hook Yapısı
+```typescript
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { createClient } from '@/lib/supabase/client'
+import type { Tables } from '@/types/database.types'
+
+// GET Query
+export function useNeedyList(params?: { status?: string }) {
+  const supabase = createClient()
+  
+  return useQuery({
+    queryKey: ['needy', 'list', params],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('needy')
+        .select('*')
+        .eq('status', params?.status || 'active')
+      
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+// POST/PUT/DELETE Mutation
+export function useCreateNeedy() {
+  const supabase = createClient()
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async (newNeedy: Tables<'needy'>) => {
+      const { data, error } = await supabase
+        .from('needy')
+        .insert(newNeedy)
+        .select()
+        .single()
+      
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['needy'] })
+    }
+  })
+}
+```
+
+### Generic Query Hook
+`src/hooks/queries/use-generic-query.ts` - Tekrar eden query kodları için kullan
+```typescript
+import { useGenericQuery } from '@/hooks/queries/use-generic-query'
+
+export function useNeedyList() {
+  return useGenericQuery({
+    table: 'needy',
+    select: '*',
+  })
+}
+```
+
+---
+
+## 3. FORM YÖNETİMİ
+
+### React Hook Form + Zod
+- Tüm formlar `src/lib/validations/` içinde Zod schema ile validate edilir
+- `@hookform/resolvers/zod` kullan
+- shadcn/ui Form component'leri kullan
+
+### Form Yapısı
+```typescript
+'use client'
+
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { needySchema, type NeedyFormValues } from '@/lib/validations/needy'
+import { useCreateNeedy } from '@/hooks/queries/use-needy'
+
+export function NeedyForm() {
+  const { mutate: createNeedy, isPending } = useCreateNeedy()
+  
+  const form = useForm<NeedyFormValues>({
+    resolver: zodResolver(needySchema),
+    defaultValues: {
+      first_name: '',
+      last_name: '',
+      phone: '',
+      address: '',
+    }
+  })
+
+  const onSubmit = (values: NeedyFormValues) => {
+    createNeedy(values, {
+      onSuccess: () => {
+        toast.success('İhtiyaç sahibi başarıyla oluşturuldu')
+        form.reset()
+      },
+      onError: (error) => {
+        toast.error('Hata: ' + error.message)
+      }
+    })
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="first_name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Ad</FormLabel>
+              <FormControl>
+                <Input placeholder="Ad girin..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" disabled={isPending}>
+          {isPending ? 'Kaydediliyor...' : 'Kaydet'}
+        </Button>
+      </form>
+    </Form>
+  )
+}
+```
+
+### Zod Schema Örneği
+```typescript
+// src/lib/validations/needy.ts
+import { z } from 'zod'
+
+export const needySchema = z.object({
+  first_name: z.string().min(2, 'En az 2 karakter'),
+  last_name: z.string().min(2, 'En az 2 karakter'),
+  phone: z.string().regex(/^(05[0-9]{9})$/, 'Geçerli bir TC telefon numarası'),
+  address: z.string().min(10, 'En az 10 karakter'),
+  city: z.string().min(2, 'Şehir seçiniz'),
+  district: z.string().min(2, 'İlçe seçiniz'),
+})
+
+export type NeedyFormValues = z.infer<typeof needySchema>
+```
+
+---
+
+## 4. STATE MANAGEMENT
+
+### Zustand Store
+- Global state için `src/stores/` içinde Zustand store'lar
+- UI state (sidebar, theme, modals) için ideal
+- Server state için TanStack Query kullan
+
+### Store Örneği
+```typescript
+// src/stores/ui-store.ts
+import { create } from 'zustand'
+
+interface UIState {
+  sidebarOpen: boolean
+  theme: 'light' | 'dark'
+  toggleSidebar: () => void
+  setTheme: (theme: 'light' | 'dark') => void
+}
+
+export const useUIStore = create<UIState>((set) => ({
+  sidebarOpen: true,
+  theme: 'light',
+  toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+  setTheme: (theme) => set({ theme }),
+}))
+```
+
+---
+
+## 5. ROUTING & PAGES
+
+### App Router Kullanımı
+- `src/app/` içinde route groups: `(auth)`, `(dashboard)`
+- Server Components varsayılan - sadece gerekirse Client Component
+- `export const dynamic = 'force-dynamic'` dynamic data için
+
+### Page Pattern
+```typescript
+// src/app/(dashboard)/needy/page.tsx
+import { createClient } from '@/lib/supabase/server'
+import { NeedyList } from '@/components/needy/needy-list'
+
+export const dynamic = 'force-dynamic'
+
+export default async function NeedyPage() {
+  const supabase = createClient()
+  const { data: needyList } = await supabase
+    .from('needy')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  return (
+    <div className="container mx-auto py-6">
+      <h1 className="text-3xl font-bold mb-6">İhtiyaç Sahipleri</h1>
+      <NeedyList data={needyList || []} />
+    </div>
+  )
+}
+```
+
+### Route Groups
+- `(auth)` - Login, Register, Forgot Password (public, no layout)
+- `(dashboard)` - Ana uygulama sayfaları (protected, sidebar + header layout)
+
+---
+
+## 6. TYPE SAFETY
+
+### TypeScript Kuralları
+- Strict mode enabled - `noImplicitReturns`, `noFallthroughCasesInSwitch`
+- `any` kullanma - proper types kullan
+- Type imports: `import type { UserRole } from '@/types/common'`
+- Database types: `import { Tables } from '@/types/database.types'`
+
+### Database Types
+```typescript
+import { Tables } from '@/types/database.types'
+
+function processNeedy(needy: Tables<'needy'>) {
+  // needy otomatik olarak tip güvenli
+}
+```
+
+### Custom Types
+```typescript
+// src/types/common.ts
+export type UserRole = 'admin' | 'manager' | 'volunteer' | 'viewer'
+export type Status = 'active' | 'inactive' | 'pending' | 'approved' | 'rejected'
+
+export interface ApiResponse<T> {
+  success: boolean
+  data?: T
+  error?: string
+  message?: string
+}
+```
+
+---
+
+## 7. SECURITY & RBAC
+
+### Role-Based Access Control (RBAC)
+- `src/lib/rbac.tsx` - RBAC component'leri
+- `src/lib/permission-middleware.ts` - Permission kontrol middleware
+- `src/lib/security.ts` - Güvenlik utility'leri
+
+### Permission Check
+```typescript
+import { hasPermission } from '@/lib/permission-middleware'
+import { RoleGuard } from '@/lib/rbac'
+
+function MyComponent() {
+  if (!hasPermission('needy', 'create')) {
+    return <AccessDenied />
+  }
+
+  return (
+    <RoleGuard allowedRoles={['admin', 'manager']}>
+      <CreateNeedyButton />
+    </RoleGuard>
+  )
+}
+```
+
+### Supabase Security
+- RLS (Row Level Security) her table'da enabled olmalı
+- Server-side Supabase client (`@/lib/supabase/server`) admin işlemleri
+- Client-side client (`@/lib/supabase/client`) user işlemleri
+
+### Environment Variables
+- `@/lib/env.ts` - Type-safe environment variable access
+- `NEXT_PUBLIC_` prefix'i public değişkenler
+- `SERVER_` prefix'i secret (client'te kullanma)
+- Asla `.env.local` commit etme
+
+---
+
+## 8. ERROR HANDLING
+
+### Centralized Error Handling
+```typescript
+import { ErrorHandler } from '@/lib/errors'
+
+try {
+  await createNeedy(data)
+} catch (error) {
+  ErrorHandler.handle(error, {
+    context: 'createNeedy',
+    showToast: true,
+  })
+}
+```
+
+### User-Friendly Error Messages
+- Türkçe mesajlar kullan
+- Toast notification'lar `sonner` ile
+- Error boundary'ler kritik component'lerde
+
+### Error Logger
+```typescript
+// src/lib/errors.ts
+export class ErrorHandler {
+  static handle(error: unknown, options?: { context?: string; showToast?: boolean }) {
+    console.error(`[${options?.context}]`, error)
+    
+    if (options?.showToast) {
+      toast.error(this.getUserMessage(error))
+    }
+  }
+
+  private static getUserMessage(error: unknown): string {
+    // User-friendly Türkçe mesaj döndür
+    return 'Bir hata oluştu. Lütfen tekrar deneyin.'
+  }
+}
+```
+
+---
+
+## 9. PERFORMANS OPTİMİZASYONU
+
+### React Optimization
+- Large list'ler için virtualization
+- Expensive calculations için `useMemo`
+- Functions için `useCallback`
+- Component splitting için `React.lazy`
+
+### Query Optimization
+- `staleTime` ve `cacheTime` uygun ayarla
+- Parallel queries için `useQueries`
+- Infinite scroll için `useInfiniteQuery`
+
+### Image Optimization
+- Next.js `Image` component kullan
+- Lazy loading
+- WebP format tercih et
+
+---
+
+## 10. TÜRKÇE DİL KURALLARI
+
+### UI Metinleri
+- Tüm kullanıcıya yönelik metinler TÜRKÇE olmalı
+- Button metinleri: "Kaydet", "Sil", "Düzenle", "Gönder"
+- Form label'ları: "Ad", "Soyad", "Telefon", "Adres"
+- Error mesajları: "Bu alan zorunludur", "Lütfen geçerli bir e-posta adresi girin"
+- Success mesajları: "Başarıyla kaydedildi", "İşlem tamamlandı"
+
+### Tarih Formatı
+- Türkçe tarih format: `dd.MM.yyyy`
+- `Intl.DateTimeFormat('tr-TR')` kullan
+- Örnek: "18.01.2026"
+
+### Sayı Formatı
+- Türkçe sayı format: `1.234,56`
+- `Intl.NumberFormat('tr-TR')` kullan
+- Para birimi: `₺`
+
+### Terminoloji
+- İhtiyaç Sahibi (Not: Needy)
+- Bağış (Not: Donation)
+- Başvuru (Not: Application)
+- Gönüllü (Not: Volunteer)
+- Yetim (Not: Orphan)
+
+---
+
+## 11. DOMAIN SPESİFİK KURALLAR
+
+### İhtiyaç Sahipleri (Needy)
+- Telefon format: `05XXXXXXXXX` (11 haneli TC format)
+- Status: `active`, `inactive`, `pending`, `approved`, `rejected`
+- Search: Ad, soyad, telefon, TCKN ile arama
+- Related data: Bağışlar, başvurular, olaylar
+
+### Bağışlar (Donations)
+- Type: `money`, `food`, `clothes`, `furniture`, `other`
+- Status: `pending`, `confirmed`, `delivered`, `cancelled`
+- Amount: Para birimi `₺`
+- Related data: İhtiyaç sahibi, bağışçı
+
+### Başvurular (Applications)
+- Status: `pending`, `under_review`, `approved`, `rejected`, `completed`
+- Priority: `low`, `medium`, `high`, `urgent`
+- Related data: İhtiyaç sahibi, başvuru formu
+
+### Etkinlikler (Events)
+- Type: `aid_distribution`, `fundraiser`, `volunteer_training`, `other`
+- Status: `planned`, `ongoing`, `completed`, `cancelled`
+- Related data: Gönüllüler, ihtiyaç sahipleri, yer
+
+### Finans (Finance)
+- Type: `income`, `expense`
+- Category: `donation`, `purchase`, `salary`, `rent`, `other`
+- Status: `pending`, `paid`, `cancelled`
+
+### Yetimler (Orphans)
+- Sponsor: `sponsored`, `unsponsored`
+- Education: `primary_school`, `middle_school`, `high_school`, `university`
+- Health status: `healthy`, `needs_attention`, `critical`
+
+---
+
+## 12. ÖZEL ÖZELLİKLER
+
+### Real-time Updates
+- `src/lib/realtime.ts` - Supabase realtime subscriptions
+- `src/lib/realtime.hooks.ts` - Real-time React hooks
+
+### Audit Trail
+- `src/lib/audit.ts` - Audit logging system
+- `src/lib/audit.hooks.ts` - Audit React hooks
+- Tüm kritik işlemler audit loglanmalı
+
+### Bulk Operations
+- `src/lib/bulk.ts` - Toplu işlemler (import/export)
+- `src/lib/bulk.hooks.ts` - Bulk React hooks
+
+### Email Notifications
+- `src/lib/email.ts` - Email sending system
+- `src/lib/email.hooks.ts` - Email React hooks
+
+### PDF Generation
+- `src/lib/pdf/pdf-generator.ts` - PDF rapor oluşturma
+- Template-based PDF generation
+
+### File Upload
+- `src/lib/upload.ts` - File upload handling
+- `src/lib/upload.types.ts` - Upload types
+- Supabase Storage kullanımı
+
+### Search
+- `src/lib/search.ts` - Full-text search
+- `src/lib/search.hooks.ts` - Search React hooks
+- `src/lib/search.types.ts` - Search types
+
+---
+
+## 13. ICONS
+
+### Lucide React
+- `lucide-react` kütüphanesini kullan
+- Örnekler: `User`, `Mail`, `Phone`, `MapPin`, `Calendar`, `DollarSign`, `Activity`
+- Renkler: `text-gray-500`, `text-blue-500`, `text-green-500`
+
+```typescript
+import { User, Mail, Phone, MapPin } from 'lucide-react'
+
+<User className="h-5 w-5 text-gray-500" />
+<Mail className="h-5 w-5 text-blue-500" />
+```
+
+---
+
+## 14. LINTING & TYPE CHECKING
+
+### Build & Check Komutları
+```bash
+npm run dev          # Development server
+npm run build        # Production build
+npm run lint         # ESLint check
+npm start            # Production server
+```
+
+### TypeScript Errors
+- Asla `@ts-ignore` kullanma
+- `@ts-expect-error` sadece bilinen durumlar
+- Strict mode hataları düzeltilmeli
+
+---
+
+## 15. KOD STİLİ KURALLARI
+
+### Import Sırası
+1. React/Next.js imports
+2. External library imports
+3. Internal imports (absolute with `@/`)
+
+```typescript
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import { useNeedyList } from '@/hooks/queries/use-needy'
+```
+
+### Naming Conventions
+- **Files**: kebab-case: `needy-list.tsx`, `needy-form.tsx`
+- **Components**: PascalCase: `NeedyList`, `NeedyForm`
+- **Functions**: camelCase: `createNeedy`, `updateNeedy`
+- **Constants**: UPPER_SNAKE_CASE: `MAX_NEEDY_COUNT`, `API_TIMEOUT`
+- **Interfaces/Types**: PascalCase: `NeedyProps`, `NeedyData`
+
+### Kullanılmayan Import'lar
+- Kullanılmayan import'ları sil
+- ESLint otomatik tespit eder
+
+### Kod Yorumları
+- Minimal yorumlar - kod kendini açıklamalı
+- Sadece complex utility function'lar için JSDoc
+- Descriptive variable/function names kullan
+
+---
+
+## 16. YAPILMAMASI GEREKENLER
+
+❌ **Asla yapma:**
+- `any` tipi kullanma
+- `@ts-ignore` kullanma
+- shadcn/ui component'lerini doğrudan değiştirme
+- `.env.local` commit etme
+- Kullanıcıya gösterilen mesajlarda İngilizce kullanma
+- Mock data kullan (production'da real Supabase)
+- Inline styles kullan (Tailwind kullan)
+- Class components kullan (Function components kullan)
+- Test dosyaları oluştur (production build yok)
+- Server component'te direkt API çağrısı yap (Server Actions kullan)
+- Client-side secret environment variable kullan
+- Duplicate code yaz (DRY principle)
+
+✅ **Yap:**
+- TypeScript strict mode kullan
+- Proper types tanımla
+- Error handling yap
+- Turkish UI text kullan
+- Supabase RLS kullan
+- Zod validation kullan
+- TanStack Query kullan
+- Server components kullan (mümkünse)
+- shadcn/ui component'leri kullan
+- Absolute imports kullan (`@/`)
+- Consistent naming convention kullan
+
+---
+
+## 17. GÖREV TEMPLATES
+
+### Yeni Component Oluşturma
+1. `src/components/[domain]/[component-name].tsx` oluştur
+2. `'use client'` ile başla (client component ise)
+3. Interface props tanımla
+4. shadcn/ui component'lerini import et
+5. `cn()` utility kullan
+6. Türkçe UI text kullan
+7. Export et
+
+### Yeni Query Hook Oluşturma
+1. `src/hooks/queries/use-[entity].ts` oluştur
+2. Supabase client import et
+3. `useQuery`, `useMutation`, `useQueryClient` import et
+4. Query key array tanımla
+5. Query/Mutation fonksiyonu yaz
+6. Cache invalidation yap
+7. Error handling ekle
+
+### Yeni Form Oluşturma
+1. `src/lib/validations/[entity].ts` içinde Zod schema tanımla
+2. `src/components/forms/[entity]-form.tsx` oluştur
+3. `react-hook-form` + `zodResolver` kullan
+4. shadcn/ui Form component'lerini kullan
+5. Query hook import et
+6. Toast notification ekle (sonner)
+7. Turkish validation messages kullan
+
+### Yeni Sayfa Oluşturma
+1. `src/app/(dashboard)/[route]/page.tsx` oluştur
+2. Server component kullan (varsayılan)
+3. `export const dynamic = 'force-dynamic'` ekle
+4. Supabase server client kullan
+5. Data fetch yap
+6. Component'leri render et
+7. Turkish UI text kullan
+
+---
+
+## 18. SIK KARŞILAŞILAN GÖREVLER
+
+### DataTable ile Tablo Oluşturma
+```typescript
+'use client'
+
+import { DataTable } from '@/components/ui/table'
+import { columns } from './columns'
+import { useNeedyList } from '@/hooks/queries/use-needy'
+
+export function NeedyTable() {
+  const { data: needyList, isLoading } = useNeedyList()
+
+  if (isLoading) return <Skeleton />
+
+  return (
+    <DataTable
+      columns={columns}
+      data={needyList || []}
+      searchKey="first_name"
+    />
+  )
+}
+```
+
+### Dialog ile Modal Oluşturma
+```typescript
+'use client'
+
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { NeedyForm } from '@/components/forms/needy-form'
+
+export function CreateNeedyDialog() {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button>Yeni İhtiyaç Sahibi Ekle</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Yeni İhtiyaç Sahibi</DialogTitle>
+          <DialogDescription>
+            Yeni ihtiyaç sahibi bilgilerini girin.
+          </DialogDescription>
+        </DialogHeader>
+        <NeedyForm onSuccess={() => setOpen(false)} />
+      </DialogContent>
+    </Dialog>
+  )
+}
+```
+
+### Sheet ile Slide-over Panel
+```typescript
+'use client'
+
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
+import { NeedyForm } from '@/components/forms/needy-form'
+
+export function NeedySheet() {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <Button>Düzenle</Button>
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>İhtiyaç Sahibi Düzenle</SheetTitle>
+          <SheetDescription>
+            İhtiyaç sahibi bilgilerini güncelleyin.
+          </SheetDescription>
+        </SheetHeader>
+        <NeedyForm onSuccess={() => setOpen(false)} />
+      </SheetContent>
+    </Sheet>
+  )
+}
+```
+
+---
+
+## 19. ENVIRONMENT VARIABLES
+
+### Type-safe Access
+```typescript
+import { env } from '@/lib/env'
+
+// Public variables
+console.log(env.NEXT_PUBLIC_SUPABASE_URL)
+console.log(env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+
+// Server-only variables (never expose to client)
+if (typeof window === 'undefined') {
+  console.log(env.SUPABASE_SERVICE_ROLE_KEY)
+}
+```
+
+### Required Variables
+- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anon key (public)
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (server only)
+
+---
+
+## 20. DEBUGGING
+
+### Console Logging
+- Development'da console.log kullanılabilir
+- Production'da sensitive data asla loglama
+- Error'lar context ile loglanmalı
+
+### Error Boundary
+```typescript
+'use client'
+
+import { Component, ReactNode } from 'react'
+
+interface ErrorBoundaryProps {
+  children: ReactNode
+  fallback?: ReactNode
+}
+
+export class ErrorBoundary extends Component<ErrorBoundaryProps, { hasError: boolean }> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || <div>Bir hata oluştu.</div>
+    }
+    return this.props.children
+  }
+}
+```
+
+---
+
+## ÖZET
+
+Bu proje, yardim yönetim için kapsamlı bir Next.js + Supabase uygulamasıdır. Temel prensipler:
+
+1. **Type Safety**: Strict TypeScript, no `any`
+2. **Security**: RLS, RBAC, no secrets in client
+3. **Performance**: TanStack Query, server components, optimization
+4. **User Experience**: Turkish UI, intuitive flows, fast loading
+5. **Code Quality**: Consistent style, no duplicate code, minimal comments
+6. **Developer Experience**: Comprehensive tooling, type-safe environment, clear patterns
+
+Her değişiklik sonrası `npm run lint` çalıştır. Production build için `npm run build`.
+
+---
+
+*Bu dosya AI asistanlar için hazırlanmıştır. Sorular veya geliştirme önerileri için issue açın.*

@@ -68,7 +68,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <QueryClientProvider client={queryClient}>
         {children}
         <Toaster position="top-right" richColors closeButton />
-        {process.env.NODE_ENV === 'development' && (
+        {process.env['NODE_ENV'] === 'development' && (
           <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
         )}
       </QueryClientProvider>

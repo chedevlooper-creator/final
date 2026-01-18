@@ -99,7 +99,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          {process.env.NODE_ENV === 'development' && (
+          {process.env['NODE_ENV'] === 'development' && (
             <div className="mt-6 text-center">
               <p className="text-sm text-slate-500">
                 Demo hesap: demo@example.com / demo123

@@ -1,3 +1,0 @@
-# deployment docker cicd terraform monitoring
-Created comprehensive deployment configuration for Aid Management Panel including Docker (Dockerfile, docker-compose.yml, .dockerignore), environment configs (.env.example, .env.production.example, setup-env.sh), CI/CD pipelines (deploy-production.yml, deploy-staging.yml, pr-check.yml), Terraform IaC (main.tf, variables.tf, outputs.tf), monitoring (prometheus.yml, grafana dashboard, health-check.sh), deployment scripts (deploy.sh, rollback.sh, backup-db.sh, migrate-db.sh), and documentation (DEPLOYMENT.md, MONITORING.md, TROUBLESHOOTING.md)
-

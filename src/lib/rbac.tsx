@@ -7,6 +7,9 @@
 import React from 'react'
 import type { UserRole } from '@/types/common'
 
+// Re-export UserRole for convenience
+export type { UserRole } from '@/types/common'
+
 /**
  * Permission types
  */
@@ -118,8 +121,8 @@ export function hasResourcePermission(
   resource: keyof typeof RESOURCE_PERMISSIONS,
   action: string
 ): boolean {
-  const permissions = RESOURCE_PERMISSIONS[resource]?.[role]
-  return permissions?.includes(action as any) ?? false
+  const permissions = RESOURCE_PERMISSIONS[resource]?.[role] as readonly string[] | undefined
+  return permissions?.includes(action) ?? false
 }
 
 /**

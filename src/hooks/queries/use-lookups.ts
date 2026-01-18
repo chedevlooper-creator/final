@@ -12,7 +12,7 @@ import {
 } from '@/lib/mock-data/needy'
 
 // Mock data kullanımı için flag
-const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true'
+const USE_MOCK_DATA = process.env['NEXT_PUBLIC_USE_MOCK_DATA'] === 'true'
 
 export function useCountries() {
   const supabase = createClient()

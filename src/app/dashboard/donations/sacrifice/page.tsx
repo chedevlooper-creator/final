@@ -130,7 +130,7 @@ export default function SacrificeDonationsPage() {
     },
     {
       id: 'actions',
-      cell: ({ row }) => (
+      cell: () => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">

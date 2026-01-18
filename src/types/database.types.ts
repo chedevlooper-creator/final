@@ -515,6 +515,35 @@ export interface Database {
                     created_at?: string
                 }
             }
+            profiles: {
+                Row: {
+                    id: string
+                    email: string
+                    name: string | null
+                    avatar_url: string | null
+                    role: 'admin' | 'moderator' | 'user' | 'viewer'
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id: string
+                    email: string
+                    name?: string | null
+                    avatar_url?: string | null
+                    role?: 'admin' | 'moderator' | 'user' | 'viewer'
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    email?: string
+                    name?: string | null
+                    avatar_url?: string | null
+                    role?: 'admin' | 'moderator' | 'user' | 'viewer'
+                    created_at?: string
+                    updated_at?: string
+                }
+            }
         }
         Views: {
             [_ in never]: never

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -30,11 +30,6 @@ import {
     ArrowLeft,
     Save,
     User,
-    Phone,
-    Calendar,
-    Package,
-    Truck,
-    MapPin,
 } from 'lucide-react'
 import Link from 'next/link'
 import { format } from 'date-fns'
@@ -88,12 +83,11 @@ const DISTRIBUTION_TYPES = [
 
 export default function SacrificeDetailPage() {
     const params = useParams()
-    const router = useRouter()
-    const id = params.id as string
+    const id = params['id'] as string
 
     const [isLoading, setIsLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)
-    const [sacrifice, setSacrifice] = useState(mockSacrifice)
+    const [sacrifice, _setSacrifice] = useState(mockSacrifice)
 
     useEffect(() => {
         setTimeout(() => setIsLoading(false), 500)

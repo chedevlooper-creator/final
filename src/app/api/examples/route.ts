@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
  * Delete yetkisi olanlar silebilir
  */
 export async function DELETE(request: NextRequest) {
-  // 'delete' yetkisi gerektirir
+  // 'delete' yetkisi gerektirir (resource: needy_persons için)
   const middleware = await withAuth(request, {
     requiredPermission: 'delete',
     resource: 'needy_persons'
@@ -178,3 +178,5 @@ export async function PATCH(request: NextRequest) {
  *      ['create', 'update']
  *    )
  */
+
+

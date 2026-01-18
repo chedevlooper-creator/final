@@ -1,2 +1,0 @@
-Creating stock-list.tsx - Comprehensive inventory stock list with statistics cards, data table, status badges (OK/LOW_STOCK/OUT_OF_STOCK), filters, pagination, and action modals
-

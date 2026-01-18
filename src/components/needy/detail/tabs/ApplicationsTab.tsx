@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 
-const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true'
+const USE_MOCK_DATA = process.env['NEXT_PUBLIC_USE_MOCK_DATA'] === 'true'
 
 interface Application {
   id: string

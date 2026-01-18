@@ -77,7 +77,7 @@ const PERMISSION_MODULES = [
 export default function UserDetailPage() {
     const params = useParams()
     const router = useRouter()
-    const id = params.id as string
+    const id = params['id'] as string
 
     const [isLoading, setIsLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)

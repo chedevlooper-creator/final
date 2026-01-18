@@ -1,2 +1,0 @@
-Creating comprehensive inventory service layer at src/lib/inventory/inventory-service.ts with 7 main services: InventoryCategoryService, InventoryItemService, WarehouseService, WarehouseLocationService, InventoryStockService, InventoryMovementService, StockAlertService. Features include CRUD operations, search, filtering, pagination, auto-code generation, stock management, and low stock alerts.
-
