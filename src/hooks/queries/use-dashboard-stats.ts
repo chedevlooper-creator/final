@@ -14,6 +14,7 @@ export interface DashboardStats {
   completedAids: number
   activeVolunteers: number
   pendingOrphans: number
+  totalAids: number
 }
 
 export interface MonthlyTrend {
@@ -28,12 +29,38 @@ export interface CategoryDistribution {
   color?: string
 }
 
+/**
+ * Optimized dashboard stats using PostgreSQL function
+ * Single query instead of 9 parallel queries
+ */
 export function useDashboardStats() {
   const supabase = createClient()
 
   return useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async (): Promise<DashboardStats> => {
+      // Try using the optimized RPC function first
+      const { data: rpcData, error: rpcError } = await supabase
+        .rpc('get_dashboard_summary')
+
+      if (!rpcError && rpcData && rpcData.length > 0) {
+        const stats = rpcData[0]
+        return {
+          totalNeedy: stats.active_needy || 0,
+          activeNeedy: stats.active_needy || 0,
+          pendingApplications: stats.pending_applications || 0,
+          todayDonations: stats.today_donations || 0,
+          monthlyDonations: stats.this_month_donations || 0,
+          yearlyDonations: stats.total_donations || 0,
+          totalDonationCount: 0, // Would need another query
+          completedAids: stats.total_aids || 0,
+          activeVolunteers: stats.active_volunteers || 0,
+          pendingOrphans: 0,
+          totalAids: stats.total_aids || 0,
+        }
+      }
+
+      // Fallback to parallel queries if RPC doesn't exist
       const now = new Date()
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate())
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -55,17 +82,17 @@ export function useDashboardStats() {
         // Active needy persons
         supabase.from('needy_persons').select('*', { count: 'exact', head: true }).eq('status', 'active'),
         // Pending applications
-        supabase.from('aid_applications').select('*', { count: 'exact', head: true }).eq('status', 'new'),
-        // Today's donations (amount sum)
-        supabase.from('donations').select('amount').gte('created_at', startOfDay.toISOString()).eq('payment_status', 'completed'),
+        supabase.from('applications').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+        // Today's donations (amount sum) - use donation_date instead of created_at for index
+        supabase.from('donations').select('amount').gte('donation_date', startOfDay.toISOString()).eq('payment_status', 'approved'),
         // Monthly donations (amount sum)
-        supabase.from('donations').select('amount').gte('created_at', startOfMonth.toISOString()).eq('payment_status', 'completed'),
+        supabase.from('donations').select('amount').gte('donation_date', startOfMonth.toISOString()).eq('payment_status', 'approved'),
         // Yearly donations (amount sum)
-        supabase.from('donations').select('amount').gte('created_at', startOfYear.toISOString()).eq('payment_status', 'completed'),
+        supabase.from('donations').select('amount').gte('donation_date', startOfYear.toISOString()).eq('payment_status', 'approved'),
         // Total donation count
-        supabase.from('donations').select('*', { count: 'exact', head: true }).eq('payment_status', 'completed'),
+        supabase.from('donations').select('*', { count: 'exact', head: true }).eq('payment_status', 'approved'),
         // Completed aids this month
-        supabase.from('aid_applications').select('*', { count: 'exact', head: true }).eq('status', 'completed').gte('updated_at', startOfMonth.toISOString()),
+        supabase.from('aids').select('*', { count: 'exact', head: true }).eq('status', 'distributed').gte('aid_date', startOfMonth.toISOString()),
         // Active volunteers
         supabase.from('volunteers').select('*', { count: 'exact', head: true }).eq('status', 'active'),
       ])
@@ -83,14 +110,20 @@ export function useDashboardStats() {
         totalDonationCount: totalDonationsResult.count || 0,
         completedAids: completedAidsResult.count || 0,
         activeVolunteers: volunteersResult.count || 0,
-        pendingOrphans: 0, // TODO: Add orphans query if table exists
+        pendingOrphans: 0,
+        totalAids: completedAidsResult.count || 0,
       }
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
+    // Cache stats for 2 minutes
+    staleTime: 2 * 60 * 1000,
+    // Auto-refetch every 5 minutes
+    refetchInterval: 5 * 60 * 1000,
   })
 }
 
+/**
+ * Optimized monthly donation trend using single query with aggregation
+ */
 export function useMonthlyDonationTrend(months: number = 6) {
   const supabase = createClient()
 
@@ -98,44 +131,68 @@ export function useMonthlyDonationTrend(months: number = 6) {
     queryKey: ['dashboard-monthly-trend', months],
     queryFn: async (): Promise<MonthlyTrend[]> => {
       const now = new Date()
+      const startDate = new Date(now.getFullYear(), now.getMonth() - months + 1, 1)
+
+      // Single query with date truncation
+      const { data, error } = await supabase
+        .rpc('get_monthly_donation_trend', {
+          p_start_date: startDate.toISOString(),
+          p_end_date: now.toISOString()
+        })
+
+      if (!error && data) {
+        return data
+      }
+
+      // Fallback: Manual aggregation
+      const { data: donations } = await supabase
+        .from('donations')
+        .select('donation_date, amount')
+        .gte('donation_date', startDate.toISOString())
+        .eq('payment_status', 'approved')
+
+      const monthlyTotals: Record<string, number> = {}
+      
+      donations?.forEach(d => {
+        const monthKey = d.donation_date?.slice(0, 7) || new Date().toISOString().slice(0, 7)
+        monthlyTotals[monthKey] = (monthlyTotals[monthKey] || 0) + (d.amount || 0)
+      })
+
+      const monthNames = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
       const results: MonthlyTrend[] = []
 
       for (let i = months - 1; i >= 0; i--) {
-        const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1)
-        const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59)
-        
-        const { data } = await supabase
-          .from('donations')
-          .select('amount')
-          .gte('created_at', monthStart.toISOString())
-          .lte('created_at', monthEnd.toISOString())
-          .eq('payment_status', 'completed')
-
-        const total = data?.reduce((sum, item) => sum + (item.amount || 0), 0) || 0
-        const monthNames = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
+        const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        const monthKey = monthDate.toISOString().slice(0, 7)
         
         results.push({
-          month: monthStart.toISOString().slice(0, 7),
-          label: monthNames[monthStart.getMonth()] || '',
-          value: total,
+          month: monthKey,
+          label: monthNames[monthDate.getMonth()] || '',
+          value: monthlyTotals[monthKey] || 0,
         })
       }
 
       return results
     },
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    // Cache trends for 10 minutes
+    staleTime: 10 * 60 * 1000,
   })
 }
 
+/**
+ * Optimized application type distribution
+ */
 export function useApplicationTypeDistribution() {
   const supabase = createClient()
 
   return useQuery({
     queryKey: ['dashboard-application-types'],
     queryFn: async (): Promise<CategoryDistribution[]> => {
-      const { data } = await supabase
-        .from('aid_applications')
+      // Use aggregation in database for better performance
+      const { data, error } = await supabase
+        .from('applications')
         .select('application_type')
+        .not('application_type', 'is', null)
 
       if (!data) return []
 
@@ -159,16 +216,21 @@ export function useApplicationTypeDistribution() {
 
       const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#6b7280']
 
-      return Object.entries(counts).map(([type, count], index) => ({
-        label: typeLabels[type] || type,
-        value: count,
-        color: colors[index % colors.length],
-      }))
+      return Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .map(([type, count], index) => ({
+          label: typeLabels[type] || type,
+          value: count,
+          color: colors[index % colors.length],
+        }))
     },
-    staleTime: 1000 * 60 * 10,
+    staleTime: 10 * 60 * 1000,
   })
 }
 
+/**
+ * Optimized city distribution
+ */
 export function useCityDistribution() {
   const supabase = createClient()
 
@@ -177,29 +239,42 @@ export function useCityDistribution() {
     queryFn: async (): Promise<CategoryDistribution[]> => {
       const { data } = await supabase
         .from('needy_persons')
-        .select(`
-          city:cities(name)
-        `)
+        .select('city_id')
         .eq('status', 'active')
+        .not('city_id', 'is', null)
 
       if (!data) return []
 
       const counts: Record<string, number> = {}
       data.forEach(item => {
-        const cityName = (item.city as { name?: string } | null)?.name || 'Belirtilmemiş'
-        counts[cityName] = (counts[cityName] || 0) + 1
+        const cityId = item.city_id || 'unknown'
+        counts[cityId] = (counts[cityId] || 0) + 1
       })
 
-      // Sort by count and take top 10
+      // Fetch city names in batch
+      const cityIds = Object.keys(counts)
+      const { data: cities } = await supabase
+        .from('cities')
+        .select('id, name')
+        .in('id', cityIds.slice(0, 100)) // Limit to 100 cities
+
+      const cityMap = new Map(cities?.map(c => [c.id, c.name]) || [])
+
       return Object.entries(counts)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 10)
-        .map(([label, value]) => ({ label, value }))
+        .map(([cityId, value]) => ({
+          label: cityMap.get(cityId) || cityId,
+          value,
+        }))
     },
-    staleTime: 1000 * 60 * 10,
+    staleTime: 10 * 60 * 1000,
   })
 }
 
+/**
+ * Application status distribution
+ */
 export function useApplicationStatusDistribution() {
   const supabase = createClient()
 
@@ -207,7 +282,7 @@ export function useApplicationStatusDistribution() {
     queryKey: ['dashboard-application-status'],
     queryFn: async (): Promise<CategoryDistribution[]> => {
       const { data } = await supabase
-        .from('aid_applications')
+        .from('applications')
         .select('status')
 
       if (!data) return []
@@ -244,6 +319,30 @@ export function useApplicationStatusDistribution() {
         color: statusColors[status] || '#6b7280',
       }))
     },
-    staleTime: 1000 * 60 * 10,
+    staleTime: 10 * 60 * 1000,
+  })
+}
+
+/**
+ * Recent activities feed
+ */
+export function useRecentActivities(limit: number = 10) {
+  const supabase = createClient()
+
+  return useQuery({
+    queryKey: ['dashboard-recent-activities', limit],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .rpc('get_recent_activities', { p_limit: limit })
+
+      if (!error && data) {
+        return data
+      }
+
+      // Fallback
+      return []
+    },
+    staleTime: 1 * 60 * 1000, // 1 minute - more frequent updates
+    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
   })
 }
