@@ -11,6 +11,11 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   
+  // ESLint configuration
+  eslint: {
+    dirs: ['src'], // Only lint src directory
+  },
+  
   // TypeScript build configuration
   typescript: {
     ignoreBuildErrors: true, // Geçici olarak TypeScript hatalarını atla

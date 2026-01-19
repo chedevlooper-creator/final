@@ -102,13 +102,13 @@ export default function DashboardPage() {
         icon={Home}
         actions={
           <div className="flex gap-2">
-            <Link href="/needy">
+            <Link href="/dashboard/needy">
               <Button variant="outline">
                 <Users className="mr-2 h-4 w-4" />
                 İhtiyaç Sahipleri
               </Button>
             </Link>
-            <Link href="/applications">
+            <Link href="/dashboard/applications">
               <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600">
                 <FileText className="mr-2 h-4 w-4" />
                 Yeni Başvuru
@@ -131,7 +131,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg font-semibold">Son Başvurular</CardTitle>
-            <Link href="/applications">
+            <Link href="/dashboard/applications">
               <Button variant="ghost" size="sm">
                 Tümünü Gör
               </Button>
@@ -185,7 +185,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-3 sm:grid-cols-2">
-              <Link href="/needy">
+              <Link href="/dashboard/needy">
                 <Button
                   variant="outline"
                   className="h-auto w-full flex-col items-start gap-2 p-4 hover:bg-slate-50 hover:border-emerald-300"
@@ -197,7 +197,7 @@ export default function DashboardPage() {
                   </div>
                 </Button>
               </Link>
-              <Link href="/applications">
+              <Link href="/dashboard/applications">
                 <Button
                   variant="outline"
                   className="h-auto w-full flex-col items-start gap-2 p-4 hover:bg-slate-50 hover:border-blue-300"
@@ -209,7 +209,7 @@ export default function DashboardPage() {
                   </div>
                 </Button>
               </Link>
-              <Link href="/donations">
+              <Link href="/dashboard/donations">
                 <Button
                   variant="outline"
                   className="h-auto w-full flex-col items-start gap-2 p-4 hover:bg-slate-50 hover:border-purple-300"
@@ -221,7 +221,7 @@ export default function DashboardPage() {
                   </div>
                 </Button>
               </Link>
-              <Link href="/calendar">
+              <Link href="/dashboard/calendar">
                 <Button
                   variant="outline"
                   className="h-auto w-full flex-col items-start gap-2 p-4 hover:bg-slate-50 hover:border-orange-300"
