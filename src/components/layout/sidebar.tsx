@@ -31,7 +31,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 z-40 h-screen border-r bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 transition-all duration-300',
+        'fixed left-0 top-0 z-40 h-screen border-r bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 transition-all duration-200',
         sidebarCollapsed ? 'w-16' : 'w-64'
       )}
     >
@@ -68,7 +68,7 @@ export function Sidebar() {
               <CollapsibleTrigger asChild>
                 <button
                   className={cn(
-                    'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150',
                     'text-slate-400 hover:bg-slate-700/50 hover:text-white',
                     sidebarCollapsed && 'justify-center'
                   )}
@@ -94,9 +94,9 @@ export function Sidebar() {
                     <Link
                       key={item.href}
                       href={item.href}
-                      prefetch={true}
+                      prefetch="intent"
                       className={cn(
-                        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all',
+                        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-150',
                         isActive
                           ? 'bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 border-l-2 border-emerald-400'
                           : 'text-slate-400 hover:bg-slate-700/50 hover:text-white'

@@ -3,9 +3,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ThemeProvider } from 'next-themes'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Toaster } from '@/components/ui/sonner'
 import { WebVitals, PerformanceMonitor } from '@/components/performance/web-vitals'
+import { setupIdlePrefetch } from '@/lib/prefetch'
+import { ViewTransitions, injectViewTransitionStyles } from '@/components/navigation/view-transitions'
+import { ProgressBar } from '@/components/navigation/progress-bar'
 
 // Query client oluşturma fonksiyonu - optimization için ayrı
 function makeQueryClient() {
@@ -64,9 +67,21 @@ function getQueryClient() {
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(getQueryClient)
 
+  useEffect(() => {
+    // Setup idle prefetching for instant page transitions
+    const cleanup = setupIdlePrefetch(queryClient)
+    
+    // Inject view transition styles
+    injectViewTransitionStyles()
+    
+    return cleanup
+  }, [queryClient])
+
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <QueryClientProvider client={queryClient}>
+        <ProgressBar />
+        <ViewTransitions />
         <WebVitals />
         <PerformanceMonitor />
         {children}

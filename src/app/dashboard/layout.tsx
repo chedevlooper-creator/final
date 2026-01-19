@@ -14,7 +14,7 @@ export default function DashboardLayout({
   const { sidebarCollapsed } = useUIStore()
   const pathname = usePathname()
 
-  // Detay sayfasında Header'ı gizle
+  // Detay sayfasinda Header'i gizle
   const isDetailPage = pathname?.includes('/needy/') && pathname !== '/needy'
 
   return (
@@ -23,7 +23,7 @@ export default function DashboardLayout({
       {!isDetailPage && <Header />}
       <main
         className={cn(
-          'min-h-screen transition-all duration-150',
+          'min-h-screen transition-all duration-200',
           !isDetailPage && 'pt-16',
           sidebarCollapsed ? 'pl-16' : 'pl-64'
         )}
