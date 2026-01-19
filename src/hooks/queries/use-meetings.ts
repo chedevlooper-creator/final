@@ -10,15 +10,22 @@ import type {
   MeetingDetail,
   MeetingParticipant,
   Task,
+  MeetingNote,
+  MeetingVote,
+  VoteResponse,
+  MeetingFile,
   CreateMeetingInput,
   UpdateMeetingInput,
   CreateTaskInput,
   UpdateTaskInput,
+  CreateNoteInput,
+  CreateVoteInput,
+  UploadFileInput,
   MeetingFilters,
   TaskFilters,
   PaginatedResponse
 } from '@/types/meeting.types';
-import { MeetingStatus, TaskStatus, ParticipantStatus } from '@/types/meeting.types';
+import { MeetingStatus, TaskStatus, ParticipantStatus, TaskPriority } from '@/types/meeting.types';
 
 // ============================================================================
 // MEETINGS / TOPLANTILAR
@@ -208,7 +215,7 @@ export function useUpdateMeeting() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: Meeting) => {
       queryClient.invalidateQueries({ queryKey: ['meetings'] });
       queryClient.invalidateQueries({ queryKey: ['meetings', 'detail', data.id] });
     },
@@ -235,7 +242,7 @@ export function useCancelMeeting() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: Meeting) => {
       queryClient.invalidateQueries({ queryKey: ['meetings'] });
       queryClient.invalidateQueries({ queryKey: ['meetings', 'detail', data.id] });
     },
@@ -307,7 +314,7 @@ export function useUpdateParticipantStatus() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (_data: MeetingParticipant, variables: { meetingId: string; userId: string; status: ParticipantStatus; availabilityConfirmed?: boolean }) => {
       queryClient.invalidateQueries({ queryKey: ['meetings', 'participants', variables.meetingId] });
     },
   });
@@ -437,7 +444,7 @@ export function useCreateTask() {
       
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: Task) => {
       queryClient.invalidateQueries({ queryKey: ['meetings', 'tasks', data.meeting_id] });
       queryClient.invalidateQueries({ queryKey: ['tasks', 'my'] });
     },
@@ -464,7 +471,7 @@ export function useUpdateTask() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: Task) => {
       queryClient.invalidateQueries({ queryKey: ['meetings', 'tasks', data.meeting_id] });
       queryClient.invalidateQueries({ queryKey: ['tasks', 'my'] });
     },
@@ -519,7 +526,7 @@ export function useUpdateTaskStatus() {
       
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: Task) => {
       queryClient.invalidateQueries({ queryKey: ['meetings', 'tasks', data.meeting_id] });
       queryClient.invalidateQueries({ queryKey: ['tasks', 'my'] });
     },
@@ -728,7 +735,7 @@ export function useCreateNote() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: MeetingNote) => {
       queryClient.invalidateQueries({ queryKey: ['meetings', 'notes', data.meeting_id] });
     },
   });
@@ -802,8 +809,8 @@ export function useCreateVote() {
       
       if (participants) {
         const notifications = participants
-          .filter(p => p.user_id !== user.id)
-          .map(p => ({
+        .filter((p: { user_id: string }) => p.user_id !== user.id)
+          .map((p: { user_id: string }) => ({
             user_id: p.user_id,
             type: 'vote_created',
             title: 'Yeni Oylama',
@@ -818,7 +825,7 @@ export function useCreateVote() {
       
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: MeetingVote) => {
       queryClient.invalidateQueries({ queryKey: ['meetings', 'votes', data.meeting_id] });
     },
   });
@@ -849,7 +856,7 @@ export function useSubmitVote() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: VoteResponse) => {
       queryClient.invalidateQueries({ queryKey: ['meetings', 'votes'] });
     },
   });
@@ -900,7 +907,7 @@ export function useUploadFile() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: MeetingFile) => {
       queryClient.invalidateQueries({ queryKey: ['meetings', 'files', data.meeting_id] });
     },
   });

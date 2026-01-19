@@ -1,20 +1,17 @@
 import * as Sentry from '@sentry/nextjs'
 
 Sentry.init({
-  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  dsn: process.env['NEXT_PUBLIC_SENTRY_DSN'],
   
   environment: process.env.NODE_ENV,
   
   // Adjust tracesSampleRate based on environment
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
   
-  // Server-side integrations
-  integrations: [
-    new Sentry.BrowserTracing(),
-  ],
+
   
   // beforeSend - Server-side filtering
-  beforeSend(event, hint) {
+  beforeSend(event: any, hint: any) {
     // Filter sensitive headers
     if (event.request?.headers) {
       delete event.request.headers.authorization
@@ -34,7 +31,7 @@ Sentry.init({
   },
   
   // Filter health check transactions
-  tracesSampler(samplingContext) {
+  tracesSampler(samplingContext: any) {
     const url = samplingContext?.transactionContext?.name || ''
     
     // Skip health checks

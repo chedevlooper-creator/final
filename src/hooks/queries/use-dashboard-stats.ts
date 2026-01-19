@@ -152,8 +152,8 @@ export function useMonthlyDonationTrend(months: number = 6) {
         .eq('payment_status', 'approved')
 
       const monthlyTotals: Record<string, number> = {}
-      
-      donations?.forEach(d => {
+
+      donations?.forEach((d: { donation_date?: string | null; amount?: number | null }) => {
         const monthKey = d.donation_date?.slice(0, 7) || new Date().toISOString().slice(0, 7)
         monthlyTotals[monthKey] = (monthlyTotals[monthKey] || 0) + (d.amount || 0)
       })
@@ -197,7 +197,7 @@ export function useApplicationTypeDistribution() {
       if (!data) return []
 
       const counts: Record<string, number> = {}
-      data.forEach(item => {
+      data.forEach((item: { application_type?: string | null }) => {
         const type = item.application_type || 'other'
         counts[type] = (counts[type] || 0) + 1
       })
@@ -246,7 +246,7 @@ export function useCityDistribution() {
       if (!data) return []
 
       const counts: Record<string, number> = {}
-      data.forEach(item => {
+      data.forEach((item: { city_id?: string | null }) => {
         const cityId = item.city_id || 'unknown'
         counts[cityId] = (counts[cityId] || 0) + 1
       })
@@ -258,13 +258,13 @@ export function useCityDistribution() {
         .select('id, name')
         .in('id', cityIds.slice(0, 100)) // Limit to 100 cities
 
-      const cityMap = new Map(cities?.map(c => [c.id, c.name]) || [])
+      const cityMap = new Map(cities?.map((c: { id: string; name: string }) => [c.id, c.name]) || [])
 
       return Object.entries(counts)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 10)
         .map(([cityId, value]) => ({
-          label: cityMap.get(cityId) || cityId,
+          label: (cityMap.get(cityId) as string) || cityId,
           value,
         }))
     },
@@ -288,7 +288,7 @@ export function useApplicationStatusDistribution() {
       if (!data) return []
 
       const counts: Record<string, number> = {}
-      data.forEach(item => {
+      data.forEach((item: { status?: string | null }) => {
         const status = item.status || 'new'
         counts[status] = (counts[status] || 0) + 1
       })

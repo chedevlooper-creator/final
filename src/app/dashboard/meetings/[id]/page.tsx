@@ -225,7 +225,7 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
                             ? 'bg-red-100 text-red-700'
                             : 'bg-blue-100 text-blue-700'
                         }`}>
-                          {TaskPriorityLabels[task.priority]}
+                          {TaskPriorityLabels[task.priority as keyof typeof TaskPriorityLabels]}
                         </span>
                         {task.due_date && (
                           <span>Son teslim: {new Date(task.due_date).toLocaleDateString('tr-TR')}</span>
@@ -282,7 +282,7 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
                             ? 'bg-green-100 text-green-700'
                             : 'bg-yellow-100 text-yellow-700'
                         }`}>
-                          {TaskStatusLabels[task.status]}
+                          {TaskStatusLabels[task.status as keyof typeof TaskStatusLabels]}
                         </span>
                       </div>
                     </div>

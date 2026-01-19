@@ -2,17 +2,47 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
-import {
-  mockCountries,
-  mockCities,
-  mockDistricts,
-  mockNeighborhoods,
-  mockCategories,
-  mockPartners
-} from '@/lib/mock-data/needy'
+
+// Mock data types
+interface Country {
+  id: string
+  name: string
+  code: string
+}
+
+interface City {
+  id: string
+  name: string
+  country_id: string
+}
+
+interface District {
+  id: string
+  name: string
+  city_id: string
+}
+
+interface Category {
+  id: string
+  name: string
+  type?: string
+}
+
+interface Partner {
+  id: string
+  name: string
+  type?: string
+}
 
 // Mock data kullanımı için flag
 const USE_MOCK_DATA = process.env['NEXT_PUBLIC_USE_MOCK_DATA'] === 'true'
+
+// Mock data fallbacks (empty arrays - actual data would come from DB)
+const mockCountries: Country[] = []
+const mockCities: City[] = []
+const mockDistricts: District[] = []
+const mockCategories: Category[] = []
+const mockPartners: Partner[] = []
 
 export function useCountries() {
   const supabase = createClient()

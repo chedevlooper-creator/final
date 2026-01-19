@@ -3,6 +3,17 @@
  * OpenAPI/Swagger specification generator
  */
 
+// Type definition for the decorator parameter
+interface RouteSpec {
+  summary: string
+  description?: string
+  tags?: string[]
+  parameters?: any[]
+  requestBody?: any
+  responses?: any
+  security?: any[]
+}
+
 export interface OpenAPISpec {
   openapi: string
   info: {
@@ -72,7 +83,7 @@ Tüm error response'ları şu formatta döner:
   },
   servers: [
     {
-      url: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
+      url: process.env['NEXT_PUBLIC_API_URL'] || 'http://localhost:3000',
       description: 'Development Server',
     },
     {
@@ -266,7 +277,7 @@ Tüm error response'ları şu formatta döner:
 /**
  * API Route decorator - Add documentation to API routes
  */
-export function DocumentRoute(spec: {
+export function DocumentRoute(config: {
   summary: string
   description?: string
   tags?: string[]
@@ -277,9 +288,10 @@ export function DocumentRoute(spec: {
 }) {
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     // Store metadata for documentation generation
-    const existingDocs = Reflect.getMetadata('api-docs', target.constructor) || {}
-    existingDocs[propertyKey] = spec
-    Reflect.defineMetadata('api-docs', existingDocs, target.constructor)
+    const constructor = target.constructor
+    const metadata = (constructor as any).__api_docs_metadata__ || {}
+    metadata[propertyKey] = config
+    (constructor as any).__api_docs_metadata__ = metadata
     return descriptor
   }
 }

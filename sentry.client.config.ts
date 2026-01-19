@@ -1,20 +1,18 @@
 import * as Sentry from '@sentry/nextjs'
 
 Sentry.init({
-  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  
+  dsn: process.env['NEXT_PUBLIC_SENTRY_DSN'],
+
   // Environment
   environment: process.env.NODE_ENV,
-  
+
   // Tracing
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
   
-  // Session Replay
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1.0,
+
   
   // beforeSend - Sensitive data filtering
-  beforeSend(event, hint) {
+  beforeSend(event: any, hint: any) {
     // Filter out sensitive data
     if (event.request) {
       // Remove passwords from request data
@@ -42,14 +40,7 @@ Sentry.init({
     return event
   },
   
-  // Integrations
-  integrations: [
-    new Sentry.BrowserTracing(),
-    new Sentry.Replay({
-      maskAllText: true,
-      blockAllMedia: true,
-    }),
-  ],
+
   
   // Tags
   initialScope: {
@@ -59,7 +50,7 @@ Sentry.init({
   },
   
   // Before breadcrumb
-  beforeBreadcrumb(breadcrumb) {
+  beforeBreadcrumb(breadcrumb: any) {
     // Filter out certain breadcrumbs
     if (breadcrumb.category === 'xhr' && breadcrumb.data?.url) {
       const url = breadcrumb.data.url as string

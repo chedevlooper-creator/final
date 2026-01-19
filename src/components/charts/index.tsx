@@ -1,8 +1,17 @@
 'use client'
 
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieLabelRenderProps } from 'recharts'
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
+
+interface PieLabelProps {
+  category: string
+  percent: number
+}
+
+const CustomPieLabel = ({ category, percent }: PieLabelProps) => {
+  return `${category}: ${(percent * 100).toFixed(0)}%`
+}
 
 interface DonationChartProps {
   data: Array<{ date: string; amount: number }>
@@ -20,7 +29,7 @@ export function DonationChart({ data }: DonationChartProps) {
         <YAxis />
         <Tooltip 
           contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', borderRadius: '8px' }}
-          formatter={(value: number) => `${value.toLocaleString('tr-TR')} TL`}
+          formatter={(value?: number) => value !== undefined ? `${value.toLocaleString('tr-TR')} TL` : ''}
         />
         <Legend />
         <Line 
@@ -52,7 +61,7 @@ export function CategoryChart({ data }: CategoryChartProps) {
           cx="50%"
           cy="50%"
           labelLine={false}
-          label={({ category, percent }) => `${category}: ${(percent * 100).toFixed(0)}%`}
+          label={({ category, percent }: any) => `${category}: ${(percent * 100).toFixed(0)}%`}
           outerRadius={80}
           fill="#8884d8"
           dataKey="amount"
@@ -61,7 +70,7 @@ export function CategoryChart({ data }: CategoryChartProps) {
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip formatter={(value: number) => `${value.toLocaleString('tr-TR')} TL`} />
+        <Tooltip formatter={(value?: number) => value !== undefined ? `${value.toLocaleString('tr-TR')} TL` : ''} />
       </PieChart>
     </ResponsiveContainer>
   )
@@ -81,7 +90,7 @@ export function AidDistributionChart({ data }: BarChartProps) {
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
         <YAxis />
-        <Tooltip formatter={(value: number) => `${value.toLocaleString('tr-TR')} TL`} />
+        <Tooltip formatter={(value?: number) => value !== undefined ? `${value.toLocaleString('tr-TR')} TL` : ''} />
         <Legend />
         <Bar dataKey="value" fill="#3b82f6" name="Yardım Tutarı" />
       </BarChart>

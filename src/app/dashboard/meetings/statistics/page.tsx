@@ -11,7 +11,7 @@
 import { useMemo } from 'react';
 import { useMeetingsList, useMeetingStatistics } from '@/hooks/queries/use-meetings';
 import { useMyTasks } from '@/hooks/queries/use-meetings';
-import { MeetingStatus, TaskStatus, TaskPriority } from '@/types/meeting.types';
+import { MeetingStatus, TaskStatus, TaskPriority, Meeting } from '@/types/meeting.types';
 import {
   BarChart3,
   Calendar,
@@ -40,10 +40,10 @@ export default function MeetingStatisticsPage() {
     
     // Toplantı durumu dağılımı
     const statusDistribution = {
-      scheduled: meetings.filter(m => m.status === MeetingStatus.SCHEDULED).length,
-      in_progress: meetings.filter(m => m.status === MeetingStatus.IN_PROGRESS).length,
-      completed: meetings.filter(m => m.status === MeetingStatus.COMPLETED).length,
-      cancelled: meetings.filter(m => m.status === MeetingStatus.CANCELLED).length,
+      scheduled: meetings.filter((m: Meeting) => m.status === MeetingStatus.SCHEDULED).length,
+      in_progress: meetings.filter((m: Meeting) => m.status === MeetingStatus.IN_PROGRESS).length,
+      completed: meetings.filter((m: Meeting) => m.status === MeetingStatus.COMPLETED).length,
+      cancelled: meetings.filter((m: Meeting) => m.status === MeetingStatus.CANCELLED).length,
     };
 
     // Toplam toplantı sayısı
@@ -76,7 +76,7 @@ export default function MeetingStatisticsPage() {
     // Bu haftaki toplantılar
     const today = new Date();
     const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-    const thisWeekMeetings = meetings.filter(m => {
+    const thisWeekMeetings = meetings.filter((m: Meeting) => {
       const meetingDate = new Date(m.meeting_date);
       return meetingDate >= startOfWeek;
     }).length;
@@ -261,7 +261,7 @@ export default function MeetingStatisticsPage() {
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: 'Kritik', count: stats.priorityDistribution.critical, color: 'bg-red-100 text-red-700 border-red-200' },
+                { label: 'Acil', count: stats.priorityDistribution.urgent, color: 'bg-red-100 text-red-700 border-red-200' },
                 { label: 'Yüksek', count: stats.priorityDistribution.high, color: 'bg-orange-100 text-orange-700 border-orange-200' },
                 { label: 'Orta', count: stats.priorityDistribution.medium, color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
                 { label: 'Düşük', count: stats.priorityDistribution.low, color: 'bg-green-100 text-green-700 border-green-200' },

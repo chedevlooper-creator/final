@@ -254,9 +254,9 @@ export function useDonationStats() {
             .eq('payment_status', 'approved')
         ])
 
-        const todayTotal = todayResult.data?.reduce((sum, d) => sum + (d.amount || 0), 0) || 0
-        const monthTotal = monthResult.data?.reduce((sum, d) => sum + (d.amount || 0), 0) || 0
-        const allTimeTotal = totalResult.data?.reduce((sum, d) => sum + (d.amount || 0), 0) || 0
+        const todayTotal = todayResult.data?.reduce((sum: number, d: { amount?: number | null }) => sum + (d.amount || 0), 0) || 0
+        const monthTotal = monthResult.data?.reduce((sum: number, d: { amount?: number | null }) => sum + (d.amount || 0), 0) || 0
+        const allTimeTotal = totalResult.data?.reduce((sum: number, d: { amount?: number | null }) => sum + (d.amount || 0), 0) || 0
 
         return {
           today: todayTotal,

@@ -5,7 +5,7 @@ import path from 'path'
 
 // Bundle analyzer configuration
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
+  enabled: process.env['ANALYZE'] === 'true',
 })
 
 const nextConfig: NextConfig = {

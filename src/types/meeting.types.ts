@@ -466,7 +466,7 @@ export interface CreateNoteInput {
  * Dosya yükleme / Upload file
  */
 export interface UploadFileInput {
-  meeting_id: string
+  meetingId: string
   file: File
 }
 
