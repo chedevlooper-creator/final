@@ -4,23 +4,32 @@ import './globals.css'
 import { Providers } from '@/components/providers'
 import { ErrorBoundary } from '@/components/error-boundary'
 
+// Font optimizasyonu - display swap ve preloading
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
+  display: 'swap',
+  preload: true,
 })
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   variable: '--font-space',
+  display: 'swap',
+  preload: true,
 })
 
 export const metadata: Metadata = {
   title: 'Yardım Yönetim Paneli',
   description: 'Sivil toplum kuruluşları için kapsamlı yardım yönetim sistemi',
+  // Preconnect for external resources
+  other: {
+    'x-dns-prefetch-control': 'on',
+  },
 }
 
-// Force dynamic rendering to prevent prerendering issues
-export const dynamic = 'force-dynamic'
+// Partial Prerendering için
+export const revalidate = 3600 // 1 saat
 
 export default function RootLayout({
   children,

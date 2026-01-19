@@ -3,6 +3,11 @@ import { withWorkflow } from 'workflow/next'
 import { securityHeaders } from '@/lib/security'
 import path from 'path'
 
+// Bundle analyzer configuration
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   
@@ -40,12 +45,36 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-icons',
       'date-fns',
       '@tanstack/react-query',
+      'recharts',
+      'xlsx',
     ],
   },
 
   // Turbopack configuration - silence multiple lockfile warning
   turbopack: {
     root: path.resolve(__dirname),
+  },
+  
+  // Webpack optimizations for bundle size
+  webpack: (config, { isServer }) => {
+    // Optimize package imports
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      }
+    }
+    
+    // Reduce bundle size with tree shaking
+    config.optimization = {
+      ...config.optimization,
+      usedExports: true,
+      sideEffects: true,
+    }
+    
+    return config
   },
   
   async headers() {
@@ -81,4 +110,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withWorkflow(nextConfig)
+export default withWorkflow(withBundleAnalyzer(nextConfig))

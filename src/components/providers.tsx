@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ThemeProvider } from 'next-themes'
 import { useState } from 'react'
 import { Toaster } from '@/components/ui/sonner'
+import { WebVitals, PerformanceMonitor } from '@/components/performance/web-vitals'
 
 // Query client oluşturma fonksiyonu - optimization için ayrı
 function makeQueryClient() {
@@ -66,6 +67,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <QueryClientProvider client={queryClient}>
+        <WebVitals />
+        <PerformanceMonitor />
         {children}
         <Toaster position="top-right" richColors closeButton />
         {process.env['NODE_ENV'] === 'development' && (
