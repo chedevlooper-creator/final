@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 
 interface UIState {
   sidebarCollapsed: boolean
@@ -13,22 +12,41 @@ interface UIState {
   closeModal: () => void
 }
 
-export const useUIStore = create<UIState>()(
-  persist(
-    (set) => ({
-      sidebarCollapsed: false,
-      sidebarOpen: true,
-      activeModal: null,
-      modalData: null,
-      toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
-      setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
-      setSidebarOpen: (open) => set({ sidebarOpen: open }),
-      openModal: (modalId, data) => set({ activeModal: modalId, modalData: data || null }),
-      closeModal: () => set({ activeModal: null, modalData: null }),
-    }),
-    {
-      name: 'ui-storage',
-      partialize: (state) => ({ sidebarCollapsed: state.sidebarCollapsed }),
+export const useUIStore = create<UIState>((set) => ({
+  sidebarCollapsed: false,
+  sidebarOpen: true,
+  activeModal: null,
+  modalData: null,
+  toggleSidebar: () => {
+    set((state) => {
+      const newState = { sidebarCollapsed: !state.sidebarCollapsed }
+      // Save to localStorage (client-side only, async)
+      if (typeof window !== 'undefined') {
+        setTimeout(() => {
+          try {
+            localStorage.setItem('ui-storage', JSON.stringify({ state: newState }))
+          } catch {
+            // Ignore errors
+          }
+        }, 0)
+      }
+      return newState
+    })
+  },
+  setSidebarCollapsed: (collapsed) => {
+    set({ sidebarCollapsed: collapsed })
+    // Save to localStorage (client-side only, async)
+    if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        try {
+          localStorage.setItem('ui-storage', JSON.stringify({ state: { sidebarCollapsed: collapsed } }))
+        } catch {
+          // Ignore errors
+        }
+      }, 0)
     }
-  )
-)
+  },
+  setSidebarOpen: (open) => set({ sidebarOpen: open }),
+  openModal: (modalId, data) => set({ activeModal: modalId, modalData: data || null }),
+  closeModal: () => set({ activeModal: null, modalData: null }),
+}))

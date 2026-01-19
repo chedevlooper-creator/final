@@ -8,7 +8,7 @@ import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useUIStore } from '@/stores/ui-store'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Collapsible,
   CollapsibleContent,
@@ -17,14 +17,46 @@ import {
 
 export function Sidebar() {
   const pathname = usePathname()
-  const { sidebarCollapsed, toggleSidebar } = useUIStore()
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const [openGroups, setOpenGroups] = useState<string[]>(['Başlangıç', 'Yardım Yönetimi'])
+  
+  // Client-side hydration
+  useEffect(() => {
+    setMounted(true)
+    const store = useUIStore.getState()
+    setSidebarCollapsed(store.sidebarCollapsed)
+    
+    // Subscribe to store changes
+    const unsubscribe = useUIStore.subscribe(
+      (state) => state.sidebarCollapsed,
+      (collapsed) => setSidebarCollapsed(collapsed)
+    )
+    
+    return unsubscribe
+  }, [])
+  
+  const toggleSidebar = () => {
+    useUIStore.getState().toggleSidebar()
+  }
 
   const toggleGroup = (title: string) => {
     setOpenGroups((prev) =>
       prev.includes(title)
         ? prev.filter((t) => t !== title)
         : [...prev, title]
+    )
+  }
+
+  if (!mounted) {
+    return (
+      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+        <div className="flex h-16 items-center justify-between border-b border-slate-700 px-4">
+          <h1 className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+            Yardım Paneli
+          </h1>
+        </div>
+      </aside>
     )
   }
 

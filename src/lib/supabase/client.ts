@@ -1,6 +1,6 @@
 import { createBrowserClient } from '@supabase/ssr'
 import { env } from '@/lib/env'
-import { supabase } from '@supabase/supabase-js'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
 // Singleton pattern for browser client
 let browserClient: ReturnType<typeof createBrowserClient> | null = null
@@ -12,6 +12,30 @@ let browserClient: ReturnType<typeof createBrowserClient> | null = null
 export function createClient() {
   if (browserClient) {
     return browserClient
+  }
+
+  // Only create client on client-side
+  if (typeof window === 'undefined') {
+    // Return a mock client for SSR
+    return createBrowserClient(
+      env.NEXT_PUBLIC_SUPABASE_URL,
+      env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+        },
+        db: {
+          schema: 'public',
+        },
+        global: {
+          headers: {
+            'x-application-name': 'yardim-yonetim-paneli',
+          },
+        },
+      }
+    )
   }
 
   browserClient = createBrowserClient(
@@ -48,7 +72,7 @@ export function createAdminClient() {
     throw new Error('Admin client should only be used on server side')
   }
 
-  return supabase(
+  return createSupabaseClient(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.SUPABASE_SERVICE_ROLE_KEY,
     {

@@ -16,14 +16,52 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 import { NotificationDropdown } from '@/components/layout/notification-dropdown'
+import { useEffect, useState } from 'react'
 
 export function Header() {
   const { user, signOut } = useAuth()
-  const { sidebarCollapsed, toggleSidebar } = useUIStore()
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  
+  // Client-side hydration
+  useEffect(() => {
+    setMounted(true)
+    const store = useUIStore.getState()
+    setSidebarCollapsed(store.sidebarCollapsed)
+    
+    // Subscribe to store changes
+    const unsubscribe = useUIStore.subscribe(
+      (state) => state.sidebarCollapsed,
+      (collapsed) => setSidebarCollapsed(collapsed)
+    )
+    
+    return unsubscribe
+  }, [])
+  
+  const toggleSidebar = () => {
+    useUIStore.getState().toggleSidebar()
+  }
 
   const initials = user?.email
     ? user.email.slice(0, 2).toUpperCase()
     : 'U'
+
+  if (!mounted) {
+    return (
+      <header className="fixed top-0 left-64 right-0 z-30 flex h-16 items-center justify-between border-b bg-white/80 backdrop-blur-sm px-4">
+        <div className="flex items-center gap-4">
+          <div className="relative hidden md:block">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Input
+              placeholder="Ara... (⌘K)"
+              className="w-64 pl-9 bg-slate-50 border-slate-200 focus:bg-white"
+              disabled
+            />
+          </div>
+        </div>
+      </header>
+    )
+  }
 
   return (
     <header
