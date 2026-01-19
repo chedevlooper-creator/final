@@ -34,14 +34,13 @@ import {
   Clock,
   CheckCircle,
   XCircle,
+  Loader2,
 } from 'lucide-react'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { APPLICATION_TYPES, APPLICATION_STATUSES, PRIORITY_LEVELS } from '@/lib/validations/application'
-
-// Mock data flag
-const USE_MOCK_DATA = process.env['NEXT_PUBLIC_USE_MOCK_DATA'] === 'true'
+import { useApplicationDetail, useUpdateApplication } from '@/hooks/queries/use-applications'
 
 interface Application {
   id: string
@@ -67,78 +66,49 @@ interface Application {
   }
 }
 
-// Mock data
-const mockApplication: Application = {
-  id: '1',
-  application_number: 'BV-2026-0001',
-  needy_person_id: '1',
-  application_type: 'food',
-  status: 'in_review',
-  priority: 'high',
-  assigned_user_id: null,
-  description: 'Aylık gıda yardımı talebi. Aile 5 kişiden oluşmakta.',
-  requested_amount: 2500,
-  approved_amount: null,
-  notes: 'Acil durum - işsizlik nedeniyle',
-  created_at: '2026-01-15T10:30:00Z',
-  updated_at: '2026-01-15T10:30:00Z',
-  needy_person: {
-    id: '1',
-    first_name: 'Ayşe',
-    last_name: 'Yılmaz',
-    phone: '0532 123 45 67',
-    identity_number: '12345678901',
-    address: 'Başakşehir, İstanbul',
-  },
-}
-
 export default function ApplicationDetailPage() {
   const params = useParams()
   const id = params['id'] as string
 
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [application, setApplication] = useState<Application | null>(null)
+  const { data: application, isLoading, error } = useApplicationDetail(id)
+  const updateMutation = useUpdateApplication()
+
   const [status, setStatus] = useState('')
   const [priority, setPriority] = useState('')
   const [notes, setNotes] = useState('')
   const [approvedAmount, setApprovedAmount] = useState<string>('')
 
+  // Sync local state with fetched data
   useEffect(() => {
-    async function fetchData() {
-      try {
-        if (USE_MOCK_DATA) {
-          // Simulate loading
-          await new Promise((resolve) => setTimeout(resolve, 500))
-          setApplication(mockApplication)
-          setStatus(mockApplication.status)
-          setPriority(mockApplication.priority || '')
-          setNotes(mockApplication.notes || '')
-          setApprovedAmount(mockApplication.approved_amount?.toString() || '')
-        } else {
-          // TODO: Real API call
-        }
-      } catch (error) {
-        console.error('Error:', error)
-        toast.error('Veri yüklenirken hata oluştu')
-      } finally {
-        setIsLoading(false)
-      }
+    if (application) {
+      setStatus(application.status || '')
+      setPriority(application.priority || '')
+      setNotes(application.notes || '')
+      setApprovedAmount(application.approved_amount?.toString() || '')
     }
+  }, [application])
 
-    fetchData()
-  }, [id])
+  // Show error toast if fetch fails
+  useEffect(() => {
+    if (error) {
+      toast.error('Başvuru yüklenirken hata oluştu')
+    }
+  }, [error])
 
   const handleSave = async () => {
-    setIsSaving(true)
     try {
-      // TODO: Real API call
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await updateMutation.mutateAsync({
+        id,
+        values: {
+          status,
+          priority: priority || null,
+          notes: notes || null,
+          approved_amount: approvedAmount ? parseFloat(approvedAmount) : null,
+        },
+      })
       toast.success('Başvuru güncellendi')
-    } catch (error) {
+    } catch (err) {
       toast.error('Kayıt sırasında hata oluştu')
-    } finally {
-      setIsSaving(false)
     }
   }
 
@@ -231,11 +201,15 @@ export default function ApplicationDetailPage() {
         </div>
         <Button
           onClick={handleSave}
-          disabled={isSaving}
+          disabled={updateMutation.isPending}
           className="bg-gradient-to-r from-emerald-500 to-cyan-500"
         >
-          <Save className="mr-2 h-4 w-4" />
-          {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
+          {updateMutation.isPending ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="mr-2 h-4 w-4" />
+          )}
+          {updateMutation.isPending ? 'Kaydediliyor...' : 'Kaydet'}
         </Button>
       </div>
 

@@ -8,14 +8,62 @@ interface ChartData {
     color?: string
 }
 
-interface SimpleBarChartProps {
-    title: string
-    data: ChartData[]
-    height?: number
+// Helper to get value from data item using key
+function getValue<T>(item: T, key: string): string | number {
+    return (item as Record<string, string | number>)[key]
 }
 
-export function SimpleBarChart({ title, data, height = 200 }: SimpleBarChartProps) {
-    const maxValue = Math.max(...data.map((d) => d.value))
+interface SimpleBarChartProps<T = ChartData> {
+    title?: string
+    data: T[]
+    height?: number
+    labelKey?: string
+    valueKey?: string
+    color?: string
+    horizontal?: boolean
+}
+
+export function SimpleBarChart<T = ChartData>({ 
+    title, 
+    data, 
+    height = 200,
+    labelKey = 'label',
+    valueKey = 'value',
+    color,
+    horizontal = false,
+}: SimpleBarChartProps<T>) {
+    const values = data.map((d) => Number(getValue(d, valueKey)))
+    const maxValue = Math.max(...values)
+
+    const content = (
+        <div className="space-y-3" style={{ minHeight: height }}>
+            {data.map((item, idx) => {
+                const label = String(getValue(item, labelKey))
+                const value = Number(getValue(item, valueKey))
+                const itemColor = (item as ChartData).color || color || `hsl(${160 + idx * 30}, 70%, 50%)`
+                
+                return (
+                    <div key={idx} className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                            <span className="text-slate-600">{label}</span>
+                            <span className="font-medium">{value.toLocaleString('tr-TR')}</span>
+                        </div>
+                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div
+                                className="h-full rounded-full transition-all duration-500"
+                                style={{
+                                    width: `${(value / maxValue) * 100}%`,
+                                    backgroundColor: itemColor,
+                                }}
+                            />
+                        </div>
+                    </div>
+                )
+            })}
+        </div>
+    )
+
+    if (!title) return content
 
     return (
         <Card>
@@ -23,52 +71,49 @@ export function SimpleBarChart({ title, data, height = 200 }: SimpleBarChartProp
                 <CardTitle className="text-sm">{title}</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="space-y-3" style={{ minHeight: height }}>
-                    {data.map((item, idx) => (
-                        <div key={idx} className="space-y-1">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-slate-600">{item.label}</span>
-                                <span className="font-medium">{item.value.toLocaleString('tr-TR')}</span>
-                            </div>
-                            <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full rounded-full transition-all duration-500"
-                                    style={{
-                                        width: `${(item.value / maxValue) * 100}%`,
-                                        backgroundColor: item.color || `hsl(${160 + idx * 30}, 70%, 50%)`,
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                {content}
             </CardContent>
         </Card>
     )
 }
 
-interface SimplePieChartProps {
-    title: string
-    data: ChartData[]
+interface SimplePieChartProps<T = ChartData> {
+    title?: string
+    data: T[]
     size?: number
+    height?: number
+    labelKey?: string
+    valueKey?: string
+    showLegend?: boolean
 }
 
-export function SimplePieChart({ title, data, size = 160 }: SimplePieChartProps) {
-    const total = data.reduce((sum, d) => sum + d.value, 0)
-    const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
+export function SimplePieChart<T = ChartData>({ 
+    title, 
+    data, 
+    size = 160,
+    height,
+    labelKey = 'label',
+    valueKey = 'value',
+    showLegend = true,
+}: SimplePieChartProps<T>) {
+    const defaultColors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16']
+    const total = data.reduce((sum, d) => sum + Number(getValue(d, valueKey)), 0)
 
     let cumulativePercent = 0
 
     const segments = data.map((item, idx) => {
-        const percent = (item.value / total) * 100
+        const value = Number(getValue(item, valueKey))
+        const label = String(getValue(item, labelKey))
+        const percent = (value / total) * 100
         const startPercent = cumulativePercent
         cumulativePercent += percent
 
         return {
-            ...item,
+            label,
+            value,
             percent,
             startPercent,
-            color: item.color || colors[idx % colors.length],
+            color: (item as ChartData).color || defaultColors[idx % defaultColors.length],
         }
     })
 
@@ -77,60 +122,84 @@ export function SimplePieChart({ title, data, size = 160 }: SimplePieChartProps)
         .map((s) => `${s.color} ${s.startPercent}% ${s.startPercent + s.percent}%`)
         .join(', ')
 
+    const content = (
+        <div className="flex items-center gap-6" style={height ? { height } : undefined}>
+            {/* Pie */}
+            <div
+                className="rounded-full flex-shrink-0"
+                style={{
+                    width: size,
+                    height: size,
+                    background: `conic-gradient(${gradientStops})`,
+                }}
+            />
+
+            {/* Legend */}
+            {showLegend && (
+                <div className="space-y-2 flex-1 max-h-full overflow-auto">
+                    {segments.map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-2">
+                                <div
+                                    className="w-3 h-3 rounded-full flex-shrink-0"
+                                    style={{ backgroundColor: item.color }}
+                                />
+                                <span className="text-slate-600 truncate">{item.label}</span>
+                            </div>
+                            <span className="font-medium flex-shrink-0">{item.percent.toFixed(0)}%</span>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    )
+
+    if (!title) return content
+
     return (
         <Card>
             <CardHeader className="pb-2">
                 <CardTitle className="text-sm">{title}</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="flex items-center gap-6">
-                    {/* Pie */}
-                    <div
-                        className="rounded-full flex-shrink-0"
-                        style={{
-                            width: size,
-                            height: size,
-                            background: `conic-gradient(${gradientStops})`,
-                        }}
-                    />
-
-                    {/* Legend */}
-                    <div className="space-y-2 flex-1">
-                        {segments.map((item, idx) => (
-                            <div key={idx} className="flex items-center justify-between text-sm">
-                                <div className="flex items-center gap-2">
-                                    <div
-                                        className="w-3 h-3 rounded-full"
-                                        style={{ backgroundColor: item.color }}
-                                    />
-                                    <span className="text-slate-600">{item.label}</span>
-                                </div>
-                                <span className="font-medium">{item.percent.toFixed(0)}%</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                {content}
             </CardContent>
         </Card>
     )
 }
 
-interface TrendChartProps {
-    title: string
-    data: ChartData[]
+interface TrendChartProps<T = ChartData> {
+    title?: string
+    data: T[]
     height?: number
     color?: string
+    labelKey?: string
+    valueKey?: string
+    showArea?: boolean
+    formatValue?: (value: number) => string
 }
 
-export function TrendChart({ title, data, height = 120, color = '#10b981' }: TrendChartProps) {
-    const maxValue = Math.max(...data.map((d) => d.value))
-    const minValue = Math.min(...data.map((d) => d.value))
+export function TrendChart<T = ChartData>({ 
+    title, 
+    data, 
+    height = 120, 
+    color = '#10b981',
+    labelKey = 'label',
+    valueKey = 'value',
+    showArea = true,
+    formatValue,
+}: TrendChartProps<T>) {
+    const values = data.map((d) => Number(getValue(d, valueKey)))
+    const maxValue = Math.max(...values)
+    const minValue = Math.min(...values)
     const range = maxValue - minValue || 1
 
     const points = data.map((d, idx) => {
-        const x = (idx / (data.length - 1)) * 100
-        const y = 100 - ((d.value - minValue) / range) * 80
-        return { x, y, ...d }
+        const value = Number(getValue(d, valueKey))
+        const label = String(getValue(d, labelKey))
+        const x = data.length > 1 ? (idx / (data.length - 1)) * 100 : 50
+        const y = 100 - ((value - minValue) / range) * 80
+        return { x, y, label, value }
     })
 
     const pathD = points
@@ -139,47 +208,62 @@ export function TrendChart({ title, data, height = 120, color = '#10b981' }: Tre
 
     const areaD = `${pathD} L 100 100 L 0 100 Z`
 
+    const content = (
+        <>
+            <div style={{ height: height - 40 }}>
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
+                    {/* Area */}
+                    {showArea && (
+                        <path
+                            d={areaD}
+                            fill={color}
+                            fillOpacity={0.1}
+                        />
+                    )}
+                    {/* Line */}
+                    <path
+                        d={pathD}
+                        fill="none"
+                        stroke={color}
+                        strokeWidth={2}
+                        vectorEffect="non-scaling-stroke"
+                    />
+                    {/* Points */}
+                    {points.map((p, idx) => (
+                        <circle
+                            key={idx}
+                            cx={p.x}
+                            cy={p.y}
+                            r={3}
+                            fill={color}
+                            vectorEffect="non-scaling-stroke"
+                        />
+                    ))}
+                </svg>
+            </div>
+            {/* Labels */}
+            <div className="flex justify-between mt-2 text-xs text-slate-500">
+                {points.map((p, idx) => (
+                    <div key={idx} className="text-center">
+                        <div>{p.label}</div>
+                        {formatValue && (
+                            <div className="font-medium text-slate-700">{formatValue(p.value)}</div>
+                        )}
+                    </div>
+                ))}
+            </div>
+        </>
+    )
+
+    if (!title) return <div style={{ height }}>{content}</div>
+
     return (
         <Card>
             <CardHeader className="pb-2">
                 <CardTitle className="text-sm">{title}</CardTitle>
             </CardHeader>
             <CardContent>
-                <div style={{ height }}>
-                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
-                        {/* Area */}
-                        <path
-                            d={areaD}
-                            fill={color}
-                            fillOpacity={0.1}
-                        />
-                        {/* Line */}
-                        <path
-                            d={pathD}
-                            fill="none"
-                            stroke={color}
-                            strokeWidth={2}
-                            vectorEffect="non-scaling-stroke"
-                        />
-                        {/* Points */}
-                        {points.map((p, idx) => (
-                            <circle
-                                key={idx}
-                                cx={p.x}
-                                cy={p.y}
-                                r={3}
-                                fill={color}
-                                vectorEffect="non-scaling-stroke"
-                            />
-                        ))}
-                    </svg>
-                </div>
-                {/* Labels */}
-                <div className="flex justify-between mt-2 text-xs text-slate-500">
-                    {data.map((d, idx) => (
-                        <span key={idx}>{d.label}</span>
-                    ))}
-                </div>
+                {content}
             </CardContent>
         </Card>
     )

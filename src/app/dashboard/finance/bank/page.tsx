@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { CreditCard, Plus, MoreHorizontal, Eye, Pencil } from 'lucide-react'
+import { CreditCard, Plus, MoreHorizontal, Eye, Pencil, Trash2 } from 'lucide-react'
 import { ColumnDef } from '@tanstack/react-table'
 import {
   DropdownMenu,
@@ -24,25 +24,31 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
-
-type BankTransaction = {
-  id: string
-  transaction_number: string | null
-  bank_account: string | null
-  transaction_type: string
-  amount: number
-  currency: string
-  description: string | null
-  created_at: string
-}
+import { useBankTransactions, useDeleteFinanceTransaction, FinanceTransaction } from '@/hooks/queries/use-finance'
+import { toast } from 'sonner'
 
 export default function FinanceBankPage() {
   const [page, setPage] = useState(0)
   const [transactionType, setTransactionType] = useState<string>('')
 
-  // TODO: Add useBankTransactions hook
-  const data = { data: [], count: 0 }
-  const isLoading = false
+  const { data, isLoading } = useBankTransactions({
+    type: transactionType as 'income' | 'expense' | undefined,
+    page,
+    limit: 20,
+  })
+  
+  const deleteMutation = useDeleteFinanceTransaction()
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Bu işlemi silmek istediğinize emin misiniz?')) {
+      try {
+        await deleteMutation.mutateAsync(id)
+        toast.success('İşlem silindi')
+      } catch (error) {
+        toast.error('İşlem silinemedi')
+      }
+    }
+  }
 
   const getTransactionTypeBadge = (type: string) => {
     const typeColors: Record<string, string> = {
@@ -62,17 +68,18 @@ export default function FinanceBankPage() {
     )
   }
 
-  const formatAmount = (amount: number, currency: string) => {
+  const formatAmount = (amount: number, currency: string, type: string) => {
     const symbol = currency === 'TRY' ? '₺' : currency
-    const color = amount >= 0 ? 'text-emerald-600' : 'text-red-600'
+    const color = type === 'income' ? 'text-emerald-600' : 'text-red-600'
+    const prefix = type === 'income' ? '+' : '-'
     return (
       <span className={`font-bold ${color}`}>
-        {symbol}{Math.abs(amount).toLocaleString('tr-TR')}
+        {prefix}{symbol}{Math.abs(amount).toLocaleString('tr-TR')}
       </span>
     )
   }
 
-  const columns: ColumnDef<BankTransaction>[] = [
+  const columns: ColumnDef<FinanceTransaction>[] = [
     {
       accessorKey: 'transaction_number',
       header: 'İşlem No',
@@ -83,21 +90,21 @@ export default function FinanceBankPage() {
       ),
     },
     {
-      accessorKey: 'bank_account',
-      header: 'Banka Hesabı',
+      accessorKey: 'category',
+      header: 'Kategori',
       cell: ({ row }) => (
-        <span className="text-sm">{row.original.bank_account || '-'}</span>
+        <span className="text-sm">{row.original.category || '-'}</span>
       ),
     },
     {
-      accessorKey: 'transaction_type',
+      accessorKey: 'type',
       header: 'İşlem Türü',
-      cell: ({ row }) => getTransactionTypeBadge(row.original.transaction_type),
+      cell: ({ row }) => getTransactionTypeBadge(row.original.type),
     },
     {
       accessorKey: 'amount',
       header: 'Tutar',
-      cell: ({ row }) => formatAmount(row.original.amount, row.original.currency),
+      cell: ({ row }) => formatAmount(row.original.amount, row.original.currency, row.original.type),
     },
     {
       accessorKey: 'description',
@@ -132,6 +139,13 @@ export default function FinanceBankPage() {
             <DropdownMenuItem>
               <Pencil className="mr-2 h-4 w-4" />
               Düzenle
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => handleDelete(row.original.id)}
+              className="text-red-600"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Sil
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

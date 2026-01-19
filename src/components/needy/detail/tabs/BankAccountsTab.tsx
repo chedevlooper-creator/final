@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -26,7 +26,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Plus, Search, Pencil, Trash2, Eye } from 'lucide-react'
+import { Pencil, Trash2, Eye, Loader2 } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import {
   BankAccount,
@@ -36,7 +36,13 @@ import {
   Currency,
   TransactionType
 } from '@/types/linked-records.types'
-import { useEffect } from 'react'
+import { 
+  useBankAccountsList, 
+  useCreateBankAccount, 
+  useUpdateBankAccount, 
+  useDeleteBankAccount 
+} from '@/hooks/queries/use-bank-accounts'
+import { toast } from 'sonner'
 
 interface BankAccountsTabProps {
   needyPersonId: string
@@ -63,15 +69,24 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
     address: '',
   })
 
-  // Mock data - gerçek uygulamada API'den gelecek
-  const [accounts, setAccounts] = useState<BankAccount[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  // API hooks
+  const isActiveFilter = statusFilter === 'active' ? true : statusFilter === 'passive' ? false : undefined
+  const { data: accountsData, isLoading } = useBankAccountsList(needyPersonId, isActiveFilter)
+  const createMutation = useCreateBankAccount()
+  const updateMutation = useUpdateBankAccount()
+  const deleteMutation = useDeleteBankAccount()
 
-  // Load data
-  useEffect(() => {
-    // TODO: Real API call
-    setIsLoading(false)
-  }, [needyPersonId])
+  // Filter accounts by search
+  const accounts = useMemo(() => {
+    if (!accountsData) return []
+    if (!searchValue) return accountsData
+    const search = searchValue.toLowerCase()
+    return accountsData.filter(acc => 
+      acc.iban?.toLowerCase().includes(search) ||
+      acc.bank_name?.toLowerCase().includes(search) ||
+      acc.account_holder_name?.toLowerCase().includes(search)
+    )
+  }, [accountsData, searchValue])
 
   const columns = [
     { key: 'account_holder_name', label: 'Alıcı Ünvanı' },
@@ -119,17 +134,62 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
   }
 
   const handleSave = async () => {
-    // TODO: API call to save
-    console.log('Saving:', formData)
-    setIsAddModalOpen(false)
+    try {
+      if (editingAccount) {
+        // Update existing
+        await updateMutation.mutateAsync({
+          id: editingAccount.id,
+          values: {
+            account_holder_name: formData.account_holder_name || null,
+            currency: formData.currency,
+            transaction_type: formData.transaction_type || null,
+            iban: formData.iban || null,
+            bank_name: formData.bank_name || null,
+            branch_name: formData.branch_name || null,
+            branch_code: formData.branch_code || null,
+            account_number: formData.account_number || null,
+            swift_code: formData.swift_code || null,
+            address: formData.address || null,
+          },
+        })
+        toast.success('Banka hesabı güncellendi')
+      } else {
+        // Create new
+        await createMutation.mutateAsync({
+          needy_person_id: needyPersonId,
+          account_holder_name: formData.account_holder_name || null,
+          currency: formData.currency,
+          transaction_type: formData.transaction_type || null,
+          iban: formData.iban || null,
+          bank_name: formData.bank_name || null,
+          branch_name: formData.branch_name || null,
+          branch_code: formData.branch_code || null,
+          account_number: formData.account_number || null,
+          swift_code: formData.swift_code || null,
+          address: formData.address || null,
+          is_active: true,
+          is_primary: false,
+        })
+        toast.success('Banka hesabı eklendi')
+      }
+      setIsAddModalOpen(false)
+    } catch (error) {
+      toast.error('Kayıt sırasında hata oluştu')
+    }
   }
 
   const handleDelete = async (id: string) => {
     if (confirm('Bu banka hesabını silmek istediğinizden emin misiniz?')) {
-      // TODO: API call to delete
-      console.log('Deleting:', id)
+      try {
+        await deleteMutation.mutateAsync({ id, needyPersonId })
+        toast.success('Banka hesabı silindi')
+      } catch (error) {
+        toast.error('Silme işlemi başarısız')
+      }
     }
   }
+  
+  const isSaving = createMutation.isPending || updateMutation.isPending
 
   return (
     <>
@@ -338,10 +398,11 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>
+            <Button variant="outline" onClick={() => setIsAddModalOpen(false)} disabled={isSaving}>
               İptal
             </Button>
-            <Button onClick={handleSave}>
+            <Button onClick={handleSave} disabled={isSaving}>
+              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Kaydet
             </Button>
           </DialogFooter>

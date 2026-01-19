@@ -320,9 +320,24 @@ export default function NeedyDetailPage() {
     }
   }
 
-  const handlePhotoChange = (file: File | null) => {
-    // TODO: Implement photo upload
-    console.log('Photo changed:', file)
+  const handlePhotoChange = (url: string | null, path: string | null) => {
+    form.setValue('photo_url', url, { shouldDirty: true })
+  }
+
+  const handlePhotoUpload = async (url: string, path: string) => {
+    // Save photo URL to database immediately after upload
+    const supabase = createClient()
+    const { error } = await supabase
+      .from('needy_persons')
+      .update({ photo_url: url })
+      .eq('id', id)
+
+    if (error) {
+      throw new Error('Fotoğraf kaydedilemedi')
+    }
+
+    // Update local state
+    setNeedyData(prev => prev ? { ...prev, photo_url: url } : null)
   }
 
   const handleStatusChange = (newStatus: 'pending' | 'active' | 'inactive' | 'rejected') => {
@@ -383,7 +398,9 @@ export default function NeedyDetailPage() {
                     <div className="md:col-span-3 space-y-4">
                       <PhotoSection
                         photoUrl={needyData?.photo_url}
+                        needyPersonId={id}
                         onPhotoChange={handlePhotoChange}
+                        onPhotoUpload={id !== 'new' ? handlePhotoUpload : undefined}
                       />
 
                       <FileInfoSection

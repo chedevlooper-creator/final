@@ -106,9 +106,29 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
       const supabase = createClient()
 
       // Mernis kontrolü yapılacaksa
-      if (values.check_mernis && values.identity_number) {
-        // TODO: Mernis API çağrısı
-        console.log('Mernis kontrolü yapılıyor:', values.identity_number)
+      if (values.check_mernis && values.identity_number && values.date_of_birth) {
+        const birthYear = new Date(values.date_of_birth).getFullYear()
+        
+        const mernisResponse = await fetch('/api/mernis/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tcKimlikNo: values.identity_number,
+            ad: values.first_name,
+            soyad: values.last_name,
+            dogumYili: birthYear,
+          }),
+        })
+
+        const mernisResult = await mernisResponse.json()
+
+        if (!mernisResult.verified) {
+          toast.error(`Mernis Doğrulama: ${mernisResult.message}`)
+          setIsLoading(false)
+          return
+        }
+
+        toast.success('TC Kimlik doğrulaması başarılı')
       }
 
       // Kayıt oluştur

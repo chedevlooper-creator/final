@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Bell, Search, LogOut, User, Menu } from 'lucide-react'
+import { Search, LogOut, User, Menu } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { useUIStore } from '@/stores/ui-store'
 import {
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
+import { NotificationDropdown } from '@/components/layout/notification-dropdown'
 
 export function Header() {
   const { user, signOut } = useAuth()
@@ -54,10 +55,7 @@ export function Header() {
 
       <div className="flex items-center gap-3">
         {/* Bildirimler */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5 text-slate-600" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
-        </Button>
+        <NotificationDropdown />
 
         {/* Kullanıcı menüsü */}
         <DropdownMenu>

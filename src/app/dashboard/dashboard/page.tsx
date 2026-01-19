@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic'
 import { useMemo } from 'react'
 import { StatCard } from '@/components/common/stat-card'
 import { PageHeader } from '@/components/common/page-header'
+import { SimpleBarChart, SimplePieChart, TrendChart } from '@/components/common/charts'
 import {
   Home,
   Users,
@@ -21,12 +22,26 @@ import Link from 'next/link'
 import { useNeedyList } from '@/hooks/queries/use-needy'
 import { useApplicationsList } from '@/hooks/queries/use-applications'
 import { useDonationStats } from '@/hooks/queries/use-donations'
+import {
+  useDashboardStats,
+  useMonthlyDonationTrend,
+  useApplicationTypeDistribution,
+  useCityDistribution,
+  useApplicationStatusDistribution,
+} from '@/hooks/queries/use-dashboard-stats'
 import type { Application } from '@/types/common'
 
 export default function DashboardPage() {
   const { data: needyData } = useNeedyList({ limit: 5 })
   const { data: applicationsData } = useApplicationsList({ limit: 5 })
   const { data: donationStats } = useDonationStats()
+  
+  // Dashboard charts data
+  const { data: dashboardStats } = useDashboardStats()
+  const { data: monthlyTrend } = useMonthlyDonationTrend(6)
+  const { data: applicationTypes } = useApplicationTypeDistribution()
+  const { data: cityDistribution } = useCityDistribution()
+  const { data: applicationStatus } = useApplicationStatusDistribution()
 
   // Memoize stats array to prevent unnecessary recalculations
   const stats = useMemo(() => [
@@ -219,6 +234,112 @@ export default function DashboardPage() {
                 </Button>
               </Link>
             </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Grafik Bölümü */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Aylık Bağış Trendi */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-emerald-500" />
+              Aylık Bağış Trendi
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {monthlyTrend && monthlyTrend.length > 0 ? (
+              <TrendChart
+                data={monthlyTrend}
+                labelKey="label"
+                valueKey="value"
+                height={250}
+                color="#10b981"
+                showArea={true}
+                formatValue={(v) => `₺${v.toLocaleString('tr-TR')}`}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-[250px] text-slate-400">
+                Veri yükleniyor...
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Başvuru Durumları */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <FileText className="h-5 w-5 text-blue-500" />
+              Başvuru Durumları
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {applicationStatus && applicationStatus.length > 0 ? (
+              <SimplePieChart
+                data={applicationStatus}
+                labelKey="label"
+                valueKey="value"
+                height={250}
+                showLegend={true}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-[250px] text-slate-400">
+                Veri yükleniyor...
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Yardım Türü Dağılımı */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-purple-500" />
+              Yardım Türü Dağılımı
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {applicationTypes && applicationTypes.length > 0 ? (
+              <SimplePieChart
+                data={applicationTypes}
+                labelKey="label"
+                valueKey="value"
+                height={250}
+                showLegend={true}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-[250px] text-slate-400">
+                Veri yükleniyor...
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Şehir Bazlı İhtiyaç Sahipleri */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <Users className="h-5 w-5 text-cyan-500" />
+              Şehir Bazlı İhtiyaç Sahipleri (Top 10)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {cityDistribution && cityDistribution.length > 0 ? (
+              <SimpleBarChart
+                data={cityDistribution}
+                labelKey="label"
+                valueKey="value"
+                height={250}
+                color="#06b6d4"
+                horizontal={true}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-[250px] text-slate-400">
+                Veri yükleniyor...
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
