@@ -1,10 +1,11 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
 import { useUIStore } from '@/stores/ui-store'
+import { useAuth } from '@/hooks/use-auth'
 
 const Sidebar = dynamic(() => import('@/components/layout/sidebar').then(mod => ({ default: mod.Sidebar })), {
   ssr: false,
@@ -19,14 +20,28 @@ function DashboardLayoutClient({
 }: {
   children: React.ReactNode
 }) {
+  const { user, loading } = useAuth()
   const pathname = usePathname()
+  const router = useRouter()
   const [mounted, setMounted] = useState(false)
-  
-  // Client-side hydration
+
+  // Client-side hydration and auth check
   useEffect(() => {
     setMounted(true)
   }, [])
-  
+
+  useEffect(() => {
+    if (mounted && !loading && !user) {
+      router.push('/login')
+    }
+  }, [mounted, loading, user, router])
+
+  if (!mounted || loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+    </div>
+  }
+
   // Use store only after mount
   const sidebarCollapsed = mounted ? useUIStore((state) => state.sidebarCollapsed) : false
 
