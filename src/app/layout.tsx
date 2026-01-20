@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
 import { ErrorBoundary } from '@/components/error-boundary'
+import { registerPostHog } from '@/instrumentation-client'
 
 // Font optimizasyonu - display swap ve preloading
 const inter = Inter({
@@ -36,6 +37,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Initialize PostHog on app load
+  registerPostHog()
+
   return (
     <html lang="tr" suppressHydrationWarning>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>

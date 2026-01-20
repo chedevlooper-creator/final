@@ -1,5 +1,5 @@
 import type { NextConfig } from 'next'
-import { withWorkflow } from 'workflow/next'
+// import { withWorkflow } from 'workflow/next'
 import { securityHeaders } from '@/lib/security'
 import path from 'path'
 
@@ -110,4 +110,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withWorkflow(withBundleAnalyzer(nextConfig))
+export default withBundleAnalyzer(nextConfig)
