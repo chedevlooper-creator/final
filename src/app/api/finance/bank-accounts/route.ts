@@ -98,7 +98,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { searchParams } = new URL(request.url).searchParams
+    const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
 
     if (!id) {
@@ -143,7 +143,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { searchParams } = new URL(request.url).searchParams
+    const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
 
     if (!id) {
