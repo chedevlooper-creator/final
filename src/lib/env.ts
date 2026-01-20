@@ -34,9 +34,16 @@ export const env = {
     }
     throw new Error('NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable is required in production')
   })(),
+  })(),
   
   // Service role key (server-side only) - MUST be set in production
-  SUPABASE_SERVICE_ROLE_KEY: process.env['SUPABASE_SERVICE_ROLE_KEY'],
+  SUPABASE_SERVICE_ROLE_KEY: process.env['SUPABASE_SERVICE_ROLE_KEY'] || (() => {
+    if (process.env['NODE_ENV'] === 'production') {
+      throw new Error('SUPABASE_SERVICE_ROLE_KEY is required in production for admin operations')
+    }
+    // Development için boş string dön (opsiyonel)
+    return ''
+  })(),
   
   // Sentry configuration (optional)
   NEXT_PUBLIC_SENTRY_DSN: process.env['NEXT_PUBLIC_SENTRY_DSN'],

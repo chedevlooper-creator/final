@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
   
   // TypeScript build configuration
   typescript: {
-    ignoreBuildErrors: true, // Geçici olarak TypeScript hatalarını atla
+    ignoreBuildErrors: false, // Production için TypeScript hatalarını kontrol et
   },
   
   // Image optimization
