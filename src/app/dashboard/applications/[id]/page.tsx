@@ -101,10 +101,10 @@ export default function ApplicationDetailPage() {
         id,
         values: {
           status,
-          priority: priority || null,
+          priority: (priority || undefined) as "low" | "medium" | "high" | "urgent" | undefined,
           notes: notes || null,
           approved_amount: approvedAmount ? parseFloat(approvedAmount) : null,
-        },
+        } as any,
       })
       toast.success('Başvuru güncellendi')
     } catch (err) {

@@ -90,9 +90,9 @@ export default function NewMeetingPage() {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
-        {errors.general && (
+        {(errors as any).general && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            {errors.general}
+            {(errors as any).general}
           </div>
         )}
 

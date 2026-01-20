@@ -30,10 +30,9 @@ export function Header() {
     setSidebarCollapsed(store.sidebarCollapsed)
     
     // Subscribe to store changes
-    const unsubscribe = useUIStore.subscribe(
-      (state) => state.sidebarCollapsed,
-      (collapsed) => setSidebarCollapsed(collapsed)
-    )
+    const unsubscribe = useUIStore.subscribe((state) => {
+      setSidebarCollapsed(state.sidebarCollapsed)
+    })
     
     return unsubscribe
   }, [])

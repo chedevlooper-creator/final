@@ -47,7 +47,7 @@ export function OptimizedLink({
   return (
     <Link
       href={href}
-      prefetch={prefetchOnView ? 'intent' : true}
+      prefetch={prefetchOnView ? true : false}
       onMouseEnter={handleMouseEnter}
       className={cn(
         className,
@@ -75,7 +75,7 @@ export function NavLink({
   return (
     <OptimizedLink
       href={href}
-      prefetch="intent"
+      prefetch={true}
       activeExact
       activeClassName="bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 border-l-2 border-emerald-400"
       className={cn(

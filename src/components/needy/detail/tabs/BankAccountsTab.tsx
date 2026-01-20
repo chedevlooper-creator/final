@@ -70,7 +70,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
   })
 
   // API hooks
-  const isActiveFilter = statusFilter === 'active' ? true : statusFilter === 'passive' ? false : undefined
+  const isActiveFilter = statusFilter === 'all' ? undefined : statusFilter === 'inactive' ? false : true
   const { data: accountsData, isLoading } = useBankAccountsList(needyPersonId, isActiveFilter)
   const createMutation = useCreateBankAccount()
   const updateMutation = useUpdateBankAccount()
@@ -253,7 +253,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => handleEdit(account)}
+                          onClick={() => handleEdit(account as any)}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>

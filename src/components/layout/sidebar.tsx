@@ -28,10 +28,9 @@ export function Sidebar() {
     setSidebarCollapsed(store.sidebarCollapsed)
     
     // Subscribe to store changes
-    const unsubscribe = useUIStore.subscribe(
-      (state) => state.sidebarCollapsed,
-      (collapsed) => setSidebarCollapsed(collapsed)
-    )
+    const unsubscribe = useUIStore.subscribe((state) => {
+      setSidebarCollapsed(state.sidebarCollapsed)
+    })
     
     return unsubscribe
   }, [])
@@ -126,7 +125,7 @@ export function Sidebar() {
                     <Link
                       key={item.href}
                       href={item.href}
-                      prefetch="intent"
+                      prefetch={true}
                       className={cn(
                         'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-150',
                         isActive

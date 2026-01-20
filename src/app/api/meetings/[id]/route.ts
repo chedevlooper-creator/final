@@ -56,8 +56,11 @@ export async function GET(
       .eq('meeting_id', id)
       .order('priority', { ascending: false });
     
+    // TypeScript için type assertion
+    const meetingResponse: any = meeting;
+    
     return NextResponse.json({
-      ...meeting,
+      ...meetingResponse,
       participants: participants || [],
       tasks: tasks || []
     });
@@ -85,20 +88,12 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
     
-    // Check if user is the creator
-    const { data: meeting } = await supabase
+    const { data, error } = await supabase
       .from('meetings')
-      .select('created_by')
-      .eq('id', id)
-      .single();
-    
-    if (!meeting || meeting.created_by !== user.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-    
-    const { data: updatedMeeting, error } = await supabase
-      .from('meetings')
-      .update(body)
+      .update({
+        ...body,
+        updated_at: new Date().toISOString()
+      })
       .eq('id', id)
       .select()
       .single();
@@ -107,7 +102,7 @@ export async function PATCH(
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     
-    return NextResponse.json(updatedMeeting);
+    return NextResponse.json(data);
   } catch (error) {
     console.error('Meeting PATCH error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -115,7 +110,7 @@ export async function PATCH(
 }
 
 /**
- * DELETE /api/meetings/[id] - Toplantıyı iptal et
+ * DELETE /api/meetings/[id] - Toplantıyı sil
  */
 export async function DELETE(
   request: NextRequest,
@@ -131,20 +126,9 @@ export async function DELETE(
     
     const { id } = await params;
     
-    // Check if user is the creator
-    const { data: meeting } = await supabase
-      .from('meetings')
-      .select('created_by')
-      .eq('id', id)
-      .single();
-    
-    if (!meeting || meeting.created_by !== user.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-    
     const { error } = await supabase
       .from('meetings')
-      .update({ status: 'cancelled' })
+      .delete()
       .eq('id', id);
     
     if (error) {

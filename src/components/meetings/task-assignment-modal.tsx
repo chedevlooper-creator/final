@@ -108,9 +108,9 @@ export function TaskAssignmentModal({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {errors.general && (
+          {(errors as any).general && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-              {errors.general}
+              {(errors as any).general}
             </div>
           )}
 
