@@ -9,6 +9,7 @@ import { WebVitals, PerformanceMonitor } from '@/components/performance/web-vita
 // import { setupIdlePrefetch } from '@/lib/prefetch'
 import { ViewTransitions, injectViewTransitionStyles } from '@/components/navigation/view-transitions'
 import { ProgressBar } from '@/components/navigation/progress-bar'
+import { PostHogProvider } from '@/components/providers-posthog'
 
 // Query client oluşturma fonksiyonu - optimization için ayrı
 function makeQueryClient() {
@@ -79,19 +80,21 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <QueryClientProvider client={queryClient}>
-        <Suspense fallback={null}>
-          <ProgressBar />
-        </Suspense>
-        <ViewTransitions />
-        <WebVitals />
-        <PerformanceMonitor />
-        {children}
-        <Toaster position="top-right" richColors closeButton />
-        {process.env['NODE_ENV'] === 'development' && (
-          <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
-        )}
-      </QueryClientProvider>
+      <PostHogProvider>
+        <QueryClientProvider client={queryClient}>
+          <Suspense fallback={null}>
+            <ProgressBar />
+          </Suspense>
+          <ViewTransitions />
+          <WebVitals />
+          <PerformanceMonitor />
+          {children}
+          <Toaster position="top-right" richColors closeButton />
+          {process.env['NODE_ENV'] === 'development' && (
+            <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+          )}
+        </QueryClientProvider>
+      </PostHogProvider>
     </ThemeProvider>
   )
 }
