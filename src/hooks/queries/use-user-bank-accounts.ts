@@ -6,7 +6,13 @@ import { bankAccountSchema } from '@/lib/validations/finance'
 
 export function useBankAccounts(options?: QueryOptions) {
   return useGenericQuery<BankAccount[]>({
-    queryKey: ['bank-accounts', 'list', options],
+    queryKey: [
+      'bank-accounts', 
+      'list', 
+      ...(options?.status ? [options.status] : []),
+      ...(options?.sortBy ? [options.sortBy] : []),
+      ...(options?.sortOrder ? [options.sortOrder] : [])
+    ],
     queryFn: async () => {
       const supabase = createClient()
       let query = supabase

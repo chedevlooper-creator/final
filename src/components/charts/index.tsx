@@ -156,3 +156,11 @@ export function StatsCards({ stats }: StatsCardsProps) {
     </div>
   )
 }
+
+export default {
+  DonationChart,
+  CategoryChart,
+  AidDistributionChart,
+  StatsCards
+}
+

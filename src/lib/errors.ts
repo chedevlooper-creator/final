@@ -100,8 +100,8 @@ export class AuthError extends AppError {
       details,
       ErrorSeverity.HIGH,
       [
-        { label: 'Tekrar Giriş Yap', action: () => window.location.href = '/login', icon: '🔐' },
-        { label: 'Ana Sayfaya Dön', action: () => window.location.href = '/', icon: '🏠' }
+        { label: 'Tekrar Giriş Yap', action: () => { window.location.href = '/login'; }, icon: '🔐' },
+        { label: 'Ana Sayfaya Dön', action: () => { window.location.href = '/'; }, icon: '🏠' }
       ],
       ErrorType.AUTHENTICATION
     )
@@ -432,12 +432,12 @@ export class ErrorHandler {
       ]
     } else if (error instanceof AuthError) {
       return [
-        { label: 'Tekrar Giriş Yap', action: () => window.location.href = '/login', icon: '🔐' }
+        { label: 'Tekrar Giriş Yap', action: () => { window.location.href = '/login'; }, icon: '🔐' }
       ]
     }
 
     return [
-      { label: 'Ana Sayfaya Dön', action: () => window.location.href = '/', icon: '🏠' }
+      { label: 'Ana Sayfaya Dön', action: () => { window.location.href = '/'; }, icon: '🏠' }
     ]
   }
 
@@ -479,9 +479,9 @@ export class ErrorHandler {
       case ErrorType.NETWORK:
         return new NetworkError(message)
       case ErrorType.VALIDATION:
-        return new ValidationError(message, context?.field as string || 'unknown', context?.value)
+        return new ValidationError(message, context?.['field'] as string || 'unknown', context?.['value'])
       case ErrorType.NOT_FOUND:
-        return new NotFoundError(context?.resource as string || 'Resource', context?.identifier as string)
+        return new NotFoundError(context?.['resource'] as string || 'Resource', context?.['identifier'] as string)
       case ErrorType.PERMISSION:
         return new AuthorizationError(message)
       case ErrorType.AUTHENTICATION:
@@ -491,7 +491,7 @@ export class ErrorHandler {
       case ErrorType.CONFLICT:
         return new ConflictError(message)
       case ErrorType.RATE_LIMIT:
-        return new RateLimitError(message, context?.retryAfter as number)
+        return new RateLimitError(message, context?.['retryAfter'] as number)
       default:
         return new AppError(message, 'UNKNOWN_ERROR', 500, context)
     }

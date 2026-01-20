@@ -102,7 +102,7 @@ export interface EmailOptions {
   to: string | string[];
   cc?: string | string[];
   bcc?: string | string[];
-  subject: string;
+  subject?: string;
   template?: EmailTemplate;
   templateData?: Record<string, any>;
   text?: string;

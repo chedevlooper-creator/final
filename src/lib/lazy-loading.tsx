@@ -35,27 +35,22 @@ export function createLazyComponent<T extends ComponentType<any>>(
 }
 
 // Heavy components that should be lazy loaded
-export const LazyCharts = createLazyComponent(
-  () => import('@/components/charts'),
-  'Grafikler yükleniyor...'
+export const LazyDonationChart = createLazyComponent(
+  () => import('@/components/charts').then(m => ({ default: m.DonationChart })),
+  'Bağış grafiği yükleniyor...'
 )
 
-export const LazyReports = createLazyComponent(
-  () => import('@/components/reports'),
-  'Raporlar yükleniyor...'
+export const LazyCategoryChart = createLazyComponent(
+  () => import('@/components/charts').then(m => ({ default: m.CategoryChart })),
+  'Kategori grafiği yükleniyor...'
 )
 
-export const LazyCalendar = createLazyComponent(
-  () => import('@/components/calendar'),
-  'Takvim yükleniyor...'
+export const LazyAidDistributionChart = createLazyComponent(
+  () => import('@/components/charts').then(m => ({ default: m.AidDistributionChart })),
+  'Yardım dağılımı yükleniyor...'
 )
 
-export const LazyMap = createLazyComponent(
-  () => import('@/components/map'),
-  'Harita yükleniyor...'
-)
-
-export const LazyDataGrid = createLazyComponent(
-  () => import('@/components/ui/data-grid'),
-  'Tablo yükleniyor...'
+export const LazyStatsCards = createLazyComponent(
+  () => import('@/components/charts').then(m => ({ default: m.StatsCards })),
+  'İstatistik kartları yükleniyor...'
 )

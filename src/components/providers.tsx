@@ -6,7 +6,7 @@ import { ThemeProvider } from 'next-themes'
 import { useState, useEffect, Suspense } from 'react'
 import { Toaster } from '@/components/ui/sonner'
 import { WebVitals, PerformanceMonitor } from '@/components/performance/web-vitals'
-import { setupIdlePrefetch } from '@/lib/prefetch'
+// import { setupIdlePrefetch } from '@/lib/prefetch'
 import { ViewTransitions, injectViewTransitionStyles } from '@/components/navigation/view-transitions'
 import { ProgressBar } from '@/components/navigation/progress-bar'
 
@@ -69,12 +69,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Setup idle prefetching for instant page transitions
-    const cleanup = setupIdlePrefetch(queryClient)
-    
+    // const cleanup = setupIdlePrefetch(queryClient)
+
     // Inject view transition styles
     injectViewTransitionStyles()
-    
-    return cleanup
+
+    // return cleanup
   }, [queryClient])
 
   return (
