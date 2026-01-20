@@ -8,24 +8,35 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Heart, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { signIn } = useAuth()
+  const [activeTab, setActiveTab] = useState('login')
+  const { signIn, signUp } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-      await signIn(email, password)
-      toast.success('Giriş başarılı!')
+      if (activeTab === 'login') {
+        await signIn(email, password)
+        // Toast is handled in signIn
+      } else {
+        await signUp(email, password, name)
+        // Toast is handled in signUp
+        setActiveTab('login') // Switch to login after successful signup
+        setPassword('') // Clear password
+      }
     } catch (error: any) {
-      toast.error(error.message || 'Giriş yapılamadı')
+      // Error toast is handled in useAuth
+      console.error(error)
     } finally {
       setIsLoading(false)
     }
@@ -49,60 +60,85 @@ export default function LoginPage() {
               Yardım Yönetim Paneli
             </CardTitle>
             <CardDescription className="text-slate-400">
-              Hesabınıza giriş yapın
+              {activeTab === 'login' ? 'Hesabınıza giriş yapın' : 'Yeni bir hesap oluşturun'}
             </CardDescription>
           </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-slate-300">
-                E-posta
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="ornek@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-emerald-500/20"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-slate-300">
-                Şifre
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-emerald-500/20"
-              />
-            </div>
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-medium"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Giriş yapılıyor...
-                </>
-              ) : (
-                'Giriş Yap'
-              )}
-            </Button>
-          </form>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-4 bg-slate-800">
+              <TabsTrigger value="login" className="data-[state=active]:bg-slate-700 data-[state=active]:text-white text-slate-400">Giriş Yap</TabsTrigger>
+              <TabsTrigger value="register" className="data-[state=active]:bg-slate-700 data-[state=active]:text-white text-slate-400">Kayıt Ol</TabsTrigger>
+            </TabsList>
 
-          {process.env['NODE_ENV'] === 'development' && (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <TabsContent value="register" className="space-y-4 mt-0">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-slate-300">
+                    Ad Soyad
+                  </Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Adınız Soyadınız"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required={activeTab === 'register'}
+                    className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-emerald-500/20"
+                  />
+                </div>
+              </TabsContent>
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-slate-300">
+                  E-posta
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="ornek@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-emerald-500/20"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-slate-300">
+                  Şifre
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-emerald-500/20"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-medium"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {activeTab === 'login' ? 'Giriş yapılıyor...' : 'Kayıt yapılıyor...'}
+                  </>
+                ) : (
+                  activeTab === 'login' ? 'Giriş Yap' : 'Kayıt Ol'
+                )}
+              </Button>
+            </form>
+          </Tabs>
+
+          {process.env['NODE_ENV'] === 'development' && activeTab === 'login' && (
             <div className="mt-6 text-center">
               <p className="text-sm text-slate-500">
-                Demo hesap: demo@example.com / demo123
+                Demo hesap bulunamadıysa lütfen kayıt olunuz.
               </p>
             </div>
           )}
