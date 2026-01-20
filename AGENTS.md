@@ -60,10 +60,14 @@
 - Custom hooks in `src/hooks/queries/` for form mutations
 - Field-level validation with Zod schemas in `src/lib/validations/`
 - Null handling: use `value={field.value || ''}` for controlled inputs
+- Custom validation functions in Zod (e.g., validateTCKimlik, validateIBAN)
+- Use .nullable().optional() for optional fields
 
 ### State Management
 - React Query (@tanstack/react-query) for server state
 - Custom hooks in `src/hooks/queries/` using useQuery/useMutation
+- Query keys pattern: `['entity-name', 'action', params]`
+- Cache settings: staleTime 10min, gcTime 30min (default)
 - Zustand for global client state
 - Supabase realtime subscriptions via `src/lib/supabase/subscriptions.ts`
 
@@ -73,6 +77,8 @@
 - Interface for component props, type for data structures
 - Generic types for reusable components: `<TData, TValue>`
 - Use proper typing with .nullable(), .optional() for Zod schemas
+- ESLint rule: `@typescript-eslint/no-explicit-any` is warn (use eslint-disable when necessary)
+- Prefix unused parameters with underscore: `_param`
 
 ### Database & API
 - Supabase as primary database (client/server separation)
