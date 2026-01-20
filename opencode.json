@@ -9,15 +9,22 @@
         "GITHUB_TOKEN": "{env:GITHUB_TOKEN}"
       }
     },
-    "everything": {
+    "vercel": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-everything"],
-      "enabled": true
+      "command": ["npx", "-y", "mcp-server-vercel"],
+      "enabled": true,
+      "environment": {
+        "VERCEL_TOKEN": "{env:VERCEL_TOKEN}"
+      }
     },
-    "filesystem": {
+    "supabase": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "C:/Users/isaha/Downloads"],
-      "enabled": true
+      "command": ["npx", "-y", "@supabase/mcp-server-supabase"],
+      "enabled": true,
+      "environment": {
+        "SUPABASE_URL": "{env:SUPABASE_URL}",
+        "SUPABASE_ACCESS_TOKEN": "{env:SUPABASE_ACCESS_TOKEN}"
+      }
     }
   }
 }
