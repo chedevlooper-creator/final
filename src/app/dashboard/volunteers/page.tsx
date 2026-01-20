@@ -119,11 +119,19 @@ export default function VolunteersPage() {
     {
       accessorKey: 'created_at',
       header: 'Kayıt Tarihi',
-      cell: ({ row }) => (
-        <span className="text-sm text-slate-500">
-          {format(new Date(row.original.created_at), 'dd MMM yyyy', { locale: tr })}
-        </span>
-      ),
+      cell: ({ row }) => {
+        try {
+          const date = row.original.created_at ? new Date(row.original.created_at) : null
+          const isValidDate = date && !isNaN(date.getTime())
+          return (
+            <span className="text-sm text-slate-500">
+              {isValidDate ? format(date!, 'dd MMM yyyy', { locale: tr }) : '-'}
+            </span>
+          )
+        } catch (e) {
+          return <span className="text-sm text-slate-500">-</span>
+        }
+      },
     },
     {
       id: 'actions',

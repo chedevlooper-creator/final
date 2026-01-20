@@ -135,7 +135,7 @@ export default function ApplicationsListPage() {
       header: 'Talep Tutarı',
       cell: ({ row }) => (
         <span className="font-medium">
-          {row.original.requested_amount 
+          {row.original.requested_amount
             ? `₺${row.original.requested_amount.toLocaleString('tr-TR')}`
             : '-'}
         </span>
@@ -154,11 +154,18 @@ export default function ApplicationsListPage() {
     {
       accessorKey: 'created_at',
       header: 'Tarih',
-      cell: ({ row }) => (
-        <span className="text-sm text-slate-500">
-          {format(new Date(row.original.created_at), 'dd MMM yyyy', { locale: tr })}
-        </span>
-      ),
+      cell: ({ row }) => {
+        try {
+          const date = row.original.created_at ? new Date(row.original.created_at) : null
+          return (
+            <span className="text-sm text-slate-500">
+              {date && !isNaN(date.getTime()) ? format(date, 'dd MMM yyyy', { locale: tr }) : '-'}
+            </span>
+          )
+        } catch (e) {
+          return <span className="text-sm text-slate-500">-</span>
+        }
+      },
     },
     {
       id: 'actions',

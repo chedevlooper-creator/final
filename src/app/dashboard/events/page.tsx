@@ -107,20 +107,27 @@ export default function EventsPage() {
     {
       accessorKey: 'event_date',
       header: 'Tarih & Saat',
-      cell: ({ row }) => (
-        <div className="space-y-1">
-          <div className="flex items-center gap-1 text-sm">
-            <Calendar className="h-3 w-3 text-slate-400" />
-            {format(new Date(row.original.event_date), 'dd MMM yyyy', { locale: tr })}
-          </div>
-          {row.original.event_time && (
-            <div className="flex items-center gap-1 text-xs text-slate-500">
-              <Clock className="h-3 w-3" />
-              {row.original.event_time}
+      cell: ({ row }) => {
+        try {
+          const date = row.original.event_date ? new Date(row.original.event_date) : null
+          return (
+            <div className="space-y-1">
+              <div className="flex items-center gap-1 text-sm">
+                <Calendar className="h-3 w-3 text-slate-400" />
+                {date && !isNaN(date.getTime()) ? format(date, 'dd MMM yyyy', { locale: tr }) : '-'}
+              </div>
+              {row.original.event_time && (
+                <div className="flex items-center gap-1 text-xs text-slate-500">
+                  <Clock className="h-3 w-3" />
+                  {row.original.event_time}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      ),
+          )
+        } catch (e) {
+          return <span className="text-sm text-slate-500">-</span>
+        }
+      },
     },
     {
       accessorKey: 'location',

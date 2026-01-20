@@ -13,11 +13,12 @@
 - `npm test` - Run all tests (Vitest)
 - `npm run test:ui` - Run Vitest with UI interface
 - `npm run test:coverage` - Generate coverage report
-- `npm test -- <test-file>` - Run specific test file
-- `npm test -- -t <test-name>` - Run specific test by name
+- `npm test -- use-needy.test.ts` - Run specific test file
+- `npm test -- -t "useNeedyList"` - Run tests matching pattern
+- `npm test -- --reporter=verbose` - Verbose output
 
 ### Environment Requirements
-- Node.js >= 20.0.0
+- Node.js >= 20.20.0
 - npm >= 10.0.0
 
 ## Code Style Guidelines
@@ -27,8 +28,10 @@
 - Use named imports: `import { Button } from '@/components/ui/button'`
 - Path aliases: `@/*` maps to `./src/*`
 - External libraries first, then internal, then types
+- Use `'use client'` directive at top of client components
 - Example:
   ```ts
+  'use client'
   import { useState } from 'react'
   import { useForm } from 'react-hook-form'
   import { zodResolver } from '@hookform/resolvers/zod'

@@ -131,11 +131,18 @@ export default function AidsListPage() {
     {
       accessorKey: 'aid_date',
       header: 'Yardım Tarihi',
-      cell: ({ row }) => (
-        <span className="text-sm text-slate-500">
-          {format(new Date(row.original.aid_date), 'dd MMM yyyy', { locale: tr })}
-        </span>
-      ),
+      cell: ({ row }) => {
+        try {
+          const date = row.original.aid_date ? new Date(row.original.aid_date) : null
+          return (
+            <span className="text-sm text-slate-500">
+              {date && !isNaN(date.getTime()) ? format(date, 'dd MMM yyyy', { locale: tr }) : '-'}
+            </span>
+          )
+        } catch (e) {
+          return <span className="text-sm text-slate-500">-</span>
+        }
+      },
     },
     {
       accessorKey: 'delivery_status',
