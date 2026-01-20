@@ -1,0 +1,164 @@
+{
+  "plugin": ["oh-my-opencode"],
+
+  "agents": {
+    "sisyphus": {
+      "model": "opus",
+      "temperature": 0.1,
+      "enabled": true,
+      "description": "Ana orchestrator - Yardım Yönetim Paneli için özel yapılandırma"
+    },
+    "oracle": {
+      "model": "gpt-5.2-medium",
+      "enabled": true,
+      "permissions": {
+        "read": true,
+        "write": true
+      }
+    },
+    "librarian": {
+      "model": "claude-sonnet-4.5",
+      "enabled": true,
+      "permissions": {
+        "read": true
+      }
+    },
+    "frontend_engineer": {
+      "model": "gemini-3-pro",
+      "enabled": true,
+      "permissions": {
+        "read": true,
+        "write": true
+      },
+      "categories": ["visual", "ui", "ux"]
+    },
+    "explore": {
+      "model": "grok-code",
+      "enabled": true,
+      "permissions": {
+        "read": true
+      }
+    }
+  },
+
+  "background_tasks": {
+    "enabled": true,
+    "max_concurrent": 4,
+    "timeout": 300,
+    "providers": {
+      "anthropic": 5,
+      "google": 3,
+      "openai": 5,
+      "grok": 10
+    }
+  },
+
+  "skills": {
+    "supabase-setup": {
+      "enabled": true,
+      "description": "Supabase tablosu, RLS kuralları ve migration yazma"
+    },
+    "nextjs-page": {
+      "enabled": true,
+      "description": "Next.js 16 App Router sayfası ve bileşeni oluşturma"
+    },
+    "react-query-hook": {
+      "enabled": true,
+      "description": "React Query hook'u oluşturma ve caching yapılandırması"
+    },
+    "zod-schema": {
+      "enabled": true,
+      "description": "Zod validasyon şeması ve React Hook Form entegrasyonu"
+    },
+    "api-route": {
+      "enabled": true,
+      "description": "Next.js API route ve error handling oluşturma"
+    },
+    "finance-backend": {
+      "enabled": true,
+      "description": "Finance module için Supabase backend entegrasyonu"
+    }
+  },
+
+  "mcps": {
+    "exa": {
+      "enabled": true,
+      "description": "Web search"
+    },
+    "context7": {
+      "enabled": true,
+      "description": "Official documentation search"
+    },
+    "grep_app": {
+      "enabled": true,
+      "description": "GitHub code search"
+    },
+    "supabase": {
+      "type": "remote",
+      "url": "https://api.supabase.com/mcp",
+      "enabled": true,
+      "description": "Supabase migration'ları ve database işlemleri"
+    },
+    "sentry": {
+      "type": "remote",
+      "url": "https://mcp.sentry.dev/mcp",
+      "enabled": false,
+      "description": "Error tracking ve issue management (opsiyonel)"
+    },
+    "mcp_everything": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-everything"],
+      "enabled": true,
+      "description": "Dosya sistemi erişimi, komut çalıştırma, her şey"
+    }
+  },
+
+  "lsp": {
+    "enabled": true,
+    "refactoring": true,
+    "diagnostics": true,
+    "rename": true,
+    "ast_search": true
+  },
+
+  "hooks": {
+    "todo_enforcer": {
+      "enabled": true,
+      "strict": true
+    },
+    "comment_checker": {
+      "enabled": true,
+      "strict": true,
+      "max_comment_ratio": 0.15
+    },
+    "context_injection": {
+      "enabled": true,
+      "files": ["AGENTS.md", "README.md", "SETUP.md"]
+    },
+    "pre_tool_use": {
+      "enabled": true
+    },
+    "post_tool_use": {
+      "enabled": true
+    }
+  },
+
+  "categories": {
+    "visual": ["frontend_engineer"],
+    "business_logic": ["sisyphus", "oracle"],
+    "database": ["librarian"],
+    "exploration": ["explore"]
+  },
+
+  "todo": {
+    "enabled": true,
+    "persistence": true,
+    "auto_resume": true,
+    "completion_check": true
+  },
+
+  "experimental": {
+    "aggressive_truncation": false,
+    "auto_resume": true
+  }
+}
