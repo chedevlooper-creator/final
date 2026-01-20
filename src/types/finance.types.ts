@@ -14,3 +14,14 @@ export interface BankAccount {
 }
 
 export type BankAccountStatus = 'active' | 'inactive' | 'closed'
+
+export type BankAccountFormValues = {
+  bank_name: string
+  account_number: string
+  iban: string
+  account_holder: string
+  balance?: number
+  currency?: string
+  status?: BankAccountStatus
+  is_primary?: boolean
+}
