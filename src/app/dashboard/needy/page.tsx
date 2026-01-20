@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { toast } from 'sonner'
 import dynamic from 'next/dynamic'
-import { ExportButton } from '@/components/common/export-button'
+// import { ExportButton } from '@/components/common/export-button'
 
 // Lazy loading modal - reduces initial bundle size by ~13KB
 const AddNeedyModal = dynamic(
@@ -311,21 +311,6 @@ export default function NeedyListPage() {
           <Plus className="h-4 w-4 mr-1" />
           Ekle
         </Button>
-        <ExportButton
-          data={data?.data || []}
-          columns={[
-            { title: 'İsim', dataKey: 'first_name' },
-            { title: 'Soyisim', dataKey: 'last_name' },
-            { title: 'Kimlik No', dataKey: 'identity_number' },
-            { title: 'Telefon', dataKey: 'phone' },
-            { title: 'Dosya No', dataKey: 'file_number' },
-            { title: 'Durum', dataKey: 'status' },
-          ]}
-          filename="ihtiyac-sahipleri"
-          title="İhtiyaç Sahipleri Listesi"
-          size="sm"
-          disabled={isLoading || !data?.data?.length}
-        />
 
         {/* Sayfalama Bilgisi */}
         <div className="ml-auto flex items-center gap-2 text-sm text-muted-foreground">
