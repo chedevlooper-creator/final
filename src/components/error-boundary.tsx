@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * Error Boundary Component
@@ -10,45 +10,47 @@
  * @since 2026-01-18
  */
 
-import React from 'react'
-import { AppError, ErrorHandler, ErrorSeverity } from '@/lib/errors'
+import React from "react";
+import { AppError, ErrorHandler, ErrorSeverity } from "@/lib/errors";
 
 interface ErrorBoundaryProps {
-  children: React.ReactNode
-  fallback?: React.ComponentType<ErrorFallbackProps>
-  onError?: (error: Error, errorInfo: React.ErrorInfo) => void
+  children: React.ReactNode;
+  fallback?: React.ComponentType<ErrorFallbackProps>;
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
 }
 
 interface ErrorFallbackProps {
-  error: Error
-  resetError: () => void
+  error: Error;
+  resetError: () => void;
 }
 
 interface ErrorBoundaryState {
-  hasError: boolean
-  error: Error | null
+  hasError: boolean;
+  error: Error | null;
 }
 
 /**
  * Default Error Fallback Component
  */
 function DefaultErrorFallback({ error, resetError }: ErrorFallbackProps) {
-  const appError = error instanceof AppError ? error : null
-  const userMessage = appError?.getUserMessage() || ErrorHandler.handle(error)
-  const recoveryActions = appError?.getRecoveryActions() || []
-  const severity = appError?.severity || ErrorSeverity.MEDIUM
+  const appError = error instanceof AppError ? error : null;
+  const userMessage = appError?.getUserMessage() || ErrorHandler.handle(error);
+  const recoveryActions = appError?.getRecoveryActions() || [];
+  const severity = appError?.severity || ErrorSeverity.MEDIUM;
 
   // Severity colors
   const severityColors = {
-    [ErrorSeverity.LOW]: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-    [ErrorSeverity.MEDIUM]: 'bg-orange-50 border-orange-200 text-orange-800',
-    [ErrorSeverity.HIGH]: 'bg-red-50 border-red-200 text-red-800',
-    [ErrorSeverity.CRITICAL]: 'bg-red-100 border-red-300 text-red-900',
-  }
+    [ErrorSeverity.LOW]: "bg-yellow-50 border-yellow-200 text-yellow-800",
+    [ErrorSeverity.MEDIUM]: "bg-orange-50 border-orange-200 text-orange-800",
+    [ErrorSeverity.HIGH]: "bg-red-50 border-red-200 text-red-800",
+    [ErrorSeverity.CRITICAL]: "bg-red-100 border-red-300 text-red-900",
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className={`max-w-lg w-full rounded-lg border-2 p-6 ${severityColors[severity]}`}>
+      <div
+        className={`max-w-lg w-full rounded-lg border-2 p-6 ${severityColors[severity]}`}
+      >
         {/* Error Icon */}
         <div className="flex justify-center mb-4">
           <svg
@@ -67,13 +69,11 @@ function DefaultErrorFallback({ error, resetError }: ErrorFallbackProps) {
         </div>
 
         {/* Error Message */}
-        <h2 className="text-xl font-bold text-center mb-2">
-          Bir Hata Oluştu
-        </h2>
+        <h2 className="text-xl font-bold text-center mb-2">Bir Hata Oluştu</h2>
         <p className="text-center mb-6">{userMessage}</p>
 
         {/* Error Details (Development Only) */}
-        {process.env.NODE_ENV === 'development' && error.message && (
+        {process.env.NODE_ENV === "development" && error.message && (
           <details className="mb-4 p-3 bg-white bg-opacity-50 rounded border border-current border-opacity-20">
             <summary className="cursor-pointer font-semibold mb-2">
               Teknik Detaylar
@@ -108,7 +108,7 @@ function DefaultErrorFallback({ error, resetError }: ErrorFallbackProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 /**
@@ -119,38 +119,43 @@ export class ErrorBoundary extends React.Component<
   ErrorBoundaryState
 > {
   constructor(props: ErrorBoundaryProps) {
-    super(props)
-    this.state = { hasError: false, error: null }
+    super(props);
+    this.state = { hasError: false, error: null };
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error }
+    return { hasError: true, error };
   }
 
   override componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     // Log error
     ErrorHandler.handle(error, {
       componentStack: errorInfo.componentStack,
-    })
+    });
 
     // Call custom error handler if provided
     if (this.props.onError) {
-      this.props.onError(error, errorInfo)
+      this.props.onError(error, errorInfo);
     }
   }
 
   resetError = (): void => {
-    this.setState({ hasError: false, error: null })
-  }
+    this.setState({ hasError: false, error: null });
+  };
 
   override render(): React.ReactNode {
     if (this.state.hasError && this.state.error) {
-      const FallbackComponent = this.props.fallback || DefaultErrorFallback
+      const FallbackComponent = this.props.fallback || DefaultErrorFallback;
 
-      return <FallbackComponent error={this.state.error} resetError={this.resetError} />
+      return (
+        <FallbackComponent
+          error={this.state.error}
+          resetError={this.resetError}
+        />
+      );
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }
 
@@ -159,8 +164,8 @@ export class ErrorBoundary extends React.Component<
  */
 export function useErrorHandler(): (error: Error) => void {
   return React.useCallback((error: Error) => {
-    throw error
-  }, [])
+    throw error;
+  }, []);
 }
 
 /**
@@ -169,15 +174,15 @@ export function useErrorHandler(): (error: Error) => void {
 export function withErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
   fallback?: React.ComponentType<ErrorFallbackProps>,
-  onError?: (error: Error, errorInfo: React.ErrorInfo) => void
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void,
 ): React.ComponentType<P> {
   const WrappedComponent = (props: P) => (
     <ErrorBoundary fallback={fallback} onError={onError}>
       <Component {...props} />
     </ErrorBoundary>
-  )
+  );
 
-  WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`
+  WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
 
-  return WrappedComponent
+  return WrappedComponent;
 }

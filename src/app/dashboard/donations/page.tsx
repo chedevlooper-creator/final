@@ -1,19 +1,19 @@
-'use client'
+"use client";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
-import { useState } from 'react'
-import { useDonationsList } from '@/hooks/queries/use-donations'
-import { PageHeader } from '@/components/common/page-header'
-import { DataTable } from '@/components/common/data-table'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import { useDonationsList } from "@/hooks/queries/use-donations";
+import { PageHeader } from "@/components/common/page-header";
+import { DataTable } from "@/components/common/data-table";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -21,93 +21,105 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Badge } from '@/components/ui/badge'
-import { DollarSign, Plus, MoreHorizontal, Eye, Pencil, Receipt } from 'lucide-react'
-import { ColumnDef } from '@tanstack/react-table'
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import {
+  DollarSign,
+  Plus,
+  MoreHorizontal,
+  Eye,
+  Pencil,
+  Receipt,
+} from "lucide-react";
+import { ColumnDef } from "@tanstack/react-table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { DONATION_TYPES, PAYMENT_METHODS, CURRENCIES } from '@/lib/validations/donation'
-import { format } from 'date-fns'
-import { tr } from 'date-fns/locale'
-import { DonationForm } from '@/components/forms/donation-form'
+} from "@/components/ui/dropdown-menu";
+import {
+  DONATION_TYPES,
+  PAYMENT_METHODS,
+  CURRENCIES,
+} from "@/lib/validations/donation";
+import { format } from "date-fns";
+import { tr } from "date-fns/locale";
+import { DonationForm } from "@/components/forms/donation-form";
 
 type Donation = {
-  id: string
-  donation_number: string | null
-  donor_name: string | null
-  donor_phone: string | null
-  donation_type: string
-  amount: number
-  currency: string
-  payment_method: string | null
-  payment_status: string
-  created_at: string
-  category?: { id: string; name: string } | null
-}
+  id: string;
+  donation_number: string | null;
+  donor_name: string | null;
+  donor_phone: string | null;
+  donation_type: string;
+  amount: number;
+  currency: string;
+  payment_method: string | null;
+  payment_status: string;
+  created_at: string;
+  category?: { id: string; name: string } | null;
+};
 
 export default function DonationsListPage() {
-  const [page, setPage] = useState(0)
-  const [donationType, setDonationType] = useState<string>('')
-  const [paymentStatus, setPaymentStatus] = useState<string>('')
-  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [page, setPage] = useState(0);
+  const [donationType, setDonationType] = useState<string>("");
+  const [paymentStatus, setPaymentStatus] = useState<string>("");
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const { data, isLoading } = useDonationsList({
     page,
     donation_type: donationType || undefined,
     payment_status: paymentStatus || undefined,
-  })
+  });
 
   const getPaymentStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
-      pending: 'bg-yellow-100 text-yellow-700',
-      completed: 'bg-green-100 text-green-700',
-      cancelled: 'bg-red-100 text-red-700',
-    }
+      pending: "bg-yellow-100 text-yellow-700",
+      completed: "bg-green-100 text-green-700",
+      cancelled: "bg-red-100 text-red-700",
+    };
     const statusLabels: Record<string, string> = {
-      pending: 'Bekliyor',
-      completed: 'Tamamlandı',
-      cancelled: 'İptal',
-    }
+      pending: "Bekliyor",
+      completed: "Tamamlandı",
+      cancelled: "İptal",
+    };
     return (
-      <Badge className={statusColors[status] || 'bg-slate-100'}>
+      <Badge className={statusColors[status] || "bg-slate-100"}>
         {statusLabels[status] || status}
       </Badge>
-    )
-  }
+    );
+  };
 
-  const formatAmount = (amount: number | null | undefined, currency: string) => {
-    if (amount === null || amount === undefined) return '-'
-    const currencyConfig = CURRENCIES.find((c) => c.value === currency)
+  const formatAmount = (
+    amount: number | null | undefined,
+    currency: string,
+  ) => {
+    if (amount === null || amount === undefined) return "-";
+    const currencyConfig = CURRENCIES.find((c) => c.value === currency);
     try {
-      return `${currencyConfig?.symbol || ''}${amount.toLocaleString('tr-TR')}`
+      return `${currencyConfig?.symbol || ""}${amount.toLocaleString("tr-TR")}`;
     } catch (e) {
-      return `${currencyConfig?.symbol || ''}${amount}`
+      return `${currencyConfig?.symbol || ""}${amount}`;
     }
-  }
+  };
 
   const columns: ColumnDef<Donation>[] = [
     {
-      accessorKey: 'donation_number',
-      header: 'Bağış No',
+      accessorKey: "donation_number",
+      header: "Bağış No",
       cell: ({ row }) => (
         <span className="font-mono text-sm text-slate-600">
-          {row.original.donation_number || '-'}
+          {row.original.donation_number || "-"}
         </span>
       ),
     },
     {
-      accessorKey: 'donor_name',
-      header: 'Bağışçı',
+      accessorKey: "donor_name",
+      header: "Bağışçı",
       cell: ({ row }) => (
         <div>
-          <p className="font-medium">
-            {row.original.donor_name || 'Anonim'}
-          </p>
+          <p className="font-medium">{row.original.donor_name || "Anonim"}</p>
           {row.original.donor_phone && (
             <p className="text-xs text-slate-500">{row.original.donor_phone}</p>
           )}
@@ -115,16 +127,18 @@ export default function DonationsListPage() {
       ),
     },
     {
-      accessorKey: 'donation_type',
-      header: 'Bağış Türü',
+      accessorKey: "donation_type",
+      header: "Bağış Türü",
       cell: ({ row }) => {
-        const typeConfig = DONATION_TYPES.find((t) => t.value === row.original.donation_type)
-        return <span>{typeConfig?.label || row.original.donation_type}</span>
+        const typeConfig = DONATION_TYPES.find(
+          (t) => t.value === row.original.donation_type,
+        );
+        return <span>{typeConfig?.label || row.original.donation_type}</span>;
       },
     },
     {
-      accessorKey: 'amount',
-      header: 'Tutar',
+      accessorKey: "amount",
+      header: "Tutar",
       cell: ({ row }) => (
         <span className="font-bold text-emerald-600">
           {formatAmount(row.original.amount, row.original.currency)}
@@ -132,37 +146,41 @@ export default function DonationsListPage() {
       ),
     },
     {
-      accessorKey: 'payment_method',
-      header: 'Ödeme Yöntemi',
+      accessorKey: "payment_method",
+      header: "Ödeme Yöntemi",
       cell: ({ row }) => {
-        const methodConfig = PAYMENT_METHODS.find((m) => m.value === row.original.payment_method)
-        return <span className="text-sm">{methodConfig?.label || '-'}</span>
+        const methodConfig = PAYMENT_METHODS.find(
+          (m) => m.value === row.original.payment_method,
+        );
+        return <span className="text-sm">{methodConfig?.label || "-"}</span>;
       },
     },
     {
-      accessorKey: 'payment_status',
-      header: 'Durum',
+      accessorKey: "payment_status",
+      header: "Durum",
       cell: ({ row }) => getPaymentStatusBadge(row.original.payment_status),
     },
     {
-      accessorKey: 'created_at',
-      header: 'Tarih',
+      accessorKey: "created_at",
+      header: "Tarih",
       cell: ({ row }) => {
         try {
-          const date = row.original.created_at ? new Date(row.original.created_at) : null
-          const isValidDate = date && !isNaN(date.getTime())
+          const date = row.original.created_at
+            ? new Date(row.original.created_at)
+            : null;
+          const isValidDate = date && !isNaN(date.getTime());
           return (
             <span className="text-sm text-slate-500">
-              {isValidDate ? format(date!, 'dd MMM yyyy', { locale: tr }) : '-'}
+              {isValidDate ? format(date!, "dd MMM yyyy", { locale: tr }) : "-"}
             </span>
-          )
+          );
         } catch (e) {
-          return <span className="text-sm text-slate-500">-</span>
+          return <span className="text-sm text-slate-500">-</span>;
         }
       },
     },
     {
-      id: 'actions',
+      id: "actions",
       cell: () => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -187,7 +205,7 @@ export default function DonationsListPage() {
         </DropdownMenu>
       ),
     },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -218,7 +236,10 @@ export default function DonationsListPage() {
 
       {/* Filtreler */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center">
-        <Select value={donationType || 'all'} onValueChange={(v) => setDonationType(v === 'all' ? '' : v)}>
+        <Select
+          value={donationType || "all"}
+          onValueChange={(v) => setDonationType(v === "all" ? "" : v)}
+        >
           <SelectTrigger className="w-48">
             <SelectValue placeholder="Bağış Türü" />
           </SelectTrigger>
@@ -231,7 +252,10 @@ export default function DonationsListPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={paymentStatus || 'all'} onValueChange={(v) => setPaymentStatus(v === 'all' ? '' : v)}>
+        <Select
+          value={paymentStatus || "all"}
+          onValueChange={(v) => setPaymentStatus(v === "all" ? "" : v)}
+        >
           <SelectTrigger className="w-40">
             <SelectValue placeholder="Durum" />
           </SelectTrigger>
@@ -254,5 +278,5 @@ export default function DonationsListPage() {
         onPageChange={setPage}
       />
     </div>
-  )
+  );
 }

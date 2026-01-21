@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -18,26 +18,26 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Save, X, Loader2 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
-import { toast } from 'sonner'
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Save, X, Loader2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 
 // Basit kayıt için minimal schema
 const addNeedySchema = z.object({
-  category_id: z.string().min(1, 'Kategori seçilmeli'),
-  first_name: z.string().min(2, 'Ad en az 2 karakter olmalı'),
-  last_name: z.string().min(2, 'Soyad en az 2 karakter olmalı'),
+  category_id: z.string().min(1, "Kategori seçilmeli"),
+  first_name: z.string().min(2, "Ad en az 2 karakter olmalı"),
+  last_name: z.string().min(2, "Soyad en az 2 karakter olmalı"),
   nationality_id: z.string().optional(),
   date_of_birth: z.string().optional(),
   identity_number: z.string().optional(),
@@ -46,94 +46,98 @@ const addNeedySchema = z.object({
   partner_type: z.string().optional(),
   partner_id: z.string().optional(),
   file_number: z.string().optional(),
-})
+});
 
-type AddNeedyFormValues = z.input<typeof addNeedySchema>
+type AddNeedyFormValues = z.input<typeof addNeedySchema>;
 
 // Kategori seçenekleri
 const CATEGORIES = [
-  { value: 'yetim_ailesi', label: 'Yetim Ailesi' },
-  { value: 'multeci_aile', label: 'Mülteci Aile' },
-  { value: 'ihtiyac_sahibi_aile', label: 'İhtiyaç Sahibi Aile' },
-  { value: 'ogrenci_yabanci', label: 'Öğrenci (Yabancı)' },
-  { value: 'ogrenci_tc', label: 'Öğrenci (TC)' },
-  { value: 'vakif_dernek', label: 'Vakıf & Dernek' },
-  { value: 'devlet_okulu', label: 'Devlet Okulu' },
-  { value: 'kamu_kurumu', label: 'Kamu Kurumu' },
-  { value: 'ozel_egitim_kurumu', label: 'Özel Eğitim Kurumu' },
-]
+  { value: "yetim_ailesi", label: "Yetim Ailesi" },
+  { value: "multeci_aile", label: "Mülteci Aile" },
+  { value: "ihtiyac_sahibi_aile", label: "İhtiyaç Sahibi Aile" },
+  { value: "ogrenci_yabanci", label: "Öğrenci (Yabancı)" },
+  { value: "ogrenci_tc", label: "Öğrenci (TC)" },
+  { value: "vakif_dernek", label: "Vakıf & Dernek" },
+  { value: "devlet_okulu", label: "Devlet Okulu" },
+  { value: "kamu_kurumu", label: "Kamu Kurumu" },
+  { value: "ozel_egitim_kurumu", label: "Özel Eğitim Kurumu" },
+];
 
 const FUND_REGIONS = [
-  { value: '', label: '(Boş)' },
-  { value: 'europe', label: 'Avrupa' },
-  { value: 'free', label: 'Serbest' },
-]
+  { value: "", label: "(Boş)" },
+  { value: "europe", label: "Avrupa" },
+  { value: "free", label: "Serbest" },
+];
 
 const PARTNER_TYPES = [
-  { value: 'partner', label: 'Partner Kurum' },
-  { value: 'field', label: 'Çalışma Sahası' },
-]
+  { value: "partner", label: "Partner Kurum" },
+  { value: "field", label: "Çalışma Sahası" },
+];
 
 interface AddNeedyModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<AddNeedyFormValues>({
     resolver: zodResolver(addNeedySchema),
     defaultValues: {
-      category_id: 'yetim_ailesi', // Varsayılan: Yetim Ailesi
-      first_name: '',
-      last_name: '',
-      nationality_id: '',
-      date_of_birth: '',
-      identity_number: '',
+      category_id: "yetim_ailesi", // Varsayılan: Yetim Ailesi
+      first_name: "",
+      last_name: "",
+      nationality_id: "",
+      date_of_birth: "",
+      identity_number: "",
       check_mernis: false,
-      fund_region: '',
-      partner_type: 'partner',
-      partner_id: '',
-      file_number: '',
+      fund_region: "",
+      partner_type: "partner",
+      partner_id: "",
+      file_number: "",
     },
-  })
+  });
 
   const onSubmit = async (values: AddNeedyFormValues) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const supabase = createClient()
+      const supabase = createClient();
 
       // Mernis kontrolü yapılacaksa
-      if (values.check_mernis && values.identity_number && values.date_of_birth) {
-        const birthYear = new Date(values.date_of_birth).getFullYear()
-        
-        const mernisResponse = await fetch('/api/mernis/verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+      if (
+        values.check_mernis &&
+        values.identity_number &&
+        values.date_of_birth
+      ) {
+        const birthYear = new Date(values.date_of_birth).getFullYear();
+
+        const mernisResponse = await fetch("/api/mernis/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             tcKimlikNo: values.identity_number,
             ad: values.first_name,
             soyad: values.last_name,
             dogumYili: birthYear,
           }),
-        })
+        });
 
-        const mernisResult = await mernisResponse.json()
+        const mernisResult = await mernisResponse.json();
 
         if (!mernisResult.verified) {
-          toast.error(`Mernis Doğrulama: ${mernisResult.message}`)
-          setIsLoading(false)
-          return
+          toast.error(`Mernis Doğrulama: ${mernisResult.message}`);
+          setIsLoading(false);
+          return;
         }
 
-        toast.success('TC Kimlik doğrulaması başarılı')
+        toast.success("TC Kimlik doğrulaması başarılı");
       }
 
       // Kayıt oluştur
       const { data, error } = await supabase
-        .from('needy_persons')
+        .from("needy_persons")
         .insert({
           category_id: values.category_id,
           first_name: values.first_name,
@@ -144,29 +148,32 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
           fund_region: values.fund_region || null,
           partner_id: values.partner_id || null,
           file_number: values.file_number || null,
-          status: 'pending', // Taslak durumu
+          status: "pending", // Taslak durumu
           is_active: true,
         })
         .select()
-        .single()
+        .single();
 
-      if (error) throw error
+      if (error) throw error;
 
-      toast.success('Kayıt başarıyla oluşturuldu')
-      onOpenChange(false)
-      form.reset()
-      
+      toast.success("Kayıt başarıyla oluşturuldu");
+      onOpenChange(false);
+      form.reset();
+
       // Detay sayfasına yönlendir
-      router.push(`/needy/${data.id}`)
+      router.push(`/needy/${data.id}`);
     } catch (error) {
-      console.error('Kayıt hatası:', error)
-      toast.error('Kayıt oluşturulurken bir hata oluştu')
+      console.error("Kayıt hatası:", error);
+      toast.error("Kayıt oluşturulurken bir hata oluştu");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  const isFormValid = form.watch('first_name') && form.watch('last_name') && form.watch('category_id')
+  const isFormValid =
+    form.watch("first_name") &&
+    form.watch("last_name") &&
+    form.watch("category_id");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -188,10 +195,7 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
               )}
               Kaydet
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
               <X className="h-4 w-4 mr-2" />
               Kapat
             </Button>
@@ -295,7 +299,11 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
                   <FormItem>
                     <FormLabel>Kimlik No</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="11 haneli TC Kimlik No" maxLength={11} />
+                      <Input
+                        {...field}
+                        placeholder="11 haneli TC Kimlik No"
+                        maxLength={11}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -335,7 +343,10 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
                     </FormControl>
                     <SelectContent>
                       {FUND_REGIONS.map((fund) => (
-                        <SelectItem key={fund.value || 'empty'} value={fund.value || 'none'}>
+                        <SelectItem
+                          key={fund.value || "empty"}
+                          value={fund.value || "none"}
+                        >
                           {fund.label}
                         </SelectItem>
                       ))}
@@ -413,5 +424,5 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
