@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import { ReactNode, useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { ReactNode, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -17,45 +17,56 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Plus, Search, Filter, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
-import { StatusFilter, STATUS_FILTER_OPTIONS } from '@/types/linked-records.types'
+} from "@/components/ui/table";
+import {
+  Plus,
+  Search,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
+import {
+  StatusFilter,
+  STATUS_FILTER_OPTIONS,
+} from "@/types/linked-records.types";
 
 interface TabLayoutProps {
-  title?: string
-  children?: ReactNode
-  
+  title?: string;
+  children?: ReactNode;
+
   // Tablo özellikleri
-  columns?: { key: string; label: string; width?: string }[]
-  data?: Record<string, unknown>[]
-  renderRow?: (item: Record<string, unknown>, index: number) => ReactNode
-  emptyMessage?: string
-  
+  columns?: { key: string; label: string; width?: string }[];
+  data?: Record<string, unknown>[];
+  renderRow?: (item: Record<string, unknown>, index: number) => ReactNode;
+  emptyMessage?: string;
+
   // Filtreleme
-  showStatusFilter?: boolean
-  statusFilter?: StatusFilter
-  onStatusFilterChange?: (value: StatusFilter) => void
-  
+  showStatusFilter?: boolean;
+  statusFilter?: StatusFilter;
+  onStatusFilterChange?: (value: StatusFilter) => void;
+
   // Arama
-  showSearch?: boolean
-  searchPlaceholder?: string
-  searchValue?: string
-  onSearchChange?: (value: string) => void
-  onSearch?: () => void
-  
+  showSearch?: boolean;
+  searchPlaceholder?: string;
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  onSearch?: () => void;
+
   // Ekleme
-  showAddButton?: boolean
-  addButtonLabel?: string
-  onAdd?: () => void
-  
+  showAddButton?: boolean;
+  addButtonLabel?: string;
+  onAdd?: () => void;
+
   // Sayfalama
-  totalRecords?: number
-  currentPage?: number
-  totalPages?: number
-  onPageChange?: (page: number) => void
-  
+  totalRecords?: number;
+  currentPage?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
+
   // Loading
-  isLoading?: boolean
+  isLoading?: boolean;
 }
 
 export function TabLayout({
@@ -64,17 +75,17 @@ export function TabLayout({
   columns = [],
   data = [],
   renderRow,
-  emptyMessage = 'Kayıt bulunamadı',
+  emptyMessage = "Kayıt bulunamadı",
   showStatusFilter = true,
-  statusFilter = 'active',
+  statusFilter = "active",
   onStatusFilterChange,
   showSearch = true,
-  searchPlaceholder = 'Ara...',
-  searchValue = '',
+  searchPlaceholder = "Ara...",
+  searchValue = "",
   onSearchChange,
   onSearch,
   showAddButton = true,
-  addButtonLabel = 'Ekle',
+  addButtonLabel = "Ekle",
   onAdd,
   totalRecords = 0,
   currentPage = 1,
@@ -88,8 +99,8 @@ export function TabLayout({
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-2 flex-1">
           {showStatusFilter && (
-            <Select 
-              value={statusFilter} 
+            <Select
+              value={statusFilter}
               onValueChange={(v) => onStatusFilterChange?.(v as StatusFilter)}
             >
               <SelectTrigger className="w-[160px]">
@@ -131,7 +142,9 @@ export function TabLayout({
       {/* Kayıt Sayısı ve Sayfalama Info */}
       <div className="flex items-center justify-between text-sm text-muted-foreground">
         <span>{totalRecords} Kayıt</span>
-        <span>{currentPage} / {totalPages}</span>
+        <span>
+          {currentPage} / {totalPages}
+        </span>
       </div>
 
       {/* İçerik - Tablo veya Custom Children */}
@@ -158,7 +171,10 @@ export function TabLayout({
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={columns.length + 2} className="text-center py-8">
+                  <TableCell
+                    colSpan={columns.length + 2}
+                    className="text-center py-8"
+                  >
                     <div className="flex items-center justify-center gap-2">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
                       <span>Yükleniyor...</span>
@@ -167,7 +183,10 @@ export function TabLayout({
                 </TableRow>
               ) : data.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={columns.length + 2} className="text-center py-8 text-muted-foreground">
+                  <TableCell
+                    colSpan={columns.length + 2}
+                    className="text-center py-8 text-muted-foreground"
+                  >
                     {emptyMessage}
                   </TableCell>
                 </TableRow>
@@ -200,11 +219,9 @@ export function TabLayout({
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          
-          <span className="px-3 py-1 text-sm">
-            {currentPage}
-          </span>
-          
+
+          <span className="px-3 py-1 text-sm">{currentPage}</span>
+
           <Button
             variant="outline"
             size="icon"
@@ -226,5 +243,5 @@ export function TabLayout({
         </div>
       )}
     </div>
-  )
+  );
 }

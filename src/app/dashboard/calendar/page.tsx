@@ -1,53 +1,67 @@
-'use client'
+"use client";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
-import { useState } from 'react'
-import { useCalendarEvents } from '@/hooks/queries/use-calendar'
-import { PageHeader } from '@/components/common/page-header'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns'
-import { tr } from 'date-fns/locale'
+import { useState } from "react";
+import { useCalendarEvents } from "@/hooks/queries/use-calendar";
+import { PageHeader } from "@/components/common/page-header";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Calendar as CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+} from "lucide-react";
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+  addMonths,
+  subMonths,
+} from "date-fns";
+import { tr } from "date-fns/locale";
 
 type CalendarEvent = {
-  id: string
-  title: string
-  date: string
-  type: string
-  time?: string
-}
+  id: string;
+  title: string;
+  date: string;
+  type: string;
+  time?: string;
+};
 
 export default function CalendarPage() {
-  const [currentDate, setCurrentDate] = useState(new Date())
-  const monthStart = startOfMonth(currentDate)
-  const monthEnd = endOfMonth(currentDate)
-  const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd })
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const monthStart = startOfMonth(currentDate);
+  const monthEnd = endOfMonth(currentDate);
+  const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
   const { data: eventsData = [] } = useCalendarEvents({
     date_from: monthStart.toISOString(),
     date_to: monthEnd.toISOString(),
-  })
-  
-  const events: CalendarEvent[] = (eventsData as any[]) || []
+  });
+
+  const events: CalendarEvent[] = (eventsData as any[]) || [];
 
   const getEventsForDay = (day: Date) => {
-    return events.filter((event) => isSameDay(new Date(event.date), day))
-  }
+    return events.filter((event) => isSameDay(new Date(event.date), day));
+  };
 
   const getEventTypeColor = (type: string) => {
     const colors: Record<string, string> = {
-      meeting: 'bg-blue-100 text-blue-700',
-      task: 'bg-green-100 text-green-700',
-      event: 'bg-purple-100 text-purple-700',
-      reminder: 'bg-orange-100 text-orange-700',
-    }
-    return colors[type] || 'bg-slate-100 text-slate-700'
-  }
+      meeting: "bg-blue-100 text-blue-700",
+      task: "bg-green-100 text-green-700",
+      event: "bg-purple-100 text-purple-700",
+      reminder: "bg-orange-100 text-orange-700",
+    };
+    return colors[type] || "bg-slate-100 text-slate-700";
+  };
 
-  const weekDays = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
+  const weekDays = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
 
   return (
     <div className="space-y-6">
@@ -69,7 +83,7 @@ export default function CalendarPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>
-                {format(currentDate, 'MMMM yyyy', { locale: tr })}
+                {format(currentDate, "MMMM yyyy", { locale: tr })}
               </CardTitle>
               <div className="flex gap-2">
                 <Button
@@ -100,7 +114,10 @@ export default function CalendarPage() {
             {/* Hafta günleri */}
             <div className="grid grid-cols-7 gap-1 mb-2">
               {weekDays.map((day) => (
-                <div key={day} className="text-center text-sm font-medium text-slate-500 p-2">
+                <div
+                  key={day}
+                  className="text-center text-sm font-medium text-slate-500 p-2"
+                >
                   {day}
                 </div>
               ))}
@@ -109,23 +126,27 @@ export default function CalendarPage() {
             {/* Takvim günleri */}
             <div className="grid grid-cols-7 gap-1">
               {daysInMonth.map((day) => {
-                const dayEvents = getEventsForDay(day)
-                const isToday = isSameDay(day, new Date())
-                const isCurrentMonth = isSameMonth(day, currentDate)
+                const dayEvents = getEventsForDay(day);
+                const isToday = isSameDay(day, new Date());
+                const isCurrentMonth = isSameMonth(day, currentDate);
 
                 return (
                   <div
                     key={day.toISOString()}
                     className={`min-h-[80px] border rounded-lg p-2 ${
-                      isCurrentMonth ? 'bg-white' : 'bg-slate-50'
-                    } ${isToday ? 'ring-2 ring-emerald-500' : ''}`}
+                      isCurrentMonth ? "bg-white" : "bg-slate-50"
+                    } ${isToday ? "ring-2 ring-emerald-500" : ""}`}
                   >
                     <div
                       className={`text-sm font-medium mb-1 ${
-                        isToday ? 'text-emerald-600' : isCurrentMonth ? 'text-slate-900' : 'text-slate-400'
+                        isToday
+                          ? "text-emerald-600"
+                          : isCurrentMonth
+                            ? "text-slate-900"
+                            : "text-slate-400"
                       }`}
                     >
-                      {format(day, 'd')}
+                      {format(day, "d")}
                     </div>
                     <div className="space-y-1">
                       {dayEvents.slice(0, 2).map((event) => (
@@ -144,7 +165,7 @@ export default function CalendarPage() {
                       )}
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
           </CardContent>
@@ -158,27 +179,29 @@ export default function CalendarPage() {
           <CardContent>
             <div className="space-y-3">
               {events.length > 0 ? (
-                events
-                  .slice(0, 5)
-                  .map((event) => (
-                    <div
-                      key={event.id}
-                      className="p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="font-medium text-sm">{event.title}</p>
-                          <p className="text-xs text-slate-500 mt-1">
-                            {format(new Date(event.date), 'dd MMM yyyy', { locale: tr })}
-                            {event.time && ` • ${event.time}`}
-                          </p>
-                        </div>
-                        <Badge className={`text-xs ${getEventTypeColor(event.type)}`}>
-                          {event.type}
-                        </Badge>
+                events.slice(0, 5).map((event) => (
+                  <div
+                    key={event.id}
+                    className="p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">{event.title}</p>
+                        <p className="text-xs text-slate-500 mt-1">
+                          {format(new Date(event.date), "dd MMM yyyy", {
+                            locale: tr,
+                          })}
+                          {event.time && ` • ${event.time}`}
+                        </p>
                       </div>
+                      <Badge
+                        className={`text-xs ${getEventTypeColor(event.type)}`}
+                      >
+                        {event.type}
+                      </Badge>
                     </div>
-                  ))
+                  </div>
+                ))
               ) : (
                 <p className="text-center text-slate-500 text-sm py-8">
                   Yaklaşan etkinlik bulunmuyor
@@ -189,5 +212,5 @@ export default function CalendarPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

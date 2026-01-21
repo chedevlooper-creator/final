@@ -1,54 +1,67 @@
-'use client'
+"use client";
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { trackEvent, identifyUser, trackButtonClick, trackFormSubmit, trackPageView, trackUserAction } from '@/lib/analytics'
-import { useEffect, useState } from 'react'
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  trackEvent,
+  identifyUser,
+  trackButtonClick,
+  trackFormSubmit,
+  trackPageView,
+  trackUserAction,
+} from "@/lib/analytics";
+import { useEffect, useState } from "react";
 
 export default function PostHogTestPage(): React.JSX.Element {
-  const [userId] = useState('test_user_' + Date.now())
+  const [userId] = useState("test_user_" + Date.now());
 
   useEffect(() => {
-    trackPageView('/test/posthog', {
-      page_name: 'PostHog Test Page'
-    })
-  }, [])
+    trackPageView("/test/posthog", {
+      page_name: "PostHog Test Page",
+    });
+  }, []);
 
   const handleTestEvent = () => {
-    trackEvent('test_event', {
-      property1: 'value1',
-      property2: 'value2',
-      test_name: 'custom_event_test'
-    })
-  }
+    trackEvent("test_event", {
+      property1: "value1",
+      property2: "value2",
+      test_name: "custom_event_test",
+    });
+  };
 
   const handleIdentify = () => {
     identifyUser(userId, {
-      email: 'test@example.com',
-      name: 'Test User'
-    })
-  }
+      email: "test@example.com",
+      name: "Test User",
+    });
+  };
 
   const handleButtonClick = () => {
-    trackButtonClick('test_button', {
-      page: '/test/posthog',
-      location: 'hero_section'
-    })
-  }
+    trackButtonClick("test_button", {
+      page: "/test/posthog",
+      location: "hero_section",
+    });
+  };
 
   const handleFormSubmit = () => {
-    trackFormSubmit('test_form', {
-      form_type: 'contact',
-      fields_count: 3
-    })
-  }
+    trackFormSubmit("test_form", {
+      form_type: "contact",
+      fields_count: 3,
+    });
+  };
 
   const handleUserAction = () => {
-    trackUserAction('dashboard_view', {
-      feature: 'analytics_test',
-      duration_ms: 1200
-    })
-  }
+    trackUserAction("dashboard_view", {
+      feature: "analytics_test",
+      duration_ms: 1200,
+    });
+  };
 
   return (
     <div className="container mx-auto py-8">
@@ -82,22 +95,41 @@ export default function PostHogTestPage(): React.JSX.Element {
             <h3 className="font-semibold mb-2">How to Verify:</h3>
             <ol className="list-decimal list-inside space-y-2 text-sm text-slate-700">
               <li>Click any button above</li>
-              <li>Open PostHog Dashboard: <a href="https://app.posthog.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">https://app.posthog.com</a></li>
+              <li>
+                Open PostHog Dashboard:{" "}
+                <a
+                  href="https://app.posthog.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  https://app.posthog.com
+                </a>
+              </li>
               <li>Check Events section</li>
-              <li>Look for events like: test_event, button_clicked, form_submitted, user_action</li>
-              <li>You should also see a posthog_installation_verified event from initial load</li>
+              <li>
+                Look for events like: test_event, button_clicked,
+                form_submitted, user_action
+              </li>
+              <li>
+                You should also see a posthog_installation_verified event from
+                initial load
+              </li>
             </ol>
           </div>
 
           <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <h3 className="font-semibold mb-2 text-blue-900">Environment Variables:</h3>
+            <h3 className="font-semibold mb-2 text-blue-900">
+              Environment Variables:
+            </h3>
             <pre className="text-xs text-blue-800 overflow-x-auto">
-              NEXT_PUBLIC_POSTHOG_KEY=phc_qnxniytK8Vv4SKn578uVzD07IsZY0xa96NjkJL6sbJE<br />
+              NEXT_PUBLIC_POSTHOG_KEY=phc_qnxniytK8Vv4SKn578uVzD07IsZY0xa96NjkJL6sbJE
+              <br />
               NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
             </pre>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
