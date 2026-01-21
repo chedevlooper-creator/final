@@ -185,7 +185,7 @@ export type { SocialCard } from '@/types/linked-records.types'
 
 // Referans
 // @deprecated Import from @/types/linked-records.types for more comprehensive type
-export type { NeedyReference } from '@/types/linked-records.types'
+export type { Reference as NeedyReference } from '@/types/linked-records.types'
 
 // Dropdown Seçenekleri
 export const CATEGORIES = [

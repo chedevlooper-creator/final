@@ -1,7 +1,11 @@
 /**
  * Excel Export Library
- * 
+ *
  * Excel dosyası export işlemleri için utility fonksiyonlar
+ *
+ * SECURITY NOTE: xlsx package has known vulnerabilities (Prototype Pollution & ReDoS).
+ * However, it's only used for exporting trusted internal data (not parsing user uploads).
+ * Risk is minimal as we control all input data. Monitor for updates: https://github.com/SheetJS/sheetjs
  */
 
 import * as XLSX from 'xlsx'
@@ -153,7 +157,7 @@ export function exportDonationsToExcel(data: Record<string, unknown>[]): void {
       header: 'Tarih',
       key: 'created_at',
       width: 20,
-      format: (val) => new Date(val).toLocaleString('tr-TR'),
+      format: (val: unknown) => new Date(val as string | number | Date).toLocaleString('tr-TR'),
     },
   ]
   
