@@ -1,0 +1,58 @@
+# Version Control
+.git
+.gitignore
+
+# Dependencies
+node_modules
+
+# Build outputs
+.next
+out
+dist
+build
+
+# Documentation (keep deployment guides)
+docs/
+*.md
+!README.md
+!DEPLOYMENT.md
+!VERCEL_SETUP.md
+
+# Development files
+.agent/
+.claude/
+.env.example
+.env.local
+.eslintrc.json
+
+# Testing
+vitest.config.ts
+vitest.setup.ts
+coverage/
+__tests__/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Reports & Notes
+CLEANUP_NOTES.md
+SECURITY_AUDIT_REPORT.md
+
+# Scripts
+run-migrations.sh
+run-migrations.bat
+
+# Images (except necessary ones)
+*.png
+*.jpg
+!public/**/*.png
+!public/**/*.jpg
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
