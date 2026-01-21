@@ -1,129 +1,149 @@
-'use client'
+"use client";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
-import { useState } from 'react'
-import { PageHeader } from '@/components/common/page-header'
-import { DataTable } from '@/components/common/data-table'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import { PageHeader } from "@/components/common/page-header";
+import { DataTable } from "@/components/common/data-table";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { CreditCard, Plus, MoreHorizontal, Eye, Pencil, Trash2 } from 'lucide-react'
-import { ColumnDef } from '@tanstack/react-table'
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import {
+  CreditCard,
+  Plus,
+  MoreHorizontal,
+  Eye,
+  Pencil,
+  Trash2,
+} from "lucide-react";
+import { ColumnDef } from "@tanstack/react-table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { format } from 'date-fns'
-import { tr } from 'date-fns/locale'
-import { useBankTransactions, useDeleteFinanceTransaction, FinanceTransaction } from '@/hooks/queries/use-finance'
-import { toast } from 'sonner'
+} from "@/components/ui/dropdown-menu";
+import { format } from "date-fns";
+import { tr } from "date-fns/locale";
+import {
+  useBankTransactions,
+  useDeleteFinanceTransaction,
+  FinanceTransaction,
+} from "@/hooks/queries/use-finance";
+import { toast } from "sonner";
 
 export default function FinanceBankPage() {
-  const [page, setPage] = useState(0)
-  const [transactionType, setTransactionType] = useState<string>('')
+  const [page, setPage] = useState(0);
+  const [transactionType, setTransactionType] = useState<string>("");
 
   const { data, isLoading } = useBankTransactions({
-    type: transactionType as 'income' | 'expense' | undefined,
+    type: transactionType as "income" | "expense" | undefined,
     page,
     limit: 20,
-  })
-  
-  const deleteMutation = useDeleteFinanceTransaction()
+  });
+
+  const deleteMutation = useDeleteFinanceTransaction();
 
   const handleDelete = async (id: string) => {
-    if (confirm('Bu işlemi silmek istediğinize emin misiniz?')) {
+    if (confirm("Bu işlemi silmek istediğinize emin misiniz?")) {
       try {
-        await deleteMutation.mutateAsync(id)
-        toast.success('İşlem silindi')
+        await deleteMutation.mutateAsync(id);
+        toast.success("İşlem silindi");
       } catch (error) {
-        toast.error('İşlem silinemedi')
+        toast.error("İşlem silinemedi");
       }
     }
-  }
+  };
 
   const getTransactionTypeBadge = (type: string) => {
     const typeColors: Record<string, string> = {
-      income: 'bg-green-100 text-green-700',
-      expense: 'bg-red-100 text-red-700',
-      transfer: 'bg-blue-100 text-blue-700',
-    }
+      income: "bg-green-100 text-green-700",
+      expense: "bg-red-100 text-red-700",
+      transfer: "bg-blue-100 text-blue-700",
+    };
     const typeLabels: Record<string, string> = {
-      income: 'Gelir',
-      expense: 'Gider',
-      transfer: 'Transfer',
-    }
+      income: "Gelir",
+      expense: "Gider",
+      transfer: "Transfer",
+    };
     return (
-      <Badge className={typeColors[type] || 'bg-slate-100'}>
+      <Badge className={typeColors[type] || "bg-slate-100"}>
         {typeLabels[type] || type}
       </Badge>
-    )
-  }
+    );
+  };
 
   const formatAmount = (amount: number, currency: string, type: string) => {
-    const symbol = currency === 'TRY' ? '₺' : currency
-    const color = type === 'income' ? 'text-emerald-600' : 'text-red-600'
-    const prefix = type === 'income' ? '+' : '-'
+    const symbol = currency === "TRY" ? "₺" : currency;
+    const color = type === "income" ? "text-emerald-600" : "text-red-600";
+    const prefix = type === "income" ? "+" : "-";
     return (
       <span className={`font-bold ${color}`}>
-        {prefix}{symbol}{Math.abs(amount).toLocaleString('tr-TR')}
+        {prefix}
+        {symbol}
+        {Math.abs(amount).toLocaleString("tr-TR")}
       </span>
-    )
-  }
+    );
+  };
 
   const columns: ColumnDef<FinanceTransaction>[] = [
     {
-      accessorKey: 'transaction_number',
-      header: 'İşlem No',
+      accessorKey: "transaction_number",
+      header: "İşlem No",
       cell: ({ row }) => (
         <span className="font-mono text-sm text-slate-600">
-          {row.original.transaction_number || '-'}
+          {row.original.transaction_number || "-"}
         </span>
       ),
     },
     {
-      accessorKey: 'category',
-      header: 'Kategori',
+      accessorKey: "category",
+      header: "Kategori",
       cell: ({ row }) => (
-        <span className="text-sm">{row.original.category || '-'}</span>
+        <span className="text-sm">{row.original.category || "-"}</span>
       ),
     },
     {
-      accessorKey: 'type',
-      header: 'İşlem Türü',
+      accessorKey: "type",
+      header: "İşlem Türü",
       cell: ({ row }) => getTransactionTypeBadge(row.original.type),
     },
     {
-      accessorKey: 'amount',
-      header: 'Tutar',
-      cell: ({ row }) => formatAmount(row.original.amount, row.original.currency, row.original.type),
+      accessorKey: "amount",
+      header: "Tutar",
+      cell: ({ row }) =>
+        formatAmount(
+          row.original.amount,
+          row.original.currency,
+          row.original.type,
+        ),
     },
     {
-      accessorKey: 'description',
-      header: 'Açıklama',
+      accessorKey: "description",
+      header: "Açıklama",
       cell: ({ row }) => (
-        <span className="text-sm">{row.original.description || '-'}</span>
+        <span className="text-sm">{row.original.description || "-"}</span>
       ),
     },
     {
-      accessorKey: 'created_at',
-      header: 'Tarih',
+      accessorKey: "created_at",
+      header: "Tarih",
       cell: ({ row }) => (
         <span className="text-sm text-slate-500">
-          {format(new Date(row.original.created_at), 'dd MMM yyyy HH:mm', { locale: tr })}
+          {format(new Date(row.original.created_at), "dd MMM yyyy HH:mm", {
+            locale: tr,
+          })}
         </span>
       ),
     },
     {
-      id: 'actions',
+      id: "actions",
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -140,7 +160,7 @@ export default function FinanceBankPage() {
               <Pencil className="mr-2 h-4 w-4" />
               Düzenle
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => handleDelete(row.original.id)}
               className="text-red-600"
             >
@@ -151,7 +171,7 @@ export default function FinanceBankPage() {
         </DropdownMenu>
       ),
     },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -169,7 +189,10 @@ export default function FinanceBankPage() {
 
       {/* Filtreler */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center">
-        <Select value={transactionType || 'all'} onValueChange={(v) => setTransactionType(v === 'all' ? '' : v)}>
+        <Select
+          value={transactionType || "all"}
+          onValueChange={(v) => setTransactionType(v === "all" ? "" : v)}
+        >
           <SelectTrigger className="w-48">
             <SelectValue placeholder="İşlem Türü" />
           </SelectTrigger>
@@ -192,5 +215,5 @@ export default function FinanceBankPage() {
         onPageChange={setPage}
       />
     </div>
-  )
+  );
 }

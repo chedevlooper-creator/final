@@ -12,26 +12,26 @@
  * Error Severity Levels
  */
 export enum ErrorSeverity {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical'
+  LOW = "low",
+  MEDIUM = "medium",
+  HIGH = "high",
+  CRITICAL = "critical",
 }
 
 /**
  * Error Types
  */
 export enum ErrorType {
-  NETWORK = 'network',
-  VALIDATION = 'validation',
-  NOT_FOUND = 'not_found',
-  PERMISSION = 'permission',
-  SERVER = 'server',
-  UNKNOWN = 'unknown',
-  AUTHENTICATION = 'authentication',
-  DATABASE = 'database',
-  CONFLICT = 'conflict',
-  RATE_LIMIT = 'rate_limit'
+  NETWORK = "network",
+  VALIDATION = "validation",
+  NOT_FOUND = "not_found",
+  PERMISSION = "permission",
+  SERVER = "server",
+  UNKNOWN = "unknown",
+  AUTHENTICATION = "authentication",
+  DATABASE = "database",
+  CONFLICT = "conflict",
+  RATE_LIMIT = "rate_limit",
 }
 
 /**
@@ -54,32 +54,32 @@ export class AppError extends Error {
     public details?: Record<string, unknown>,
     public severity: ErrorSeverity = ErrorSeverity.MEDIUM,
     public recoveryActions?: RecoveryAction[],
-    public errorType: ErrorType = ErrorType.UNKNOWN
+    public errorType: ErrorType = ErrorType.UNKNOWN,
   ) {
-    super(message)
-    this.name = this.constructor.name
-    Error.captureStackTrace(this, this.constructor)
+    super(message);
+    this.name = this.constructor.name;
+    Error.captureStackTrace(this, this.constructor);
   }
 
   /**
    * Get user-friendly Turkish message
    */
   getUserMessage(): string {
-    return ErrorHandler.getUserMessage(this)
+    return ErrorHandler.getUserMessage(this);
   }
 
   /**
    * Get recovery actions
    */
   getRecoveryActions(): RecoveryAction[] {
-    return this.recoveryActions || ErrorHandler.getDefaultRecoveryActions(this)
+    return this.recoveryActions || ErrorHandler.getDefaultRecoveryActions(this);
   }
 
   /**
    * Get error type
    */
   getErrorType(): ErrorType {
-    return this.errorType
+    return this.errorType;
   }
 }
 
@@ -89,9 +89,9 @@ export class AppError extends Error {
  */
 export class AuthError extends AppError {
   constructor(
-    message: string = 'Authentication failed',
-    public authCode: string = 'AUTH_FAILED',
-    details?: Record<string, unknown>
+    message: string = "Authentication failed",
+    public authCode: string = "AUTH_FAILED",
+    details?: Record<string, unknown>,
   ) {
     super(
       message,
@@ -100,12 +100,24 @@ export class AuthError extends AppError {
       details,
       ErrorSeverity.HIGH,
       [
-        { label: 'Tekrar Giriş Yap', action: () => { window.location.href = '/login'; }, icon: '🔐' },
-        { label: 'Ana Sayfaya Dön', action: () => { window.location.href = '/'; }, icon: '🏠' }
+        {
+          label: "Tekrar Giriş Yap",
+          action: () => {
+            window.location.href = "/login";
+          },
+          icon: "🔐",
+        },
+        {
+          label: "Ana Sayfaya Dön",
+          action: () => {
+            window.location.href = "/";
+          },
+          icon: "🏠",
+        },
       ],
-      ErrorType.AUTHENTICATION
-    )
-    this.name = 'AuthError'
+      ErrorType.AUTHENTICATION,
+    );
+    this.name = "AuthError";
   }
 }
 
@@ -115,22 +127,26 @@ export class AuthError extends AppError {
  */
 export class AuthorizationError extends AppError {
   constructor(
-    message: string = 'You do not have permission to perform this action',
-    details?: Record<string, unknown>
+    message: string = "You do not have permission to perform this action",
+    details?: Record<string, unknown>,
   ) {
     super(
       message,
-      'FORBIDDEN',
+      "FORBIDDEN",
       403,
       details,
       ErrorSeverity.MEDIUM,
       [
-        { label: 'Geri Dön', action: () => window.history.back(), icon: '↩️' },
-        { label: 'Ana Sayfaya Dön', action: () => window.location.href = '/', icon: '🏠' }
+        { label: "Geri Dön", action: () => window.history.back(), icon: "↩️" },
+        {
+          label: "Ana Sayfaya Dön",
+          action: () => (window.location.href = "/"),
+          icon: "🏠",
+        },
       ],
-      ErrorType.PERMISSION
-    )
-    this.name = 'AuthorizationError'
+      ErrorType.PERMISSION,
+    );
+    this.name = "AuthorizationError";
   }
 }
 
@@ -143,11 +159,11 @@ export class ValidationError extends AppError {
     message: string,
     public field: string,
     public value: unknown,
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ) {
     super(
       message,
-      'VALIDATION_ERROR',
+      "VALIDATION_ERROR",
       400,
       {
         field,
@@ -155,12 +171,10 @@ export class ValidationError extends AppError {
         ...details,
       },
       ErrorSeverity.LOW,
-      [
-        { label: 'Formu Düzenle', action: () => { }, icon: '✏️' }
-      ],
-      ErrorType.VALIDATION
-    )
-    this.name = 'ValidationError'
+      [{ label: "Formu Düzenle", action: () => {}, icon: "✏️" }],
+      ErrorType.VALIDATION,
+    );
+    this.name = "ValidationError";
   }
 }
 
@@ -170,22 +184,26 @@ export class ValidationError extends AppError {
  */
 export class NetworkError extends AppError {
   constructor(
-    message: string = 'Network request failed',
+    message: string = "Network request failed",
     public httpStatusCode?: number,
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ) {
     super(
       message,
-      'NETWORK_ERROR',
+      "NETWORK_ERROR",
       httpStatusCode || 500,
       details,
       ErrorSeverity.MEDIUM,
       [
-        { label: 'Tekrar Dene', action: () => window.location.reload(), icon: '🔄' }
+        {
+          label: "Tekrar Dene",
+          action: () => window.location.reload(),
+          icon: "🔄",
+        },
       ],
-      ErrorType.NETWORK
-    )
-    this.name = 'NetworkError'
+      ErrorType.NETWORK,
+    );
+    this.name = "NetworkError";
   }
 }
 
@@ -195,27 +213,31 @@ export class NetworkError extends AppError {
  */
 export class NotFoundError extends AppError {
   constructor(
-    resource: string = 'Resource',
+    resource: string = "Resource",
     identifier?: string,
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ) {
     const message = identifier
       ? `${resource} with identifier '${identifier}' not found`
-      : `${resource} not found`
+      : `${resource} not found`;
 
     super(
       message,
-      'NOT_FOUND',
+      "NOT_FOUND",
       404,
       { resource, identifier, ...details },
       ErrorSeverity.LOW,
       [
-        { label: 'Geri Dön', action: () => window.history.back(), icon: '↩️' },
-        { label: 'Ana Sayfaya Dön', action: () => window.location.href = '/', icon: '🏠' }
+        { label: "Geri Dön", action: () => window.history.back(), icon: "↩️" },
+        {
+          label: "Ana Sayfaya Dön",
+          action: () => (window.location.href = "/"),
+          icon: "🏠",
+        },
       ],
-      ErrorType.NOT_FOUND
-    )
-    this.name = 'NotFoundError'
+      ErrorType.NOT_FOUND,
+    );
+    this.name = "NotFoundError";
   }
 }
 
@@ -224,22 +246,17 @@ export class NotFoundError extends AppError {
  * Thrown when there's a conflict with existing data
  */
 export class ConflictError extends AppError {
-  constructor(
-    message: string,
-    details?: Record<string, unknown>
-  ) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(
       message,
-      'CONFLICT',
+      "CONFLICT",
       409,
       details,
       ErrorSeverity.MEDIUM,
-      [
-        { label: 'Verileri Kontrol Et', action: () => { }, icon: '🔍' }
-      ],
-      ErrorType.CONFLICT
-    )
-    this.name = 'ConflictError'
+      [{ label: "Verileri Kontrol Et", action: () => {}, icon: "🔍" }],
+      ErrorType.CONFLICT,
+    );
+    this.name = "ConflictError";
   }
 }
 
@@ -249,22 +266,26 @@ export class ConflictError extends AppError {
  */
 export class RateLimitError extends AppError {
   constructor(
-    message: string = 'Rate limit exceeded',
+    message: string = "Rate limit exceeded",
     public retryAfter?: number,
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ) {
     super(
       message,
-      'RATE_LIMIT_EXCEEDED',
+      "RATE_LIMIT_EXCEEDED",
       429,
       { retryAfter, ...details },
       ErrorSeverity.MEDIUM,
       [
-        { label: `${retryAfter || 60} saniye bekleyin`, action: () => { }, icon: '⏳' }
+        {
+          label: `${retryAfter || 60} saniye bekleyin`,
+          action: () => {},
+          icon: "⏳",
+        },
       ],
-      ErrorType.RATE_LIMIT
-    )
-    this.name = 'RateLimitError'
+      ErrorType.RATE_LIMIT,
+    );
+    this.name = "RateLimitError";
   }
 }
 
@@ -274,22 +295,30 @@ export class RateLimitError extends AppError {
  */
 export class DatabaseError extends AppError {
   constructor(
-    message: string = 'Database operation failed',
-    details?: Record<string, unknown>
+    message: string = "Database operation failed",
+    details?: Record<string, unknown>,
   ) {
     super(
       message,
-      'DATABASE_ERROR',
+      "DATABASE_ERROR",
       500,
       details,
       ErrorSeverity.HIGH,
       [
-        { label: 'Tekrar Dene', action: () => window.location.reload(), icon: '🔄' },
-        { label: 'Destek ile İletişime Geç', action: () => window.location.href = '/support', icon: '📞' }
+        {
+          label: "Tekrar Dene",
+          action: () => window.location.reload(),
+          icon: "🔄",
+        },
+        {
+          label: "Destek ile İletişime Geç",
+          action: () => (window.location.href = "/support"),
+          icon: "📞",
+        },
       ],
-      ErrorType.DATABASE
-    )
-    this.name = 'DatabaseError'
+      ErrorType.DATABASE,
+    );
+    this.name = "DatabaseError";
   }
 }
 
@@ -298,20 +327,23 @@ export class DatabaseError extends AppError {
  * Logs errors with appropriate severity levels
  */
 export class ErrorLogger {
-  private static isDevelopment = process.env['NODE_ENV'] === 'development'
+  private static isDevelopment = process.env["NODE_ENV"] === "development";
 
   /**
    * Log error with context
    */
-  static error(error: Error | AppError, context?: Record<string, unknown>): void {
+  static error(
+    error: Error | AppError,
+    context?: Record<string, unknown>,
+  ): void {
     // Ignore AbortError - these are usually harmless and caused by HMR or React Strict Mode
     if (
-      error.name === 'AbortError' ||
-      error.message?.includes('signal is aborted') ||
-      (error instanceof AppError && error.code === 'ABORT_ERROR')
+      error.name === "AbortError" ||
+      error.message?.includes("signal is aborted") ||
+      (error instanceof AppError && error.code === "ABORT_ERROR")
     ) {
       if (this.isDevelopment) {
-        console.debug('🔇 Suppressed AbortError in Logger');
+        console.debug("🔇 Suppressed AbortError in Logger");
       }
       return;
     }
@@ -329,14 +361,14 @@ export class ErrorLogger {
       }),
       context,
       timestamp: new Date().toISOString(),
-    }
+    };
 
     if (this.isDevelopment) {
-      console.error('❌ Error:', errorInfo)
+      console.error("❌ Error:", errorInfo);
     } else {
       // In production, send to error tracking service (e.g., Sentry)
       // Sentry.captureException(error, { extra: context })
-      console.error('Error:', errorInfo.name, errorInfo.message)
+      console.error("Error:", errorInfo.name, errorInfo.message);
     }
   }
 
@@ -348,12 +380,12 @@ export class ErrorLogger {
       message,
       context,
       timestamp: new Date().toISOString(),
-    }
+    };
 
     if (this.isDevelopment) {
-      console.warn('⚠️ Warning:', warnInfo)
+      console.warn("⚠️ Warning:", warnInfo);
     } else {
-      console.warn('Warning:', message)
+      console.warn("Warning:", message);
     }
   }
 
@@ -362,7 +394,7 @@ export class ErrorLogger {
    */
   static info(message: string, context?: Record<string, unknown>): void {
     if (this.isDevelopment) {
-      console.info('ℹ️ Info:', message, context)
+      console.info("ℹ️ Info:", message, context);
     }
   }
 }
@@ -376,16 +408,16 @@ export class ErrorHandler {
    * Turkish error messages mapping
    */
   private static turkishMessages: Record<string, string> = {
-    'AUTH_FAILED': 'Geçersiz kullanıcı adı veya şifre',
-    'FORBIDDEN': 'Bu işlem için yetkiniz yok',
-    'VALIDATION_ERROR': 'Lütfen girdiğiniz bilgileri kontrol edin',
-    'NETWORK_ERROR': 'Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin',
-    'NOT_FOUND': 'Sayfa veya kayıt bulunamadı',
-    'CONFLICT': 'Bu kayıt zaten mevcut',
-    'RATE_LIMIT_EXCEEDED': 'Çok fazla deneme yaptınız. Lütfen bir süre bekleyin',
-    'DATABASE_ERROR': 'Veritabanı hatası. Lütfen daha sonra tekrar deneyin',
-    'UNKNOWN_ERROR': 'Beklenmeyen bir hata oluştu',
-  }
+    AUTH_FAILED: "Geçersiz kullanıcı adı veya şifre",
+    FORBIDDEN: "Bu işlem için yetkiniz yok",
+    VALIDATION_ERROR: "Lütfen girdiğiniz bilgileri kontrol edin",
+    NETWORK_ERROR: "Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin",
+    NOT_FOUND: "Sayfa veya kayıt bulunamadı",
+    CONFLICT: "Bu kayıt zaten mevcut",
+    RATE_LIMIT_EXCEEDED: "Çok fazla deneme yaptınız. Lütfen bir süre bekleyin",
+    DATABASE_ERROR: "Veritabanı hatası. Lütfen daha sonra tekrar deneyin",
+    UNKNOWN_ERROR: "Beklenmeyen bir hata oluştu",
+  };
 
   /**
    * Handle error and return user-friendly message
@@ -393,13 +425,13 @@ export class ErrorHandler {
   static handle(error: unknown, context?: Record<string, unknown>): string {
     // Log the error
     if (error instanceof Error) {
-      ErrorLogger.error(error, context)
+      ErrorLogger.error(error, context);
     } else {
-      ErrorLogger.error(new Error(String(error)), context)
+      ErrorLogger.error(new Error(String(error)), context);
     }
 
     // Return user-friendly message
-    return this.getUserMessage(error)
+    return this.getUserMessage(error);
   }
 
   /**
@@ -407,25 +439,27 @@ export class ErrorHandler {
    */
   static getUserMessage(error: unknown): string {
     if (error instanceof AuthError) {
-      return this.turkishMessages['AUTH_FAILED']
+      return this.turkishMessages["AUTH_FAILED"];
     } else if (error instanceof AuthorizationError) {
-      return this.turkishMessages['FORBIDDEN']
+      return this.turkishMessages["FORBIDDEN"];
     } else if (error instanceof ValidationError) {
-      return this.turkishMessages['VALIDATION_ERROR']
+      return this.turkishMessages["VALIDATION_ERROR"];
     } else if (error instanceof NetworkError) {
-      return this.turkishMessages['NETWORK_ERROR']
+      return this.turkishMessages["NETWORK_ERROR"];
     } else if (error instanceof NotFoundError) {
-      return this.turkishMessages['NOT_FOUND']
+      return this.turkishMessages["NOT_FOUND"];
     } else if (error instanceof RateLimitError) {
-      return this.turkishMessages['RATE_LIMIT_EXCEEDED']
+      return this.turkishMessages["RATE_LIMIT_EXCEEDED"];
     } else if (error instanceof DatabaseError) {
-      return this.turkishMessages['DATABASE_ERROR']
+      return this.turkishMessages["DATABASE_ERROR"];
     } else if (error instanceof ConflictError) {
-      return this.turkishMessages['CONFLICT']
+      return this.turkishMessages["CONFLICT"];
     } else if (error instanceof Error) {
-      return this.isDevelopment() ? error.message : this.turkishMessages['UNKNOWN_ERROR']
+      return this.isDevelopment()
+        ? error.message
+        : this.turkishMessages["UNKNOWN_ERROR"];
     } else {
-      return this.turkishMessages['UNKNOWN_ERROR']
+      return this.turkishMessages["UNKNOWN_ERROR"];
     }
   }
 
@@ -435,77 +469,116 @@ export class ErrorHandler {
   static getDefaultRecoveryActions(error: unknown): RecoveryAction[] {
     if (error instanceof NetworkError) {
       return [
-        { label: 'Tekrar Dene', action: () => window.location.reload(), icon: '🔄' }
-      ]
+        {
+          label: "Tekrar Dene",
+          action: () => window.location.reload(),
+          icon: "🔄",
+        },
+      ];
     } else if (error instanceof NotFoundError) {
       return [
-        { label: 'Geri Dön', action: () => window.history.back(), icon: '↩️' },
-        { label: 'Ana Sayfaya Dön', action: () => window.location.href = '/', icon: '🏠' }
-      ]
+        { label: "Geri Dön", action: () => window.history.back(), icon: "↩️" },
+        {
+          label: "Ana Sayfaya Dön",
+          action: () => (window.location.href = "/"),
+          icon: "🏠",
+        },
+      ];
     } else if (error instanceof AuthError) {
       return [
-        { label: 'Tekrar Giriş Yap', action: () => { window.location.href = '/login'; }, icon: '🔐' }
-      ]
+        {
+          label: "Tekrar Giriş Yap",
+          action: () => {
+            window.location.href = "/login";
+          },
+          icon: "🔐",
+        },
+      ];
     }
 
     return [
-      { label: 'Ana Sayfaya Dön', action: () => { window.location.href = '/'; }, icon: '🏠' }
-    ]
+      {
+        label: "Ana Sayfaya Dön",
+        action: () => {
+          window.location.href = "/";
+        },
+        icon: "🏠",
+      },
+    ];
   }
 
   /**
    * Check if running in development
    */
   private static isDevelopment(): boolean {
-    return process.env['NODE_ENV'] === 'development'
+    return process.env["NODE_ENV"] === "development";
   }
 
   /**
    * Parse Supabase error and convert to appropriate AppError
    */
-  static fromSupabaseError(error: { message: string; code?: string; details?: unknown }): AppError {
-    const message = error.message || 'Bir hata oluştu'
+  static fromSupabaseError(error: {
+    message: string;
+    code?: string;
+    details?: unknown;
+  }): AppError {
+    const message = error.message || "Bir hata oluştu";
 
     switch (error.code) {
-      case 'PGRST116':
-      case 'PGRST301':
-        return new NotFoundError('Resource')
-      case '23505':
-        return new ConflictError('Bu kayıt zaten mevcut')
-      case '23503':
-        return new ValidationError('İlişkili kayıt bulunamadı', 'foreign_key', null)
-      case '42501':
-        return new AuthorizationError('Bu işlem için yetkiniz yok')
+      case "PGRST116":
+      case "PGRST301":
+        return new NotFoundError("Resource");
+      case "23505":
+        return new ConflictError("Bu kayıt zaten mevcut");
+      case "23503":
+        return new ValidationError(
+          "İlişkili kayıt bulunamadı",
+          "foreign_key",
+          null,
+        );
+      case "42501":
+        return new AuthorizationError("Bu işlem için yetkiniz yok");
       default:
-        return new AppError(message, error.code || 'UNKNOWN_ERROR', 500, {
+        return new AppError(message, error.code || "UNKNOWN_ERROR", 500, {
           details: error.details,
-        })
+        });
     }
   }
 
   /**
    * Create error from error type
    */
-  static createError(type: ErrorType, message: string, context?: Record<string, unknown>): AppError {
+  static createError(
+    type: ErrorType,
+    message: string,
+    context?: Record<string, unknown>,
+  ): AppError {
     switch (type) {
       case ErrorType.NETWORK:
-        return new NetworkError(message)
+        return new NetworkError(message);
       case ErrorType.VALIDATION:
-        return new ValidationError(message, context?.['field'] as string || 'unknown', context?.['value'])
+        return new ValidationError(
+          message,
+          (context?.["field"] as string) || "unknown",
+          context?.["value"],
+        );
       case ErrorType.NOT_FOUND:
-        return new NotFoundError(context?.['resource'] as string || 'Resource', context?.['identifier'] as string)
+        return new NotFoundError(
+          (context?.["resource"] as string) || "Resource",
+          context?.["identifier"] as string,
+        );
       case ErrorType.PERMISSION:
-        return new AuthorizationError(message)
+        return new AuthorizationError(message);
       case ErrorType.AUTHENTICATION:
-        return new AuthError(message)
+        return new AuthError(message);
       case ErrorType.DATABASE:
-        return new DatabaseError(message)
+        return new DatabaseError(message);
       case ErrorType.CONFLICT:
-        return new ConflictError(message)
+        return new ConflictError(message);
       case ErrorType.RATE_LIMIT:
-        return new RateLimitError(message, context?.['retryAfter'] as number)
+        return new RateLimitError(message, context?.["retryAfter"] as number);
       default:
-        return new AppError(message, 'UNKNOWN_ERROR', 500, context)
+        return new AppError(message, "UNKNOWN_ERROR", 500, context);
     }
   }
 
@@ -513,15 +586,15 @@ export class ErrorHandler {
    * Get error type from error
    */
   static getErrorType(error: unknown): ErrorType {
-    if (error instanceof NetworkError) return ErrorType.NETWORK
-    if (error instanceof ValidationError) return ErrorType.VALIDATION
-    if (error instanceof NotFoundError) return ErrorType.NOT_FOUND
-    if (error instanceof AuthorizationError) return ErrorType.PERMISSION
-    if (error instanceof AuthError) return ErrorType.AUTHENTICATION
-    if (error instanceof DatabaseError) return ErrorType.DATABASE
-    if (error instanceof ConflictError) return ErrorType.CONFLICT
-    if (error instanceof RateLimitError) return ErrorType.RATE_LIMIT
-    return ErrorType.UNKNOWN
+    if (error instanceof NetworkError) return ErrorType.NETWORK;
+    if (error instanceof ValidationError) return ErrorType.VALIDATION;
+    if (error instanceof NotFoundError) return ErrorType.NOT_FOUND;
+    if (error instanceof AuthorizationError) return ErrorType.PERMISSION;
+    if (error instanceof AuthError) return ErrorType.AUTHENTICATION;
+    if (error instanceof DatabaseError) return ErrorType.DATABASE;
+    if (error instanceof ConflictError) return ErrorType.CONFLICT;
+    if (error instanceof RateLimitError) return ErrorType.RATE_LIMIT;
+    return ErrorType.UNKNOWN;
   }
 
   /**
@@ -529,8 +602,8 @@ export class ErrorHandler {
    */
   static getSeverity(error: unknown): ErrorSeverity {
     if (error instanceof AppError) {
-      return error.severity
+      return error.severity;
     }
-    return ErrorSeverity.MEDIUM
+    return ErrorSeverity.MEDIUM;
   }
 }
