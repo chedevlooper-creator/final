@@ -64,8 +64,9 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
       await createMutation.mutateAsync(values)
       toast.success('Başvuru oluşturuldu')
       onSuccess?.()
-    } catch (error: any) {
-      toast.error(error.message || 'Bir hata oluştu')
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Bir hata oluştu'
+      toast.error(errorMessage)
     }
   }
 

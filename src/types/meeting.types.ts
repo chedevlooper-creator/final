@@ -292,14 +292,9 @@ export interface TaskFilters {
 
 /**
  * Paginated response / Sayfalı yanıt
+ * @deprecated Import from @/types/common instead
  */
-export interface PaginatedResponse<T> {
-  data: T[]
-  count: number
-  page: number
-  limit: number
-  totalPages: number
-}
+export type { PaginatedResponse } from '@/types/common'
 
 /**
  * Toplantı istatistikleri / Meeting statistics

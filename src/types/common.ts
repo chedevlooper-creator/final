@@ -131,12 +131,13 @@ export interface ApiError {
 
 /**
  * Paginated Response
+ * Generic pagination wrapper for API responses
  */
 export interface PaginatedResponse<T> {
   data: T[]
   count: number
   page: number
-  pageSize: number
+  limit: number  // Number of items per page (renamed from pageSize for consistency)
   totalPages: number
 }
 

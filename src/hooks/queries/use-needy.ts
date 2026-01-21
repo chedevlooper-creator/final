@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { NeedyPersonFormValues } from '@/lib/validations/needy'
+import type { NeedyPerson } from '@/types/needy.types'
 
 export interface NeedyFilters {
   search?: string
@@ -179,10 +180,9 @@ export function useUpdateNeedy() {
 
       const previousPerson = queryClient.getQueryData(['needy-persons', 'detail', id])
 
-      queryClient.setQueryData(['needy-persons', 'detail', id], (old: any) => ({
-        ...old,
-        ...values
-      }))
+      queryClient.setQueryData(['needy-persons', 'detail', id], (old: NeedyPerson | undefined) =>
+        old ? { ...old, ...values } : undefined
+      )
 
       return { previousPerson }
     },

@@ -168,79 +168,24 @@ export interface Document {
 }
 
 // Bağımlı Kişi
-export interface Dependent {
-  id: string
-  needy_person_id: string
-  first_name: string
-  last_name: string
-  relation_type?: string
-  gender?: string
-  date_of_birth?: string
-  identity_number?: string
-  has_disability?: boolean
-  disability_details?: string
-  education_status?: string
-  employment_status?: string
-  notes?: string
-  is_active: boolean
-  created_at: string
-}
+// @deprecated Import from @/types/linked-records.types for more comprehensive type
+export type { Dependent } from '@/types/linked-records.types'
 
 // Görüşme Kaydı
-export interface Interview {
-  id: string
-  needy_person_id: string
-  interview_type?: string
-  interview_date?: string
-  interviewer_name?: string
-  subject?: string
-  notes?: string
-  result?: string
-  next_action?: string
-  next_interview_date?: string
-  created_at: string
-}
+// @deprecated Import from @/types/linked-records.types for more comprehensive type
+export type { Interview } from '@/types/linked-records.types'
 
 // Rıza Beyanı
-export interface Consent {
-  id: string
-  needy_person_id: string
-  consent_type: string
-  consent_date?: string
-  expiry_date?: string
-  document_path?: string
-  status: string
-  notes?: string
-  created_at: string
-}
+// @deprecated Import from @/types/linked-records.types for more comprehensive type
+export type { Consent } from '@/types/linked-records.types'
 
 // Sosyal Kart
-export interface SocialCard {
-  id: string
-  needy_person_id: string
-  card_type?: string
-  card_number?: string
-  issue_date?: string
-  expiry_date?: string
-  issuing_authority?: string
-  status: string
-  notes?: string
-  created_at: string
-}
+// @deprecated Import from @/types/linked-records.types for more comprehensive type
+export type { SocialCard } from '@/types/linked-records.types'
 
 // Referans
-export interface NeedyReference {
-  id: string
-  needy_person_id: string
-  name: string
-  relation_type?: string
-  phone?: string
-  email?: string
-  address?: string
-  notes?: string
-  is_active: boolean
-  created_at: string
-}
+// @deprecated Import from @/types/linked-records.types for more comprehensive type
+export type { NeedyReference } from '@/types/linked-records.types'
 
 // Dropdown Seçenekleri
 export const CATEGORIES = [
