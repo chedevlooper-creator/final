@@ -1,0 +1,177 @@
+name: Code Quality
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          ANALYZE: true
+
+      # Bundle size analizi
+      - name: Analyze bundle size
+        id: bundle_size
+        run: |
+          echo "📊 Analyzing bundle size..."
+          
+          # .next/build-manifest.json kontrolü
+          if [ -f ".next/build-manifest.json" ]; then
+            BUNDLE_SIZE=$(du -sh .next | cut -f1)
+            echo "bundle_size=$BUNDLE_SIZE" >> $GITHUB_OUTPUT
+            echo "Bundle size: $BUNDLE_SIZE"
+          else
+            echo "bundle_size=N/A" >> $GITHUB_OUTPUT
+          fi
+
+      # Unused code detection
+      - name: Find unused exports
+        id: unused_code
+        run: |
+          echo "🔍 Finding unused exports..."
+          
+          # ts-prune kullanarak unused exports bul
+          npx ts-prune --error | tee unused-exports.txt || true
+          
+          UNUSED_COUNT=$(wc -l < unused-exports.txt || echo "0")
+          echo "unused_count=$UNUSED_COUNT" >> $GITHUB_OUTPUT
+          echo "Found $UNUSED_COUNT unused exports"
+
+      # Duplicate code finder
+      - name: Check for code duplication
+        id: duplicates
+        run: |
+          echo "🔍 Checking for code duplication..."
+          
+          # jscpd kullanarak duplicate code bul
+          npx jscpd src/ --min-lines 10 --min-tokens 50 --format "javascript,typescript,tsx" --output ./jscpd-report || true
+          
+          if [ -f "jscpd-report/jscpd-report.json" ]; then
+            echo "✅ Duplication report generated"
+          else
+            echo "No significant duplication found"
+          fi
+
+      # Complexity analysis
+      - name: Analyze code complexity
+        run: |
+          echo "📊 Analyzing code complexity..."
+          
+          # Find functions with high cyclomatic complexity
+          npx eslint src/ --ext .ts,.tsx --format json | \
+            grep -o '"complexity":[0-9]*' | \
+            grep -o '[0-9]*' | \
+            sort -rn | \
+            head -10 > complexity.txt || true
+          
+          echo "Top 10 most complex functions:"
+          cat complexity.txt || echo "No complexity issues found"
+
+      # Dead code detection
+      - name: Find dead code
+        run: |
+          echo "🔍 Finding potentially dead code..."
+          
+          # Find unused imports
+          npx eslint src/ --ext .ts,.tsx --rule 'no-unused-vars: error' --format unix | \
+            grep 'no-unused-vars' | \
+            head -20 > dead-code.txt || true
+          
+          if [ -s dead-code.txt ]; then
+            echo "⚠️  Potentially dead code found"
+            cat dead-code.txt
+          else
+            echo "✅ No obvious dead code detected"
+          fi
+
+      # Generate quality report
+      - name: Generate quality report
+        run: |
+          echo "## 📊 Code Quality Report" > quality-report.md
+          echo "" >> quality-report.md
+          echo "**Date:** $(date)" >> quality-report.md
+          echo "" >> quality-report.md
+          echo "### Metrics" >> quality-report.md
+          echo "- Bundle Size: ${{ steps.bundle_size.outputs.bundle_size }}" >> quality-report.md
+          echo "- Unused Exports: ${{ steps.unused_code.outputs.unused_count }}" >> quality-report.md
+          echo "" >> quality-report.md
+          echo "### Details" >> quality-report.md
+          echo "" >> quality-report.md
+          echo "#### Unused Exports (sample):" >> quality-report.md
+          head -10 unused-exports.txt >> quality-report.md || echo "None" >> quality-report.md
+          echo "" >> quality-report.md
+          echo "#### Code Complexity (top issues):" >> quality-report.md
+          head -5 complexity.txt >> quality-report.md || echo "None" >> quality-report.md
+
+      - name: Upload quality report
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-quality-report
+          path: |
+            quality-report.md
+            unused-exports.txt
+            complexity.txt
+            dead-code.txt
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const bundleSize = '${{ steps.bundle_size.outputs.bundle_size }}';
+            const unusedCount = '${{ steps.unused_code.outputs.unused_count }}';
+            
+            const body = `## 📊 Code Quality Analysis\n\n` +
+              `| Metric | Value |\n` +
+              `|--------|-------|\n` +
+              `| Bundle Size | ${bundleSize} |\n` +
+              `| Unused Exports | ${unusedCount} |\n\n` +
+              `### Recommendations\n` +
+              (unusedCount > 10 ? '⚠️  Consider cleaning up unused exports\n' : '✅ Low number of unused exports\n') +
+              `\n📎 Detailed report available in workflow artifacts`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Quality Summary
+        if: always()
+        run: |
+          echo "## 📊 Code Quality Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Bundle Size | ${{ steps.bundle_size.outputs.bundle_size }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unused Exports | ${{ steps.unused_code.outputs.unused_count }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Code quality analysis completed" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,126 @@
+name: Type Safety Checker
+
+on:
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Her Pazartesi saat 09:00
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  type-safety:
+    name: TypeScript Type Safety Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run TypeScript compiler
+        id: tsc
+        run: |
+          echo "🔍 Running TypeScript type check..."
+          npx tsc --noEmit || echo "tsc_failed=true" >> $GITHUB_OUTPUT
+
+      - name: Count 'any' types
+        id: count_any
+        run: |
+          echo "🔍 Counting 'any' type usage..."
+          
+          ANY_COUNT=$(grep -r ": any" src/ --exclude-dir=node_modules --exclude-dir=.next | wc -l || echo "0")
+          ANY_ARRAY_COUNT=$(grep -r ": any\[\]" src/ --exclude-dir=node_modules --exclude-dir=.next | wc -l || echo "0")
+          
+          TOTAL_ANY=$((ANY_COUNT + ANY_ARRAY_COUNT))
+          
+          echo "any_count=$TOTAL_ANY" >> $GITHUB_OUTPUT
+          echo "Found $TOTAL_ANY 'any' types"
+
+      - name: Count '@ts-ignore' comments
+        id: count_ignore
+        run: |
+          echo "🔍 Counting @ts-ignore comments..."
+          
+          IGNORE_COUNT=$(grep -r "@ts-ignore" src/ --exclude-dir=node_modules --exclude-dir=.next | wc -l || echo "0")
+          
+          echo "ignore_count=$IGNORE_COUNT" >> $GITHUB_OUTPUT
+          echo "Found $IGNORE_COUNT @ts-ignore comments"
+
+      - name: Count unsafe assertions
+        id: count_assertions
+        run: |
+          echo "🔍 Counting unsafe type assertions..."
+          
+          AS_ANY_COUNT=$(grep -r "as any" src/ --exclude-dir=node_modules --exclude-dir=.next | wc -l || echo "0")
+          
+          echo "assertion_count=$AS_ANY_COUNT" >> $GITHUB_OUTPUT
+          echo "Found $AS_ANY_COUNT 'as any' assertions"
+
+      - name: Generate detailed report
+        run: |
+          echo "## 🎯 Type Safety Report" > type-safety-report.md
+          echo "" >> type-safety-report.md
+          echo "**Date:** $(date)" >> type-safety-report.md
+          echo "" >> type-safety-report.md
+          echo "### Summary" >> type-safety-report.md
+          echo "- \`any\` types: ${{ steps.count_any.outputs.any_count }}" >> type-safety-report.md
+          echo "- \`@ts-ignore\` comments: ${{ steps.count_ignore.outputs.ignore_count }}" >> type-safety-report.md
+          echo "- Unsafe assertions: ${{ steps.count_assertions.outputs.assertion_count }}" >> type-safety-report.md
+          echo "" >> type-safety-report.md
+          echo "### Files with 'any' types:" >> type-safety-report.md
+          grep -r ": any" src/ --exclude-dir=node_modules --exclude-dir=.next | head -20 >> type-safety-report.md || echo "None found" >> type-safety-report.md
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: type-safety-report
+          path: type-safety-report.md
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const anyCount = '${{ steps.count_any.outputs.any_count }}';
+            const ignoreCount = '${{ steps.count_ignore.outputs.ignore_count }}';
+            const assertionCount = '${{ steps.count_assertions.outputs.assertion_count }}';
+            
+            const body = `## 🎯 Type Safety Report\n\n` +
+              `| Metric | Count |\n` +
+              `|--------|-------|\n` +
+              `| \`any\` types | ${anyCount} |\n` +
+              `| \`@ts-ignore\` | ${ignoreCount} |\n` +
+              `| Unsafe assertions | ${assertionCount} |\n\n` +
+              `**Goal:** Strict mode with 0 any, 0 ignore\n\n` +
+              (anyCount > 0 ? '⚠️  Consider replacing `any` with specific types\n' : '✅ No `any` types found\n');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Type Safety Summary
+        if: always()
+        run: |
+          echo "## 🎯 Type Safety Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| \`any\` types | ${{ steps.count_any.outputs.any_count }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`@ts-ignore\` | ${{ steps.count_ignore.outputs.ignore_count }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unsafe assertions | ${{ steps.count_assertions.outputs.assertion_count }} |" >> $GITHUB_STEP_SUMMARY
