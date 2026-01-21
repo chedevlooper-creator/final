@@ -1,5 +1,4 @@
-'use client'
-
+import { memo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface ChartData {
@@ -23,7 +22,7 @@ interface SimpleBarChartProps<T = ChartData> {
     horizontal?: boolean
 }
 
-export function SimpleBarChart<T = ChartData>({ 
+export const SimpleBarChart = memo(function SimpleBarChart<T = ChartData>({ 
     title, 
     data, 
     height = 200,
@@ -75,7 +74,7 @@ export function SimpleBarChart<T = ChartData>({
             </CardContent>
         </Card>
     )
-}
+})
 
 interface SimplePieChartProps<T = ChartData> {
     title?: string
@@ -87,7 +86,7 @@ interface SimplePieChartProps<T = ChartData> {
     showLegend?: boolean
 }
 
-export function SimplePieChart<T = ChartData>({ 
+export const SimplePieChart = memo(function SimplePieChart<T = ChartData>({ 
     title, 
     data, 
     size = 160,
@@ -166,7 +165,7 @@ export function SimplePieChart<T = ChartData>({
             </CardContent>
         </Card>
     )
-}
+})
 
 interface TrendChartProps<T = ChartData> {
     title?: string
@@ -179,7 +178,7 @@ interface TrendChartProps<T = ChartData> {
     formatValue?: (value: number) => string
 }
 
-export function TrendChart<T = ChartData>({ 
+export const TrendChart = memo(function TrendChart<T = ChartData>({ 
     title, 
     data, 
     height = 120, 
@@ -267,4 +266,4 @@ export function TrendChart<T = ChartData>({
             </CardContent>
         </Card>
     )
-}
+})

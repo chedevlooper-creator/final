@@ -11,7 +11,8 @@
       "Bash(test:*)",
       "Bash(npm audit:*)",
       "Bash(npm uninstall:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

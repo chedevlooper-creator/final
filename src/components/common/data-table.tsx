@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -38,7 +38,7 @@ interface DataTableProps<TData, TValue> {
   onRowClick?: (data: TData) => void
 }
 
-export function DataTable<TData, TValue>({
+function DataTableInner<TData, TValue>({
   columns,
   data,
   searchKey,
@@ -179,3 +179,5 @@ export function DataTable<TData, TValue>({
     </div>
   )
 }
+
+export const DataTable = memo(DataTableInner) as typeof DataTableInner

@@ -6,6 +6,7 @@ import { useMemo } from 'react'
 import { StatCard } from '@/components/common/stat-card'
 import { PageHeader } from '@/components/common/page-header'
 import { SimpleBarChart, SimplePieChart, TrendChart } from '@/components/common/charts'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Home,
   Users,
@@ -37,57 +38,57 @@ export default function DashboardPage() {
   const { data: donationStats } = useDonationStats()
   
   // Dashboard charts data
-  const { data: dashboardStats } = useDashboardStats()
-  const { data: monthlyTrend } = useMonthlyDonationTrend(6)
-  const { data: applicationTypes } = useApplicationTypeDistribution()
-  const { data: cityDistribution } = useCityDistribution()
-  const { data: applicationStatus } = useApplicationStatusDistribution()
+  const { data: dashboardStats, isLoading: isStatsLoading } = useDashboardStats()
+  const { data: monthlyTrend, isLoading: isTrendLoading } = useMonthlyDonationTrend(6)
+  const { data: applicationTypes, isLoading: isTypesLoading } = useApplicationTypeDistribution()
+  const { data: cityDistribution, isLoading: isCityLoading } = useCityDistribution()
+  const { data: applicationStatus, isLoading: isStatusLoading } = useApplicationStatusDistribution()
 
   // Memoize stats array to prevent unnecessary recalculations
   const stats = useMemo(() => [
     {
       title: 'Toplam İhtiyaç Sahibi',
-      value: needyData?.count || 0,
+      value: isStatsLoading ? <Skeleton className="h-7 w-16" /> : (needyData?.count || 0),
       icon: Users,
       iconColor: 'text-blue-500',
       description: 'Sistemdeki toplam kayıt',
     },
     {
       title: 'Bekleyen Başvuru',
-      value: applicationsData?.data?.filter((app: Application) => app.status === 'new').length || 0,
+      value: isStatsLoading ? <Skeleton className="h-7 w-16" /> : (applicationsData?.data?.filter((app: Application) => app.status === 'new').length || 0),
       icon: Clock,
       iconColor: 'text-orange-500',
       description: 'İşlem bekliyor',
     },
     {
       title: 'Bugünkü Bağış',
-      value: `₺${(donationStats?.today || 0).toLocaleString('tr-TR')}`,
+      value: isStatsLoading ? <Skeleton className="h-7 w-24" /> : `₺${(donationStats?.today || 0).toLocaleString('tr-TR')}`,
       icon: DollarSign,
       iconColor: 'text-emerald-500',
       description: 'Bugün toplanan',
     },
     {
       title: 'Aylık Bağış',
-      value: `₺${(donationStats?.thisMonth || 0).toLocaleString('tr-TR')}`,
+      value: isStatsLoading ? <Skeleton className="h-7 w-24" /> : `₺${(donationStats?.thisMonth || 0).toLocaleString('tr-TR')}`,
       icon: TrendingUp,
       iconColor: 'text-purple-500',
       description: 'Bu ay toplanan',
     },
     {
       title: 'Tamamlanan Yardım',
-      value: applicationsData?.data?.filter((app: Application) => app.status === 'completed').length || 0,
+      value: isStatsLoading ? <Skeleton className="h-7 w-16" /> : (applicationsData?.data?.filter((app: Application) => app.status === 'completed').length || 0),
       icon: CheckCircle,
       iconColor: 'text-cyan-500',
       description: 'Bu ay tamamlanan',
     },
     {
       title: 'Toplam Bağış',
-      value: donationStats?.count || 0,
+      value: isStatsLoading ? <Skeleton className="h-7 w-16" /> : (donationStats?.count || 0),
       icon: FileText,
       iconColor: 'text-red-500',
       description: 'Tüm zamanlar',
     },
-  ], [needyData?.count, applicationsData?.data, donationStats])
+  ], [needyData?.count, applicationsData?.data, donationStats, isStatsLoading])
 
   // Memoize filtered applications to prevent recalculation on every render
   const recentApplications = useMemo(() => {
@@ -249,7 +250,11 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {monthlyTrend && monthlyTrend.length > 0 ? (
+            {isTrendLoading ? (
+              <div className="space-y-2 h-[250px]">
+                <Skeleton className="h-full w-full" />
+              </div>
+            ) : monthlyTrend && monthlyTrend.length > 0 ? (
               <TrendChart
                 data={monthlyTrend}
                 labelKey="label"
@@ -261,7 +266,7 @@ export default function DashboardPage() {
               />
             ) : (
               <div className="flex items-center justify-center h-[250px] text-slate-400">
-                Veri yükleniyor...
+                Veri bulunamadı
               </div>
             )}
           </CardContent>
@@ -276,7 +281,16 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {applicationStatus && applicationStatus.length > 0 ? (
+            {isStatusLoading ? (
+              <div className="flex items-center gap-6 h-[250px]">
+                <Skeleton className="h-40 w-40 rounded-full" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
+              </div>
+            ) : applicationStatus && applicationStatus.length > 0 ? (
               <SimplePieChart
                 data={applicationStatus}
                 labelKey="label"
@@ -286,7 +300,7 @@ export default function DashboardPage() {
               />
             ) : (
               <div className="flex items-center justify-center h-[250px] text-slate-400">
-                Veri yükleniyor...
+                Veri bulunamadı
               </div>
             )}
           </CardContent>
@@ -301,7 +315,16 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {applicationTypes && applicationTypes.length > 0 ? (
+            {isTypesLoading ? (
+              <div className="flex items-center gap-6 h-[250px]">
+                <Skeleton className="h-40 w-40 rounded-full" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
+              </div>
+            ) : applicationTypes && applicationTypes.length > 0 ? (
               <SimplePieChart
                 data={applicationTypes}
                 labelKey="label"
@@ -311,7 +334,7 @@ export default function DashboardPage() {
               />
             ) : (
               <div className="flex items-center justify-center h-[250px] text-slate-400">
-                Veri yükleniyor...
+                Veri bulunamadı
               </div>
             )}
           </CardContent>
@@ -326,7 +349,16 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {cityDistribution && cityDistribution.length > 0 ? (
+            {isCityLoading ? (
+              <div className="space-y-4 h-[250px]">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="space-y-1">
+                    <Skeleton className="h-3 w-20" />
+                    <Skeleton className="h-2 w-full" />
+                  </div>
+                ))}
+              </div>
+            ) : cityDistribution && cityDistribution.length > 0 ? (
               <SimpleBarChart
                 data={cityDistribution}
                 labelKey="label"
@@ -337,7 +369,7 @@ export default function DashboardPage() {
               />
             ) : (
               <div className="flex items-center justify-center h-[250px] text-slate-400">
-                Veri yükleniyor...
+                Veri bulunamadı
               </div>
             )}
           </CardContent>

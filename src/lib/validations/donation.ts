@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { CURRENCIES as COMMON_CURRENCIES, PAYMENT_METHODS as COMMON_PAYMENT_METHODS } from '@/types/common'
 
 export const donationSchema = z.object({
   donor_name: z.string().nullable().optional(),
@@ -26,17 +27,7 @@ export const DONATION_TYPES = [
 ]
 
 // Ödeme Yöntemleri
-export const PAYMENT_METHODS = [
-  { value: 'cash', label: 'Nakit' },
-  { value: 'bank_transfer', label: 'Banka Havalesi' },
-  { value: 'credit_card', label: 'Kredi Kartı' },
-  { value: 'online', label: 'Online Ödeme' },
-]
+export const PAYMENT_METHODS = COMMON_PAYMENT_METHODS
 
 // Para Birimleri
-export const CURRENCIES = [
-  { value: 'TRY', label: '₺ TRY', symbol: '₺' },
-  { value: 'USD', label: '$ USD', symbol: '$' },
-  { value: 'EUR', label: '€ EUR', symbol: '€' },
-  { value: 'GBP', label: '£ GBP', symbol: '£' },
-]
+export const CURRENCIES = COMMON_CURRENCIES

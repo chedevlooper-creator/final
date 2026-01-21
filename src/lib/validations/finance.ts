@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { CURRENCIES as COMMON_CURRENCIES } from '@/types/common'
 
 function validateIBAN(iban: string): boolean {
   const cleanIBAN = iban.replace(/\s/g, '').toUpperCase()
@@ -22,11 +23,7 @@ export const bankAccountSchema = z.object({
 
 export type BankAccountFormValues = z.infer<typeof bankAccountSchema>
 
-export const CURRENCIES = [
-  { value: 'TRY', label: '₺ TRY', symbol: '₺' },
-  { value: 'USD', label: '$ USD', symbol: '$' },
-  { value: 'EUR', label: '€ EUR', symbol: '€' },
-]
+export const CURRENCIES = COMMON_CURRENCIES
 
 export const BANK_ACCOUNT_STATUSES = [
   { value: 'active', label: 'Aktif' },
