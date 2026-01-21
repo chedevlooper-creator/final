@@ -185,7 +185,7 @@ export interface Notification {
   title: string
   message: string
   read: boolean
-  data?: any
+  data?: Record<string, unknown>
   created_at: string
 }
 
@@ -292,14 +292,9 @@ export interface TaskFilters {
 
 /**
  * Paginated response / Sayfalı yanıt
+ * @deprecated Import from @/types/common instead
  */
-export interface PaginatedResponse<T> {
-  data: T[]
-  count: number
-  page: number
-  limit: number
-  totalPages: number
-}
+export type { PaginatedResponse } from '@/types/common'
 
 /**
  * Toplantı istatistikleri / Meeting statistics
@@ -450,7 +445,7 @@ export interface CreateVoteInput {
   title: string
   description?: string
   vote_type: VoteType
-  options?: any[]
+  options?: string[]
 }
 
 /**

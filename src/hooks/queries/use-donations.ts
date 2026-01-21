@@ -185,10 +185,9 @@ export function useUpdateDonation() {
       const previousDonation = queryClient.getQueryData(['donations', 'detail', id])
 
       // Optimistically update to the new value
-      queryClient.setQueryData(['donations', 'detail', id], (old: any) => ({
-        ...old,
-        ...values
-      }))
+      queryClient.setQueryData(['donations', 'detail', id], (old: Record<string, unknown> | undefined) =>
+        old ? { ...old, ...values } : undefined
+      )
 
       // Return context with previous value
       return { previousDonation }

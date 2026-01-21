@@ -14,18 +14,18 @@ export interface ExcelExportOptions {
   subject?: string
 }
 
-export interface ExcelColumn {
+export interface ExcelColumn<T = unknown> {
   header: string
   key: string
   width?: number
-  format?: (value: any) => any
+  format?: (value: T) => string | number | boolean
 }
 
 /**
  * Basit veriyi Excel'e export eder
  */
-export function exportToExcel(
-  data: any[],
+export function exportToExcel<T extends Record<string, unknown>>(
+  data: T[],
   options: ExcelExportOptions
 ): void {
   const workbook = XLSX.utils.book_new()
@@ -37,7 +37,7 @@ export function exportToExcel(
   
   // Metadata
   if (options.author || options.title || options.subject) {
-    const props: any = {}
+    const props: Partial<{ Author: string; Title: string; Subject: string }> = {}
     if (options.author) props.Author = options.author
     if (options.title) props.Title = options.title
     if (options.subject) props.Subject = options.subject
@@ -51,14 +51,14 @@ export function exportToExcel(
 /**
  * Column mapping ile Excel export
  */
-export function exportToExcelWithColumns(
-  data: any[],
-  columns: ExcelColumn[],
+export function exportToExcelWithColumns<T extends Record<string, unknown>>(
+  data: T[],
+  columns: ExcelColumn<unknown>[],
   options: ExcelExportOptions
 ): void {
   // Transform data
   const transformedData = data.map((row) => {
-    const transformed: any = {}
+    const transformed: Record<string, unknown> = {}
     columns.forEach((col) => {
       const value = row[col.key]
       transformed[col.header] = col.format ? col.format(value) : value
@@ -75,7 +75,7 @@ export function exportToExcelWithColumns(
 export function exportToExcelMultipleSheets(
   sheets: Array<{
     name: string
-    data: any[]
+    data: Record<string, unknown>[]
   }>,
   options: ExcelExportOptions
 ): void {
@@ -100,7 +100,7 @@ export function exportToExcelMultipleSheets(
 /**
  * İhtiyaç sahipleri için özel export
  */
-export function exportNeedyPersonsToExcel(data: any[]): void {
+export function exportNeedyPersonsToExcel(data: Record<string, unknown>[]): void {
   const columns: ExcelColumn[] = [
     { header: 'Dosya No', key: 'file_number', width: 15 },
     { header: 'Ad', key: 'first_name', width: 20 },
@@ -135,7 +135,7 @@ export function exportNeedyPersonsToExcel(data: any[]): void {
 /**
  * Bağışlar için özel export
  */
-export function exportDonationsToExcel(data: any[]): void {
+export function exportDonationsToExcel(data: Record<string, unknown>[]): void {
   const columns: ExcelColumn[] = [
     { header: 'Bağış No', key: 'donation_number', width: 15 },
     { header: 'Bağışçı Adı', key: 'donor_name', width: 25 },
@@ -169,9 +169,9 @@ export function exportDonationsToExcel(data: any[]): void {
  * Rapor için multiple sheets export
  */
 export function exportReportToExcel(data: {
-  donations: any[]
-  aids: any[]
-  needyPersons: any[]
+  donations: Record<string, unknown>[]
+  aids: Record<string, unknown>[]
+  needyPersons: Record<string, unknown>[]
 }): void {
   exportToExcelMultipleSheets(
     [

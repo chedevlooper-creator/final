@@ -21,9 +21,10 @@ function makeQueryClient() {
         gcTime: 30 * 60 * 1000,
 
         // Retry ayarları
-        retry: (failureCount, error: any) => {
+        retry: (failureCount, error: unknown) => {
           // 404 ve 403 hatalarında retry yapma
-          if (error?.status === 404 || error?.status === 403) {
+          const err = error as { status?: number }
+          if (err?.status === 404 || err?.status === 403) {
             return false
           }
           // Maksimum 2 retry

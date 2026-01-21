@@ -46,19 +46,27 @@ export const securityHeaders = {
   /**
    * Content-Security-Policy (CSP)
    * Controls which resources can be loaded
-   * 
-   * Note: This is a basic CSP. You may need to customize it based on your needs
-   * especially if you're using external services like analytics, fonts, etc.
+   *
+   * Security Improvements:
+   * - Removed 'unsafe-eval' from script-src (XSS risk)
+   * - Added WebSocket support for Supabase realtime (wss://*.supabase.co)
+   * - Added base-uri and form-action directives for additional protection
+   *
+   * Note: 'unsafe-inline' is kept for Next.js compatibility but should be replaced
+   * with nonce-based CSP for better security. See:
+   * https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy
    */
   ...(process.env['NODE_ENV'] === 'production' ? {
     'Content-Security-Policy': [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
-      "style-src 'self' 'unsafe-inline'",
+      "script-src 'self' 'unsafe-inline'", // TODO: Replace with nonce-based CSP
+      "style-src 'self' 'unsafe-inline'",  // TODO: Replace with nonce-based CSP
       "img-src 'self' data: blob: https://*.supabase.co",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.supabase.co",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
       "frame-ancestors 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
     ].join('; ')
   } : {}),
 
@@ -71,14 +79,15 @@ export const securityHeaders = {
 
 /**
  * CORS Configuration
- * 
+ *
  * Configure which origins are allowed to access your API
  */
 export const corsConfig = {
   // In production, replace with your actual domain
+  // In development, restrict to localhost only for better security
   origin: process.env['NODE_ENV'] === 'production'
     ? 'https://yourdomain.com'
-    : '*', // Allow all origins in development
+    : ['http://localhost:3000', 'http://127.0.0.1:3000'],
 
   credentials: true,
 

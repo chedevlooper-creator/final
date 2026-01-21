@@ -114,8 +114,9 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
         toast.success('Kayıt oluşturuldu')
       }
       onSuccess?.()
-    } catch (error: any) {
-      toast.error(error.message || 'Bir hata oluştu')
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Bir hata oluştu'
+      toast.error(errorMessage)
     }
   }
 

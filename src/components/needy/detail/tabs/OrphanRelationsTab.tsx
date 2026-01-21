@@ -71,13 +71,13 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
   }
 
   const handleSave = async () => {
-    console.log('Saving:', formData)
+    // TODO: Implement save functionality
     setIsAddModalOpen(false)
   }
 
   const handleDelete = async (id: string) => {
     if (confirm('Bu bağlantıyı kaldırmak istediğinizden emin misiniz?')) {
-      console.log('Deleting:', id)
+      // TODO: Implement delete functionality
     }
   }
 

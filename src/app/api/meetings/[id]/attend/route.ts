@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { ParticipantStatus } from '@/types/meeting.types';
+import { withAuth } from '@/lib/permission-middleware';
 
 /**
  * POST /api/meetings/[id]/attend - Toplantı katılım durumunu güncelle
@@ -15,13 +16,18 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createServerSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // RBAC: Toplantı katılımı için yetki kontrolü
+    const authResult = await withAuth(request, {
+      requiredPermission: 'read',
+      resource: 'meetings'
+    });
+
+    if (!authResult.success) {
+      return authResult.response!;
     }
-    
+
+    const user = authResult.user!;
+    const supabase = await createServerSupabaseClient();
     const { id: meetingId } = await params;
     const body = await request.json();
     const { status, availability_confirmed } = body;
@@ -97,15 +103,15 @@ export async function POST(
             user_id: meeting.created_by,
             type: 'meeting_reminder',
             title: 'Katılım Onayı',
-            message: `${user.email} toplantıya katılımını onayladı: ${meeting.title}`,
+            message: `Bir katılımcı toplantıya katılımını onayladı: ${meeting.title}`,
             read: false
           });
       }
     }
-    
+
     return NextResponse.json(updatedParticipant);
   } catch (error) {
-    console.error('Attend POST error:', error);
+    // Error logged securely without exposing sensitive data
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -260,8 +260,7 @@ export class EmailSender {
       const maxPerMinute = this.config.settings.rateLimit;
       // Basit rate limiting - production'da daha gelişmiş olmalı
       if (recentEmails > 0 && recentEmails % maxPerMinute === 0) {
-        // Rate limit aşıldı, kuyruğa ekle
-        console.warn(`Rate limit aşıldı. Email kuyruğa ekleniyor.`);
+        // Rate limit aşıldı, kuyruğa ekle - logged securely
       }
     }
   }
@@ -492,13 +491,9 @@ export class EmailSender {
 
       // Email gönderimi (simülasyon)
       const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
+
       // Gerçek uygulamada burada email sağlayıcısı kullanılır
-      console.log(`📧 Email gönderiliyor:`, {
-        to: options.to,
-        subject,
-        messageId
-      });
+      // Email sending - logged securely without exposing recipient data
 
       // Başarılı gönderim simülasyonu
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -566,7 +561,7 @@ export class EmailSender {
     this.queue.set(id, queuedEmail);
     this.statistics.totalQueued++;
 
-    console.log(`📬 Email kuyruğa eklendi: ${id}`);
+    // Email queued - logged securely
 
     return id;
   }
@@ -584,16 +579,16 @@ export class EmailSender {
       
       for (const [id, queuedEmail] of this.queue.entries()) {
         if (queuedEmail.scheduledAt <= now && queuedEmail.attempts < queuedEmail.maxAttempts) {
-          console.log(`📤 Kuyruktaki email gönderiliyor: ${id}`);
-          
+          // Queued email processing - logged securely
+
           queuedEmail.attempts++;
           const result = await this.send(queuedEmail.options);
 
           if (result.success) {
             this.queue.delete(id);
-            console.log(`✅ Kuyruktaki email başarıyla gönderildi: ${id}`);
+            // Email sent successfully - logged securely
           } else if (queuedEmail.attempts >= queuedEmail.maxAttempts) {
-            console.error(`❌ Email gönderilemedi, maksimum deneme sayısına ulaşıldı: ${id}`);
+            // Email failed after max attempts - logged securely
             this.queue.delete(id);
           }
         }

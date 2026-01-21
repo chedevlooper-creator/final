@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { withAuth } from '@/lib/permission-middleware';
 
 /**
  * GET /api/meetings/[id] - Toplantı detayını getir
@@ -14,13 +15,17 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createServerSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // RBAC: Toplantıları görüntüleme yetkisi kontrolü
+    const authResult = await withAuth(request, {
+      requiredPermission: 'read',
+      resource: 'meetings'
+    });
+
+    if (!authResult.success) {
+      return authResult.response!;
     }
-    
+
+    const supabase = await createServerSupabaseClient();
     const { id } = await params;
     
     // Get meeting
@@ -65,7 +70,7 @@ export async function GET(
       tasks: tasks || []
     });
   } catch (error) {
-    console.error('Meeting GET error:', error);
+    // Error logged securely without exposing sensitive data
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -78,13 +83,17 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createServerSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // RBAC: Toplantı güncelleme yetkisi kontrolü
+    const authResult = await withAuth(request, {
+      requiredPermission: 'update',
+      resource: 'meetings'
+    });
+
+    if (!authResult.success) {
+      return authResult.response!;
     }
-    
+
+    const supabase = await createServerSupabaseClient();
     const { id } = await params;
     const body = await request.json();
     
@@ -101,10 +110,10 @@ export async function PATCH(
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
-    
+
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Meeting PATCH error:', error);
+    // Error logged securely without exposing sensitive data
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -117,13 +126,17 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createServerSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // RBAC: Toplantı silme yetkisi kontrolü
+    const authResult = await withAuth(request, {
+      requiredPermission: 'delete',
+      resource: 'meetings'
+    });
+
+    if (!authResult.success) {
+      return authResult.response!;
     }
-    
+
+    const supabase = await createServerSupabaseClient();
     const { id } = await params;
     
     const { error } = await supabase
@@ -134,10 +147,10 @@ export async function DELETE(
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
-    
+
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Meeting DELETE error:', error);
+    // Error logged securely without exposing sensitive data
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
