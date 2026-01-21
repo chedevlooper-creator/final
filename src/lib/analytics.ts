@@ -1,4 +1,4 @@
-import posthog from 'posthog-js'
+import posthog from "posthog-js";
 
 /**
  * PostHog Analytics Helper Functions
@@ -7,104 +7,101 @@ import posthog from 'posthog-js'
 
 export function trackEvent(
   eventName: string,
-  properties?: Record<string, unknown>
+  properties?: Record<string, unknown>,
 ) {
-  if (typeof window === 'undefined') return
+  if (typeof window === "undefined") return;
 
   try {
-    posthog.capture(eventName, properties)
-    console.log(`📊 Event tracked: ${eventName}`, properties)
+    posthog.capture(eventName, properties);
+    console.log(`📊 Event tracked: ${eventName}`, properties);
   } catch (error) {
-    console.error('PostHog tracking error:', error)
+    console.error("PostHog tracking error:", error);
   }
 }
 
 export function trackPageView(
   page: string,
-  properties?: Record<string, unknown>
+  properties?: Record<string, unknown>,
 ) {
-  if (typeof window === 'undefined') return
+  if (typeof window === "undefined") return;
 
-  posthog.capture('$pageview', {
+  posthog.capture("$pageview", {
     $current_url: page,
-    ...properties
-  })
+    ...properties,
+  });
 }
 
 export function identifyUser(
   userId: string,
-  properties?: Record<string, unknown>
+  properties?: Record<string, unknown>,
 ) {
-  if (typeof window === 'undefined') return
+  if (typeof window === "undefined") return;
 
-  posthog.identify(userId, properties)
-  console.log(`👤 User identified: ${userId}`, properties)
+  posthog.identify(userId, properties);
+  console.log(`👤 User identified: ${userId}`, properties);
 }
 
 export function resetUser() {
-  if (typeof window === 'undefined') return
+  if (typeof window === "undefined") return;
 
-  posthog.reset()
-  console.log('🔄 User reset')
+  posthog.reset();
+  console.log("🔄 User reset");
 }
 
 export function trackButtonClick(
   buttonName: string,
-  properties?: Record<string, unknown>
+  properties?: Record<string, unknown>,
 ) {
-  trackEvent('button_clicked', {
+  trackEvent("button_clicked", {
     button_name: buttonName,
-    ...properties
-  })
+    ...properties,
+  });
 }
 
 export function trackFormSubmit(
   formName: string,
-  properties?: Record<string, unknown>
+  properties?: Record<string, unknown>,
 ) {
-  trackEvent('form_submitted', {
+  trackEvent("form_submitted", {
     form_name: formName,
-    ...properties
-  })
+    ...properties,
+  });
 }
 
 export function trackApiCall(
   apiName: string,
-  properties?: Record<string, unknown>
+  properties?: Record<string, unknown>,
 ) {
-  trackEvent('api_called', {
+  trackEvent("api_called", {
     api_name: apiName,
-    ...properties
-  })
+    ...properties,
+  });
 }
 
-export function trackNavigation(
-  from: string,
-  to: string
-) {
-  trackEvent('navigation', {
+export function trackNavigation(from: string, to: string) {
+  trackEvent("navigation", {
     from,
     to,
-    timestamp: new Date().toISOString()
-  })
+    timestamp: new Date().toISOString(),
+  });
 }
 
 export function trackError(
   errorName: string,
-  errorDetails: Record<string, unknown>
+  errorDetails: Record<string, unknown>,
 ) {
-  trackEvent('error_occurred', {
+  trackEvent("error_occurred", {
     error_name: errorName,
-    ...errorDetails
-  })
+    ...errorDetails,
+  });
 }
 
 export function trackUserAction(
   action: string,
-  properties?: Record<string, unknown>
+  properties?: Record<string, unknown>,
 ) {
-  trackEvent('user_action', {
+  trackEvent("user_action", {
     action,
-    ...properties
-  })
+    ...properties,
+  });
 }

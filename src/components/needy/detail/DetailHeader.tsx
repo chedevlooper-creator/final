@@ -1,32 +1,25 @@
-'use client'
+"use client";
 
-import { Button } from '@/components/ui/button'
-import { 
-  Save, 
-  X, 
-  Link2, 
-  History,
-  Loader2,
-  Trash2
-} from 'lucide-react'
-import Link from 'next/link'
+import { Button } from "@/components/ui/button";
+import { Save, X, Link2, History, Loader2, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 interface DetailHeaderProps {
-  id: string
-  isLoading?: boolean
-  isDirty?: boolean
-  onSave: () => void
-  onClose: () => void
-  onDeleteRequest?: () => void
+  id: string;
+  isLoading?: boolean;
+  isDirty?: boolean;
+  onSave: () => void;
+  onClose: () => void;
+  onDeleteRequest?: () => void;
 }
 
-export function DetailHeader({ 
-  id, 
-  isLoading, 
+export function DetailHeader({
+  id,
+  isLoading,
   isDirty,
-  onSave, 
+  onSave,
   onClose,
-  onDeleteRequest
+  onDeleteRequest,
 }: DetailHeaderProps) {
   return (
     <div className="sticky top-0 z-10 bg-background border-b">
@@ -45,10 +38,7 @@ export function DetailHeader({
             )}
             Kaydet
           </Button>
-          <Button
-            variant="outline"
-            onClick={onClose}
-          >
+          <Button variant="outline" onClick={onClose}>
             <X className="h-4 w-4 mr-2" />
             Kapat
           </Button>
@@ -74,8 +64,8 @@ export function DetailHeader({
             </Button>
           </Link>
           {onDeleteRequest && (
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="sm"
               onClick={onDeleteRequest}
               className="text-red-600 hover:text-red-700 hover:bg-red-50"
@@ -87,5 +77,5 @@ export function DetailHeader({
         </div>
       </div>
     </div>
-  )
+  );
 }

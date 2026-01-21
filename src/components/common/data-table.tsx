@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   ColumnDef,
@@ -10,7 +10,7 @@ import {
   SortingState,
   getFilteredRowModel,
   ColumnFiltersState,
-} from '@tanstack/react-table'
+} from "@tanstack/react-table";
 import {
   Table,
   TableBody,
@@ -18,31 +18,31 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { useState, memo } from 'react'
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
-import { Skeleton } from '@/components/ui/skeleton'
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useState, memo } from "react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  searchKey?: string
-  searchPlaceholder?: string
-  isLoading?: boolean
-  pageCount?: number
-  pageIndex?: number
-  pageSize?: number
-  onPageChange?: (page: number) => void
-  onRowClick?: (data: TData) => void
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  searchKey?: string;
+  searchPlaceholder?: string;
+  isLoading?: boolean;
+  pageCount?: number;
+  pageIndex?: number;
+  pageSize?: number;
+  onPageChange?: (page: number) => void;
+  onRowClick?: (data: TData) => void;
 }
 
 function DataTableInner<TData, TValue>({
   columns,
   data,
   searchKey,
-  searchPlaceholder = 'Ara...',
+  searchPlaceholder = "Ara...",
   isLoading,
   pageCount,
   pageIndex = 0,
@@ -50,8 +50,8 @@ function DataTableInner<TData, TValue>({
   onPageChange,
   onRowClick,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const table = useReactTable({
     data,
@@ -66,7 +66,7 @@ function DataTableInner<TData, TValue>({
       sorting,
       columnFilters,
     },
-  })
+  });
 
   if (isLoading) {
     return (
@@ -83,7 +83,7 @@ function DataTableInner<TData, TValue>({
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -93,7 +93,9 @@ function DataTableInner<TData, TValue>({
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder={searchPlaceholder}
-            value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ''}
+            value={
+              (table.getColumn(searchKey)?.getFilterValue() as string) ?? ""
+            }
             onChange={(event) =>
               table.getColumn(searchKey)?.setFilterValue(event.target.value)
             }
@@ -106,15 +108,21 @@ function DataTableInner<TData, TValue>({
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="bg-slate-50 hover:bg-slate-50">
+              <TableRow
+                key={headerGroup.id}
+                className="bg-slate-50 hover:bg-slate-50"
+              >
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="font-semibold text-slate-700">
+                  <TableHead
+                    key={header.id}
+                    className="font-semibold text-slate-700"
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -125,20 +133,30 @@ function DataTableInner<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                  className={onRowClick ? "cursor-pointer hover:bg-slate-50/50" : "hover:bg-slate-50/50"}
+                  data-state={row.getIsSelected() && "selected"}
+                  className={
+                    onRowClick
+                      ? "cursor-pointer hover:bg-slate-50/50"
+                      : "hover:bg-slate-50/50"
+                  }
                   onClick={() => onRowClick?.(row.original)}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-slate-500">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center text-slate-500"
+                >
                   Kayıt bulunamadı.
                 </TableCell>
               </TableRow>
@@ -149,9 +167,7 @@ function DataTableInner<TData, TValue>({
 
       {/* Pagination */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-500">
-          Toplam {data.length} kayıt
-        </p>
+        <p className="text-sm text-slate-500">Toplam {data.length} kayıt</p>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -177,7 +193,7 @@ function DataTableInner<TData, TValue>({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export const DataTable = memo(DataTableInner) as typeof DataTableInner
+export const DataTable = memo(DataTableInner) as typeof DataTableInner;

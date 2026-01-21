@@ -1,13 +1,19 @@
-'use client'
+"use client";
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ThemeProvider } from 'next-themes'
-import { useState, useEffect, Suspense } from 'react'
-import { Toaster } from '@/components/ui/sonner'
-import { WebVitals, PerformanceMonitor } from '@/components/performance/web-vitals'
-import { ViewTransitions, injectViewTransitionStyles } from '@/components/navigation/view-transitions'
-import { ProgressBar } from '@/components/navigation/progress-bar'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ThemeProvider } from "next-themes";
+import { useState, useEffect, Suspense } from "react";
+import { Toaster } from "@/components/ui/sonner";
+import {
+  WebVitals,
+  PerformanceMonitor,
+} from "@/components/performance/web-vitals";
+import {
+  ViewTransitions,
+  injectViewTransitionStyles,
+} from "@/components/navigation/view-transitions";
+import { ProgressBar } from "@/components/navigation/progress-bar";
 
 // Query client oluşturma fonksiyonu - optimization için ayrı
 function makeQueryClient() {
@@ -23,12 +29,12 @@ function makeQueryClient() {
         // Retry ayarları
         retry: (failureCount, error: unknown) => {
           // 404 ve 403 hatalarında retry yapma
-          const err = error as { status?: number }
+          const err = error as { status?: number };
           if (err?.status === 404 || err?.status === 403) {
-            return false
+            return false;
           }
           // Maksimum 2 retry
-          return failureCount < 2
+          return failureCount < 2;
         },
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
 
@@ -47,33 +53,38 @@ function makeQueryClient() {
         retryDelay: 1000,
       },
     },
-  })
+  });
 }
 
 // Browser'da singleton pattern
-let browserQueryClient: QueryClient | undefined = undefined
+let browserQueryClient: QueryClient | undefined = undefined;
 
 function getQueryClient() {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     // Server: her zaman yeni client oluştur
-    return makeQueryClient()
+    return makeQueryClient();
   } else {
     // Browser: singleton kullan
-    if (!browserQueryClient) browserQueryClient = makeQueryClient()
-    return browserQueryClient
+    if (!browserQueryClient) browserQueryClient = makeQueryClient();
+    return browserQueryClient;
   }
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(getQueryClient)
+  const [queryClient] = useState(getQueryClient);
 
   useEffect(() => {
     // Inject view transition styles
-    injectViewTransitionStyles()
-  }, [])
+    injectViewTransitionStyles();
+  }, []);
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
       <QueryClientProvider client={queryClient}>
         <Suspense fallback={null}>
           <ProgressBar />
@@ -83,10 +94,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <PerformanceMonitor />
         {children}
         <Toaster position="top-right" richColors closeButton />
-        {process.env['NODE_ENV'] === 'development' && (
-          <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+        {process.env["NODE_ENV"] === "development" && (
+          <ReactQueryDevtools
+            initialIsOpen={false}
+            buttonPosition="bottom-left"
+          />
         )}
       </QueryClientProvider>
     </ThemeProvider>
-  )
+  );
 }

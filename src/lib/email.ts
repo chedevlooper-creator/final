@@ -1,61 +1,67 @@
 /**
  * Email Notification System - Core Library
  * Email gönderimi için merkezi yönetim sistemi
- * 
+ *
  * @version 1.0.0
  * @author Aid Management Panel Team
  */
 
 // Email gönderim hataları için özel sınıflar
 export class EmailError extends Error {
-  constructor(message: string, public code?: string) {
+  constructor(
+    message: string,
+    public code?: string,
+  ) {
     super(message);
-    this.name = 'EmailError';
+    this.name = "EmailError";
   }
 }
 
 export class EmailValidationError extends EmailError {
   constructor(message: string) {
-    super(message, 'VALIDATION_ERROR');
-    this.name = 'EmailValidationError';
+    super(message, "VALIDATION_ERROR");
+    this.name = "EmailValidationError";
   }
 }
 
 export class EmailSendError extends EmailError {
-  constructor(message: string, public providerError?: any) {
-    super(message, 'SEND_ERROR');
-    this.name = 'EmailSendError';
+  constructor(
+    message: string,
+    public providerError?: any,
+  ) {
+    super(message, "SEND_ERROR");
+    this.name = "EmailSendError";
   }
 }
 
 // Email sağlayıcı tipleri
 export enum EmailProvider {
-  SMTP = 'smtp',
-  SENDGRID = 'sendgrid',
-  AWS_SES = 'aws_ses',
-  MAILGUN = 'mailgun',
-  POSTMARK = 'postmark'
+  SMTP = "smtp",
+  SENDGRID = "sendgrid",
+  AWS_SES = "aws_ses",
+  MAILGUN = "mailgun",
+  POSTMARK = "postmark",
 }
 
 // Email öncelik seviyeleri
 export enum EmailPriority {
-  LOW = 'low',
-  NORMAL = 'normal',
-  HIGH = 'high',
-  URGENT = 'urgent'
+  LOW = "low",
+  NORMAL = "normal",
+  HIGH = "high",
+  URGENT = "urgent",
 }
 
 // Email template tipleri
 export enum EmailTemplate {
-  WELCOME = 'welcome',
-  PASSWORD_RESET = 'password_reset',
-  DONATION_RECEIPT = 'donation_receipt',
-  VOLUNTEER_ASSIGNMENT = 'volunteer_assignment',
-  INVENTORY_ALERT = 'inventory_alert',
-  SYSTEM_NOTIFICATION = 'system_notification',
-  WEEKLY_REPORT = 'weekly_report',
-  MONTHLY_REPORT = 'monthly_report',
-  CUSTOM = 'custom'
+  WELCOME = "welcome",
+  PASSWORD_RESET = "password_reset",
+  DONATION_RECEIPT = "donation_receipt",
+  VOLUNTEER_ASSIGNMENT = "volunteer_assignment",
+  INVENTORY_ALERT = "inventory_alert",
+  SYSTEM_NOTIFICATION = "system_notification",
+  WEEKLY_REPORT = "weekly_report",
+  MONTHLY_REPORT = "monthly_report",
+  CUSTOM = "custom",
 }
 
 // Email yapılandırması arayüzü
@@ -75,22 +81,22 @@ export interface EmailConfig {
       user: string;
       pass: string;
     };
-    
+
     // SendGrid ayarları
     sendGridApiKey?: string;
-    
+
     // AWS SES ayarları
     accessKeyId?: string;
     secretAccessKey?: string;
     region?: string;
-    
+
     // Mailgun ayarları
     domain?: string;
     mailgunApiKey?: string;
-    
+
     // Postmark ayarları
     serverToken?: string;
-    
+
     // Genel ayarlar
     maxRecipients?: number;
     rateLimit?: number; // dakikadaki email sayısı
@@ -120,7 +126,7 @@ export interface EmailOptions {
 export interface EmailAttachment {
   filename: string;
   content: string | Buffer;
-  encoding?: 'base64' | 'utf8';
+  encoding?: "base64" | "utf8";
   contentType?: string;
 }
 
@@ -140,10 +146,13 @@ export interface EmailStatistics {
   totalQueued: number;
   avgDeliveryTime: number;
   successRate: number;
-  providerStats: Record<EmailProvider, {
-    sent: number;
-    failed: number;
-  }>;
+  providerStats: Record<
+    EmailProvider,
+    {
+      sent: number;
+      failed: number;
+    }
+  >;
 }
 
 // Email kuyruğu öğesi arayüzü
@@ -180,8 +189,8 @@ export class EmailSender {
       [EmailProvider.SENDGRID]: { sent: 0, failed: 0 },
       [EmailProvider.AWS_SES]: { sent: 0, failed: 0 },
       [EmailProvider.MAILGUN]: { sent: 0, failed: 0 },
-      [EmailProvider.POSTMARK]: { sent: 0, failed: 0 }
-    }
+      [EmailProvider.POSTMARK]: { sent: 0, failed: 0 },
+    },
   };
   private isProcessingQueue: boolean = false;
   private static instance: EmailSender;
@@ -197,7 +206,9 @@ export class EmailSender {
   static getInstance(config?: EmailConfig): EmailSender {
     if (!EmailSender.instance) {
       if (!config) {
-        throw new EmailError('Email configuration required for first initialization');
+        throw new EmailError(
+          "Email configuration required for first initialization",
+        );
       }
       EmailSender.instance = new EmailSender(config);
     }
@@ -236,7 +247,9 @@ export class EmailSender {
 
     // BCC doğrulama
     if (options.bcc) {
-      const bccEmails = Array.isArray(options.bcc) ? options.bcc : [options.bcc];
+      const bccEmails = Array.isArray(options.bcc)
+        ? options.bcc
+        : [options.bcc];
       for (const email of bccEmails) {
         if (!this.validateEmail(email)) {
           throw new EmailValidationError(`Geçersiz BCC email adresi: ${email}`);
@@ -246,12 +259,14 @@ export class EmailSender {
 
     // Konu doğrulama
     if (!options.subject || options.subject.trim().length === 0) {
-      throw new EmailValidationError('Email konusu boş olamaz');
+      throw new EmailValidationError("Email konusu boş olamaz");
     }
 
     // İçerik doğrulama
     if (!options.template && !options.html && !options.text) {
-      throw new EmailValidationError('Email içeriği veya template seçilmelidir');
+      throw new EmailValidationError(
+        "Email içeriği veya template seçilmelidir",
+      );
     }
 
     // Rate limiting kontrolü
@@ -268,7 +283,10 @@ export class EmailSender {
   /**
    * Template'i işle
    */
-  private processTemplate(template: EmailTemplate, data: Record<string, any>): EmailTemplateContent {
+  private processTemplate(
+    template: EmailTemplate,
+    data: Record<string, any>,
+  ): EmailTemplateContent {
     const templates = this.getTemplates();
     const templateContent = templates[template];
 
@@ -282,12 +300,12 @@ export class EmailSender {
     let html = templateContent.html;
 
     for (const key of templateContent.variables) {
-      const value = data[key] || '';
+      const value = data[key] || "";
       const placeholder = `{{${key}}}`;
-      
-      subject = subject.replace(new RegExp(placeholder, 'g'), value);
-      text = text.replace(new RegExp(placeholder, 'g'), value);
-      html = html.replace(new RegExp(placeholder, 'g'), value);
+
+      subject = subject.replace(new RegExp(placeholder, "g"), value);
+      text = text.replace(new RegExp(placeholder, "g"), value);
+      html = html.replace(new RegExp(placeholder, "g"), value);
     }
 
     return { subject, text, html, variables: templateContent.variables };
@@ -299,8 +317,8 @@ export class EmailSender {
   private getTemplates(): Record<EmailTemplate, EmailTemplateContent> {
     return {
       [EmailTemplate.WELCOME]: {
-        subject: 'Yardım Yönetim Paneline Hoş Geldiniz',
-        text: 'Merhaba {{name}},\n\nYardım Yönetim Paneline hoş geldiniz!\n\nHesabınız oluşturuldu ve hemen kullanmaya başlayabilirsiniz.',
+        subject: "Yardım Yönetim Paneline Hoş Geldiniz",
+        text: "Merhaba {{name}},\n\nYardım Yönetim Paneline hoş geldiniz!\n\nHesabınız oluşturuldu ve hemen kullanmaya başlayabilirsiniz.",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2>Yardım Yönetim Paneline Hoş Geldiniz! 👋</h2>
@@ -312,11 +330,11 @@ export class EmailSender {
             <p>Saygılarımızla,<br>Yardım Yönetim Paneli Ekibi</p>
           </div>
         `,
-        variables: ['name', 'loginUrl']
+        variables: ["name", "loginUrl"],
       },
       [EmailTemplate.PASSWORD_RESET]: {
-        subject: 'Şifre Sıfırlama Talebi',
-        text: 'Merhaba {{name}},\n\nŞifrenizi sıfırlamak için aşağıdaki linke tıklayın:\n{{resetUrl}}\n\nBu link 1 saat geçerlidir.',
+        subject: "Şifre Sıfırlama Talebi",
+        text: "Merhaba {{name}},\n\nŞifrenizi sıfırlamak için aşağıdaki linke tıklayın:\n{{resetUrl}}\n\nBu link 1 saat geçerlidir.",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2>Şifre Sıfırlama</h2>
@@ -328,11 +346,11 @@ export class EmailSender {
             <p>Saygılarımızla,<br>Yardım Yönetim Paneli Ekibi</p>
           </div>
         `,
-        variables: ['name', 'resetUrl']
+        variables: ["name", "resetUrl"],
       },
       [EmailTemplate.DONATION_RECEIPT]: {
-        subject: 'Bağış Makbuzu - {{donationId}}',
-        text: 'Sayın {{donorName}},\n\n{{amount}} tutarındaki bağışınız için teşekkür ederiz.\n\nBağış ID: {{donationId}}\nTarih: {{date}}',
+        subject: "Bağış Makbuzu - {{donationId}}",
+        text: "Sayın {{donorName}},\n\n{{amount}} tutarındaki bağışınız için teşekkür ederiz.\n\nBağış ID: {{donationId}}\nTarih: {{date}}",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2>🙏 Bağışınız İçin Teşekkürler</h2>
@@ -349,11 +367,11 @@ export class EmailSender {
             <p>Saygılarımızla,<br>Yardım Yönetim Paneli Ekibi</p>
           </div>
         `,
-        variables: ['donorName', 'amount', 'donationId', 'date', 'category']
+        variables: ["donorName", "amount", "donationId", "date", "category"],
       },
       [EmailTemplate.VOLUNTEER_ASSIGNMENT]: {
-        subject: 'Gönüllü Görev Ataması - {{taskName}}',
-        text: 'Merhaba {{volunteerName}},\n\n{{taskName}} görevine atandınız.\n\nBaşlangıç: {{startDate}}\nKonum: {{location}}',
+        subject: "Gönüllü Görev Ataması - {{taskName}}",
+        text: "Merhaba {{volunteerName}},\n\n{{taskName}} görevine atandınız.\n\nBaşlangıç: {{startDate}}\nKonum: {{location}}",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2>🤝 Yeni Görev Ataması</h2>
@@ -370,11 +388,18 @@ export class EmailSender {
             <p>Saygılarımla,<br>Yardım Yönetim Paneli Ekibi</p>
           </div>
         `,
-        variables: ['volunteerName', 'taskName', 'startDate', 'location', 'description', 'taskUrl']
+        variables: [
+          "volunteerName",
+          "taskName",
+          "startDate",
+          "location",
+          "description",
+          "taskUrl",
+        ],
       },
       [EmailTemplate.INVENTORY_ALERT]: {
-        subject: '⚠️ Stok Uyarısı - {{itemName}}',
-        text: 'Stok uyarısı!\n\nÜrün: {{itemName}}\nMevcut: {{currentStock}}\nMinimum: {{minStock}}',
+        subject: "⚠️ Stok Uyarısı - {{itemName}}",
+        text: "Stok uyarısı!\n\nÜrün: {{itemName}}\nMevcut: {{currentStock}}\nMinimum: {{minStock}}",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #dc3545;">⚠️ Stok Uyarısı</h2>
@@ -389,11 +414,17 @@ export class EmailSender {
             <a href="{{inventoryUrl}}" style="background: #ffc107; color: black; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 16px 0;">Stok Yönetimine Git</a>
           </div>
         `,
-        variables: ['itemName', 'currentStock', 'minStock', 'warehouse', 'inventoryUrl']
+        variables: [
+          "itemName",
+          "currentStock",
+          "minStock",
+          "warehouse",
+          "inventoryUrl",
+        ],
       },
       [EmailTemplate.SYSTEM_NOTIFICATION]: {
-        subject: '{{subject}}',
-        text: '{{message}}',
+        subject: "{{subject}}",
+        text: "{{message}}",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2>{{title}}</h2>
@@ -403,11 +434,11 @@ export class EmailSender {
             {{/if}}
           </div>
         `,
-        variables: ['subject', 'title', 'message', 'actionUrl']
+        variables: ["subject", "title", "message", "actionUrl"],
       },
       [EmailTemplate.WEEKLY_REPORT]: {
-        subject: 'Haftalık Rapor - {{weekStartDate}} ile {{weekEndDate}} arası',
-        text: 'Haftalık özet raporunuz:\n\nToplam Bağış: {{totalDonations}}\nToplam Gönüllü: {{totalVolunteers}}\nYardım Alan: {{totalHelped}}',
+        subject: "Haftalık Rapor - {{weekStartDate}} ile {{weekEndDate}} arası",
+        text: "Haftalık özet raporunuz:\n\nToplam Bağış: {{totalDonations}}\nToplam Gönüllü: {{totalVolunteers}}\nYardım Alan: {{totalHelped}}",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2>📊 Haftalık Rapor</h2>
@@ -430,11 +461,18 @@ export class EmailSender {
             <a href="{{reportUrl}}" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 16px 0;">Raporu Görüntüle</a>
           </div>
         `,
-        variables: ['weekStartDate', 'weekEndDate', 'totalDonations', 'totalVolunteers', 'totalHelped', 'reportUrl']
+        variables: [
+          "weekStartDate",
+          "weekEndDate",
+          "totalDonations",
+          "totalVolunteers",
+          "totalHelped",
+          "reportUrl",
+        ],
       },
       [EmailTemplate.MONTHLY_REPORT]: {
-        subject: 'Aylık Rapor - {{month}} {{year}}',
-        text: 'Aylık özet raporunuz:\n\nToplam Bağış: {{totalDonations}}\nAktif Gönüllü: {{activeVolunteers}}\nYeni İhtiyaç Sahibi: {{newNeedyPersons}}',
+        subject: "Aylık Rapor - {{month}} {{year}}",
+        text: "Aylık özet raporunuz:\n\nToplam Bağış: {{totalDonations}}\nAktif Gönüllü: {{activeVolunteers}}\nYeni İhtiyaç Sahibi: {{newNeedyPersons}}",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2>📈 Aylık Rapor - {{month}} {{year}}</h2>
@@ -456,14 +494,21 @@ export class EmailSender {
             <a href="{{reportUrl}}" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 16px 0;">Detaylı Rapor</a>
           </div>
         `,
-        variables: ['month', 'year', 'totalDonations', 'activeVolunteers', 'newNeedyPersons', 'reportUrl']
+        variables: [
+          "month",
+          "year",
+          "totalDonations",
+          "activeVolunteers",
+          "newNeedyPersons",
+          "reportUrl",
+        ],
       },
       [EmailTemplate.CUSTOM]: {
-        subject: '{{subject}}',
-        text: '{{text}}',
-        html: '{{html}}',
-        variables: []
-      }
+        subject: "{{subject}}",
+        text: "{{text}}",
+        html: "{{html}}",
+        variables: [],
+      },
     };
   }
 
@@ -472,7 +517,7 @@ export class EmailSender {
    */
   async send(options: EmailOptions): Promise<EmailResult> {
     const startTime = Date.now();
-    
+
     try {
       // Validasyon
       this.validateOptions(options);
@@ -483,7 +528,10 @@ export class EmailSender {
       let html = options.html;
 
       if (options.template && options.templateData) {
-        const templateContent = this.processTemplate(options.template, options.templateData);
+        const templateContent = this.processTemplate(
+          options.template,
+          options.templateData,
+        );
         subject = templateContent.subject;
         text = templateContent.text;
         html = templateContent.html;
@@ -496,34 +544,42 @@ export class EmailSender {
       // Email sending - logged securely without exposing recipient data
 
       // Başarılı gönderim simülasyonu
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const deliveryTime = Date.now() - startTime;
-      
+
       // İstatistik güncelle
       this.statistics.totalSent++;
       this.statistics.providerStats[this.config.provider].sent++;
-      this.statistics.successRate = (this.statistics.totalSent / (this.statistics.totalSent + this.statistics.totalFailed)) * 100;
-      this.statistics.avgDeliveryTime = (this.statistics.avgDeliveryTime * (this.statistics.totalSent - 1) + deliveryTime) / this.statistics.totalSent;
+      this.statistics.successRate =
+        (this.statistics.totalSent /
+          (this.statistics.totalSent + this.statistics.totalFailed)) *
+        100;
+      this.statistics.avgDeliveryTime =
+        (this.statistics.avgDeliveryTime * (this.statistics.totalSent - 1) +
+          deliveryTime) /
+        this.statistics.totalSent;
 
       return {
         success: true,
         messageId,
         provider: this.config.provider,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
-
     } catch (error: any) {
       // Hata kaydı
       this.statistics.totalFailed++;
       this.statistics.providerStats[this.config.provider].failed++;
-      this.statistics.successRate = (this.statistics.totalSent / (this.statistics.totalSent + this.statistics.totalFailed)) * 100;
+      this.statistics.successRate =
+        (this.statistics.totalSent /
+          (this.statistics.totalSent + this.statistics.totalFailed)) *
+        100;
 
       return {
         success: false,
         error: error.message,
         provider: this.config.provider,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
     }
   }
@@ -533,7 +589,7 @@ export class EmailSender {
    */
   async sendBulk(optionsList: EmailOptions[]): Promise<EmailResult[]> {
     const results: EmailResult[] = [];
-    
+
     for (const options of optionsList) {
       const result = await this.send(options);
       results.push(result);
@@ -547,7 +603,7 @@ export class EmailSender {
    */
   enqueue(options: EmailOptions, scheduledAt?: Date): string {
     const id = `queue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const queuedEmail: QueuedEmail = {
       id,
       options,
@@ -555,7 +611,7 @@ export class EmailSender {
       attempts: 0,
       maxAttempts: 3,
       priority: options.priority || EmailPriority.NORMAL,
-      createdAt: new Date()
+      createdAt: new Date(),
     };
 
     this.queue.set(id, queuedEmail);
@@ -571,14 +627,17 @@ export class EmailSender {
    */
   private async startQueueProcessor(): Promise<void> {
     if (this.isProcessingQueue) return;
-    
+
     this.isProcessingQueue = true;
 
     const processQueue = async () => {
       const now = new Date();
-      
+
       for (const [id, queuedEmail] of this.queue.entries()) {
-        if (queuedEmail.scheduledAt <= now && queuedEmail.attempts < queuedEmail.maxAttempts) {
+        if (
+          queuedEmail.scheduledAt <= now &&
+          queuedEmail.attempts < queuedEmail.maxAttempts
+        ) {
           // Queued email processing - logged securely
 
           queuedEmail.attempts++;
@@ -623,8 +682,8 @@ export class EmailSender {
         [EmailProvider.SENDGRID]: { sent: 0, failed: 0 },
         [EmailProvider.AWS_SES]: { sent: 0, failed: 0 },
         [EmailProvider.MAILGUN]: { sent: 0, failed: 0 },
-        [EmailProvider.POSTMARK]: { sent: 0, failed: 0 }
-      }
+        [EmailProvider.POSTMARK]: { sent: 0, failed: 0 },
+      },
     };
   }
 
@@ -697,127 +756,151 @@ export const email = {
   /**
    * Hoş geldin emaili gönder
    */
-  sendWelcome: (to: string, data: { name: string; loginUrl: string }): Promise<EmailResult> => {
+  sendWelcome: (
+    to: string,
+    data: { name: string; loginUrl: string },
+  ): Promise<EmailResult> => {
     return email.send({
       to,
       template: EmailTemplate.WELCOME,
-      templateData: data
+      templateData: data,
     });
   },
 
   /**
    * Şifre sıfırlama emaili gönder
    */
-  sendPasswordReset: (to: string, data: { name: string; resetUrl: string }): Promise<EmailResult> => {
+  sendPasswordReset: (
+    to: string,
+    data: { name: string; resetUrl: string },
+  ): Promise<EmailResult> => {
     return email.send({
       to,
       template: EmailTemplate.PASSWORD_RESET,
-      templateData: data
+      templateData: data,
     });
   },
 
   /**
    * Bağış makbuzu gönder
    */
-  sendDonationReceipt: (to: string, data: {
-    donorName: string;
-    amount: string;
-    donationId: string;
-    date: string;
-    category: string;
-  }): Promise<EmailResult> => {
+  sendDonationReceipt: (
+    to: string,
+    data: {
+      donorName: string;
+      amount: string;
+      donationId: string;
+      date: string;
+      category: string;
+    },
+  ): Promise<EmailResult> => {
     return email.send({
       to,
       template: EmailTemplate.DONATION_RECEIPT,
-      templateData: data
+      templateData: data,
     });
   },
 
   /**
    * Gönüllü görev ataması gönder
    */
-  sendVolunteerAssignment: (to: string, data: {
-    volunteerName: string;
-    taskName: string;
-    startDate: string;
-    location: string;
-    description: string;
-    taskUrl: string;
-  }): Promise<EmailResult> => {
+  sendVolunteerAssignment: (
+    to: string,
+    data: {
+      volunteerName: string;
+      taskName: string;
+      startDate: string;
+      location: string;
+      description: string;
+      taskUrl: string;
+    },
+  ): Promise<EmailResult> => {
     return email.send({
       to,
       template: EmailTemplate.VOLUNTEER_ASSIGNMENT,
-      templateData: data
+      templateData: data,
     });
   },
 
   /**
    * Stok uyarısı gönder
    */
-  sendInventoryAlert: (to: string, data: {
-    itemName: string;
-    currentStock: number;
-    minStock: number;
-    warehouse: string;
-    inventoryUrl: string;
-  }): Promise<EmailResult> => {
+  sendInventoryAlert: (
+    to: string,
+    data: {
+      itemName: string;
+      currentStock: number;
+      minStock: number;
+      warehouse: string;
+      inventoryUrl: string;
+    },
+  ): Promise<EmailResult> => {
     return email.send({
       to,
       template: EmailTemplate.INVENTORY_ALERT,
       templateData: data,
-      priority: EmailPriority.HIGH
+      priority: EmailPriority.HIGH,
     });
   },
 
   /**
    * Haftalık rapor gönder
    */
-  sendWeeklyReport: (to: string, data: {
-    weekStartDate: string;
-    weekEndDate: string;
-    totalDonations: string;
-    totalVolunteers: number;
-    totalHelped: number;
-    reportUrl: string;
-  }): Promise<EmailResult> => {
+  sendWeeklyReport: (
+    to: string,
+    data: {
+      weekStartDate: string;
+      weekEndDate: string;
+      totalDonations: string;
+      totalVolunteers: number;
+      totalHelped: number;
+      reportUrl: string;
+    },
+  ): Promise<EmailResult> => {
     return email.send({
       to,
       template: EmailTemplate.WEEKLY_REPORT,
-      templateData: data
+      templateData: data,
     });
   },
 
   /**
    * Aylık rapor gönder
    */
-  sendMonthlyReport: (to: string, data: {
-    month: string;
-    year: number;
-    totalDonations: string;
-    activeVolunteers: number;
-    newNeedyPersons: number;
-    reportUrl: string;
-  }): Promise<EmailResult> => {
+  sendMonthlyReport: (
+    to: string,
+    data: {
+      month: string;
+      year: number;
+      totalDonations: string;
+      activeVolunteers: number;
+      newNeedyPersons: number;
+      reportUrl: string;
+    },
+  ): Promise<EmailResult> => {
     return email.send({
       to,
       template: EmailTemplate.MONTHLY_REPORT,
-      templateData: data
+      templateData: data,
     });
   },
 
   /**
    * Sistem bildirimi gönder
    */
-  sendSystemNotification: (to: string, data: {
-    subject: string;
-    title: string;
-    message: string;
-    actionUrl?: string;
-  }): Promise<EmailResult> => {
+  sendSystemNotification: (
+    to: string,
+    data: {
+      subject: string;
+      title: string;
+      message: string;
+      actionUrl?: string;
+    },
+  ): Promise<EmailResult> => {
     return email.send({
       to,
       template: EmailTemplate.SYSTEM_NOTIFICATION,
-      templateData: data
+      templateData: data,
     });
-  }
+  },
 };

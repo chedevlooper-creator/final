@@ -1,12 +1,16 @@
-'use client'
+"use client";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
-import { useMemo } from 'react'
-import { StatCard } from '@/components/common/stat-card'
-import { PageHeader } from '@/components/common/page-header'
-import { SimpleBarChart, SimplePieChart, TrendChart } from '@/components/common/charts'
-import { Skeleton } from '@/components/ui/skeleton'
+import { useMemo } from "react";
+import { StatCard } from "@/components/common/stat-card";
+import { PageHeader } from "@/components/common/page-header";
+import {
+  SimpleBarChart,
+  SimplePieChart,
+  TrendChart,
+} from "@/components/common/charts";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Home,
   Users,
@@ -16,84 +20,120 @@ import {
   CheckCircle,
   TrendingUp,
   Calendar,
-} from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { useNeedyList } from '@/hooks/queries/use-needy'
-import { useApplicationsList } from '@/hooks/queries/use-applications'
-import { useDonationStats } from '@/hooks/queries/use-donations'
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useNeedyList } from "@/hooks/queries/use-needy";
+import { useApplicationsList } from "@/hooks/queries/use-applications";
+import { useDonationStats } from "@/hooks/queries/use-donations";
 import {
   useDashboardStats,
   useMonthlyDonationTrend,
   useApplicationTypeDistribution,
   useCityDistribution,
   useApplicationStatusDistribution,
-} from '@/hooks/queries/use-dashboard-stats'
-import type { Application } from '@/types/common'
+} from "@/hooks/queries/use-dashboard-stats";
+import type { Application } from "@/types/common";
 
 export default function DashboardPage() {
-  const { data: needyData } = useNeedyList({ limit: 5 })
-  const { data: applicationsData } = useApplicationsList({ limit: 5 })
-  const { data: donationStats } = useDonationStats()
-  
+  const { data: needyData } = useNeedyList({ limit: 5 });
+  const { data: applicationsData } = useApplicationsList({ limit: 5 });
+  const { data: donationStats } = useDonationStats();
+
   // Dashboard charts data
-  const { data: dashboardStats, isLoading: isStatsLoading } = useDashboardStats()
-  const { data: monthlyTrend, isLoading: isTrendLoading } = useMonthlyDonationTrend(6)
-  const { data: applicationTypes, isLoading: isTypesLoading } = useApplicationTypeDistribution()
-  const { data: cityDistribution, isLoading: isCityLoading } = useCityDistribution()
-  const { data: applicationStatus, isLoading: isStatusLoading } = useApplicationStatusDistribution()
+  const { data: dashboardStats, isLoading: isStatsLoading } =
+    useDashboardStats();
+  const { data: monthlyTrend, isLoading: isTrendLoading } =
+    useMonthlyDonationTrend(6);
+  const { data: applicationTypes, isLoading: isTypesLoading } =
+    useApplicationTypeDistribution();
+  const { data: cityDistribution, isLoading: isCityLoading } =
+    useCityDistribution();
+  const { data: applicationStatus, isLoading: isStatusLoading } =
+    useApplicationStatusDistribution();
 
   // Memoize stats array to prevent unnecessary recalculations
-  const stats = useMemo(() => [
-    {
-      title: 'Toplam İhtiyaç Sahibi',
-      value: isStatsLoading ? <Skeleton className="h-7 w-16" /> : (needyData?.count || 0),
-      icon: Users,
-      iconColor: 'text-blue-500',
-      description: 'Sistemdeki toplam kayıt',
-    },
-    {
-      title: 'Bekleyen Başvuru',
-      value: isStatsLoading ? <Skeleton className="h-7 w-16" /> : (applicationsData?.data?.filter((app: Application) => app.status === 'new').length || 0),
-      icon: Clock,
-      iconColor: 'text-orange-500',
-      description: 'İşlem bekliyor',
-    },
-    {
-      title: 'Bugünkü Bağış',
-      value: isStatsLoading ? <Skeleton className="h-7 w-24" /> : `₺${(donationStats?.today || 0).toLocaleString('tr-TR')}`,
-      icon: DollarSign,
-      iconColor: 'text-emerald-500',
-      description: 'Bugün toplanan',
-    },
-    {
-      title: 'Aylık Bağış',
-      value: isStatsLoading ? <Skeleton className="h-7 w-24" /> : `₺${(donationStats?.thisMonth || 0).toLocaleString('tr-TR')}`,
-      icon: TrendingUp,
-      iconColor: 'text-purple-500',
-      description: 'Bu ay toplanan',
-    },
-    {
-      title: 'Tamamlanan Yardım',
-      value: isStatsLoading ? <Skeleton className="h-7 w-16" /> : (applicationsData?.data?.filter((app: Application) => app.status === 'completed').length || 0),
-      icon: CheckCircle,
-      iconColor: 'text-cyan-500',
-      description: 'Bu ay tamamlanan',
-    },
-    {
-      title: 'Toplam Bağış',
-      value: isStatsLoading ? <Skeleton className="h-7 w-16" /> : (donationStats?.count || 0),
-      icon: FileText,
-      iconColor: 'text-red-500',
-      description: 'Tüm zamanlar',
-    },
-  ], [needyData?.count, applicationsData?.data, donationStats, isStatsLoading])
+  const stats = useMemo(
+    () => [
+      {
+        title: "Toplam İhtiyaç Sahibi",
+        value: isStatsLoading ? (
+          <Skeleton className="h-7 w-16" />
+        ) : (
+          needyData?.count || 0
+        ),
+        icon: Users,
+        iconColor: "text-blue-500",
+        description: "Sistemdeki toplam kayıt",
+      },
+      {
+        title: "Bekleyen Başvuru",
+        value: isStatsLoading ? (
+          <Skeleton className="h-7 w-16" />
+        ) : (
+          applicationsData?.data?.filter(
+            (app: Application) => app.status === "new",
+          ).length || 0
+        ),
+        icon: Clock,
+        iconColor: "text-orange-500",
+        description: "İşlem bekliyor",
+      },
+      {
+        title: "Bugünkü Bağış",
+        value: isStatsLoading ? (
+          <Skeleton className="h-7 w-24" />
+        ) : (
+          `₺${(donationStats?.today || 0).toLocaleString("tr-TR")}`
+        ),
+        icon: DollarSign,
+        iconColor: "text-emerald-500",
+        description: "Bugün toplanan",
+      },
+      {
+        title: "Aylık Bağış",
+        value: isStatsLoading ? (
+          <Skeleton className="h-7 w-24" />
+        ) : (
+          `₺${(donationStats?.thisMonth || 0).toLocaleString("tr-TR")}`
+        ),
+        icon: TrendingUp,
+        iconColor: "text-purple-500",
+        description: "Bu ay toplanan",
+      },
+      {
+        title: "Tamamlanan Yardım",
+        value: isStatsLoading ? (
+          <Skeleton className="h-7 w-16" />
+        ) : (
+          applicationsData?.data?.filter(
+            (app: Application) => app.status === "completed",
+          ).length || 0
+        ),
+        icon: CheckCircle,
+        iconColor: "text-cyan-500",
+        description: "Bu ay tamamlanan",
+      },
+      {
+        title: "Toplam Bağış",
+        value: isStatsLoading ? (
+          <Skeleton className="h-7 w-16" />
+        ) : (
+          donationStats?.count || 0
+        ),
+        icon: FileText,
+        iconColor: "text-red-500",
+        description: "Tüm zamanlar",
+      },
+    ],
+    [needyData?.count, applicationsData?.data, donationStats, isStatsLoading],
+  );
 
   // Memoize filtered applications to prevent recalculation on every render
   const recentApplications = useMemo(() => {
-    return applicationsData?.data?.slice(0, 5) || []
-  }, [applicationsData?.data])
+    return applicationsData?.data?.slice(0, 5) || [];
+  }, [applicationsData?.data]);
 
   return (
     <div className="space-y-8">
@@ -131,7 +171,9 @@ export default function DashboardPage() {
         {/* Son Başvurular */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg font-semibold">Son Başvurular</CardTitle>
+            <CardTitle className="text-lg font-semibold">
+              Son Başvurular
+            </CardTitle>
             <Link href="/dashboard/applications">
               <Button variant="ghost" size="sm">
                 Tümünü Gör
@@ -152,21 +194,28 @@ export default function DashboardPage() {
                       </div>
                       <div>
                         <p className="font-medium text-sm">
-                          {app.needy_person?.first_name} {app.needy_person?.last_name}
+                          {app.needy_person?.first_name}{" "}
+                          {app.needy_person?.last_name}
                         </p>
-                        <p className="text-xs text-slate-500">{app.application_type}</p>
+                        <p className="text-xs text-slate-500">
+                          {app.application_type}
+                        </p>
                       </div>
                     </div>
                     <span
                       className={`rounded-full px-2 py-1 text-xs font-medium ${
-                        app.status === 'new'
-                          ? 'bg-blue-100 text-blue-700'
-                          : app.status === 'approved'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-slate-100 text-slate-700'
+                        app.status === "new"
+                          ? "bg-blue-100 text-blue-700"
+                          : app.status === "approved"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-slate-100 text-slate-700"
                       }`}
                     >
-                      {app.status === 'new' ? 'Yeni' : app.status === 'approved' ? 'Onaylandı' : app.status}
+                      {app.status === "new"
+                        ? "Yeni"
+                        : app.status === "approved"
+                          ? "Onaylandı"
+                          : app.status}
                     </span>
                   </div>
                 ))
@@ -182,7 +231,9 @@ export default function DashboardPage() {
         {/* Hızlı İşlemler */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">Hızlı İşlemler</CardTitle>
+            <CardTitle className="text-lg font-semibold">
+              Hızlı İşlemler
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -230,7 +281,9 @@ export default function DashboardPage() {
                   <Calendar className="h-6 w-6 text-orange-500" />
                   <div className="text-left">
                     <p className="font-medium">Takvim</p>
-                    <p className="text-xs text-slate-500">Etkinlikleri görüntüle</p>
+                    <p className="text-xs text-slate-500">
+                      Etkinlikleri görüntüle
+                    </p>
                   </div>
                 </Button>
               </Link>
@@ -262,7 +315,7 @@ export default function DashboardPage() {
                 height={250}
                 color="#10b981"
                 showArea={true}
-                formatValue={(v) => `₺${v.toLocaleString('tr-TR')}`}
+                formatValue={(v) => `₺${v.toLocaleString("tr-TR")}`}
               />
             ) : (
               <div className="flex items-center justify-center h-[250px] text-slate-400">
@@ -376,5 +429,5 @@ export default function DashboardPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
