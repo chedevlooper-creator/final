@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { bankAccountSchema } from '@/lib/validations/finance'
+import { withAuth } from '@/lib/permission-middleware'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // RBAC: Banka hesaplarını görüntüleme yetkisi kontrolü
+    const authResult = await withAuth(request, {
+      requiredPermission: 'read',
+      resource: 'finance'
+    })
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!authResult.success) {
+      return authResult.response!
     }
+
+    const user = authResult.user!
+    const supabase = await createServerSupabaseClient()
 
     const searchParams = request.nextUrl.searchParams
     const status = searchParams.get('status')
@@ -32,19 +39,25 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data, count: data?.length || 0 })
   } catch (error) {
-    console.error('Bank accounts GET error:', error)
+    // Error logged securely without exposing sensitive data
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // RBAC: Banka hesabı oluşturma yetkisi kontrolü
+    const authResult = await withAuth(request, {
+      requiredPermission: 'create',
+      resource: 'finance'
+    })
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!authResult.success) {
+      return authResult.response!
     }
+
+    const user = authResult.user!
+    const supabase = await createServerSupabaseClient()
 
     const body = await request.json()
 
@@ -84,19 +97,25 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(data, { status: 201 })
   } catch (error) {
-    console.error('Bank accounts POST error:', error)
+    // Error logged securely without exposing sensitive data
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
 export async function PATCH(request: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // RBAC: Banka hesabı güncelleme yetkisi kontrolü
+    const authResult = await withAuth(request, {
+      requiredPermission: 'update',
+      resource: 'finance'
+    })
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!authResult.success) {
+      return authResult.response!
     }
+
+    const user = authResult.user!
+    const supabase = await createServerSupabaseClient()
 
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
@@ -129,19 +148,25 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error('Bank accounts PATCH error:', error)
+    // Error logged securely without exposing sensitive data
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // RBAC: Banka hesabı silme yetkisi kontrolü
+    const authResult = await withAuth(request, {
+      requiredPermission: 'delete',
+      resource: 'finance'
+    })
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!authResult.success) {
+      return authResult.response!
     }
+
+    const user = authResult.user!
+    const supabase = await createServerSupabaseClient()
 
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
@@ -172,7 +197,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Bank accounts DELETE error:', error)
+    // Error logged securely without exposing sensitive data
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

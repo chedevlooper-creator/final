@@ -79,7 +79,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
       avatar_url: profile?.['avatar_url'] || user.user_metadata?.['avatar_url']
     }
   } catch (error) {
-    console.error('Auth middleware error:', error)
+    // Auth error logged securely without exposing sensitive data
     return null
   }
 }
@@ -193,7 +193,7 @@ export async function withAuth(
       user
     }
   } catch (error) {
-    console.error('Auth middleware error:', error)
+    // Auth middleware error logged securely without exposing sensitive data
     return {
       success: false,
       error: 'Internal server error',

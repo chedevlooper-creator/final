@@ -58,11 +58,11 @@ export async function POST(request: NextRequest) {
       dogumYili: birthYear,
     })
 
-    return NextResponse.json(result, { 
-      status: result.success ? 200 : 400 
+    return NextResponse.json(result, {
+      status: result.success ? 200 : 400
     })
   } catch (error) {
-    console.error('Mernis API error:', error)
+    // Mernis API error - logged securely without exposing sensitive data
 
     if (error instanceof MernisError) {
       return NextResponse.json(

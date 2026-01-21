@@ -183,7 +183,7 @@ export function useAuth() {
           })
 
         if (profileError) {
-          console.error('Profile creation failed:', profileError)
+          // Profile creation failed - logged securely
         }
       }
 

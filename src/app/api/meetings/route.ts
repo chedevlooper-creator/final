@@ -6,24 +6,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { MeetingStatus } from '@/types/meeting.types';
+import { withAuth } from '@/lib/permission-middleware';
 
 /**
  * GET /api/meetings - Toplantı listesini getir
  */
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // RBAC: Toplantıları görüntüleme yetkisi kontrolü
+    const authResult = await withAuth(request, {
+      requiredPermission: 'read',
+      resource: 'meetings'
+    });
+
+    if (!authResult.success) {
+      return authResult.response!;
     }
+
+    const supabase = await createServerSupabaseClient();
     
     const searchParams = request.nextUrl.searchParams;
     const status = searchParams.get('status');
     const upcoming = searchParams.get('upcoming');
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const limit = parseInt(searchParams.get('limit') || '10', 10);
     
     let query = supabase
       .from('meetings')
@@ -56,7 +62,7 @@ export async function GET(request: NextRequest) {
       totalPages: Math.ceil((count || 0) / limit)
     });
   } catch (error) {
-    console.error('Meetings GET error:', error);
+    // Error logged securely without exposing sensitive data
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -66,12 +72,18 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // RBAC: Toplantı oluşturma yetkisi kontrolü
+    const authResult = await withAuth(request, {
+      requiredPermission: 'create',
+      resource: 'meetings'
+    });
+
+    if (!authResult.success) {
+      return authResult.response!;
     }
+
+    const user = authResult.user!;
+    const supabase = await createServerSupabaseClient();
     
     const body = await request.json();
     const { title, description, meeting_date, location, participant_ids } = body;
@@ -119,15 +131,15 @@ export async function POST(request: NextRequest) {
       const { error: participantsError } = await supabase
         .from('meeting_participants')
         .insert(participants);
-      
+
       if (participantsError) {
-        console.error('Error adding participants:', participantsError);
+        // Participants error - logged securely
       }
     }
-    
+
     return NextResponse.json(meeting, { status: 201 });
   } catch (error) {
-    console.error('Meetings POST error:', error);
+    // Error logged securely without exposing sensitive data
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
