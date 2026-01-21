@@ -185,7 +185,7 @@ export interface Notification {
   title: string
   message: string
   read: boolean
-  data?: any
+  data?: Record<string, unknown>
   created_at: string
 }
 
@@ -450,7 +450,7 @@ export interface CreateVoteInput {
   title: string
   description?: string
   vote_type: VoteType
-  options?: any[]
+  options?: string[]
 }
 
 /**
