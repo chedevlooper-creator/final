@@ -1,12 +1,12 @@
-import { cn } from '@/lib/utils'
-import { LucideIcon } from 'lucide-react'
+import { cn } from "@/lib/utils";
+import { LucideIcon } from "lucide-react";
 
 interface PageHeaderProps {
-  title: string
-  description?: string
-  icon?: LucideIcon
-  actions?: React.ReactNode
-  className?: string
+  title: string;
+  description?: string;
+  icon?: LucideIcon;
+  actions?: React.ReactNode;
+  className?: string;
 }
 
 export function PageHeader({
@@ -19,8 +19,8 @@ export function PageHeader({
   return (
     <div
       className={cn(
-        'flex flex-col gap-4 md:flex-row md:items-center md:justify-between',
-        className
+        "flex flex-col gap-4 md:flex-row md:items-center md:justify-between",
+        className,
       )}
     >
       <div className="flex items-center gap-3">
@@ -38,5 +38,5 @@ export function PageHeader({
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>
-  )
+  );
 }

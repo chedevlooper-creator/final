@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -18,7 +18,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -26,89 +26,110 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from '@/components/ui/dialog'
-import { Plus, Eye, Download, Trash2, FileText, Upload, CheckCircle2 } from 'lucide-react'
-import { TabLayout } from './TabLayout'
-import { Document, DOCUMENT_TYPE_OPTIONS, DocumentType, StatusFilter } from '@/types/linked-records.types'
-import { useLinkedRecords, useCreateLinkedRecord, useDeleteLinkedRecord } from '@/hooks/queries/use-linked-records'
-import { toast } from 'sonner'
-import { format } from 'date-fns'
-import { tr } from 'date-fns/locale'
+} from "@/components/ui/dialog";
+import {
+  Plus,
+  Eye,
+  Download,
+  Trash2,
+  FileText,
+  Upload,
+  CheckCircle2,
+} from "lucide-react";
+import { TabLayout } from "./TabLayout";
+import {
+  Document,
+  DOCUMENT_TYPE_OPTIONS,
+  DocumentType,
+  StatusFilter,
+} from "@/types/linked-records.types";
+import {
+  useLinkedRecords,
+  useCreateLinkedRecord,
+  useDeleteLinkedRecord,
+} from "@/hooks/queries/use-linked-records";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { tr } from "date-fns/locale";
 
 interface DocumentsTabProps {
-  needyPersonId: string
-  onClose: () => void
+  needyPersonId: string;
+  onClose: () => void;
 }
 
 export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
-  const [searchValue, setSearchValue] = useState('')
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  
-  const { data: documents = [], isLoading } = useLinkedRecords<any>('needy_documents', needyPersonId)
-  const createMutation = useCreateLinkedRecord<any>('needy_documents')
-  const deleteMutation = useDeleteLinkedRecord('needy_documents')
+  const [searchValue, setSearchValue] = useState("");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  const { data: documents = [], isLoading } = useLinkedRecords<any>(
+    "needy_documents",
+    needyPersonId,
+  );
+  const createMutation = useCreateLinkedRecord<any>("needy_documents");
+  const deleteMutation = useDeleteLinkedRecord("needy_documents");
 
   const [formData, setFormData] = useState({
-    document_type: '' as DocumentType | '',
-    document_name: '',
-    document_number: '',
-    issue_date: '',
-    expiry_date: '',
-    issuing_authority: '',
-    notes: '',
-  })
+    document_type: "" as DocumentType | "",
+    document_name: "",
+    document_number: "",
+    issue_date: "",
+    expiry_date: "",
+    issuing_authority: "",
+    notes: "",
+  });
 
   const columns = [
-    { key: 'document_type', label: 'Belge Türü', width: '150px' },
-    { key: 'document_name', label: 'Belge Adı' },
-    { key: 'document_number', label: 'Belge No', width: '120px' },
-    { key: 'issue_date', label: 'Veriliş Tarihi', width: '120px' },
-    { key: 'expiry_date', label: 'Geçerlilik Tarihi', width: '120px' },
-    { key: 'is_verified', label: 'Doğrulandı', width: '100px' },
-  ]
+    { key: "document_type", label: "Belge Türü", width: "150px" },
+    { key: "document_name", label: "Belge Adı" },
+    { key: "document_number", label: "Belge No", width: "120px" },
+    { key: "issue_date", label: "Veriliş Tarihi", width: "120px" },
+    { key: "expiry_date", label: "Geçerlilik Tarihi", width: "120px" },
+    { key: "is_verified", label: "Doğrulandı", width: "100px" },
+  ];
 
   const handleAdd = () => {
     setFormData({
-      document_type: '',
-      document_name: '',
-      document_number: '',
-      issue_date: '',
-      expiry_date: '',
-      issuing_authority: '',
-      notes: '',
-    })
-    setIsAddModalOpen(true)
-  }
+      document_type: "",
+      document_name: "",
+      document_number: "",
+      issue_date: "",
+      expiry_date: "",
+      issuing_authority: "",
+      notes: "",
+    });
+    setIsAddModalOpen(true);
+  };
 
   const handleSave = async () => {
     try {
       await createMutation.mutateAsync({
         ...formData,
-        needy_person_id: needyPersonId
-      })
-      toast.success('Döküman eklendi')
-      setIsAddModalOpen(false)
+        needy_person_id: needyPersonId,
+      });
+      toast.success("Döküman eklendi");
+      setIsAddModalOpen(false);
     } catch (error) {
-      toast.error('Döküman yüklenemedi')
+      toast.error("Döküman yüklenemedi");
     }
-  }
+  };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Bu dokümanı silmek istediğinizden emin misiniz?')) {
+    if (confirm("Bu dokümanı silmek istediğinizden emin misiniz?")) {
       try {
-        await deleteMutation.mutateAsync({ id, needyPersonId })
-        toast.success('Döküman silindi')
+        await deleteMutation.mutateAsync({ id, needyPersonId });
+        toast.success("Döküman silindi");
       } catch (error) {
-        toast.error('Silme işlemi başarısız oldu')
+        toast.error("Silme işlemi başarısız oldu");
       }
     }
-  }
+  };
 
-  const filteredDocs = documents.filter((doc: any) => 
-    !searchValue || 
-    doc.document_name?.toLowerCase().includes(searchValue.toLowerCase()) ||
-    doc.document_number?.includes(searchValue)
-  )
+  const filteredDocs = documents.filter(
+    (doc: any) =>
+      !searchValue ||
+      doc.document_name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      doc.document_number?.includes(searchValue),
+  );
 
   return (
     <>
@@ -140,7 +161,10 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
             <TableBody>
               {filteredDocs.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={columns.length + 2} className="text-center py-8 text-muted-foreground">
+                  <TableCell
+                    colSpan={columns.length + 2}
+                    className="text-center py-8 text-muted-foreground"
+                  >
                     Kayıtlı doküman bulunamadı
                   </TableCell>
                 </TableRow>
@@ -155,16 +179,26 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <FileText className="h-4 w-4 text-muted-foreground" />
-                        {DOCUMENT_TYPE_OPTIONS.find(t => t.value === doc.document_type)?.label}
+                        {
+                          DOCUMENT_TYPE_OPTIONS.find(
+                            (t) => t.value === doc.document_type,
+                          )?.label
+                        }
                       </div>
                     </TableCell>
                     <TableCell>{doc.document_name}</TableCell>
                     <TableCell>{doc.document_number}</TableCell>
                     <TableCell>
-                      {doc.issue_date && format(new Date(doc.issue_date), 'dd.MM.yyyy', { locale: tr })}
+                      {doc.issue_date &&
+                        format(new Date(doc.issue_date), "dd.MM.yyyy", {
+                          locale: tr,
+                        })}
                     </TableCell>
                     <TableCell>
-                      {doc.expiry_date && format(new Date(doc.expiry_date), 'dd.MM.yyyy', { locale: tr })}
+                      {doc.expiry_date &&
+                        format(new Date(doc.expiry_date), "dd.MM.yyyy", {
+                          locale: tr,
+                        })}
                     </TableCell>
                     <TableCell>
                       {doc.is_verified && (
@@ -200,16 +234,19 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
           <DialogHeader>
             <DialogTitle>Yeni Doküman Yükle</DialogTitle>
             <DialogDescription>
-              İhtiyaç sahibine ait yeni bir dökümanı buradan sisteme yükleyebilirsiniz.
+              İhtiyaç sahibine ait yeni bir dökümanı buradan sisteme
+              yükleyebilirsiniz.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div>
               <Label>Belge Türü *</Label>
               <Select
                 value={formData.document_type}
-                onValueChange={(v) => setFormData({ ...formData, document_type: v as DocumentType })}
+                onValueChange={(v) =>
+                  setFormData({ ...formData, document_type: v as DocumentType })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Belge türü seçin" />
@@ -223,16 +260,18 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label>Belge Adı *</Label>
               <Input
                 value={formData.document_name}
-                onChange={(e) => setFormData({ ...formData, document_name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, document_name: e.target.value })
+                }
                 placeholder="Belge açıklaması"
               />
             </div>
-            
+
             <div>
               <Label>Dosya</Label>
               <div className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:bg-muted/50">
@@ -245,13 +284,18 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
                 </p>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Belge Numarası</Label>
                 <Input
                   value={formData.document_number}
-                  onChange={(e) => setFormData({ ...formData, document_number: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      document_number: e.target.value,
+                    })
+                  }
                   placeholder="Belge numarası"
                 />
               </div>
@@ -259,19 +303,26 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
                 <Label>Veren Kurum</Label>
                 <Input
                   value={formData.issuing_authority}
-                  onChange={(e) => setFormData({ ...formData, issuing_authority: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      issuing_authority: e.target.value,
+                    })
+                  }
                   placeholder="Veren kurum"
                 />
               </div>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Veriliş Tarihi</Label>
                 <Input
                   type="date"
                   value={formData.issue_date}
-                  onChange={(e) => setFormData({ ...formData, issue_date: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, issue_date: e.target.value })
+                  }
                 />
               </div>
               <div>
@@ -279,22 +330,22 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
                 <Input
                   type="date"
                   value={formData.expiry_date}
-                  onChange={(e) => setFormData({ ...formData, expiry_date: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, expiry_date: e.target.value })
+                  }
                 />
               </div>
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>
               İptal
             </Button>
-            <Button onClick={handleSave}>
-              Yükle
-            </Button>
+            <Button onClick={handleSave}>Yükle</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

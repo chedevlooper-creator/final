@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 
 /**
  * Top progress bar for page transitions
@@ -9,51 +9,51 @@ import { usePathname, useSearchParams } from 'next/navigation'
  */
 
 export function ProgressBar() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    let timer: NodeJS.Timeout
-    let progressTimer: NodeJS.Timeout
+    let timer: NodeJS.Timeout;
+    let progressTimer: NodeJS.Timeout;
 
     const startLoading = () => {
-      setIsLoading(true)
-      setProgress(0)
-      
+      setIsLoading(true);
+      setProgress(0);
+
       // Simulate progress
       progressTimer = setInterval(() => {
         setProgress((prev) => {
-          if (prev >= 90) return prev
-          return prev + Math.random() * 10
-        })
-      }, 100)
-    }
+          if (prev >= 90) return prev;
+          return prev + Math.random() * 10;
+        });
+      }, 100);
+    };
 
     const stopLoading = () => {
-      clearInterval(progressTimer)
-      setProgress(100)
-      
+      clearInterval(progressTimer);
+      setProgress(100);
+
       timer = setTimeout(() => {
-        setIsLoading(false)
-        setProgress(0)
-      }, 200)
-    }
+        setIsLoading(false);
+        setProgress(0);
+      }, 200);
+    };
 
     // Start loading on route change
-    startLoading()
+    startLoading();
 
     // Stop loading when route change is complete
-    stopLoading()
+    stopLoading();
 
     return () => {
-      clearInterval(progressTimer)
-      clearTimeout(timer)
-    }
-  }, [pathname, searchParams])
+      clearInterval(progressTimer);
+      clearTimeout(timer);
+    };
+  }, [pathname, searchParams]);
 
-  if (!isLoading) return null
+  if (!isLoading) return null;
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[9999] h-1 bg-slate-200 dark:bg-slate-800">
@@ -62,5 +62,5 @@ export function ProgressBar() {
         style={{ width: `${progress}%` }}
       />
     </div>
-  )
+  );
 }

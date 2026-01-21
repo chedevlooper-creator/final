@@ -1,24 +1,24 @@
-'use client'
+"use client";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
-import { toast } from 'sonner'
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import {
   FileText,
   ArrowLeft,
@@ -35,65 +35,72 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
-} from 'lucide-react'
-import Link from 'next/link'
-import { format } from 'date-fns'
-import { tr } from 'date-fns/locale'
-import { APPLICATION_TYPES, APPLICATION_STATUSES, PRIORITY_LEVELS } from '@/lib/validations/application'
-import { useApplicationDetail, useUpdateApplication } from '@/hooks/queries/use-applications'
+} from "lucide-react";
+import Link from "next/link";
+import { format } from "date-fns";
+import { tr } from "date-fns/locale";
+import {
+  APPLICATION_TYPES,
+  APPLICATION_STATUSES,
+  PRIORITY_LEVELS,
+} from "@/lib/validations/application";
+import {
+  useApplicationDetail,
+  useUpdateApplication,
+} from "@/hooks/queries/use-applications";
 
 interface Application {
-  id: string
-  application_number: string | null
-  needy_person_id: string
-  application_type: string
-  status: string
-  priority: string | null
-  assigned_user_id: string | null
-  description: string | null
-  requested_amount: number | null
-  approved_amount: number | null
-  notes: string | null
-  created_at: string
-  updated_at: string
+  id: string;
+  application_number: string | null;
+  needy_person_id: string;
+  application_type: string;
+  status: string;
+  priority: string | null;
+  assigned_user_id: string | null;
+  description: string | null;
+  requested_amount: number | null;
+  approved_amount: number | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
   needy_person?: {
-    id: string
-    first_name: string
-    last_name: string
-    phone: string | null
-    identity_number: string | null
-    address: string | null
-  }
+    id: string;
+    first_name: string;
+    last_name: string;
+    phone: string | null;
+    identity_number: string | null;
+    address: string | null;
+  };
 }
 
 export default function ApplicationDetailPage() {
-  const params = useParams()
-  const id = params['id'] as string
+  const params = useParams();
+  const id = params["id"] as string;
 
-  const { data: application, isLoading, error } = useApplicationDetail(id)
-  const updateMutation = useUpdateApplication()
+  const { data: application, isLoading, error } = useApplicationDetail(id);
+  const updateMutation = useUpdateApplication();
 
-  const [status, setStatus] = useState('')
-  const [priority, setPriority] = useState('')
-  const [notes, setNotes] = useState('')
-  const [approvedAmount, setApprovedAmount] = useState<string>('')
+  const [status, setStatus] = useState("");
+  const [priority, setPriority] = useState("");
+  const [notes, setNotes] = useState("");
+  const [approvedAmount, setApprovedAmount] = useState<string>("");
 
   // Sync local state with fetched data
   useEffect(() => {
     if (application) {
-      setStatus(application.status || '')
-      setPriority(application.priority || '')
-      setNotes(application.notes || '')
-      setApprovedAmount(application.approved_amount?.toString() || '')
+      setStatus(application.status || "");
+      setPriority(application.priority || "");
+      setNotes(application.notes || "");
+      setApprovedAmount(application.approved_amount?.toString() || "");
     }
-  }, [application])
+  }, [application]);
 
   // Show error toast if fetch fails
   useEffect(() => {
     if (error) {
-      toast.error('Başvuru yüklenirken hata oluştu')
+      toast.error("Başvuru yüklenirken hata oluştu");
     }
-  }, [error])
+  }, [error]);
 
   const handleSave = async () => {
     try {
@@ -101,53 +108,65 @@ export default function ApplicationDetailPage() {
         id,
         values: {
           status,
-          priority: (priority || undefined) as "low" | "medium" | "high" | "urgent" | undefined,
+          priority: (priority || undefined) as
+            | "low"
+            | "medium"
+            | "high"
+            | "urgent"
+            | undefined,
           notes: notes || null,
           approved_amount: approvedAmount ? parseFloat(approvedAmount) : null,
         } as any,
-      })
-      toast.success('Başvuru güncellendi')
+      });
+      toast.success("Başvuru güncellendi");
     } catch (err) {
-      toast.error('Kayıt sırasında hata oluştu')
+      toast.error("Kayıt sırasında hata oluştu");
     }
-  }
+  };
 
   const handleStatusChange = async (newStatus: string) => {
-    setStatus(newStatus)
-  }
+    setStatus(newStatus);
+  };
 
   const getStatusBadge = (statusValue: string) => {
-    const statusConfig = APPLICATION_STATUSES.find((s) => s.value === statusValue)
+    const statusConfig = APPLICATION_STATUSES.find(
+      (s) => s.value === statusValue,
+    );
     const colorClasses: Record<string, string> = {
-      blue: 'bg-blue-100 text-blue-700',
-      yellow: 'bg-yellow-100 text-yellow-700',
-      green: 'bg-green-100 text-green-700',
-      red: 'bg-red-100 text-red-700',
-      orange: 'bg-orange-100 text-orange-700',
-      gray: 'bg-slate-100 text-slate-700',
-    }
+      blue: "bg-blue-100 text-blue-700",
+      yellow: "bg-yellow-100 text-yellow-700",
+      green: "bg-green-100 text-green-700",
+      red: "bg-red-100 text-red-700",
+      orange: "bg-orange-100 text-orange-700",
+      gray: "bg-slate-100 text-slate-700",
+    };
     return (
-      <Badge className={colorClasses[statusConfig?.color || 'gray']}>
+      <Badge className={colorClasses[statusConfig?.color || "gray"]}>
         {statusConfig?.label || statusValue}
       </Badge>
-    )
-  }
+    );
+  };
 
   const getPriorityBadge = (priorityValue: string | null) => {
-    if (!priorityValue) return null
-    const priorityConfig = PRIORITY_LEVELS.find((p) => p.value === priorityValue)
+    if (!priorityValue) return null;
+    const priorityConfig = PRIORITY_LEVELS.find(
+      (p) => p.value === priorityValue,
+    );
     const colorClasses: Record<string, string> = {
-      gray: 'bg-slate-100 text-slate-600',
-      blue: 'bg-blue-100 text-blue-600',
-      orange: 'bg-orange-100 text-orange-600',
-      red: 'bg-red-100 text-red-600',
-    }
+      gray: "bg-slate-100 text-slate-600",
+      blue: "bg-blue-100 text-blue-600",
+      orange: "bg-orange-100 text-orange-600",
+      red: "bg-red-100 text-red-600",
+    };
     return (
-      <Badge variant="outline" className={colorClasses[priorityConfig?.color || 'gray']}>
+      <Badge
+        variant="outline"
+        className={colorClasses[priorityConfig?.color || "gray"]}
+      >
         {priorityConfig?.label || priorityValue}
       </Badge>
-    )
-  }
+    );
+  };
 
   if (isLoading) {
     return (
@@ -162,7 +181,7 @@ export default function ApplicationDetailPage() {
           <Skeleton className="h-48" />
         </div>
       </div>
-    )
+    );
   }
 
   if (!application) {
@@ -173,7 +192,7 @@ export default function ApplicationDetailPage() {
           <Button variant="link">Listeye Dön</Button>
         </Link>
       </div>
-    )
+    );
   }
 
   return (
@@ -195,7 +214,9 @@ export default function ApplicationDetailPage() {
               {getPriorityBadge(priority)}
             </div>
             <p className="text-sm text-slate-500">
-              {format(new Date(application.created_at), 'dd MMMM yyyy HH:mm', { locale: tr })}
+              {format(new Date(application.created_at), "dd MMMM yyyy HH:mm", {
+                locale: tr,
+              })}
             </p>
           </div>
         </div>
@@ -209,7 +230,7 @@ export default function ApplicationDetailPage() {
           ) : (
             <Save className="mr-2 h-4 w-4" />
           )}
-          {updateMutation.isPending ? 'Kaydediliyor...' : 'Kaydet'}
+          {updateMutation.isPending ? "Kaydediliyor..." : "Kaydet"}
         </Button>
       </div>
 
@@ -230,22 +251,28 @@ export default function ApplicationDetailPage() {
                 <div>
                   <Label className="text-sm text-slate-500">Başvuru Türü</Label>
                   <p className="font-medium">
-                    {APPLICATION_TYPES.find((t) => t.value === application.application_type)?.label || application.application_type}
+                    {APPLICATION_TYPES.find(
+                      (t) => t.value === application.application_type,
+                    )?.label || application.application_type}
                   </p>
                 </div>
                 <div>
-                  <Label className="text-sm text-slate-500">Talep Edilen Tutar</Label>
+                  <Label className="text-sm text-slate-500">
+                    Talep Edilen Tutar
+                  </Label>
                   <p className="font-medium text-lg">
                     {application.requested_amount
-                      ? `₺${application.requested_amount.toLocaleString('tr-TR')}`
-                      : '-'}
+                      ? `₺${application.requested_amount.toLocaleString("tr-TR")}`
+                      : "-"}
                   </p>
                 </div>
               </div>
 
               <div>
                 <Label className="text-sm text-slate-500">Açıklama</Label>
-                <p className="mt-1">{application.description || 'Açıklama girilmemiş'}</p>
+                <p className="mt-1">
+                  {application.description || "Açıklama girilmemiş"}
+                </p>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
@@ -381,23 +408,33 @@ export default function ApplicationDetailPage() {
                     <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
                       <CheckCircle className="h-5 w-5 text-green-600" />
                       <div className="flex-1">
-                        <p className="font-medium text-green-800">Başvuru Alındı</p>
+                        <p className="font-medium text-green-800">
+                          Başvuru Alındı
+                        </p>
                         <p className="text-xs text-green-600">
-                          {format(new Date(application.created_at), 'dd.MM.yyyy HH:mm', { locale: tr })}
+                          {format(
+                            new Date(application.created_at),
+                            "dd.MM.yyyy HH:mm",
+                            { locale: tr },
+                          )}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
                       <Clock className="h-5 w-5 text-yellow-600" />
                       <div className="flex-1">
-                        <p className="font-medium text-yellow-800">İnceleniyor</p>
+                        <p className="font-medium text-yellow-800">
+                          İnceleniyor
+                        </p>
                         <p className="text-xs text-yellow-600">Devam ediyor</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg opacity-50">
                       <AlertCircle className="h-5 w-5 text-slate-400" />
                       <div className="flex-1">
-                        <p className="font-medium text-slate-500">Onay Bekliyor</p>
+                        <p className="font-medium text-slate-500">
+                          Onay Bekliyor
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -423,13 +460,16 @@ export default function ApplicationDetailPage() {
                   href={`/needy/${application.needy_person?.id}`}
                   className="text-lg font-semibold text-blue-600 hover:underline"
                 >
-                  {application.needy_person?.first_name} {application.needy_person?.last_name}
+                  {application.needy_person?.first_name}{" "}
+                  {application.needy_person?.last_name}
                 </Link>
               </div>
               {application.needy_person?.identity_number && (
                 <div>
                   <Label className="text-xs text-slate-500">Kimlik No</Label>
-                  <p className="font-mono">{application.needy_person.identity_number}</p>
+                  <p className="font-mono">
+                    {application.needy_person.identity_number}
+                  </p>
                 </div>
               )}
               {application.needy_person?.phone && (
@@ -462,7 +502,7 @@ export default function ApplicationDetailPage() {
                 variant="outline"
                 size="sm"
                 className="w-full justify-start text-green-600 hover:text-green-700 hover:bg-green-50"
-                onClick={() => handleStatusChange('approved')}
+                onClick={() => handleStatusChange("approved")}
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
                 Onayla
@@ -471,7 +511,7 @@ export default function ApplicationDetailPage() {
                 variant="outline"
                 size="sm"
                 className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-                onClick={() => handleStatusChange('rejected')}
+                onClick={() => handleStatusChange("rejected")}
               >
                 <XCircle className="mr-2 h-4 w-4" />
                 Reddet
@@ -498,16 +538,28 @@ export default function ApplicationDetailPage() {
             <CardContent className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-slate-500">Oluşturulma:</span>
-                <span>{format(new Date(application.created_at), 'dd.MM.yyyy HH:mm', { locale: tr })}</span>
+                <span>
+                  {format(
+                    new Date(application.created_at),
+                    "dd.MM.yyyy HH:mm",
+                    { locale: tr },
+                  )}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Güncelleme:</span>
-                <span>{format(new Date(application.updated_at), 'dd.MM.yyyy HH:mm', { locale: tr })}</span>
+                <span>
+                  {format(
+                    new Date(application.updated_at),
+                    "dd.MM.yyyy HH:mm",
+                    { locale: tr },
+                  )}
+                </span>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
     </div>
-  )
+  );
 }
