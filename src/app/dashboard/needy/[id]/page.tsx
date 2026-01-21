@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Form } from '@/components/ui/form'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { DetailHeader } from '@/components/needy/detail/DetailHeader'
 import { PhotoSection } from '@/components/needy/detail/PhotoSection'
@@ -141,6 +142,7 @@ export default function NeedyDetailPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [needyData, setNeedyData] = useState<NeedyPerson | null>(null)
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   // Çoklu seçim state'leri
   const [selectedIncomeSources, setSelectedIncomeSources] = useState<string[]>([])
@@ -180,25 +182,32 @@ export default function NeedyDetailPage() {
         const supabase = createClient()
 
         // Fetch needy person
+        // Fetch needy person with explicit foreign key relations
         const { data: person, error } = await supabase
           .from('needy_persons')
           .select(`
             *,
-            category:categories(id, name),
+            category:categories!category_id(id, name),
             nationality:countries!nationality_id(id, name),
             country:countries!country_id(id, name),
-            city:cities(id, name),
-            district:districts(id, name),
-            neighborhood:neighborhoods(id, name),
-            partner:partners(id, name)
+            city:cities!city_id(id, name),
+            district:districts!district_id(id, name),
+            neighborhood:neighborhoods!neighborhood_id(id, name),
+            partner:partners!partner_id(id, name)
           `)
           .eq('id', id)
           .single()
 
         if (error) {
-          console.error('Error fetching needy person:', error)
-          toast.error('Kayıt bulunamadı.')
-          router.push('/needy')
+          console.error('Detailed error fetching needy person:', {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+          })
+          toast.error(`Kayıt yüklenemedi: ${error.message}`)
+          setFetchError(error.message)
+          setIsLoading(false)
           return
         }
 
@@ -288,7 +297,7 @@ export default function NeedyDetailPage() {
         if (error) throw error
 
         toast.success('Yeni kayıt oluşturuldu.')
-        router.push(`/needy/${data.id}`)
+        router.push(`/dashboard/needy/${data.id}`)
       } else {
         // Update existing record
         const { error } = await supabase
@@ -313,10 +322,10 @@ export default function NeedyDetailPage() {
   const handleClose = () => {
     if (form.formState.isDirty) {
       if (window.confirm('Kaydedilmemiş değişiklikler var. Çıkmak istediğinizden emin misiniz?')) {
-        router.push('/needy')
+        router.push('/dashboard/needy')
       }
     } else {
-      router.push('/needy')
+      router.push('/dashboard/needy')
     }
   }
 
@@ -367,6 +376,22 @@ export default function NeedyDetailPage() {
             </div>
           </div>
         </div>
+      </div>
+    )
+  }
+
+  if (fetchError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-8 text-center space-y-4">
+        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+          <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <h2 className="text-xl font-bold text-gray-900">Veri Yüklenemedi</h2>
+        <p className="text-gray-600 max-w-md">{fetchError}</p>
+        <Button onClick={() => window.location.reload()} variant="outline">Tekrar Dene</Button>
+        <Button onClick={() => router.push('/dashboard/needy')} variant="ghost">Listeye Dön</Button>
       </div>
     )
   }

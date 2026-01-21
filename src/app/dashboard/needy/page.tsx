@@ -18,6 +18,7 @@ import { Users, Plus, Search, MoreHorizontal, Eye, Pencil, Trash2, Filter } from
 import { ColumnDef } from '@tanstack/react-table'
 import { Tables } from '@/types/database.types'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,6 +56,7 @@ const statusColors: Record<string, string> = {
 }
 
 export default function NeedyListPage() {
+  const router = useRouter()
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<string>('')
@@ -108,7 +110,7 @@ export default function NeedyListPage() {
     {
       id: 'detail',
       cell: ({ row }) => (
-        <Link href={`/needy/${row.original.id}`} prefetch={true}>
+        <Link href={`/dashboard/needy/${row.original.id}`} prefetch={true}>
           <Button variant="ghost" size="icon" className="h-8 w-8">
             <Eye className="h-4 w-4 text-blue-600" />
           </Button>
@@ -216,7 +218,7 @@ export default function NeedyListPage() {
       cell: ({ row }) => (
         <Badge className={statusColors[row.original.status] || 'bg-slate-100'}>
           {row.original.status === 'active' ? 'Aktif' :
-           row.original.status === 'inactive' ? 'Pasif' : 'Taslak'}
+            row.original.status === 'inactive' ? 'Pasif' : 'Taslak'}
         </Badge>
       ),
     },
@@ -230,13 +232,13 @@ export default function NeedyListPage() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <Link href={`/needy/${row.original.id}`} prefetch={true}>
+            <Link href={`/dashboard/needy/${row.original.id}`} prefetch={true}>
               <DropdownMenuItem>
                 <Eye className="mr-2 h-4 w-4" />
                 Görüntüle
               </DropdownMenuItem>
             </Link>
-            <Link href={`/needy/${row.original.id}?edit=true`} prefetch={true}>
+            <Link href={`/dashboard/needy/${row.original.id}?edit=true`} prefetch={true}>
               <DropdownMenuItem>
                 <Pencil className="mr-2 h-4 w-4" />
                 Düzenle
@@ -300,8 +302,8 @@ export default function NeedyListPage() {
           <Filter className="h-4 w-4 mr-1" />
           Filtre
         </Button>
-        <Button 
-          size="sm" 
+        <Button
+          size="sm"
           className="bg-blue-600 hover:bg-blue-700"
           onClick={() => {
             // Hash routing ile modal aç
@@ -328,6 +330,7 @@ export default function NeedyListPage() {
         pageCount={Math.ceil((data?.count || 0) / 20)}
         pageIndex={page}
         onPageChange={setPage}
+        onRowClick={(row) => router.push(`/dashboard/needy/${row.id}`)}
       />
 
       {/* Ekle Modal */}

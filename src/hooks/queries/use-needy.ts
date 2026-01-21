@@ -64,7 +64,7 @@ export function useNeedyList(filters?: NeedyFilters) {
         .range(page * limit, (page + 1) * limit - 1)
 
       if (error) throw error
-      
+
       return {
         data: data || [],
         count: count || 0,
@@ -92,14 +92,14 @@ export function useNeedyDetail(id: string) {
         .from('needy_persons')
         .select(`
           *,
-          category:categories(id, name),
-          partner:partners(id, name),
+          category:categories!category_id(id, name),
+          partner:partners!partner_id(id, name),
           nationality:countries!nationality_id(id, name),
           country:countries!country_id(id, name),
-          city:cities(id, name),
-          district:districts(id, name),
-          aids:aids(id, aid_date, amount, aid_type, status),
-          donations:donations(id, amount, donation_date)
+          city:cities!city_id(id, name),
+          district:districts!district_id(id, name),
+          neighborhood:neighborhoods!neighborhood_id(id, name),
+          aids:aids(id, aid_date, amount, aid_type, status)
         `)
         .eq('id', id)
         .single()
@@ -136,10 +136,10 @@ export function useCreateNeedy() {
       return data
     },
     onSuccess: (newPerson) => {
-      queryClient.invalidateQueries({ 
-        queryKey: ['needy-persons', 'list'] 
+      queryClient.invalidateQueries({
+        queryKey: ['needy-persons', 'list']
       })
-      
+
       // Add to cache
       queryClient.setQueryData(
         ['needy-persons', 'detail', newPerson.id],
@@ -157,13 +157,13 @@ export function useUpdateNeedy() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async ({ id, values }: { 
+    mutationFn: async ({ id, values }: {
       id: string
-      values: Partial<NeedyPersonFormValues> 
+      values: Partial<NeedyPersonFormValues>
     }) => {
       const { data, error } = await supabase
         .from('needy_persons')
-        .update({ 
+        .update({
           ...values,
           updated_at: new Date().toISOString()
         })
@@ -195,8 +195,8 @@ export function useUpdateNeedy() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
-        queryKey: ['needy-persons', 'list'] 
+      queryClient.invalidateQueries({
+        queryKey: ['needy-persons', 'list']
       })
     },
   })
@@ -221,12 +221,12 @@ export function useDeleteNeedy() {
     },
     onSuccess: (deletedId) => {
       // Remove from cache
-      queryClient.removeQueries({ 
-        queryKey: ['needy-persons', 'detail', deletedId] 
+      queryClient.removeQueries({
+        queryKey: ['needy-persons', 'detail', deletedId]
       })
-      
-      queryClient.invalidateQueries({ 
-        queryKey: ['needy-persons', 'list'] 
+
+      queryClient.invalidateQueries({
+        queryKey: ['needy-persons', 'list']
       })
     },
   })
@@ -240,13 +240,13 @@ export function useBulkUpdateNeedyStatus() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async ({ ids, status }: { 
+    mutationFn: async ({ ids, status }: {
       ids: string[]
-      status: string 
+      status: string
     }) => {
       const { error } = await supabase
         .from('needy_persons')
-        .update({ 
+        .update({
           status,
           updated_at: new Date().toISOString()
         })
@@ -256,8 +256,8 @@ export function useBulkUpdateNeedyStatus() {
       return { ids, status }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
-        queryKey: ['needy-persons', 'list'] 
+      queryClient.invalidateQueries({
+        queryKey: ['needy-persons', 'list']
       })
     },
   })

@@ -156,7 +156,7 @@ export class ValidationError extends AppError {
       },
       ErrorSeverity.LOW,
       [
-        { label: 'Formu Düzenle', action: () => {}, icon: '✏️' }
+        { label: 'Formu Düzenle', action: () => { }, icon: '✏️' }
       ],
       ErrorType.VALIDATION
     )
@@ -235,7 +235,7 @@ export class ConflictError extends AppError {
       details,
       ErrorSeverity.MEDIUM,
       [
-        { label: 'Verileri Kontrol Et', action: () => {}, icon: '🔍' }
+        { label: 'Verileri Kontrol Et', action: () => { }, icon: '🔍' }
       ],
       ErrorType.CONFLICT
     )
@@ -260,7 +260,7 @@ export class RateLimitError extends AppError {
       { retryAfter, ...details },
       ErrorSeverity.MEDIUM,
       [
-        { label: `${retryAfter || 60} saniye bekleyin`, action: () => {}, icon: '⏳' }
+        { label: `${retryAfter || 60} saniye bekleyin`, action: () => { }, icon: '⏳' }
       ],
       ErrorType.RATE_LIMIT
     )
@@ -304,6 +304,18 @@ export class ErrorLogger {
    * Log error with context
    */
   static error(error: Error | AppError, context?: Record<string, unknown>): void {
+    // Ignore AbortError - these are usually harmless and caused by HMR or React Strict Mode
+    if (
+      error.name === 'AbortError' ||
+      error.message?.includes('signal is aborted') ||
+      (error instanceof AppError && error.code === 'ABORT_ERROR')
+    ) {
+      if (this.isDevelopment) {
+        console.debug('🔇 Suppressed AbortError in Logger');
+      }
+      return;
+    }
+
     const errorInfo = {
       name: error.name,
       message: error.message,

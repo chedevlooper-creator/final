@@ -35,7 +35,7 @@ export const menuItems: MenuGroup[] = [
     title: 'Başlangıç',
     icon: Home,
     items: [
-      { title: 'Ana Sayfa', href: '/dashboard/dashboard', icon: Home },
+      { title: 'Ana Sayfa', href: '/dashboard', icon: Home },
       { title: 'Hesabım', href: '/dashboard/account', icon: Users },
     ]
   },

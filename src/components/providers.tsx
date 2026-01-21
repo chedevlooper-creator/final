@@ -6,10 +6,8 @@ import { ThemeProvider } from 'next-themes'
 import { useState, useEffect, Suspense } from 'react'
 import { Toaster } from '@/components/ui/sonner'
 import { WebVitals, PerformanceMonitor } from '@/components/performance/web-vitals'
-// import { setupIdlePrefetch } from '@/lib/prefetch'
 import { ViewTransitions, injectViewTransitionStyles } from '@/components/navigation/view-transitions'
 import { ProgressBar } from '@/components/navigation/progress-bar'
-import { PostHogProvider } from '@/components/providers-posthog'
 
 // Query client oluşturma fonksiyonu - optimization için ayrı
 function makeQueryClient() {
@@ -69,32 +67,25 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(getQueryClient)
 
   useEffect(() => {
-    // Setup idle prefetching for instant page transitions
-    // const cleanup = setupIdlePrefetch(queryClient)
-
     // Inject view transition styles
     injectViewTransitionStyles()
-
-    // return cleanup
-  }, [queryClient])
+  }, [])
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <PostHogProvider>
-        <QueryClientProvider client={queryClient}>
-          <Suspense fallback={null}>
-            <ProgressBar />
-          </Suspense>
-          <ViewTransitions />
-          <WebVitals />
-          <PerformanceMonitor />
-          {children}
-          <Toaster position="top-right" richColors closeButton />
-          {process.env['NODE_ENV'] === 'development' && (
-            <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
-          )}
-        </QueryClientProvider>
-      </PostHogProvider>
+      <QueryClientProvider client={queryClient}>
+        <Suspense fallback={null}>
+          <ProgressBar />
+        </Suspense>
+        <ViewTransitions />
+        <WebVitals />
+        <PerformanceMonitor />
+        {children}
+        <Toaster position="top-right" richColors closeButton />
+        {process.env['NODE_ENV'] === 'development' && (
+          <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+        )}
+      </QueryClientProvider>
     </ThemeProvider>
   )
 }

@@ -1,12 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-    let response = NextResponse.next({
-        request: {
-            headers: request.headers,
-        },
+    let supabaseResponse = NextResponse.next({
+        request,
     })
 
     const supabase = createServerClient(
@@ -19,32 +16,52 @@ export async function middleware(request: NextRequest) {
                 },
                 setAll(cookiesToSet) {
                     cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
-                    response = NextResponse.next({
-                        request: {
-                            headers: request.headers,
-                        },
+                    supabaseResponse = NextResponse.next({
+                        request,
                     })
                     cookiesToSet.forEach(({ name, value, options }) =>
-                        response.cookies.set(name, value, options)
+                        supabaseResponse.cookies.set(name, value, options)
                     )
                 },
             },
         }
     )
 
+    // IMPORTANT: DO NOT REMOVE. This refreshes the session if it's expired.
     const { data: { user } } = await supabase.auth.getUser()
 
-    // Eğer kullanıcı giriş yapmamışsa ve login sayfasında değilse login'e yönlendir
-    if (!user && !request.nextUrl.pathname.startsWith('/login')) {
-        return NextResponse.redirect(new URL('/login', request.url))
+    const { pathname } = request.nextUrl
+
+    // 1. Kullanıcı giriş YAPMAMIŞSA
+    if (!user) {
+        // Login veya Auth dışındaki sayfalara erişmeye çalışıyorsa /login'e gönder
+        if (!pathname.startsWith('/login') && !pathname.startsWith('/auth')) {
+            const url = request.nextUrl.clone()
+            url.pathname = '/login'
+            // Redirect yaparken de güncellenmiş çerezleri (e.g. refresh denemesi olduysa) taşımalıyız
+            const redirectResponse = NextResponse.redirect(url)
+            supabaseResponse.cookies.getAll().forEach(cookie => {
+                redirectResponse.cookies.set(cookie.name, cookie.value, cookie)
+            })
+            return redirectResponse
+        }
     }
 
-    // Eğer kullanıcı giriş yapmışsa ve login sayfasına gitmeye çalışıyorsa ana sayfaya yönlendir
-    if (user && request.nextUrl.pathname.startsWith('/login')) {
-        return NextResponse.redirect(new URL('/dashboard/dashboard', request.url))
+    // 2. Kullanıcı giriş YAPMIŞSA
+    if (user) {
+        // Login sayfasına gitmeye çalışıyorsa Dashboard'a gönder
+        if (pathname.startsWith('/login')) {
+            const url = request.nextUrl.clone()
+            url.pathname = '/dashboard'
+            const redirectResponse = NextResponse.redirect(url)
+            supabaseResponse.cookies.getAll().forEach(cookie => {
+                redirectResponse.cookies.set(cookie.name, cookie.value, cookie)
+            })
+            return redirectResponse
+        }
     }
 
-    return response
+    return supabaseResponse
 }
 
 export const config = {
@@ -54,7 +71,7 @@ export const config = {
          * - _next/static (static files)
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
-         * Feel free to modify this pattern to include more paths.
+         * - public assets
          */
         '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     ],

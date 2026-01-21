@@ -16,25 +16,9 @@ export function createClient() {
 
   // Only create client on client-side
   if (typeof window === 'undefined') {
-    // Return a mock client for SSR
     return createBrowserClient(
       env.NEXT_PUBLIC_SUPABASE_URL,
-      env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false,
-        },
-        db: {
-          schema: 'public',
-        },
-        global: {
-          headers: {
-            'x-application-name': 'yardim-yonetim-paneli',
-          },
-        },
-      }
+      env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     )
   }
 
@@ -46,16 +30,6 @@ export function createClient() {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        storage: window.localStorage,
-        storageKey: 'supabase.auth.token',
-      },
-      db: {
-        schema: 'public',
-      },
-      global: {
-        headers: {
-          'x-application-name': 'yardim-yonetim-paneli',
-        },
       },
     }
   )

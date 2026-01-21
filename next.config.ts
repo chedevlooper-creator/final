@@ -10,12 +10,12 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  
+
   // TypeScript build configuration
   typescript: {
     ignoreBuildErrors: false, // Production için TypeScript hatalarını kontrol et
   },
-  
+
   // Image optimization
   images: {
     remotePatterns: [
@@ -41,6 +41,7 @@ const nextConfig: NextConfig = {
   // Experimental features for better performance
   experimental: {
     optimizePackageImports: [
+
       'lucide-react',
       '@radix-ui/react-icons',
       'date-fns',
@@ -50,11 +51,12 @@ const nextConfig: NextConfig = {
     ],
   },
 
+
   // Turbopack configuration - silence multiple lockfile warning
   turbopack: {
     root: path.resolve(__dirname),
   },
-  
+
   // Webpack optimizations for bundle size
   webpack: (config, { isServer }) => {
     // Optimize package imports
@@ -66,17 +68,17 @@ const nextConfig: NextConfig = {
         tls: false,
       }
     }
-    
+
     // Reduce bundle size with tree shaking
     config.optimization = {
       ...config.optimization,
       usedExports: true,
       sideEffects: true,
     }
-    
+
     return config
   },
-  
+
   async headers() {
     return [
       {

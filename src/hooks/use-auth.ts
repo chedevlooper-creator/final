@@ -30,12 +30,12 @@ export function useAuth() {
     if (user?.user_metadata?.['role']) {
       return user.user_metadata['role'] as UserRole
     }
-    
+
     // Then check profile state
     if (profile?.role) {
       return profile.role
     }
-    
+
     // Default to viewer
     return 'viewer'
   }, [user, profile])
@@ -47,7 +47,7 @@ export function useAuth() {
     const getUser = async () => {
       try {
         const { data: { user }, error } = await supabase.auth.getUser()
-        
+
         // Auth session missing is expected when user is not logged in
         if (error) {
           // Don't show error for missing session - this is expected on login page
@@ -58,7 +58,7 @@ export function useAuth() {
           }
           throw ErrorHandler.fromSupabaseError(error)
         }
-        
+
         setUser(user)
 
         // Fetch user profile from profiles table
@@ -68,7 +68,7 @@ export function useAuth() {
             .select('*')
             .eq('id', user.id)
             .single()
-          
+
           if (profileData) {
             setProfile({
               id: profileData.id,
@@ -94,7 +94,7 @@ export function useAuth() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event: any, session: any) => {
       setUser(session?.user ?? null)
-      
+
       if (session?.user) {
         // Refetch profile on auth state change
         const { data: profileData } = await supabase
@@ -102,7 +102,7 @@ export function useAuth() {
           .select('*')
           .eq('id', session.user.id)
           .single()
-        
+
         if (profileData) {
           setProfile({
             id: profileData.id,
@@ -117,7 +117,7 @@ export function useAuth() {
       } else {
         setProfile(null)
       }
-      
+
       setLoading(false)
     })
 
@@ -132,7 +132,7 @@ export function useAuth() {
         email,
         password,
       })
-      
+
       if (error) {
         throw new AuthError(
           error.message || 'Giriş başarısız',
@@ -141,10 +141,11 @@ export function useAuth() {
       }
 
       toast.success('Giriş başarılı!')
-      router.push('/')
+      // Force a full reload to ensure cookies are synchronized with the server middleware
+      window.location.href = '/dashboard'
       return data
     } catch (error) {
-      const message = ErrorHandler.handle(error, { 
+      const message = ErrorHandler.handle(error, {
         action: 'signIn',
         email: email.substring(0, 3) + '***' // Mask email for logging
       })
@@ -165,7 +166,7 @@ export function useAuth() {
           }
         }
       })
-      
+
       if (error) {
         throw ErrorHandler.fromSupabaseError(error)
       }
@@ -180,7 +181,7 @@ export function useAuth() {
             name: name || '',
             role: 'user'
           })
-        
+
         if (profileError) {
           console.error('Profile creation failed:', profileError)
         }
@@ -189,7 +190,7 @@ export function useAuth() {
       toast.success('Kayıt başarılı! Lütfen e-posta adresinizi doğrulayın.')
       return data
     } catch (error) {
-      const message = ErrorHandler.handle(error, { 
+      const message = ErrorHandler.handle(error, {
         action: 'signUp',
         email: email.substring(0, 3) + '***'
       })
@@ -201,13 +202,13 @@ export function useAuth() {
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut()
-      
+
       if (error) {
         throw ErrorHandler.fromSupabaseError(error)
       }
 
       toast.success('Çıkış yapıldı')
-      router.push('/login')
+      window.location.href = '/login'
     } catch (error) {
       const message = ErrorHandler.handle(error, { action: 'signOut' })
       toast.error(message)
@@ -260,13 +261,13 @@ export function useAuth() {
     signUp,
     signOut,
     updateProfile,
-    
+
     // Role and permissions
     role: userRole,
     permissions,
     hasPermission,
     canPerform,
-    
+
     // Convenience booleans
     isAdmin: userRole === 'admin',
     isModerator: userRole === 'moderator',
