@@ -1,1 +1,21 @@
-{\n  "buildCommand": "npm run build",\n  "installCommand": "npm ci",\n  "framework": "nextjs",\n  "outputDirectory": ".next",\n  "regions": ["iad1"],\n  "crons": [\n    {\n      "path": "/api/cron",\n      "schedule": "0 10 * * *"\n    }\n  ],\n  "env": {\n    "NODE_ENV": "production"\n  },\n  "build": {\n    "env": {\n      "NEXT_TELEMETRY_DISABLED": "1"\n    }\n  }\n}
+{
+  "buildCommand": "npm run build",
+  "installCommand": "npm ci",
+  "framework": "nextjs",
+  "outputDirectory": ".next",
+  "regions": ["iad1"],
+  "crons": [
+    {
+      "path": "/api/cron",
+      "schedule": "0 10 * * *"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "NEXT_TELEMETRY_DISABLED": "1"
+    }
+  }
+}
