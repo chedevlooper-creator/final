@@ -353,10 +353,23 @@ export default function NeedyDetailPage() {
     form.setValue('status', newStatus, { shouldDirty: true })
   }
 
-  const handleDeleteRequest = () => {
+  const handleDeleteRequest = async () => {
     if (window.confirm('Bu kaydı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
-      // TODO: Implement delete
-      console.log('Delete requested')
+      try {
+        const supabase = createClient()
+        const { error } = await supabase
+          .from('needy_persons')
+          .delete()
+          .eq('id', id)
+
+        if (error) throw error
+
+        toast.success('Kayıt başarıyla silindi.')
+        router.push('/dashboard/needy')
+      } catch (error) {
+        console.error('Error deleting:', error)
+        toast.error('Kayıt silinirken bir hata oluştu.')
+      }
     }
   }
 
