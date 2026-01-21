@@ -25,11 +25,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog'
 import { Plus, Eye, Download, Trash2, FileText, Upload, CheckCircle2 } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import { Document, DOCUMENT_TYPE_OPTIONS, DocumentType, StatusFilter } from '@/types/linked-records.types'
-import { useLinkedRecords, useCreateLinkedRecord, useDeleteLinkedRecord, LinkedRecordTable } from '@/hooks/queries/use-linked-records'
+import { useLinkedRecords, useCreateLinkedRecord, useDeleteLinkedRecord } from '@/hooks/queries/use-linked-records'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
@@ -40,7 +41,6 @@ interface DocumentsTabProps {
 }
 
 export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   
@@ -199,6 +199,9 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Yeni Doküman Yükle</DialogTitle>
+            <DialogDescription>
+              İhtiyaç sahibine ait yeni bir dökümanı buradan sisteme yükleyebilirsiniz.
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">

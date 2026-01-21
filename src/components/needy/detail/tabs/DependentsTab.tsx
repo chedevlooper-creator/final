@@ -25,6 +25,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { TabLayout } from './TabLayout'
@@ -212,7 +213,10 @@ export function DependentsTab({ needyPersonId, onClose }: DependentsTabProps) {
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Bağımlı Kişi Ekle</DialogTitle>
+            <DialogTitle>Bağımlı Kişi {editingId ? 'Güncelle' : 'Ekle'}</DialogTitle>
+            <DialogDescription>
+              Bağımlı kişinin bilgilerini buradan {editingId ? 'güncelleyebilirsiniz' : 'ekleyebilirsiniz'}.
+            </DialogDescription>
           </DialogHeader>
           
           <div className="grid grid-cols-2 gap-4 py-4">

@@ -6,7 +6,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from '@/components/ui/dialog'
 import { Plus, Eye, Gift, Truck, Trash2 } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import { AidReceived, AID_TYPE_OPTIONS, DELIVERY_STATUS_OPTIONS, CURRENCY_OPTIONS, AidType, DeliveryStatus } from '@/types/linked-records.types'
@@ -167,7 +174,12 @@ export function AidsReceivedTab({ needyPersonId, onClose }: AidsReceivedTabProps
 
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Yardım Kaydı Ekle</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Yardım Kaydı Ekle</DialogTitle>
+            <DialogDescription>
+              İhtiyaç sahibine yapılan yardımın detaylarını buradan kaydedebilirsiniz.
+            </DialogDescription>
+          </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div><Label>Yardım Tarihi *</Label><Input type="date" value={formData.aid_date} onChange={(e) => setFormData({ ...formData, aid_date: e.target.value })} /></div>
