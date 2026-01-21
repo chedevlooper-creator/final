@@ -1,61 +1,67 @@
 /**
  * Bulk Operations System - Core Library
  * Toplu işlemler için merkezi yönetim sistemi
- * 
+ *
  * @version 1.0.0
  * @author Aid Management Panel Team
  */
 
 // Toplu işlem hataları için özel sınıflar
 export class BulkOperationError extends Error {
-  constructor(message: string, public code?: string) {
+  constructor(
+    message: string,
+    public code?: string,
+  ) {
     super(message);
-    this.name = 'BulkOperationError';
+    this.name = "BulkOperationError";
   }
 }
 
 export class BulkValidationError extends BulkOperationError {
   constructor(message: string) {
-    super(message, 'VALIDATION_ERROR');
-    this.name = 'BulkValidationError';
+    super(message, "VALIDATION_ERROR");
+    this.name = "BulkValidationError";
   }
 }
 
 export class BulkExecutionError extends BulkOperationError {
-  constructor(message: string, public itemErrors?: Array<{ index: number; error: string }>) {
-    super(message, 'EXECUTION_ERROR');
-    this.name = 'BulkExecutionError';
+  constructor(
+    message: string,
+    public itemErrors?: Array<{ index: number; error: string }>,
+  ) {
+    super(message, "EXECUTION_ERROR");
+    this.name = "BulkExecutionError";
   }
 }
 
 // İşlem tipleri
 export enum BulkOperationType {
-  CREATE = 'create',
-  UPDATE = 'update',
-  DELETE = 'delete',
-  EXPORT = 'export',
-  IMPORT = 'import',
-  APPROVE = 'approve',
-  REJECT = 'reject',
-  CUSTOM = 'custom'
+  CREATE = "create",
+  UPDATE = "update",
+  DELETE = "delete",
+  EXPORT = "export",
+  IMPORT = "import",
+  APPROVE = "approve",
+  REJECT = "reject",
+  CUSTOM = "custom",
 }
 
 // İşlem durumları
 export enum BulkOperationStatus {
-  PENDING = 'pending',
-  RUNNING = 'running',
-  COMPLETED = 'completed',
-  PARTIALLY_COMPLETED = 'partially_completed',
-  FAILED = 'failed',
-  CANCELLED = 'cancelled'
+  PENDING = "pending",
+  RUNNING = "running",
+  COMPLETED = "completed",
+  PARTIALLY_COMPLETED = "partially_completed",
+  FAILED = "failed",
+  CANCELLED = "cancelled",
 }
 
 // İşlem öncelikleri
 export enum BulkOperationPriority {
-  LOW = 'low',
-  NORMAL = 'normal',
-  HIGH = 'high',
-  URGENT = 'urgent'
+  LOW = "low",
+  NORMAL = "normal",
+  HIGH = "high",
+  URGENT = "urgent",
 }
 
 // Toplu işlem seçenekleri
@@ -109,7 +115,7 @@ export interface BulkOperationResult<T = any> {
 export interface BulkOperationItem<T = any> {
   id: string;
   item: T;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: "pending" | "processing" | "completed" | "failed";
   result?: any;
   error?: string;
   startTime?: Date;
@@ -136,27 +142,27 @@ export class BulkOperation<T = any> {
       continueOnError: true,
       maxConcurrent: 5,
       priority: BulkOperationPriority.NORMAL,
-      ...options
+      ...options,
     };
     this.status = BulkOperationStatus.PENDING;
-    
+
     // Öğeleri hazırla
     this.items = this.options.items.map((item, index) => ({
       id: `${this.id}_item_${index}`,
       item,
-      status: 'pending' as const,
-      index
+      status: "pending" as const,
+      index,
     }));
-    
+
     this.progress = {
       total: this.items.length,
       completed: 0,
       failed: 0,
-      percentage: 0
+      percentage: 0,
     };
-    
+
     this.abortController = new AbortController();
-    
+
     // Aktif işlemlere ekle
     BulkOperation.activeOperations.set(this.id, this);
   }
@@ -197,9 +203,13 @@ export class BulkOperation<T = any> {
   /**
    * İşlemi çalıştır
    */
-  async execute(operationFn: (item: T, signal: AbortSignal) => Promise<any>): Promise<BulkOperationResult<T>> {
+  async execute(
+    operationFn: (item: T, signal: AbortSignal) => Promise<any>,
+  ): Promise<BulkOperationResult<T>> {
     if (this.status !== BulkOperationStatus.PENDING) {
-      throw new BulkOperationError(`İşlem zaten çalışıyor veya tamamlandı. Durum: ${this.status}`);
+      throw new BulkOperationError(
+        `İşlem zaten çalışıyor veya tamamlandı. Durum: ${this.status}`,
+      );
     }
 
     this.status = BulkOperationStatus.RUNNING;
@@ -208,14 +218,14 @@ export class BulkOperation<T = any> {
     try {
       const batchSize = this.options.batchSize || 100;
       const totalBatches = Math.ceil(this.items.length / batchSize);
-      
+
       this.progress.totalBatches = totalBatches;
       this.progress.currentBatch = 0;
 
       // Batch'lere böl
       for (let i = 0; i < this.items.length; i += batchSize) {
         if (this.abortController.signal.aborted) {
-          throw new BulkOperationError('İşlem iptal edildi');
+          throw new BulkOperationError("İşlem iptal edildi");
         }
 
         const batch = this.items.slice(i, i + batchSize);
@@ -226,25 +236,27 @@ export class BulkOperation<T = any> {
           batch.map(async (itemObj) => {
             if (this.abortController.signal.aborted) return;
 
-            itemObj.status = 'processing';
+            itemObj.status = "processing";
             itemObj.startTime = new Date();
 
             try {
-              const result = await operationFn(itemObj.item, this.abortController.signal);
-              
-              itemObj.status = 'completed';
+              const result = await operationFn(
+                itemObj.item,
+                this.abortController.signal,
+              );
+
+              itemObj.status = "completed";
               itemObj.result = result;
               itemObj.endTime = new Date();
-              
+
               this.progress.completed++;
-              
             } catch (error: any) {
-              itemObj.status = 'failed';
-              itemObj.error = error.message || 'Bilinmeyen hata';
+              itemObj.status = "failed";
+              itemObj.error = error.message || "Bilinmeyen hata";
               itemObj.endTime = new Date();
-              
+
               this.progress.failed++;
-              
+
               if (!this.options.continueOnError) {
                 throw error;
               }
@@ -252,14 +264,19 @@ export class BulkOperation<T = any> {
 
             // İlerleme güncelle
             this.progress.percentage = Math.round(
-              ((this.progress.completed + this.progress.failed) / this.progress.total) * 100
+              ((this.progress.completed + this.progress.failed) /
+                this.progress.total) *
+                100,
             );
 
             // Tahmini kalan süre
             if (this.progress.completed > 0) {
               const elapsed = Date.now() - this.startTime!.getTime();
               const avgTime = elapsed / this.progress.completed;
-              const remaining = this.progress.total - this.progress.completed - this.progress.failed;
+              const remaining =
+                this.progress.total -
+                this.progress.completed -
+                this.progress.failed;
               this.progress.estimatedTimeRemaining = avgTime * remaining;
             }
 
@@ -267,34 +284,38 @@ export class BulkOperation<T = any> {
             if (this.options.onProgress) {
               this.options.onProgress(this.getProgress());
             }
-          })
+          }),
         );
 
         // Batch arası gecikme
-        if (this.options.delayBetweenBatches && i + batchSize < this.items.length) {
-          await new Promise(resolve => setTimeout(resolve, this.options.delayBetweenBatches));
+        if (
+          this.options.delayBetweenBatches &&
+          i + batchSize < this.items.length
+        ) {
+          await new Promise((resolve) =>
+            setTimeout(resolve, this.options.delayBetweenBatches),
+          );
         }
       }
 
       this.endTime = new Date();
       this.status = this.determineFinalStatus();
-      
+
       const result = this.buildResult();
-      
+
       // Complete callback
       if (this.options.onComplete) {
         this.options.onComplete(result);
       }
-      
+
       // Aktif işlemlerden sil
       BulkOperation.activeOperations.delete(this.id);
 
       return result;
-
     } catch (error: any) {
       this.endTime = new Date();
       this.status = BulkOperationStatus.FAILED;
-      
+
       BulkOperation.activeOperations.delete(this.id);
 
       if (this.options.onError) {
@@ -302,10 +323,13 @@ export class BulkOperation<T = any> {
       }
 
       throw new BulkExecutionError(
-        error.message || 'Toplu işlem başarısız',
+        error.message || "Toplu işlem başarısız",
         this.items
-          .filter(item => item.status === 'failed')
-          .map(item => ({ index: this.items.indexOf(item), error: item.error || 'Unknown error' }))
+          .filter((item) => item.status === "failed")
+          .map((item) => ({
+            index: this.items.indexOf(item),
+            error: item.error || "Unknown error",
+          })),
       );
     }
   }
@@ -328,15 +352,15 @@ export class BulkOperation<T = any> {
    */
   private buildResult(): BulkOperationResult<T> {
     const successfulItems = this.items
-      .filter(item => item.status === 'completed')
-      .map(item => item.item);
+      .filter((item) => item.status === "completed")
+      .map((item) => item.item);
 
     const failedItems = this.items
-      .filter(item => item.status === 'failed')
-      .map(item => ({
+      .filter((item) => item.status === "failed")
+      .map((item) => ({
         item: item.item,
-        error: item.error || 'Unknown error',
-        index: this.items.indexOf(item)
+        error: item.error || "Unknown error",
+        index: this.items.indexOf(item),
       }));
 
     const duration = this.endTime!.getTime() - this.startTime!.getTime();
@@ -353,9 +377,9 @@ export class BulkOperation<T = any> {
         endTime: this.endTime!,
         duration,
         averageTimePerItem,
-        successRate: this.progress.percentage
+        successRate: this.progress.percentage,
       },
-      metadata: this.options.metadata
+      metadata: this.options.metadata,
     };
   }
 
@@ -377,7 +401,7 @@ export class BulkOperation<T = any> {
    * Tüm aktif işlemleri iptal et
    */
   static cancelAllOperations(): void {
-    BulkOperation.activeOperations.forEach(operation => operation.cancel());
+    BulkOperation.activeOperations.forEach((operation) => operation.cancel());
     BulkOperation.activeOperations.clear();
   }
 }
@@ -390,12 +414,12 @@ export const bulk = {
   create: async <T>(
     items: T[],
     createFn: (item: T) => Promise<any>,
-    options?: Partial<BulkOperationOptions<T>>
+    options?: Partial<BulkOperationOptions<T>>,
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({
       items,
       operation: BulkOperationType.CREATE,
-      ...options
+      ...options,
     });
 
     return operation.execute(createFn);
@@ -407,12 +431,12 @@ export const bulk = {
   update: async <T>(
     items: T[],
     updateFn: (item: T) => Promise<any>,
-    options?: Partial<BulkOperationOptions<T>>
+    options?: Partial<BulkOperationOptions<T>>,
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({
       items,
       operation: BulkOperationType.UPDATE,
-      ...options
+      ...options,
     });
 
     return operation.execute(updateFn);
@@ -424,12 +448,12 @@ export const bulk = {
   delete: async <T>(
     items: T[],
     deleteFn: (item: T) => Promise<any>,
-    options?: Partial<BulkOperationOptions<T>>
+    options?: Partial<BulkOperationOptions<T>>,
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({
       items,
       operation: BulkOperationType.DELETE,
-      ...options
+      ...options,
     });
 
     return operation.execute(deleteFn);
@@ -441,12 +465,12 @@ export const bulk = {
   approve: async <T>(
     items: T[],
     approveFn: (item: T) => Promise<any>,
-    options?: Partial<BulkOperationOptions<T>>
+    options?: Partial<BulkOperationOptions<T>>,
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({
       items,
       operation: BulkOperationType.APPROVE,
-      ...options
+      ...options,
     });
 
     return operation.execute(approveFn);
@@ -458,12 +482,12 @@ export const bulk = {
   reject: async <T>(
     items: T[],
     rejectFn: (item: T) => Promise<any>,
-    options?: Partial<BulkOperationOptions<T>>
+    options?: Partial<BulkOperationOptions<T>>,
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({
       items,
       operation: BulkOperationType.REJECT,
-      ...options
+      ...options,
     });
 
     return operation.execute(rejectFn);
@@ -475,12 +499,12 @@ export const bulk = {
   export: async <T>(
     items: T[],
     exportFn: (item: T) => Promise<any>,
-    options?: Partial<BulkOperationOptions<T>>
+    options?: Partial<BulkOperationOptions<T>>,
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({
       items,
       operation: BulkOperationType.EXPORT,
-      ...options
+      ...options,
     });
 
     return operation.execute(exportFn);
@@ -492,12 +516,12 @@ export const bulk = {
   import: async <T>(
     items: T[],
     importFn: (item: T) => Promise<any>,
-    options?: Partial<BulkOperationOptions<T>>
+    options?: Partial<BulkOperationOptions<T>>,
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({
       items,
       operation: BulkOperationType.IMPORT,
-      ...options
+      ...options,
     });
 
     return operation.execute(importFn);
@@ -509,12 +533,12 @@ export const bulk = {
   custom: async <T>(
     items: T[],
     customFn: (item: T) => Promise<any>,
-    options?: Partial<BulkOperationOptions<T>>
+    options?: Partial<BulkOperationOptions<T>>,
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({
       items,
       operation: BulkOperationType.CUSTOM,
-      ...options
+      ...options,
     });
 
     return operation.execute(customFn);
@@ -539,5 +563,5 @@ export const bulk = {
    */
   cancelAll: (): void => {
     BulkOperation.cancelAllOperations();
-  }
+  },
 };

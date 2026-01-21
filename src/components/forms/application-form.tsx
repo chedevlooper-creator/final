@@ -1,13 +1,18 @@
-'use client'
+"use client";
 
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { applicationSchema, ApplicationFormValues, APPLICATION_TYPES, PRIORITY_LEVELS } from '@/lib/validations/application'
-import { useCreateApplication } from '@/hooks/queries/use-applications'
-import { useNeedyList } from '@/hooks/queries/use-needy'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  applicationSchema,
+  ApplicationFormValues,
+  APPLICATION_TYPES,
+  PRIORITY_LEVELS,
+} from "@/lib/validations/application";
+import { useCreateApplication } from "@/hooks/queries/use-applications";
+import { useNeedyList } from "@/hooks/queries/use-needy";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -15,14 +20,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 import {
   Command,
   CommandEmpty,
@@ -30,47 +35,64 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command'
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover'
-import { toast } from 'sonner'
-import { Loader2, Check, ChevronsUpDown } from 'lucide-react'
-import { useState } from 'react'
-import { cn } from '@/lib/utils'
+} from "@/components/ui/popover";
+import { toast } from "sonner";
+import { Loader2, Check, ChevronsUpDown } from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface ApplicationFormProps {
-  onSuccess?: () => void
+  onSuccess?: () => void;
 }
 
 export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
-  const createMutation = useCreateApplication()
-  const [open, setOpen] = useState(false)
-  const [searchValue, setSearchValue] = useState('')
+  const createMutation = useCreateApplication();
+  const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
-  const { data: needyData } = useNeedyList({ search: searchValue, limit: 50 }) as { data: { data: Array<{ id: string; first_name: string; last_name: string; identity_number: string | null; phone: string | null }>; count: number } | undefined }
+  const { data: needyData } = useNeedyList({
+    search: searchValue,
+    limit: 50,
+  }) as {
+    data:
+      | {
+          data: Array<{
+            id: string;
+            first_name: string;
+            last_name: string;
+            identity_number: string | null;
+            phone: string | null;
+          }>;
+          count: number;
+        }
+      | undefined;
+  };
 
   const form = useForm<ApplicationFormValues>({
     resolver: zodResolver(applicationSchema),
     defaultValues: {
-      priority: 'medium',
+      priority: "medium",
     },
-  })
+  });
 
   const onSubmit = async (values: ApplicationFormValues) => {
     try {
-      await createMutation.mutateAsync(values)
-      toast.success('Başvuru oluşturuldu')
-      onSuccess?.()
+      await createMutation.mutateAsync(values);
+      toast.success("Başvuru oluşturuldu");
+      onSuccess?.();
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Bir hata oluştu'
-      toast.error(errorMessage)
+      const errorMessage =
+        error instanceof Error ? error.message : "Bir hata oluştu";
+      toast.error(errorMessage);
     }
-  }
+  };
 
-  const isLoading = createMutation.isPending
+  const isLoading = createMutation.isPending;
 
   return (
     <Form {...form}>
@@ -90,15 +112,17 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
                       role="combobox"
                       aria-expanded={open}
                       className={cn(
-                        'w-full justify-between',
-                        !field.value && 'text-muted-foreground'
+                        "w-full justify-between",
+                        !field.value && "text-muted-foreground",
                       )}
                     >
                       {field.value
-                        ? needyData?.data?.find((person) => person.id === field.value)
-                            ? `${needyData.data.find((person) => person.id === field.value)?.first_name} ${needyData.data.find((person) => person.id === field.value)?.last_name}`
-                            : 'Seçiniz...'
-                        : 'İhtiyaç sahibi seçin...'}
+                        ? needyData?.data?.find(
+                            (person) => person.id === field.value,
+                          )
+                          ? `${needyData.data.find((person) => person.id === field.value)?.first_name} ${needyData.data.find((person) => person.id === field.value)?.last_name}`
+                          : "Seçiniz..."
+                        : "İhtiyaç sahibi seçin..."}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </FormControl>
@@ -118,19 +142,25 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
                             key={person.id}
                             value={person.id}
                             onSelect={() => {
-                              form.setValue('needy_person_id', person.id)
-                              setOpen(false)
+                              form.setValue("needy_person_id", person.id);
+                              setOpen(false);
                             }}
                           >
                             <Check
                               className={cn(
-                                'mr-2 h-4 w-4',
-                                field.value === person.id ? 'opacity-100' : 'opacity-0'
+                                "mr-2 h-4 w-4",
+                                field.value === person.id
+                                  ? "opacity-100"
+                                  : "opacity-0",
                               )}
                             />
                             <div>
-                              <p className="font-medium">{person.first_name} {person.last_name}</p>
-                              <p className="text-xs text-slate-500">{person.identity_number || person.phone || '-'}</p>
+                              <p className="font-medium">
+                                {person.first_name} {person.last_name}
+                              </p>
+                              <p className="text-xs text-slate-500">
+                                {person.identity_number || person.phone || "-"}
+                              </p>
                             </div>
                           </CommandItem>
                         ))}
@@ -211,8 +241,12 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
                   min={0}
                   placeholder="0.00"
                   {...field}
-                  value={field.value || ''}
-                  onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : null)}
+                  value={field.value || ""}
+                  onChange={(e) =>
+                    field.onChange(
+                      e.target.value ? parseFloat(e.target.value) : null,
+                    )
+                  }
                 />
               </FormControl>
               <FormMessage />
@@ -231,7 +265,7 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
                 <Textarea
                   placeholder="Başvuru hakkında detaylı bilgi..."
                   {...field}
-                  value={field.value || ''}
+                  value={field.value || ""}
                 />
               </FormControl>
               <FormMessage />
@@ -250,7 +284,7 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
                 <Textarea
                   placeholder="Ek notlar..."
                   {...field}
-                  value={field.value || ''}
+                  value={field.value || ""}
                 />
               </FormControl>
               <FormMessage />
@@ -273,5 +307,5 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
         </div>
       </form>
     </Form>
-  )
+  );
 }
