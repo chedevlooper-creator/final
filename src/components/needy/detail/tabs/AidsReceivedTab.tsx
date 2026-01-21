@@ -7,9 +7,11 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { Plus, Eye, Gift, Truck } from 'lucide-react'
+import { Plus, Eye, Gift, Truck, Trash2 } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import { AidReceived, AID_TYPE_OPTIONS, DELIVERY_STATUS_OPTIONS, CURRENCY_OPTIONS, AidType, DeliveryStatus } from '@/types/linked-records.types'
+import { useLinkedRecords, useCreateLinkedRecord, useDeleteLinkedRecord, NeedyAidReceived } from '@/hooks/queries/use-linked-records'
+import { toast } from 'sonner'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 
@@ -21,14 +23,18 @@ interface AidsReceivedTabProps {
 export function AidsReceivedTab({ needyPersonId, onClose }: AidsReceivedTabProps) {
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [aids, setAids] = useState<AidReceived[]>([])
+  
+  const { data: aids = [], isLoading } = useLinkedRecords<NeedyAidReceived>('needy_aids_received', needyPersonId, { orderBy: 'aid_date' })
+  const createMutation = useCreateLinkedRecord<NeedyAidReceived>('needy_aids_received')
+  const deleteMutation = useDeleteLinkedRecord('needy_aids_received')
+
   const [formData, setFormData] = useState({
     aid_type: '' as AidType | '',
     aid_category: '',
     description: '',
     amount: '',
     currency: 'TRY',
-    aid_date: '',
+    aid_date: new Date().toISOString().split('T')[0],
   })
 
   const columns = [
@@ -41,10 +47,41 @@ export function AidsReceivedTab({ needyPersonId, onClose }: AidsReceivedTabProps
   ]
 
   const handleAdd = () => {
-    setFormData({ aid_type: '', aid_category: '', description: '', amount: '', currency: 'TRY', aid_date: '' })
+    setFormData({ aid_type: '', aid_category: '', description: '', amount: '', currency: 'TRY', aid_date: new Date().toISOString().split('T')[0] })
     setIsAddModalOpen(true)
   }
-  const handleSave = async () => setIsAddModalOpen(false)
+
+  const handleSave = async () => {
+    try {
+      await createMutation.mutateAsync({
+        ...formData,
+        amount: formData.amount ? parseFloat(formData.amount) : null,
+        needy_person_id: needyPersonId,
+        delivery_status: 'delivered'
+      })
+      toast.success('Yardım kaydı eklendi')
+      setIsAddModalOpen(false)
+    } catch (error) {
+      toast.error('Kayıt başarısız oldu')
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Bu yardım kaydını silmek istediğinizden emin misiniz?')) {
+      try {
+        await deleteMutation.mutateAsync({ id, needyPersonId })
+        toast.success('Kayıt silindi')
+      } catch (error) {
+        toast.error('Silme işlemi başarısız oldu')
+      }
+    }
+  }
+
+  const filteredAids = aids.filter(aid => 
+    !searchValue || 
+    aid.description?.toLowerCase().includes(searchValue.toLowerCase()) ||
+    aid.aid_category?.toLowerCase().includes(searchValue.toLowerCase())
+  )
 
   // Toplam tutar hesaplama
   const totalAmount = aids.reduce((sum, aid) => sum + (aid.amount || 0), 0)
@@ -60,7 +97,8 @@ export function AidsReceivedTab({ needyPersonId, onClose }: AidsReceivedTabProps
         showAddButton={true}
         addButtonLabel="Ekle"
         onAdd={handleAdd}
-        totalRecords={aids.length}
+        totalRecords={filteredAids.length}
+        isLoading={isLoading}
       >
         {/* Özet Kartı */}
         {aids.length > 0 && (
@@ -85,17 +123,18 @@ export function AidsReceivedTab({ needyPersonId, onClose }: AidsReceivedTabProps
               <TableRow>
                 <TableHead className="w-[50px]"></TableHead>
                 {columns.map((col) => (<TableHead key={col.key} style={{ width: col.width }}>{col.label}</TableHead>))}
+                <TableHead className="w-[80px]">İşlem</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {aids.length === 0 ? (
+              {filteredAids.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={columns.length + 1} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={columns.length + 2} className="text-center py-8 text-muted-foreground">
                     Yapılan yardım kaydı bulunamadı
                   </TableCell>
                 </TableRow>
               ) : (
-                aids.map((aid) => (
+                filteredAids.map((aid) => (
                   <TableRow key={aid.id}>
                     <TableCell><Button variant="ghost" size="icon" className="h-8 w-8"><Eye className="h-4 w-4" /></Button></TableCell>
                     <TableCell>{aid.aid_date && format(new Date(aid.aid_date), 'dd.MM.yyyy', { locale: tr })}</TableCell>
@@ -112,6 +151,11 @@ export function AidsReceivedTab({ needyPersonId, onClose }: AidsReceivedTabProps
                         <Truck className="h-3 w-3" />
                         {DELIVERY_STATUS_OPTIONS.find(s => s.value === aid.delivery_status)?.label}
                       </span>
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(aid.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))

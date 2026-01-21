@@ -171,15 +171,18 @@ export function useAuth() {
         throw ErrorHandler.fromSupabaseError(error)
       }
 
-      // Create profile record
+      // Create or update profile record using upsert to prevent duplicates
       if (data.user) {
         const { error: profileError } = await supabase
           .from('profiles')
-          .insert({
+          .upsert({
             id: data.user.id,
             email: data.user.email,
             name: name || '',
-            role: 'user'
+            role: 'user',
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'id'
           })
 
         if (profileError) {

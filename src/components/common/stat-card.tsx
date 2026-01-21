@@ -33,8 +33,8 @@ export const StatCard = memo(function StatCard({
     >
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <p className="text-sm font-medium text-slate-500">{title}</p>
-          <p className="text-2xl font-bold text-slate-900">{value}</p>
+          <h3 className="text-sm font-medium text-slate-500">{title}</h3>
+          <div className="text-2xl font-bold text-slate-900">{value}</div>
           {description && (
             <p className="text-xs text-slate-400">{description}</p>
           )}
