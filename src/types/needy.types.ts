@@ -134,8 +134,9 @@ export interface NeedyPerson {
   profession?: { id: string; name: string }
 }
 
-// Banka Hesabı
-export interface BankAccount {
+// Banka Hesabı (Needy Person için)
+// Not: Genel BankAccount için @/types/finance.types kullanın
+export interface NeedyPersonBankAccount {
   id: string
   needy_person_id: string
   account_holder: string

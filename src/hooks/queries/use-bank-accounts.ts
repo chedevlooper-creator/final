@@ -2,26 +2,10 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
+import type { NeedyPersonBankAccount } from '@/types/linked-records.types'
 
-export interface BankAccount {
-  id: string
-  needy_person_id: string
-  account_holder_name: string | null
-  currency: string
-  transaction_type: string | null
-  iban: string | null
-  bank_name: string | null
-  branch_name: string | null
-  branch_code: string | null
-  account_number: string | null
-  swift_code: string | null
-  address: string | null
-  is_active: boolean
-  is_primary: boolean
-  created_at: string
-  updated_at: string
-  notes: string | null
-}
+// Use the centralized type definition
+export type BankAccount = NeedyPersonBankAccount
 
 export interface BankAccountFormValues {
   needy_person_id: string

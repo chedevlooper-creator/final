@@ -64,6 +64,8 @@ export interface NeedyPersonBasic {
 
 /**
  * Needy Person Detailed
+ * @deprecated Import from @/types/needy.types instead
+ * This interface is kept for backward compatibility but should not be used
  */
 export interface NeedyPerson extends NeedyPersonBasic {
   identity_number?: string | null
@@ -77,6 +79,10 @@ export interface NeedyPerson extends NeedyPersonBasic {
     name: string
   } | null
 }
+
+// Re-export the proper NeedyPerson type from needy.types
+// TODO: Update all imports to use @/types/needy.types directly
+export type { NeedyPerson as NeedyPersonDetailed } from '@/types/needy.types'
 
 /**
  * Donation Interface
