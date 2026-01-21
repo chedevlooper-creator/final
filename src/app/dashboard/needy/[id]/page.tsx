@@ -219,7 +219,24 @@ export default function NeedyDetailPage() {
           setSelectedTags(prev => [...prev, 'criminal_record'])
         }
 
-        // TODO: Fetch related multi-select data from junction tables
+        // Fetch related multi-select data from junction tables
+        const [diseasesRes, incomeSourcesRes] = await Promise.all([
+          supabase
+            .from('needy_diseases')
+            .select('disease_id')
+            .eq('needy_person_id', id),
+          supabase
+            .from('needy_income_sources')
+            .select('income_source_id')
+            .eq('needy_person_id', id)
+        ])
+
+        if (diseasesRes.data) {
+          setSelectedDiseases(diseasesRes.data.map(d => d.disease_id))
+        }
+        if (incomeSourcesRes.data) {
+          setSelectedIncomeSources(incomeSourcesRes.data.map(i => i.income_source_id))
+        }
 
         // Fetch lookup data
         const [countriesRes, citiesRes, categoriesRes, partnersRes] = await Promise.all([
@@ -296,6 +313,9 @@ export default function NeedyDetailPage() {
 
         if (error) throw error
 
+        // Handle junction tables for new record
+        await handleJunctionTables(data.id, supabase)
+
         toast.success('Yeni kayıt oluşturuldu.')
         router.push(`/dashboard/needy/${data.id}`)
       } else {
@@ -307,6 +327,9 @@ export default function NeedyDetailPage() {
 
         if (error) throw error
 
+        // Handle junction tables for existing record
+        await handleJunctionTables(id, supabase)
+
         toast.success('Kayıt güncellendi.')
       }
 
@@ -316,6 +339,30 @@ export default function NeedyDetailPage() {
       toast.error('Kayıt sırasında bir hata oluştu.')
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  const handleJunctionTables = async (personId: string, supabase: any) => {
+    // Sync Diseases
+    await supabase.from('needy_diseases').delete().eq('needy_person_id', personId)
+    if (selectedDiseases.length > 0) {
+      await supabase.from('needy_diseases').insert(
+        selectedDiseases.map(diseaseId => ({
+          needy_person_id: personId,
+          disease_id: diseaseId
+        }))
+      )
+    }
+
+    // Sync Income Sources
+    await supabase.from('needy_income_sources').delete().eq('needy_person_id', personId)
+    if (selectedIncomeSources.length > 0) {
+      await supabase.from('needy_income_sources').insert(
+        selectedIncomeSources.map(sourceId => ({
+          needy_person_id: personId,
+          income_source_id: sourceId
+        }))
+      )
     }
   }
 

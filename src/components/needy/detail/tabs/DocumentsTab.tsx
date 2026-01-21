@@ -25,10 +25,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog'
 import { Plus, Eye, Download, Trash2, FileText, Upload, CheckCircle2 } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import { Document, DOCUMENT_TYPE_OPTIONS, DocumentType, StatusFilter } from '@/types/linked-records.types'
+import { useLinkedRecords, useCreateLinkedRecord, useDeleteLinkedRecord } from '@/hooks/queries/use-linked-records'
+import { toast } from 'sonner'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 
@@ -38,10 +41,13 @@ interface DocumentsTabProps {
 }
 
 export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   
+  const { data: documents = [], isLoading } = useLinkedRecords<any>('needy_documents', needyPersonId)
+  const createMutation = useCreateLinkedRecord<any>('needy_documents')
+  const deleteMutation = useDeleteLinkedRecord('needy_documents')
+
   const [formData, setFormData] = useState({
     document_type: '' as DocumentType | '',
     document_name: '',
@@ -51,9 +57,6 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
     issuing_authority: '',
     notes: '',
   })
-
-  const [documents, setDocuments] = useState<Document[]>([])
-  const [isLoading, setIsLoading] = useState(false)
 
   const columns = [
     { key: 'document_type', label: 'Belge Türü', width: '150px' },
@@ -78,15 +81,34 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
   }
 
   const handleSave = async () => {
-    console.log('Saving:', formData)
-    setIsAddModalOpen(false)
+    try {
+      await createMutation.mutateAsync({
+        ...formData,
+        needy_person_id: needyPersonId
+      })
+      toast.success('Döküman eklendi')
+      setIsAddModalOpen(false)
+    } catch (error) {
+      toast.error('Döküman yüklenemedi')
+    }
   }
 
   const handleDelete = async (id: string) => {
     if (confirm('Bu dokümanı silmek istediğinizden emin misiniz?')) {
-      console.log('Deleting:', id)
+      try {
+        await deleteMutation.mutateAsync({ id, needyPersonId })
+        toast.success('Döküman silindi')
+      } catch (error) {
+        toast.error('Silme işlemi başarısız oldu')
+      }
     }
   }
+
+  const filteredDocs = documents.filter((doc: any) => 
+    !searchValue || 
+    doc.document_name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+    doc.document_number?.includes(searchValue)
+  )
 
   return (
     <>
@@ -99,9 +121,7 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
         showAddButton={true}
         addButtonLabel="Yükle"
         onAdd={handleAdd}
-        totalRecords={documents.length}
-        currentPage={1}
-        totalPages={1}
+        totalRecords={filteredDocs.length}
         isLoading={isLoading}
       >
         <div className="border rounded-lg overflow-hidden">
@@ -118,14 +138,14 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {documents.length === 0 ? (
+              {filteredDocs.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={columns.length + 2} className="text-center py-8 text-muted-foreground">
                     Kayıtlı doküman bulunamadı
                   </TableCell>
                 </TableRow>
               ) : (
-                documents.map((doc) => (
+                filteredDocs.map((doc: any) => (
                   <TableRow key={doc.id}>
                     <TableCell>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -179,6 +199,9 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Yeni Doküman Yükle</DialogTitle>
+            <DialogDescription>
+              İhtiyaç sahibine ait yeni bir dökümanı buradan sisteme yükleyebilirsiniz.
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
