@@ -62,5 +62,4 @@ nul
 scripts/create-user.js
 setup_secrets.sh
 src/instrumentation-client.ts
-src/proxy.ts
 supabase/.temp/

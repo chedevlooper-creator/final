@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifyTCKimlik } from '@/lib/mernis/client'
 import { MernisError, isValidTCKimlikFormat } from '@/lib/mernis/types'
 
-export const runtime = 'edge' // Use edge runtime for better performance
+// Removed edge runtime to enable static generation
+// export const runtime = 'edge'
 
 /**
  * POST /api/mernis/verify
