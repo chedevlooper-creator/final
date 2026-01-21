@@ -1,15 +1,15 @@
-import { create } from 'zustand'
+import { create } from "zustand";
 
 interface UIState {
-  sidebarCollapsed: boolean
-  sidebarOpen: boolean
-  activeModal: string | null
-  modalData: Record<string, unknown> | null
-  toggleSidebar: () => void
-  setSidebarCollapsed: (collapsed: boolean) => void
-  setSidebarOpen: (open: boolean) => void
-  openModal: (modalId: string, data?: Record<string, unknown>) => void
-  closeModal: () => void
+  sidebarCollapsed: boolean;
+  sidebarOpen: boolean;
+  activeModal: string | null;
+  modalData: Record<string, unknown> | null;
+  toggleSidebar: () => void;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+  setSidebarOpen: (open: boolean) => void;
+  openModal: (modalId: string, data?: Record<string, unknown>) => void;
+  closeModal: () => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -19,34 +19,41 @@ export const useUIStore = create<UIState>((set) => ({
   modalData: null,
   toggleSidebar: () => {
     set((state) => {
-      const newState = { sidebarCollapsed: !state.sidebarCollapsed }
+      const newState = { sidebarCollapsed: !state.sidebarCollapsed };
       // Save to localStorage (client-side only, async)
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         setTimeout(() => {
           try {
-            localStorage.setItem('ui-storage', JSON.stringify({ state: newState }))
+            localStorage.setItem(
+              "ui-storage",
+              JSON.stringify({ state: newState }),
+            );
           } catch {
             // Ignore errors
           }
-        }, 0)
+        }, 0);
       }
-      return newState
-    })
+      return newState;
+    });
   },
   setSidebarCollapsed: (collapsed) => {
-    set({ sidebarCollapsed: collapsed })
+    set({ sidebarCollapsed: collapsed });
     // Save to localStorage (client-side only, async)
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       setTimeout(() => {
         try {
-          localStorage.setItem('ui-storage', JSON.stringify({ state: { sidebarCollapsed: collapsed } }))
+          localStorage.setItem(
+            "ui-storage",
+            JSON.stringify({ state: { sidebarCollapsed: collapsed } }),
+          );
         } catch {
           // Ignore errors
         }
-      }, 0)
+      }, 0);
     }
   },
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
-  openModal: (modalId, data) => set({ activeModal: modalId, modalData: data || null }),
+  openModal: (modalId, data) =>
+    set({ activeModal: modalId, modalData: data || null }),
   closeModal: () => set({ activeModal: null, modalData: null }),
-}))
+}));

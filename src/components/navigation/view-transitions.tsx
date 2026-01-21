@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
+import { useEffect } from "react";
 
 /**
  * View Transitions API for smooth page transitions
@@ -11,42 +11,42 @@ export function ViewTransitions() {
   useEffect(() => {
     // Check if View Transitions API is supported
     if (!document.startViewTransition) {
-      return
+      return;
     }
 
     // Override default Next.js navigation
-    const originalPushState = history.pushState
-    const originalReplaceState = history.replaceState
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
 
     history.pushState = function (...args) {
-      originalPushState.apply(history, args)
-      
+      originalPushState.apply(history, args);
+
       if (document.startViewTransition) {
         document.startViewTransition(() => {
           // The navigation has already happened
           // This is just for the transition effect
-          return Promise.resolve()
-        })
+          return Promise.resolve();
+        });
       }
-    }
+    };
 
     history.replaceState = function (...args) {
-      originalReplaceState.apply(history, args)
-      
+      originalReplaceState.apply(history, args);
+
       if (document.startViewTransition) {
         document.startViewTransition(() => {
-          return Promise.resolve()
-        })
+          return Promise.resolve();
+        });
       }
-    }
+    };
 
     return () => {
-      history.pushState = originalPushState
-      history.replaceState = originalReplaceState
-    }
-  }, [])
+      history.pushState = originalPushState;
+      history.replaceState = originalReplaceState;
+    };
+  }, []);
 
-  return null
+  return null;
 }
 
 /**
@@ -75,15 +75,15 @@ export const viewTransitionStyles = `
     from { opacity: 0; }
     to { opacity: 1; }
   }
-`
+`;
 
 /**
  * Inject styles into head
  */
 export function injectViewTransitionStyles() {
-  if (typeof document === 'undefined') return
-  
-  const style = document.createElement('style')
-  style.textContent = viewTransitionStyles
-  document.head.appendChild(style)
+  if (typeof document === "undefined") return;
+
+  const style = document.createElement("style");
+  style.textContent = viewTransitionStyles;
+  document.head.appendChild(style);
 }

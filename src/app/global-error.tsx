@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export default function GlobalError({
   error,
   reset,
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
   return (
     <html lang="tr">
@@ -24,5 +24,5 @@ export default function GlobalError({
         </div>
       </body>
     </html>
-  )
+  );
 }

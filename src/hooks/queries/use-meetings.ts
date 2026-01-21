@@ -3,8 +3,8 @@
  * Meeting Management System - React Query Hooks
  */
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createClient } from '@/lib/supabase/client';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createClient } from "@/lib/supabase/client";
 import type {
   Meeting,
   MeetingDetail,
@@ -23,9 +23,14 @@ import type {
   UploadFileInput,
   MeetingFilters,
   TaskFilters,
-  PaginatedResponse
-} from '@/types/meeting.types';
-import { MeetingStatus, TaskStatus, ParticipantStatus, TaskPriority } from '@/types/meeting.types';
+  PaginatedResponse,
+} from "@/types/meeting.types";
+import {
+  MeetingStatus,
+  TaskStatus,
+  ParticipantStatus,
+  TaskPriority,
+} from "@/types/meeting.types";
 
 // ============================================================================
 // MEETINGS / TOPLANTILAR
@@ -37,56 +42,56 @@ import { MeetingStatus, TaskStatus, ParticipantStatus, TaskPriority } from '@/ty
  */
 export function useMeetingsList(filters?: MeetingFilters) {
   const supabase = createClient();
-  
+
   return useQuery({
-    queryKey: ['meetings', 'list', filters],
+    queryKey: ["meetings", "list", filters],
     queryFn: async () => {
       let query = supabase
-        .from('meetings')
-        .select('*', { count: 'exact' })
-        .order('meeting_date', { ascending: true });
-      
+        .from("meetings")
+        .select("*", { count: "exact" })
+        .order("meeting_date", { ascending: true });
+
       // Status filter
       if (filters?.status) {
-        query = query.eq('status', filters.status);
+        query = query.eq("status", filters.status);
       }
-      
+
       // Date range filters
       if (filters?.date_from) {
-        query = query.gte('meeting_date', filters.date_from);
+        query = query.gte("meeting_date", filters.date_from);
       }
       if (filters?.date_to) {
-        query = query.lte('meeting_date', filters.date_to);
+        query = query.lte("meeting_date", filters.date_to);
       }
-      
+
       // Upcoming meetings filter
       if (filters?.upcoming) {
-        query = query.gte('meeting_date', new Date().toISOString());
+        query = query.gte("meeting_date", new Date().toISOString());
       }
-      
+
       // Search filter
       if (filters?.search) {
-        query = query.textSearch('search_vector', filters.search);
+        query = query.textSearch("search_vector", filters.search);
       }
-      
+
       // Pagination
       const page = filters?.page || 1;
       const limit = filters?.limit || 10;
       const from = (page - 1) * limit;
       const to = from + limit - 1;
-      
+
       query = query.range(from, to);
-      
+
       const { data, error, count } = await query;
-      
+
       if (error) throw error;
-      
+
       return {
         data: data || [],
         count: count || 0,
         page,
         limit,
-        totalPages: Math.ceil((count || 0) / limit)
+        totalPages: Math.ceil((count || 0) / limit),
       } as PaginatedResponse<Meeting>;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -99,44 +104,50 @@ export function useMeetingsList(filters?: MeetingFilters) {
  */
 export function useMeetingDetail(meetingId: string) {
   const supabase = createClient();
-  
+
   return useQuery({
-    queryKey: ['meetings', 'detail', meetingId],
+    queryKey: ["meetings", "detail", meetingId],
     queryFn: async () => {
       const { data: meeting, error: meetingError } = await supabase
-        .from('meetings')
-        .select(`
+        .from("meetings")
+        .select(
+          `
           *,
           creator:auth.users(id, email, raw_user_meta_data->>full_name)
-        `)
-        .eq('id', meetingId)
+        `,
+        )
+        .eq("id", meetingId)
         .single();
-      
+
       if (meetingError) throw meetingError;
-      
+
       // Get participants
       const { data: participants } = await supabase
-        .from('meeting_participants')
-        .select(`
+        .from("meeting_participants")
+        .select(
+          `
           *,
           user:auth.users(id, email, raw_user_meta_data->>full_name, raw_user_meta_data->>avatar_url)
-        `)
-        .eq('meeting_id', meetingId);
-      
+        `,
+        )
+        .eq("meeting_id", meetingId);
+
       // Get tasks
       const { data: tasks } = await supabase
-        .from('tasks')
-        .select(`
+        .from("tasks")
+        .select(
+          `
           *,
           assignee:auth.users(id, email, raw_user_meta_data->>full_name)
-        `)
-        .eq('meeting_id', meetingId)
-        .order('priority', { ascending: false });
-      
+        `,
+        )
+        .eq("meeting_id", meetingId)
+        .order("priority", { ascending: false });
+
       return {
         ...meeting,
         participants: participants || [],
-        tasks: tasks || []
+        tasks: tasks || [],
       } as MeetingDetail;
     },
     enabled: !!meetingId,
@@ -151,46 +162,48 @@ export function useMeetingDetail(meetingId: string) {
 export function useCreateMeeting() {
   const queryClient = useQueryClient();
   const supabase = createClient();
-  
+
   return useMutation({
     mutationFn: async (input: CreateMeetingInput) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       // Create meeting
       const { data: meeting, error: meetingError } = await supabase
-        .from('meetings')
+        .from("meetings")
         .insert({
           title: input.title,
           description: input.description,
           meeting_date: input.meeting_date,
           location: input.location,
-          created_by: user.id
+          created_by: user.id,
         })
         .select()
         .single();
-      
+
       if (meetingError) throw meetingError;
-      
+
       // Add participants if provided
       if (input.participant_ids && input.participant_ids.length > 0) {
-        const participants = input.participant_ids.map(userId => ({
+        const participants = input.participant_ids.map((userId) => ({
           meeting_id: meeting.id,
           user_id: userId,
-          status: 'invited' as ParticipantStatus
+          status: "invited" as ParticipantStatus,
         }));
-        
+
         const { error: participantsError } = await supabase
-          .from('meeting_participants')
+          .from("meeting_participants")
           .insert(participants);
-        
+
         if (participantsError) throw participantsError;
       }
-      
+
       return meeting;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['meetings'] });
+      queryClient.invalidateQueries({ queryKey: ["meetings"] });
     },
   });
 }
@@ -202,22 +215,30 @@ export function useCreateMeeting() {
 export function useUpdateMeeting() {
   const queryClient = useQueryClient();
   const supabase = createClient();
-  
+
   return useMutation({
-    mutationFn: async ({ meetingId, updates }: { meetingId: string; updates: UpdateMeetingInput }) => {
+    mutationFn: async ({
+      meetingId,
+      updates,
+    }: {
+      meetingId: string;
+      updates: UpdateMeetingInput;
+    }) => {
       const { data, error } = await supabase
-        .from('meetings')
+        .from("meetings")
         .update(updates)
-        .eq('id', meetingId)
+        .eq("id", meetingId)
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
     onSuccess: (data: Meeting) => {
-      queryClient.invalidateQueries({ queryKey: ['meetings'] });
-      queryClient.invalidateQueries({ queryKey: ['meetings', 'detail', data.id] });
+      queryClient.invalidateQueries({ queryKey: ["meetings"] });
+      queryClient.invalidateQueries({
+        queryKey: ["meetings", "detail", data.id],
+      });
     },
   });
 }
@@ -229,22 +250,24 @@ export function useUpdateMeeting() {
 export function useCancelMeeting() {
   const queryClient = useQueryClient();
   const supabase = createClient();
-  
+
   return useMutation({
     mutationFn: async (meetingId: string) => {
       const { data, error } = await supabase
-        .from('meetings')
+        .from("meetings")
         .update({ status: MeetingStatus.CANCELLED })
-        .eq('id', meetingId)
+        .eq("id", meetingId)
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
     onSuccess: (data: Meeting) => {
-      queryClient.invalidateQueries({ queryKey: ['meetings'] });
-      queryClient.invalidateQueries({ queryKey: ['meetings', 'detail', data.id] });
+      queryClient.invalidateQueries({ queryKey: ["meetings"] });
+      queryClient.invalidateQueries({
+        queryKey: ["meetings", "detail", data.id],
+      });
     },
   });
 }
@@ -259,18 +282,20 @@ export function useCancelMeeting() {
  */
 export function useMeetingParticipants(meetingId: string) {
   const supabase = createClient();
-  
+
   return useQuery({
-    queryKey: ['meetings', 'participants', meetingId],
+    queryKey: ["meetings", "participants", meetingId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('meeting_participants')
-        .select(`
+        .from("meeting_participants")
+        .select(
+          `
           *,
           user:auth.users(id, email, raw_user_meta_data->>full_name, raw_user_meta_data->>avatar_url)
-        `)
-        .eq('meeting_id', meetingId);
-      
+        `,
+        )
+        .eq("meeting_id", meetingId);
+
       if (error) throw error;
       return data || [];
     },
@@ -286,13 +311,13 @@ export function useMeetingParticipants(meetingId: string) {
 export function useUpdateParticipantStatus() {
   const queryClient = useQueryClient();
   const supabase = createClient();
-  
+
   return useMutation({
     mutationFn: async ({
       meetingId,
       userId,
       status,
-      availabilityConfirmed
+      availabilityConfirmed,
     }: {
       meetingId: string;
       userId: string;
@@ -300,22 +325,35 @@ export function useUpdateParticipantStatus() {
       availabilityConfirmed?: boolean;
     }) => {
       const { data, error } = await supabase
-        .from('meeting_participants')
+        .from("meeting_participants")
         .update({
           status,
           availability_confirmed: availabilityConfirmed ?? true,
-          joined_at: status === ParticipantStatus.ATTENDED ? new Date().toISOString() : null
+          joined_at:
+            status === ParticipantStatus.ATTENDED
+              ? new Date().toISOString()
+              : null,
         })
-        .eq('meeting_id', meetingId)
-        .eq('user_id', userId)
+        .eq("meeting_id", meetingId)
+        .eq("user_id", userId)
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
-    onSuccess: (_data: MeetingParticipant, variables: { meetingId: string; userId: string; status: ParticipantStatus; availabilityConfirmed?: boolean }) => {
-      queryClient.invalidateQueries({ queryKey: ['meetings', 'participants', variables.meetingId] });
+    onSuccess: (
+      _data: MeetingParticipant,
+      variables: {
+        meetingId: string;
+        userId: string;
+        status: ParticipantStatus;
+        availabilityConfirmed?: boolean;
+      },
+    ) => {
+      queryClient.invalidateQueries({
+        queryKey: ["meetings", "participants", variables.meetingId],
+      });
     },
   });
 }
@@ -330,19 +368,21 @@ export function useUpdateParticipantStatus() {
  */
 export function useMeetingTasks(meetingId: string) {
   const supabase = createClient();
-  
+
   return useQuery({
-    queryKey: ['meetings', 'tasks', meetingId],
+    queryKey: ["meetings", "tasks", meetingId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('tasks')
-        .select(`
+        .from("tasks")
+        .select(
+          `
           *,
           assignee:auth.users(id, email, raw_user_meta_data->>full_name)
-        `)
-        .eq('meeting_id', meetingId)
-        .order('priority', { ascending: false });
-      
+        `,
+        )
+        .eq("meeting_id", meetingId)
+        .order("priority", { ascending: false });
+
       if (error) throw error;
       return data || [];
     },
@@ -357,44 +397,50 @@ export function useMeetingTasks(meetingId: string) {
  */
 export function useMyTasks(filters?: TaskFilters) {
   const supabase = createClient();
-  
+
   return useQuery({
-    queryKey: ['tasks', 'my', filters],
+    queryKey: ["tasks", "my", filters],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       let query = supabase
-        .from('tasks')
-        .select(`
+        .from("tasks")
+        .select(
+          `
           *,
           meeting:meetings(id, title, meeting_date, status),
           assignee:auth.users(id, email, raw_user_meta_data->>full_name)
-        `)
-        .eq('assigned_to', user.id);
-      
+        `,
+        )
+        .eq("assigned_to", user.id);
+
       // Status filter
       if (filters?.status) {
-        query = query.eq('status', filters.status);
+        query = query.eq("status", filters.status);
       }
-      
+
       // Priority filter
       if (filters?.priority) {
-        query = query.eq('priority', filters.priority);
+        query = query.eq("priority", filters.priority);
       }
-      
+
       // Meeting filter
       if (filters?.meeting_id) {
-        query = query.eq('meeting_id', filters.meeting_id);
+        query = query.eq("meeting_id", filters.meeting_id);
       }
-      
+
       // Overdue filter
       if (filters?.overdue) {
-        query = query.lt('due_date', new Date().toISOString().split('T')[0]);
+        query = query.lt("due_date", new Date().toISOString().split("T")[0]);
       }
-      
-      const { data, error } = await query.order('due_date', { ascending: true });
-      
+
+      const { data, error } = await query.order("due_date", {
+        ascending: true,
+      });
+
       if (error) throw error;
       return data || [];
     },
@@ -409,11 +455,11 @@ export function useMyTasks(filters?: TaskFilters) {
 export function useCreateTask() {
   const queryClient = useQueryClient();
   const supabase = createClient();
-  
+
   return useMutation({
     mutationFn: async (input: CreateTaskInput) => {
       const { data, error } = await supabase
-        .from('tasks')
+        .from("tasks")
         .insert({
           meeting_id: input.meeting_id,
           assigned_to: input.assigned_to,
@@ -421,32 +467,34 @@ export function useCreateTask() {
           description: input.description,
           category: input.category,
           priority: input.priority,
-          due_date: input.due_date
+          due_date: input.due_date,
         })
-        .select(`
+        .select(
+          `
           *,
           assignee:auth.users(id, email, raw_user_meta_data->>full_name)
-        `)
+        `,
+        )
         .single();
-      
+
       if (error) throw error;
-      
+
       // Create notification for task assignment
-      await supabase
-        .from('notifications')
-        .insert({
-          user_id: input.assigned_to,
-          type: 'task_assigned',
-          title: 'Yeni Görev',
-          message: `"${input.title}" göreviniz atanmıştır`,
-          read: false
-        });
-      
+      await supabase.from("notifications").insert({
+        user_id: input.assigned_to,
+        type: "task_assigned",
+        title: "Yeni Görev",
+        message: `"${input.title}" göreviniz atanmıştır`,
+        read: false,
+      });
+
       return data;
     },
     onSuccess: (data: Task) => {
-      queryClient.invalidateQueries({ queryKey: ['meetings', 'tasks', data.meeting_id] });
-      queryClient.invalidateQueries({ queryKey: ['tasks', 'my'] });
+      queryClient.invalidateQueries({
+        queryKey: ["meetings", "tasks", data.meeting_id],
+      });
+      queryClient.invalidateQueries({ queryKey: ["tasks", "my"] });
     },
   });
 }
@@ -458,22 +506,30 @@ export function useCreateTask() {
 export function useUpdateTask() {
   const queryClient = useQueryClient();
   const supabase = createClient();
-  
+
   return useMutation({
-    mutationFn: async ({ taskId, updates }: { taskId: string; updates: UpdateTaskInput }) => {
+    mutationFn: async ({
+      taskId,
+      updates,
+    }: {
+      taskId: string;
+      updates: UpdateTaskInput;
+    }) => {
       const { data, error } = await supabase
-        .from('tasks')
+        .from("tasks")
         .update(updates)
-        .eq('id', taskId)
+        .eq("id", taskId)
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
     onSuccess: (data: Task) => {
-      queryClient.invalidateQueries({ queryKey: ['meetings', 'tasks', data.meeting_id] });
-      queryClient.invalidateQueries({ queryKey: ['tasks', 'my'] });
+      queryClient.invalidateQueries({
+        queryKey: ["meetings", "tasks", data.meeting_id],
+      });
+      queryClient.invalidateQueries({ queryKey: ["tasks", "my"] });
     },
   });
 }
@@ -485,50 +541,56 @@ export function useUpdateTask() {
 export function useUpdateTaskStatus() {
   const queryClient = useQueryClient();
   const supabase = createClient();
-  
+
   return useMutation({
-    mutationFn: async ({ taskId, status }: { taskId: string; status: TaskStatus }) => {
+    mutationFn: async ({
+      taskId,
+      status,
+    }: {
+      taskId: string;
+      status: TaskStatus;
+    }) => {
       // First, get task details for notification
       const { data: task } = await supabase
-        .from('tasks')
-        .select('*, meeting:meetings(created_by)')
-        .eq('id', taskId)
+        .from("tasks")
+        .select("*, meeting:meetings(created_by)")
+        .eq("id", taskId)
         .single();
-      
-      if (!task) throw new Error('Task not found');
-      
+
+      if (!task) throw new Error("Task not found");
+
       const updates: any = { status };
       if (status === TaskStatus.COMPLETED) {
         updates.completed_at = new Date().toISOString();
       }
-      
+
       const { data, error } = await supabase
-        .from('tasks')
+        .from("tasks")
         .update(updates)
-        .eq('id', taskId)
+        .eq("id", taskId)
         .select()
         .single();
-      
+
       if (error) throw error;
-      
+
       // Create notification for meeting creator if task is completed
       if (status === TaskStatus.COMPLETED && task.meeting?.created_by) {
-        await supabase
-          .from('notifications')
-          .insert({
-            user_id: task.meeting.created_by,
-            type: 'task_completed',
-            title: 'Görev Tamamlandı',
-            message: `"${task.title}" görevi tamamlandı`,
-            read: false
-          });
+        await supabase.from("notifications").insert({
+          user_id: task.meeting.created_by,
+          type: "task_completed",
+          title: "Görev Tamamlandı",
+          message: `"${task.title}" görevi tamamlandı`,
+          read: false,
+        });
       }
-      
+
       return data;
     },
     onSuccess: (data: Task) => {
-      queryClient.invalidateQueries({ queryKey: ['meetings', 'tasks', data.meeting_id] });
-      queryClient.invalidateQueries({ queryKey: ['tasks', 'my'] });
+      queryClient.invalidateQueries({
+        queryKey: ["meetings", "tasks", data.meeting_id],
+      });
+      queryClient.invalidateQueries({ queryKey: ["tasks", "my"] });
     },
   });
 }
@@ -543,13 +605,14 @@ export function useUpdateTaskStatus() {
  */
 export function useMeetingStatistics(meetingId: string) {
   const supabase = createClient();
-  
+
   return useQuery({
-    queryKey: ['meetings', 'stats', meetingId],
+    queryKey: ["meetings", "stats", meetingId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .rpc('get_meeting_stats', { p_meeting_id: meetingId });
-      
+      const { data, error } = await supabase.rpc("get_meeting_stats", {
+        p_meeting_id: meetingId,
+      });
+
       if (error) throw error;
       return data;
     },
@@ -568,16 +631,19 @@ export function useMeetingStatistics(meetingId: string) {
  */
 export function useAvailableMeetings() {
   const supabase = createClient();
-  
+
   return useQuery({
-    queryKey: ['meetings', 'available'],
+    queryKey: ["meetings", "available"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return [];
-      
-      const { data, error } = await supabase
-        .rpc('get_available_meetings', { p_user_id: user.id });
-      
+
+      const { data, error } = await supabase.rpc("get_available_meetings", {
+        p_user_id: user.id,
+      });
+
       if (error) throw error;
       return data || [];
     },
@@ -596,22 +662,24 @@ export function useAvailableMeetings() {
  */
 export function useUsersList() {
   const supabase = createClient();
-  
+
   return useQuery({
-    queryKey: ['users', 'list'],
+    queryKey: ["users", "list"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('users')
-        .select('id, email, raw_user_meta_data->>full_name, raw_user_meta_data->>avatar_url')
-        .order('email');
-      
+        .from("users")
+        .select(
+          "id, email, raw_user_meta_data->>full_name, raw_user_meta_data->>avatar_url",
+        )
+        .order("email");
+
       if (error) throw error;
-      
+
       return (data || []).map((user: any) => ({
         id: user.id,
         email: user.email,
         name: user.full_name || user.email,
-        avatar: user.avatar_url
+        avatar: user.avatar_url,
       }));
     },
     staleTime: 10 * 60 * 1000, // 10 minutes - user list doesn't change often
@@ -633,45 +701,51 @@ export function useMyTasksAdvanced(filters?: {
   overdue?: boolean;
 }) {
   const supabase = createClient();
-  
+
   return useQuery({
-    queryKey: ['tasks', 'my-advanced', filters],
+    queryKey: ["tasks", "my-advanced", filters],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       let query = supabase
-        .from('tasks')
-        .select(`
+        .from("tasks")
+        .select(
+          `
           *,
           meeting:meetings(id, title, meeting_date, location, status),
           creator:meetings!inner(created_by)
-        `)
-        .eq('assigned_to', user.id);
-      
+        `,
+        )
+        .eq("assigned_to", user.id);
+
       // Status filter
       if (filters?.status) {
-        query = query.eq('status', filters.status);
+        query = query.eq("status", filters.status);
       }
-      
+
       // Priority filter
       if (filters?.priority) {
-        query = query.eq('priority', filters.priority);
+        query = query.eq("priority", filters.priority);
       }
-      
+
       // Overdue filter
       if (filters?.overdue) {
-        query = query.lt('due_date', new Date().toISOString().split('T')[0]);
-        query = query.not('status', 'eq', 'completed');
+        query = query.lt("due_date", new Date().toISOString().split("T")[0]);
+        query = query.not("status", "eq", "completed");
       }
-      
+
       // Search filter
       if (filters?.search) {
-        query = query.ilike('title', `%${filters.search}%`);
+        query = query.ilike("title", `%${filters.search}%`);
       }
-      
-      const { data, error } = await query.order('due_date', { ascending: true });
-      
+
+      const { data, error } = await query.order("due_date", {
+        ascending: true,
+      });
+
       if (error) throw error;
       return data || [];
     },
@@ -688,19 +762,21 @@ export function useMyTasksAdvanced(filters?: {
  */
 export function useMeetingNotes(meetingId: string) {
   const supabase = createClient();
-  
+
   return useQuery({
-    queryKey: ['meetings', 'notes', meetingId],
+    queryKey: ["meetings", "notes", meetingId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('meeting_notes')
-        .select(`
+        .from("meeting_notes")
+        .select(
+          `
           *,
           user:auth.users(id, email, raw_user_meta_data->>full_name, raw_user_meta_data->>avatar_url)
-        `)
-        .eq('meeting_id', meetingId)
-        .order('created_at', { ascending: false });
-      
+        `,
+        )
+        .eq("meeting_id", meetingId)
+        .order("created_at", { ascending: false });
+
       if (error) throw error;
       return data || [];
     },
@@ -715,14 +791,16 @@ export function useMeetingNotes(meetingId: string) {
 export function useCreateNote() {
   const queryClient = useQueryClient();
   const supabase = createClient();
-  
+
   return useMutation({
     mutationFn: async (input: CreateNoteInput) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       const { data, error } = await supabase
-        .from('meeting_notes')
+        .from("meeting_notes")
         .insert({
           meeting_id: input.meeting_id,
           user_id: user.id,
@@ -731,12 +809,14 @@ export function useCreateNote() {
         })
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
     onSuccess: (data: MeetingNote) => {
-      queryClient.invalidateQueries({ queryKey: ['meetings', 'notes', data.meeting_id] });
+      queryClient.invalidateQueries({
+        queryKey: ["meetings", "notes", data.meeting_id],
+      });
     },
   });
 }
@@ -746,13 +826,14 @@ export function useCreateNote() {
  */
 export function useMeetingVotes(meetingId: string) {
   const supabase = createClient();
-  
+
   return useQuery({
-    queryKey: ['meetings', 'votes', meetingId],
+    queryKey: ["meetings", "votes", meetingId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('meeting_votes')
-        .select(`
+        .from("meeting_votes")
+        .select(
+          `
           *,
           creator:auth.users(id, email, raw_user_meta_data->>full_name),
           responses:vote_responses(
@@ -762,10 +843,11 @@ export function useMeetingVotes(meetingId: string) {
             created_at,
             user:auth.users(id, email, raw_user_meta_data->>full_name)
           )
-        `)
-        .eq('meeting_id', meetingId)
-        .order('created_at', { ascending: false });
-      
+        `,
+        )
+        .eq("meeting_id", meetingId)
+        .order("created_at", { ascending: false });
+
       if (error) throw error;
       return data || [];
     },
@@ -780,14 +862,16 @@ export function useMeetingVotes(meetingId: string) {
 export function useCreateVote() {
   const queryClient = useQueryClient();
   const supabase = createClient();
-  
+
   return useMutation({
     mutationFn: async (input: CreateVoteInput) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       const { data, error } = await supabase
-        .from('meeting_votes')
+        .from("meeting_votes")
         .insert({
           meeting_id: input.meeting_id,
           title: input.title,
@@ -798,35 +882,37 @@ export function useCreateVote() {
         })
         .select()
         .single();
-      
+
       if (error) throw error;
-      
+
       // Notify participants
       const { data: participants } = await supabase
-        .from('meeting_participants')
-        .select('user_id')
-        .eq('meeting_id', input.meeting_id);
-      
+        .from("meeting_participants")
+        .select("user_id")
+        .eq("meeting_id", input.meeting_id);
+
       if (participants) {
         const notifications = participants
-        .filter((p: { user_id: string }) => p.user_id !== user.id)
+          .filter((p: { user_id: string }) => p.user_id !== user.id)
           .map((p: { user_id: string }) => ({
             user_id: p.user_id,
-            type: 'vote_created',
-            title: 'Yeni Oylama',
+            type: "vote_created",
+            title: "Yeni Oylama",
             message: `"${input.title}" başlıklı oylama başlatıldı.`,
             read: false,
           }));
-        
+
         if (notifications.length > 0) {
-          await supabase.from('notifications').insert(notifications);
+          await supabase.from("notifications").insert(notifications);
         }
       }
-      
+
       return data;
     },
     onSuccess: (data: MeetingVote) => {
-      queryClient.invalidateQueries({ queryKey: ['meetings', 'votes', data.meeting_id] });
+      queryClient.invalidateQueries({
+        queryKey: ["meetings", "votes", data.meeting_id],
+      });
     },
   });
 }
@@ -837,14 +923,22 @@ export function useCreateVote() {
 export function useSubmitVote() {
   const queryClient = useQueryClient();
   const supabase = createClient();
-  
+
   return useMutation({
-    mutationFn: async ({ voteId, response }: { voteId: string; response: any }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-      
+    mutationFn: async ({
+      voteId,
+      response,
+    }: {
+      voteId: string;
+      response: any;
+    }) => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       const { data, error } = await supabase
-        .from('vote_responses')
+        .from("vote_responses")
         .insert({
           vote_id: voteId,
           user_id: user.id,
@@ -852,12 +946,12 @@ export function useSubmitVote() {
         })
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
     onSuccess: (data: VoteResponse) => {
-      queryClient.invalidateQueries({ queryKey: ['meetings', 'votes'] });
+      queryClient.invalidateQueries({ queryKey: ["meetings", "votes"] });
     },
   });
 }
@@ -868,31 +962,33 @@ export function useSubmitVote() {
 export function useUploadFile() {
   const queryClient = useQueryClient();
   const supabase = createClient();
-  
+
   return useMutation({
     mutationFn: async ({ meetingId, file }: UploadFileInput) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       // Upload to Storage
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name.split(".").pop();
       const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `meetings/${meetingId}/${fileName}`;
-      
+
       const { error: uploadError } = await supabase.storage
-        .from('meeting-files')
+        .from("meeting-files")
         .upload(filePath, file);
-      
+
       if (uploadError) throw uploadError;
-      
+
       // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('meeting-files')
-        .getPublicUrl(filePath);
-      
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("meeting-files").getPublicUrl(filePath);
+
       // Save to database
       const { data, error } = await supabase
-        .from('meeting_files')
+        .from("meeting_files")
         .insert({
           meeting_id: meetingId,
           file_name: file.name,
@@ -903,12 +999,14 @@ export function useUploadFile() {
         })
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
     onSuccess: (data: MeetingFile) => {
-      queryClient.invalidateQueries({ queryKey: ['meetings', 'files', data.meeting_id] });
+      queryClient.invalidateQueries({
+        queryKey: ["meetings", "files", data.meeting_id],
+      });
     },
   });
 }
@@ -918,19 +1016,21 @@ export function useUploadFile() {
  */
 export function useMeetingFiles(meetingId: string) {
   const supabase = createClient();
-  
+
   return useQuery({
-    queryKey: ['meetings', 'files', meetingId],
+    queryKey: ["meetings", "files", meetingId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('meeting_files')
-        .select(`
+        .from("meeting_files")
+        .select(
+          `
           *,
           uploader:auth.users(id, email, raw_user_meta_data->>full_name)
-        `)
-        .eq('meeting_id', meetingId)
-        .order('created_at', { ascending: false });
-      
+        `,
+        )
+        .eq("meeting_id", meetingId)
+        .order("created_at", { ascending: false });
+
       if (error) throw error;
       return data || [];
     },
