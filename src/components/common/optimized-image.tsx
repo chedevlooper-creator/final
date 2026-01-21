@@ -1,25 +1,25 @@
 /**
  * Optimized Image Component
- * 
+ *
  * This component wraps Next.js Image with additional optimizations
  * including lazy loading, blur placeholder, and proper sizing
  */
 
-'use client'
+"use client";
 
-import Image from 'next/image'
-import { useState } from 'react'
+import Image from "next/image";
+import { useState } from "react";
 
 interface OptimizedImageProps {
-  src: string
-  alt: string
-  width?: number
-  height?: number
-  className?: string
-  priority?: boolean
-  fill?: boolean
-  sizes?: string
-  quality?: number
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  className?: string;
+  priority?: boolean;
+  fill?: boolean;
+  sizes?: string;
+  quality?: number;
 }
 
 export function OptimizedImage({
@@ -30,11 +30,11 @@ export function OptimizedImage({
   className,
   priority = false,
   fill = false,
-  sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
+  sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
   quality = 75,
 }: OptimizedImageProps) {
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(false)
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   if (error) {
     return (
@@ -44,11 +44,13 @@ export function OptimizedImage({
       >
         <span className="text-slate-400 text-sm">Yüklenemedi</span>
       </div>
-    )
+    );
   }
 
   return (
-    <div className={`relative overflow-hidden ${isLoading ? 'animate-pulse bg-slate-100' : ''} ${className}`}>
+    <div
+      className={`relative overflow-hidden ${isLoading ? "animate-pulse bg-slate-100" : ""} ${className}`}
+    >
       <Image
         src={src}
         alt={alt}
@@ -58,13 +60,13 @@ export function OptimizedImage({
         sizes={sizes}
         quality={quality}
         priority={priority}
-        loading={priority ? 'eager' : 'lazy'}
-        className={`transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+        loading={priority ? "eager" : "lazy"}
+        className={`transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"}`}
         onLoad={() => setIsLoading(false)}
         onError={() => setError(true)}
       />
     </div>
-  )
+  );
 }
 
 /**
@@ -77,10 +79,10 @@ export function ProfilePicture({
   size = 40,
   className,
 }: {
-  src: string
-  alt: string
-  size?: number
-  className?: string
+  src: string;
+  alt: string;
+  size?: number;
+  className?: string;
 }) {
   return (
     <OptimizedImage
@@ -92,7 +94,7 @@ export function ProfilePicture({
       sizes={`${size}px`}
       quality={90}
     />
-  )
+  );
 }
 
 /**
@@ -106,11 +108,11 @@ export function Logo({
   height = 40,
   className,
 }: {
-  src: string
-  alt: string
-  width?: number
-  height?: number
-  className?: string
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  className?: string;
 }) {
   return (
     <OptimizedImage
@@ -122,5 +124,5 @@ export function Logo({
       priority={true} // Logos should load immediately
       quality={95}
     />
-  )
+  );
 }

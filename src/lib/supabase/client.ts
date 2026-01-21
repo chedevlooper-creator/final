@@ -1,9 +1,9 @@
-import { createBrowserClient } from '@supabase/ssr'
-import { env } from '@/lib/env'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createBrowserClient } from "@supabase/ssr";
+import { env } from "@/lib/env";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 // Singleton pattern for browser client
-let browserClient: ReturnType<typeof createBrowserClient> | null = null
+let browserClient: ReturnType<typeof createBrowserClient> | null = null;
 
 /**
  * Optimized browser client with singleton pattern
@@ -11,15 +11,15 @@ let browserClient: ReturnType<typeof createBrowserClient> | null = null
  */
 export function createClient() {
   if (browserClient) {
-    return browserClient
+    return browserClient;
   }
 
   // Only create client on client-side
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return createBrowserClient(
       env.NEXT_PUBLIC_SUPABASE_URL,
-      env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    )
+      env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    );
   }
 
   browserClient = createBrowserClient(
@@ -31,10 +31,10 @@ export function createClient() {
         autoRefreshToken: true,
         detectSessionInUrl: true,
       },
-    }
-  )
+    },
+  );
 
-  return browserClient
+  return browserClient;
 }
 
 /**
@@ -42,8 +42,8 @@ export function createClient() {
  * Use only in server-side contexts!
  */
 export function createAdminClient() {
-  if (typeof window !== 'undefined') {
-    throw new Error('Admin client should only be used on server side')
+  if (typeof window !== "undefined") {
+    throw new Error("Admin client should only be used on server side");
   }
 
   return createSupabaseClient(
@@ -54,16 +54,16 @@ export function createAdminClient() {
         autoRefreshToken: false,
         persistSession: false,
       },
-    }
-  )
+    },
+  );
 }
 
 /**
  * Reset client (useful for logout)
  */
 export function resetClient() {
-  browserClient = null
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('supabase.auth.token')
+  browserClient = null;
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("supabase.auth.token");
   }
 }

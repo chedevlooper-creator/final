@@ -1,13 +1,19 @@
-'use client'
+"use client";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
-import { PageHeader } from '@/components/common/page-header'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Users } from 'lucide-react'
+import { PageHeader } from "@/components/common/page-header";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Users } from "lucide-react";
 
 export default function AccountPage() {
   return (
@@ -48,12 +54,18 @@ export default function AccountPage() {
         <Card>
           <CardHeader>
             <CardTitle>Şifre Değiştir</CardTitle>
-            <CardDescription>Hesap güvenliğiniz için şifrenizi güncelleyin</CardDescription>
+            <CardDescription>
+              Hesap güvenliğiniz için şifrenizi güncelleyin
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="current-password">Mevcut Şifre</Label>
-              <Input id="current-password" type="password" placeholder="••••••••" />
+              <Input
+                id="current-password"
+                type="password"
+                placeholder="••••••••"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="new-password">Yeni Şifre</Label>
@@ -61,7 +73,11 @@ export default function AccountPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm-password">Yeni Şifre (Tekrar)</Label>
-              <Input id="confirm-password" type="password" placeholder="••••••••" />
+              <Input
+                id="confirm-password"
+                type="password"
+                placeholder="••••••••"
+              />
             </div>
             <Button className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600">
               Şifreyi Değiştir
@@ -70,5 +86,5 @@ export default function AccountPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

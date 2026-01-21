@@ -1,35 +1,35 @@
-'use client'
+"use client";
 
-import { Control } from 'react-hook-form'
-import Link from 'next/link'
+import { Control } from "react-hook-form";
+import Link from "next/link";
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { FileText } from 'lucide-react'
-import { CATEGORIES, FUND_REGIONS } from '@/types/needy.types'
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FileText } from "lucide-react";
+import { CATEGORIES, FUND_REGIONS } from "@/types/needy.types";
 
 interface FileInfoSectionProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  control: Control<any>
-  partners?: { id: string; name: string }[]
-  categories?: { id: string; name: string }[]
-  linkedOrphanId?: string
-  linkedCardId?: string
+  control: Control<any>;
+  partners?: { id: string; name: string }[];
+  categories?: { id: string; name: string }[];
+  linkedOrphanId?: string;
+  linkedCardId?: string;
 }
 
 export function FileInfoSection({
@@ -56,7 +56,12 @@ export function FileInfoSection({
               <FormItem>
                 <FormLabel>Dosya No</FormLabel>
                 <FormControl>
-                  <Input {...field} value={field.value || ''} placeholder="Otomatik atanır" disabled />
+                  <Input
+                    {...field}
+                    value={field.value || ""}
+                    placeholder="Otomatik atanır"
+                    disabled
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -68,7 +73,10 @@ export function FileInfoSection({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Kategori</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value || ''}>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ""}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Kategori seçin" />
@@ -97,7 +105,10 @@ export function FileInfoSection({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Partner</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value || ''}>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ""}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Partner seçin" />
@@ -121,7 +132,10 @@ export function FileInfoSection({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Fon</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value || ''}>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ""}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Fon seçin" />
@@ -147,14 +161,18 @@ export function FileInfoSection({
           <div className="space-y-2">
             <Label>Bağlı Yetim</Label>
             <div className="flex items-center gap-2">
-              <Input 
-                value={linkedOrphanId ? `Yetim #${linkedOrphanId.slice(0, 8)}` : '-'} 
-                disabled 
+              <Input
+                value={
+                  linkedOrphanId ? `Yetim #${linkedOrphanId.slice(0, 8)}` : "-"
+                }
+                disabled
                 className="bg-muted"
               />
               {linkedOrphanId && (
                 <Link href={`/orphans/${linkedOrphanId}`}>
-                  <Button variant="outline" size="sm">Görüntüle</Button>
+                  <Button variant="outline" size="sm">
+                    Görüntüle
+                  </Button>
                 </Link>
               )}
             </div>
@@ -164,14 +182,16 @@ export function FileInfoSection({
           <div className="space-y-2">
             <Label>Bağlı Kart</Label>
             <div className="flex items-center gap-2">
-              <Input 
-                value={linkedCardId ? `Kart #${linkedCardId.slice(0, 8)}` : '-'} 
-                disabled 
+              <Input
+                value={linkedCardId ? `Kart #${linkedCardId.slice(0, 8)}` : "-"}
+                disabled
                 className="bg-muted"
               />
               {linkedCardId && (
                 <Link href={`/needy/${linkedCardId}`}>
-                  <Button variant="outline" size="sm">Görüntüle</Button>
+                  <Button variant="outline" size="sm">
+                    Görüntüle
+                  </Button>
                 </Link>
               )}
             </div>
@@ -179,5 +199,5 @@ export function FileInfoSection({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
