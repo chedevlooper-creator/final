@@ -232,10 +232,10 @@ export default function NeedyDetailPage() {
         ])
 
         if (diseasesRes.data) {
-          setSelectedDiseases(diseasesRes.data.map(d => d.disease_id))
+          setSelectedDiseases(diseasesRes.data.map((d: { disease_id: string }) => d.disease_id))
         }
         if (incomeSourcesRes.data) {
-          setSelectedIncomeSources(incomeSourcesRes.data.map(i => i.income_source_id))
+          setSelectedIncomeSources(incomeSourcesRes.data.map((i: { income_source_id: string }) => i.income_source_id))
         }
 
         // Fetch lookup data
