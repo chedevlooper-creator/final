@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Search, LogOut, User, Menu } from 'lucide-react'
-import { useAuth } from '@/hooks/use-auth'
-import { useUIStore } from '@/stores/ui-store'
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search, LogOut, User, Menu } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { useUIStore } from "@/stores/ui-store";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,38 +12,36 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { cn } from '@/lib/utils'
-import { NotificationDropdown } from '@/components/layout/notification-dropdown'
-import { useEffect, useState } from 'react'
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import { NotificationDropdown } from "@/components/layout/notification-dropdown";
+import { useEffect, useState } from "react";
 
 export function Header() {
-  const { user, signOut } = useAuth()
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  
+  const { user, signOut } = useAuth();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
   // Client-side hydration
   useEffect(() => {
-    setMounted(true)
-    const store = useUIStore.getState()
-    setSidebarCollapsed(store.sidebarCollapsed)
-    
+    setMounted(true);
+    const store = useUIStore.getState();
+    setSidebarCollapsed(store.sidebarCollapsed);
+
     // Subscribe to store changes
     const unsubscribe = useUIStore.subscribe((state) => {
-      setSidebarCollapsed(state.sidebarCollapsed)
-    })
-    
-    return unsubscribe
-  }, [])
-  
-  const toggleSidebar = () => {
-    useUIStore.getState().toggleSidebar()
-  }
+      setSidebarCollapsed(state.sidebarCollapsed);
+    });
 
-  const initials = user?.email
-    ? user.email.slice(0, 2).toUpperCase()
-    : 'U'
+    return unsubscribe;
+  }, []);
+
+  const toggleSidebar = () => {
+    useUIStore.getState().toggleSidebar();
+  };
+
+  const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "U";
 
   if (!mounted) {
     return (
@@ -59,15 +57,15 @@ export function Header() {
           </div>
         </div>
       </header>
-    )
+    );
   }
 
   return (
     <header
       className={cn(
-        'fixed top-0 z-30 flex h-16 items-center justify-between border-b bg-white/80 backdrop-blur-sm px-4 transition-all duration-300',
-        sidebarCollapsed ? 'left-16' : 'left-64',
-        'right-0'
+        "fixed top-0 z-30 flex h-16 items-center justify-between border-b bg-white/80 backdrop-blur-sm px-4 transition-all duration-300",
+        sidebarCollapsed ? "left-16" : "left-64",
+        "right-0",
       )}
     >
       <div className="flex items-center gap-4">
@@ -104,14 +102,16 @@ export function Header() {
                 </AvatarFallback>
               </Avatar>
               <span className="hidden md:inline text-sm font-medium text-slate-700">
-                {user?.email?.split('@')[0]}
+                {user?.email?.split("@")[0]}
               </span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">{user?.email?.split('@')[0]}</p>
+                <p className="text-sm font-medium">
+                  {user?.email?.split("@")[0]}
+                </p>
                 <p className="text-xs text-slate-500">{user?.email}</p>
               </div>
             </DropdownMenuLabel>
@@ -129,5 +129,5 @@ export function Header() {
         </DropdownMenu>
       </div>
     </header>
-  )
+  );
 }

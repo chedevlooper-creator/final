@@ -1,10 +1,10 @@
 /**
  * Mernis API Client
  * TC Kimlik Doğrulama servisi
- * 
+ *
  * Bu client, Nüfus ve Vatandaşlık İşleri Genel Müdürlüğü'nün
  * TC Kimlik Doğrulama web servisini kullanır.
- * 
+ *
  * Servis URL: https://tckimlik.nvi.gov.tr/Service/KPSPublic.asmx
  */
 
@@ -15,16 +15,16 @@ import {
   isValidTCKimlikFormat,
   sanitizeName,
   isValidBirthYear,
-} from './types'
+} from "./types";
 
-const MERNIS_WSDL_URL = 'https://tckimlik.nvi.gov.tr/Service/KPSPublic.asmx'
+const MERNIS_WSDL_URL = "https://tckimlik.nvi.gov.tr/Service/KPSPublic.asmx";
 
 /**
  * SOAP envelope template for TC Kimlik verification
  */
 function createSoapEnvelope(request: MernisVerifyRequest): string {
-  const { tcKimlikNo, ad, soyad, dogumYili } = request
-  
+  const { tcKimlikNo, ad, soyad, dogumYili } = request;
+
   return `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
                xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
@@ -37,7 +37,7 @@ function createSoapEnvelope(request: MernisVerifyRequest): string {
       <DogumYili>${dogumYili}</DogumYili>
     </TCKimlikNoDogrula>
   </soap:Body>
-</soap:Envelope>`
+</soap:Envelope>`;
 }
 
 /**
@@ -45,11 +45,13 @@ function createSoapEnvelope(request: MernisVerifyRequest): string {
  */
 function parseSoapResponse(xml: string): boolean {
   // Extract the result from SOAP response
-  const match = xml.match(/<TCKimlikNoDogrulaResult>(.*?)<\/TCKimlikNoDogrulaResult>/i)
+  const match = xml.match(
+    /<TCKimlikNoDogrulaResult>(.*?)<\/TCKimlikNoDogrulaResult>/i,
+  );
   if (match && match[1]) {
-    return match[1].toLowerCase() === 'true'
+    return match[1].toLowerCase() === "true";
   }
-  return false
+  return false;
 }
 
 /**
@@ -59,37 +61,33 @@ function validateInput(request: MernisVerifyRequest): void {
   // TC Kimlik numarası kontrolü
   if (!isValidTCKimlikFormat(request.tcKimlikNo)) {
     throw new MernisError(
-      'Geçersiz TC Kimlik numarası formatı',
-      'INVALID_TC_NUMBER',
-      400
-    )
+      "Geçersiz TC Kimlik numarası formatı",
+      "INVALID_TC_NUMBER",
+      400,
+    );
   }
-  
+
   // İsim kontrolü
   if (!request.ad || request.ad.trim().length < 2) {
     throw new MernisError(
-      'İsim en az 2 karakter olmalıdır',
-      'INVALID_NAME',
-      400
-    )
+      "İsim en az 2 karakter olmalıdır",
+      "INVALID_NAME",
+      400,
+    );
   }
-  
+
   // Soyisim kontrolü
   if (!request.soyad || request.soyad.trim().length < 2) {
     throw new MernisError(
-      'Soyisim en az 2 karakter olmalıdır',
-      'INVALID_SURNAME',
-      400
-    )
+      "Soyisim en az 2 karakter olmalıdır",
+      "INVALID_SURNAME",
+      400,
+    );
   }
-  
+
   // Doğum yılı kontrolü
   if (!isValidBirthYear(request.dogumYili)) {
-    throw new MernisError(
-      'Geçersiz doğum yılı',
-      'INVALID_BIRTH_YEAR',
-      400
-    )
+    throw new MernisError("Geçersiz doğum yılı", "INVALID_BIRTH_YEAR", 400);
   }
 }
 
@@ -97,42 +95,42 @@ function validateInput(request: MernisVerifyRequest): void {
  * TC Kimlik numarası doğrulama
  */
 export async function verifyTCKimlik(
-  request: MernisVerifyRequest
+  request: MernisVerifyRequest,
 ): Promise<MernisVerifyResponse> {
   try {
     // Input validation
-    validateInput(request)
-    
-    const soapEnvelope = createSoapEnvelope(request)
-    
+    validateInput(request);
+
+    const soapEnvelope = createSoapEnvelope(request);
+
     const response = await fetch(MERNIS_WSDL_URL, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'text/xml; charset=utf-8',
-        'SOAPAction': 'http://tckimlik.nvi.gov.tr/WS/TCKimlikNoDogrula',
+        "Content-Type": "text/xml; charset=utf-8",
+        SOAPAction: "http://tckimlik.nvi.gov.tr/WS/TCKimlikNoDogrula",
       },
       body: soapEnvelope,
-    })
-    
+    });
+
     if (!response.ok) {
       throw new MernisError(
-        'Mernis servisi yanıt vermedi',
-        'SERVICE_ERROR',
-        response.status
-      )
+        "Mernis servisi yanıt vermedi",
+        "SERVICE_ERROR",
+        response.status,
+      );
     }
-    
-    const xml = await response.text()
-    const verified = parseSoapResponse(xml)
-    
+
+    const xml = await response.text();
+    const verified = parseSoapResponse(xml);
+
     return {
       success: true,
       verified,
-      message: verified 
-        ? 'TC Kimlik doğrulaması başarılı' 
-        : 'TC Kimlik bilgileri eşleşmiyor',
+      message: verified
+        ? "TC Kimlik doğrulaması başarılı"
+        : "TC Kimlik bilgileri eşleşmiyor",
       timestamp: new Date().toISOString(),
-    }
+    };
   } catch (error) {
     if (error instanceof MernisError) {
       return {
@@ -140,17 +138,17 @@ export async function verifyTCKimlik(
         verified: false,
         message: error.message,
         timestamp: new Date().toISOString(),
-      }
+      };
     }
-    
-    console.error('Mernis verification error:', error)
-    
+
+    console.error("Mernis verification error:", error);
+
     return {
       success: false,
       verified: false,
-      message: 'TC Kimlik doğrulama sırasında bir hata oluştu',
+      message: "TC Kimlik doğrulama sırasında bir hata oluştu",
       timestamp: new Date().toISOString(),
-    }
+    };
   }
 }
 
@@ -159,5 +157,5 @@ export async function verifyTCKimlik(
  * Test ve offline kontrol için kullanılabilir
  */
 export function verifyTCKimlikOffline(tcKimlikNo: string): boolean {
-  return isValidTCKimlikFormat(tcKimlikNo)
+  return isValidTCKimlikFormat(tcKimlikNo);
 }

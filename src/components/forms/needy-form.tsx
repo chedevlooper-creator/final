@@ -1,13 +1,21 @@
-'use client'
+"use client";
 
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { needyPersonSchema, NeedyPersonFormValues } from '@/lib/validations/needy'
-import { useCreateNeedy, useUpdateNeedy } from '@/hooks/queries/use-needy'
-import { useCountries, useCities, useCategories, usePartners } from '@/hooks/queries/use-lookups'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  needyPersonSchema,
+  NeedyPersonFormValues,
+} from "@/lib/validations/needy";
+import { useCreateNeedy, useUpdateNeedy } from "@/hooks/queries/use-needy";
+import {
+  useCountries,
+  useCities,
+  useCategories,
+  usePartners,
+} from "@/hooks/queries/use-lookups";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -15,112 +23,145 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
-import { Tables } from '@/types/database.types'
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { Tables } from "@/types/database.types";
 
 interface NeedyFormProps {
-  initialData?: Tables<'needy_persons'>
-  onSuccess?: () => void
+  initialData?: Tables<"needy_persons">;
+  onSuccess?: () => void;
 }
 
 const LIVING_SITUATIONS = [
-  { value: 'own_house', label: 'Kendi Evi' },
-  { value: 'rental', label: 'Kiracı' },
-  { value: 'with_relatives', label: 'Akraba Yanı' },
-  { value: 'shelter', label: 'Barınak' },
-  { value: 'homeless', label: 'Evsiz' },
-  { value: 'other', label: 'Diğer' },
-]
+  { value: "own_house", label: "Kendi Evi" },
+  { value: "rental", label: "Kiracı" },
+  { value: "with_relatives", label: "Akraba Yanı" },
+  { value: "shelter", label: "Barınak" },
+  { value: "homeless", label: "Evsiz" },
+  { value: "other", label: "Diğer" },
+];
 
 const INCOME_SOURCES = [
-  { value: 'none', label: 'Gelir Yok' },
-  { value: 'salary', label: 'Maaş' },
-  { value: 'pension', label: 'Emekli Maaşı' },
-  { value: 'social_aid', label: 'Sosyal Yardım' },
-  { value: 'charity', label: 'Hayırsever Yardımı' },
-  { value: 'other', label: 'Diğer' },
-]
+  { value: "none", label: "Gelir Yok" },
+  { value: "salary", label: "Maaş" },
+  { value: "pension", label: "Emekli Maaşı" },
+  { value: "social_aid", label: "Sosyal Yardım" },
+  { value: "charity", label: "Hayırsever Yardımı" },
+  { value: "other", label: "Diğer" },
+];
 
 export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
-  const createMutation = useCreateNeedy()
-  const updateMutation = useUpdateNeedy()
-  const isEditing = !!initialData
+  const createMutation = useCreateNeedy();
+  const updateMutation = useUpdateNeedy();
+  const isEditing = !!initialData;
 
-  const { data: countries } = useCountries() as { data: Array<{ id: string; name: string; code: string | null }> | undefined }
-  const { data: categories } = useCategories('needy') as { data: Array<{ id: string; name: string; type: string | null }> | undefined }
-  const { data: partners } = usePartners() as { data: Array<{ id: string; name: string; type: string | null }> | undefined }
+  const { data: countries } = useCountries() as {
+    data: Array<{ id: string; name: string; code: string | null }> | undefined;
+  };
+  const { data: categories } = useCategories("needy") as {
+    data: Array<{ id: string; name: string; type: string | null }> | undefined;
+  };
+  const { data: partners } = usePartners() as {
+    data: Array<{ id: string; name: string; type: string | null }> | undefined;
+  };
 
   const form = useForm<NeedyPersonFormValues>({
     resolver: zodResolver(needyPersonSchema),
-    defaultValues: initialData ? {
-      first_name: initialData.first_name,
-      last_name: initialData.last_name,
-      first_name_original: initialData.first_name_original,
-      last_name_original: initialData.last_name_original,
-      category_id: initialData.category_id,
-      partner_id: initialData.partner_id,
-      nationality_id: initialData.nationality_id,
-      country_id: initialData.country_id,
-      city_id: initialData.city_id,
-      district_id: initialData.district_id,
-      identity_type: initialData.identity_type as 'tc' | 'passport' | 'other' | null,
-      identity_number: initialData.identity_number,
-      passport_number: initialData.passport_number,
-      gender: initialData.gender as 'male' | 'female' | null,
-      date_of_birth: initialData.date_of_birth,
-      phone: initialData.phone,
-      email: initialData.email,
-      address: initialData.address,
-      living_situation: initialData.living_situation as 'own_house' | 'rental' | 'with_relatives' | 'shelter' | 'homeless' | 'other' | null,
-      income_source: initialData.income_source as 'none' | 'salary' | 'pension' | 'social_aid' | 'charity' | 'other' | null,
-      monthly_income: initialData.monthly_income,
-      rent_amount: initialData.rent_amount,
-      debt_amount: initialData.debt_amount,
-      family_size: initialData.family_size,
-      health_status: initialData.health_status,
-      disability_status: initialData.disability_status,
-      notes: initialData.notes,
-      status: (initialData.status as 'active' | 'inactive' | 'pending') || 'active',
-      is_active: initialData.is_active ?? true,
-      tags: initialData.tags || [],
-    } : {
-      first_name: '',
-      last_name: '',
-      status: 'active',
-      is_active: true,
-    },
-  })
+    defaultValues: initialData
+      ? {
+          first_name: initialData.first_name,
+          last_name: initialData.last_name,
+          first_name_original: initialData.first_name_original,
+          last_name_original: initialData.last_name_original,
+          category_id: initialData.category_id,
+          partner_id: initialData.partner_id,
+          nationality_id: initialData.nationality_id,
+          country_id: initialData.country_id,
+          city_id: initialData.city_id,
+          district_id: initialData.district_id,
+          identity_type: initialData.identity_type as
+            | "tc"
+            | "passport"
+            | "other"
+            | null,
+          identity_number: initialData.identity_number,
+          passport_number: initialData.passport_number,
+          gender: initialData.gender as "male" | "female" | null,
+          date_of_birth: initialData.date_of_birth,
+          phone: initialData.phone,
+          email: initialData.email,
+          address: initialData.address,
+          living_situation: initialData.living_situation as
+            | "own_house"
+            | "rental"
+            | "with_relatives"
+            | "shelter"
+            | "homeless"
+            | "other"
+            | null,
+          income_source: initialData.income_source as
+            | "none"
+            | "salary"
+            | "pension"
+            | "social_aid"
+            | "charity"
+            | "other"
+            | null,
+          monthly_income: initialData.monthly_income,
+          rent_amount: initialData.rent_amount,
+          debt_amount: initialData.debt_amount,
+          family_size: initialData.family_size,
+          health_status: initialData.health_status,
+          disability_status: initialData.disability_status,
+          notes: initialData.notes,
+          status:
+            (initialData.status as "active" | "inactive" | "pending") ||
+            "active",
+          is_active: initialData.is_active ?? true,
+          tags: initialData.tags || [],
+        }
+      : {
+          first_name: "",
+          last_name: "",
+          status: "active",
+          is_active: true,
+        },
+  });
 
-  const selectedCountryId = form.watch('country_id')
-  const { data: cities } = useCities(selectedCountryId || undefined) as { data: Array<{ id: string; name: string; country_id: string | null }> | undefined }
+  const selectedCountryId = form.watch("country_id");
+  const { data: cities } = useCities(selectedCountryId || undefined) as {
+    data:
+      | Array<{ id: string; name: string; country_id: string | null }>
+      | undefined;
+  };
 
   const onSubmit = async (values: NeedyPersonFormValues) => {
     try {
       if (isEditing) {
-        await updateMutation.mutateAsync({ id: initialData.id, values })
-        toast.success('Kayıt güncellendi')
+        await updateMutation.mutateAsync({ id: initialData.id, values });
+        toast.success("Kayıt güncellendi");
       } else {
-        await createMutation.mutateAsync(values)
-        toast.success('Kayıt oluşturuldu')
+        await createMutation.mutateAsync(values);
+        toast.success("Kayıt oluşturuldu");
       }
-      onSuccess?.()
+      onSuccess?.();
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Bir hata oluştu'
-      toast.error(errorMessage)
+      const errorMessage =
+        error instanceof Error ? error.message : "Bir hata oluştu";
+      toast.error(errorMessage);
     }
-  }
+  };
 
-  const isLoading = createMutation.isPending || updateMutation.isPending
+  const isLoading = createMutation.isPending || updateMutation.isPending;
 
   return (
     <Form {...form}>
@@ -168,7 +209,10 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Cinsiyet</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ''}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || ""}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seçiniz" />
@@ -190,7 +234,7 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                   <FormItem>
                     <FormLabel>Doğum Tarihi</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} value={field.value || ''} />
+                      <Input type="date" {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -203,7 +247,11 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                   <FormItem>
                     <FormLabel>Telefon</FormLabel>
                     <FormControl>
-                      <Input placeholder="0500 000 00 00" {...field} value={field.value || ''} />
+                      <Input
+                        placeholder="0500 000 00 00"
+                        {...field}
+                        value={field.value || ""}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -216,7 +264,12 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                   <FormItem>
                     <FormLabel>E-posta</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="ornek@email.com" {...field} value={field.value || ''} />
+                      <Input
+                        type="email"
+                        placeholder="ornek@email.com"
+                        {...field}
+                        value={field.value || ""}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -228,7 +281,10 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Kategori</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ''}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || ""}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Kategori seçin" />
@@ -252,7 +308,10 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Partner</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ''}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || ""}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Partner seçin" />
@@ -282,7 +341,10 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Kimlik Türü</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ''}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || ""}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seçiniz" />
@@ -305,7 +367,12 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                   <FormItem>
                     <FormLabel>TC Kimlik No</FormLabel>
                     <FormControl>
-                      <Input placeholder="11 haneli TC kimlik" maxLength={11} {...field} value={field.value || ''} />
+                      <Input
+                        placeholder="11 haneli TC kimlik"
+                        maxLength={11}
+                        {...field}
+                        value={field.value || ""}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -318,7 +385,11 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                   <FormItem>
                     <FormLabel>Pasaport No</FormLabel>
                     <FormControl>
-                      <Input placeholder="Pasaport numarası" {...field} value={field.value || ''} />
+                      <Input
+                        placeholder="Pasaport numarası"
+                        {...field}
+                        value={field.value || ""}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -330,7 +401,10 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Uyruk</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ''}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || ""}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Uyruk seçin" />
@@ -360,7 +434,10 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Ülke</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ''}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || ""}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Ülke seçin" />
@@ -384,7 +461,11 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Şehir</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ''} disabled={!selectedCountryId}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || ""}
+                      disabled={!selectedCountryId}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Şehir seçin" />
@@ -408,7 +489,10 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Yaşam Durumu</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ''}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || ""}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seçiniz" />
@@ -433,12 +517,16 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                   <FormItem>
                     <FormLabel>Hane Nüfusu</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        min={1} 
-                        {...field} 
-                        value={field.value || ''} 
-                        onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : null)}
+                      <Input
+                        type="number"
+                        min={1}
+                        {...field}
+                        value={field.value || ""}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value ? parseInt(e.target.value) : null,
+                          )
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -453,7 +541,11 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                 <FormItem>
                   <FormLabel>Adres</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Açık adres" {...field} value={field.value || ''} />
+                    <Textarea
+                      placeholder="Açık adres"
+                      {...field}
+                      value={field.value || ""}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -470,7 +562,10 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Gelir Kaynağı</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ''}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || ""}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seçiniz" />
@@ -495,12 +590,16 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                   <FormItem>
                     <FormLabel>Aylık Gelir (₺)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        min={0} 
-                        {...field} 
-                        value={field.value || ''} 
-                        onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : null)}
+                      <Input
+                        type="number"
+                        min={0}
+                        {...field}
+                        value={field.value || ""}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value ? parseFloat(e.target.value) : null,
+                          )
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -514,12 +613,16 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                   <FormItem>
                     <FormLabel>Kira Tutarı (₺)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        min={0} 
-                        {...field} 
-                        value={field.value || ''} 
-                        onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : null)}
+                      <Input
+                        type="number"
+                        min={0}
+                        {...field}
+                        value={field.value || ""}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value ? parseFloat(e.target.value) : null,
+                          )
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -533,12 +636,16 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                   <FormItem>
                     <FormLabel>Borç Tutarı (₺)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        min={0} 
-                        {...field} 
-                        value={field.value || ''} 
-                        onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : null)}
+                      <Input
+                        type="number"
+                        min={0}
+                        {...field}
+                        value={field.value || ""}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value ? parseFloat(e.target.value) : null,
+                          )
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -553,7 +660,11 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                 <FormItem>
                   <FormLabel>Notlar</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Ek notlar..." {...field} value={field.value || ''} />
+                    <Textarea
+                      placeholder="Ek notlar..."
+                      {...field}
+                      value={field.value || ""}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -566,16 +677,16 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
           <Button type="button" variant="outline" onClick={onSuccess}>
             İptal
           </Button>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={isLoading}
             className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600"
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isEditing ? 'Güncelle' : 'Kaydet'}
+            {isEditing ? "Güncelle" : "Kaydet"}
           </Button>
         </div>
       </form>
     </Form>
-  )
+  );
 }
