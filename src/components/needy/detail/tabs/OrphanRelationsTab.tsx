@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -18,68 +18,76 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog'
-import { Plus, Eye, Pencil, Trash2, ExternalLink } from 'lucide-react'
-import { TabLayout } from './TabLayout'
-import { OrphanRelation, ORPHAN_RELATION_TYPE_OPTIONS, OrphanRelationType, StatusFilter } from '@/types/linked-records.types'
-import Link from 'next/link'
+} from "@/components/ui/dialog";
+import { Plus, Eye, Pencil, Trash2, ExternalLink } from "lucide-react";
+import { TabLayout } from "./TabLayout";
+import {
+  OrphanRelation,
+  ORPHAN_RELATION_TYPE_OPTIONS,
+  OrphanRelationType,
+  StatusFilter,
+} from "@/types/linked-records.types";
+import Link from "next/link";
 
 interface OrphanRelationsTabProps {
-  needyPersonId: string
-  onClose: () => void
+  needyPersonId: string;
+  onClose: () => void;
 }
 
-export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTabProps) {
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
-  const [searchValue, setSearchValue] = useState('')
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [relations, setRelations] = useState<OrphanRelation[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+export function OrphanRelationsTab({
+  needyPersonId,
+  onClose,
+}: OrphanRelationsTabProps) {
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("active");
+  const [searchValue, setSearchValue] = useState("");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [relations, setRelations] = useState<OrphanRelation[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    orphan_id: '',
-    relation_type: '' as OrphanRelationType | '',
-    relation_description: '',
-    start_date: '',
+    orphan_id: "",
+    relation_type: "" as OrphanRelationType | "",
+    relation_description: "",
+    start_date: "",
     is_primary_guardian: false,
-  })
+  });
 
   const columns = [
-    { key: 'orphan_name', label: 'Yetim Adı' },
-    { key: 'relation_type', label: 'İlişki Türü', width: '150px' },
-    { key: 'start_date', label: 'Başlangıç', width: '120px' },
-    { key: 'is_primary', label: 'Birincil Veli', width: '100px' },
-    { key: 'status', label: 'Durum', width: '80px' },
-  ]
+    { key: "orphan_name", label: "Yetim Adı" },
+    { key: "relation_type", label: "İlişki Türü", width: "150px" },
+    { key: "start_date", label: "Başlangıç", width: "120px" },
+    { key: "is_primary", label: "Birincil Veli", width: "100px" },
+    { key: "status", label: "Durum", width: "80px" },
+  ];
 
   const handleAdd = () => {
     setFormData({
-      orphan_id: '',
-      relation_type: '',
-      relation_description: '',
-      start_date: '',
+      orphan_id: "",
+      relation_type: "",
+      relation_description: "",
+      start_date: "",
       is_primary_guardian: false,
-    })
-    setIsAddModalOpen(true)
-  }
+    });
+    setIsAddModalOpen(true);
+  };
 
   const handleSave = async () => {
     // TODO: Implement save functionality
-    setIsAddModalOpen(false)
-  }
+    setIsAddModalOpen(false);
+  };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Bu bağlantıyı kaldırmak istediğinizden emin misiniz?')) {
+    if (confirm("Bu bağlantıyı kaldırmak istediğinizden emin misiniz?")) {
       // TODO: Implement delete functionality
     }
-  }
+  };
 
   return (
     <>
@@ -115,7 +123,10 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
             <TableBody>
               {relations.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={columns.length + 2} className="text-center py-8 text-muted-foreground">
+                  <TableCell
+                    colSpan={columns.length + 2}
+                    className="text-center py-8 text-muted-foreground"
+                  >
                     Bağlı yetim kaydı bulunamadı
                   </TableCell>
                 </TableRow>
@@ -133,7 +144,11 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
                       {relation.orphan?.first_name} {relation.orphan?.last_name}
                     </TableCell>
                     <TableCell>
-                      {ORPHAN_RELATION_TYPE_OPTIONS.find(t => t.value === relation.relation_type)?.label}
+                      {
+                        ORPHAN_RELATION_TYPE_OPTIONS.find(
+                          (t) => t.value === relation.relation_type,
+                        )?.label
+                      }
                     </TableCell>
                     <TableCell>{relation.start_date}</TableCell>
                     <TableCell>
@@ -142,8 +157,10 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className={`text-xs px-2 py-1 rounded ${relation.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                        {relation.is_active ? 'Aktif' : 'Pasif'}
+                      <span
+                        className={`text-xs px-2 py-1 rounded ${relation.is_active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}`}
+                      >
+                        {relation.is_active ? "Aktif" : "Pasif"}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -171,13 +188,15 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
           <DialogHeader>
             <DialogTitle>Yetim Bağla</DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div>
               <Label>Yetim Seç *</Label>
               <Select
                 value={formData.orphan_id}
-                onValueChange={(v) => setFormData({ ...formData, orphan_id: v })}
+                onValueChange={(v) =>
+                  setFormData({ ...formData, orphan_id: v })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Yetim seçin..." />
@@ -187,12 +206,17 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label>İlişki Türü *</Label>
               <Select
                 value={formData.relation_type}
-                onValueChange={(v) => setFormData({ ...formData, relation_type: v as OrphanRelationType })}
+                onValueChange={(v) =>
+                  setFormData({
+                    ...formData,
+                    relation_type: v as OrphanRelationType,
+                  })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="İlişki türü seçin" />
@@ -206,36 +230,41 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label>Başlangıç Tarihi</Label>
               <Input
                 type="date"
                 value={formData.start_date}
-                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, start_date: e.target.value })
+                }
               />
             </div>
-            
+
             <div>
               <Label>Açıklama</Label>
               <Input
                 value={formData.relation_description}
-                onChange={(e) => setFormData({ ...formData, relation_description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    relation_description: e.target.value,
+                  })
+                }
                 placeholder="İlişki hakkında not"
               />
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>
               İptal
             </Button>
-            <Button onClick={handleSave}>
-              Bağla
-            </Button>
+            <Button onClick={handleSave}>Bağla</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

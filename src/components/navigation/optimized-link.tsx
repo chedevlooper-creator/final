@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils'
-import { ComponentProps } from 'react'
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { ComponentProps } from "react";
 
 /**
  * Optimized Link component with:
@@ -13,10 +13,10 @@ import { ComponentProps } from 'react'
  * - Smooth transitions
  */
 interface OptimizedLinkProps extends ComponentProps<typeof Link> {
-  prefetchOnHover?: boolean
-  prefetchOnView?: boolean
-  activeClassName?: string
-  activeExact?: boolean
+  prefetchOnHover?: boolean;
+  prefetchOnView?: boolean;
+  activeClassName?: string;
+  activeExact?: boolean;
 }
 
 export function OptimizedLink({
@@ -29,35 +29,32 @@ export function OptimizedLink({
   children,
   ...props
 }: OptimizedLinkProps) {
-  const pathname = usePathname()
-  
+  const pathname = usePathname();
+
   // Active state detection
   const isActive = activeExact
     ? pathname === href
-    : pathname?.startsWith(href as string)
-  
+    : pathname?.startsWith(href as string);
+
   // Prefetch on hover handler
   const handleMouseEnter = () => {
-    if (prefetchOnHover && typeof href === 'string') {
+    if (prefetchOnHover && typeof href === "string") {
       // Next.js automatically prefetches on hover with Link
       // This is a no-op but documents intent
     }
-  }
-  
+  };
+
   return (
     <Link
       href={href}
       prefetch={prefetchOnView ? true : false}
       onMouseEnter={handleMouseEnter}
-      className={cn(
-        className,
-        activeClassName && isActive && activeClassName
-      )}
+      className={cn(className, activeClassName && isActive && activeClassName)}
       {...props}
     >
       {children}
     </Link>
-  )
+  );
 }
 
 /**
@@ -69,9 +66,9 @@ export function NavLink({
   children,
   ...props
 }: ComponentProps<typeof Link>) {
-  const pathname = usePathname()
-  const isActive = pathname === href
-  
+  const pathname = usePathname();
+  const isActive = pathname === href;
+
   return (
     <OptimizedLink
       href={href}
@@ -79,13 +76,13 @@ export function NavLink({
       activeExact
       activeClassName="bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 border-l-2 border-emerald-400"
       className={cn(
-        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-150',
-        !isActive && 'text-slate-400 hover:bg-slate-700/50 hover:text-white',
-        className
+        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-150",
+        !isActive && "text-slate-400 hover:bg-slate-700/50 hover:text-white",
+        className,
       )}
       {...props}
     >
       {children}
     </OptimizedLink>
-  )
+  );
 }

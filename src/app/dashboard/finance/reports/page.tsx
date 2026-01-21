@@ -1,11 +1,17 @@
-'use client'
+"use client";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
-import { PageHeader } from '@/components/common/page-header'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { BarChart3, Download, FileText } from 'lucide-react'
+import { PageHeader } from "@/components/common/page-header";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { BarChart3, Download, FileText } from "lucide-react";
 
 export default function FinanceReportsPage() {
   return (
@@ -109,7 +115,9 @@ export default function FinanceReportsPage() {
               <BarChart3 className="h-5 w-5 text-red-500" />
               Tarih Aralığı
             </CardTitle>
-            <CardDescription>Belirli tarih aralığı finans raporu</CardDescription>
+            <CardDescription>
+              Belirli tarih aralığı finans raporu
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full" variant="outline">
@@ -120,5 +128,5 @@ export default function FinanceReportsPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

@@ -1,14 +1,20 @@
-'use client'
+"use client";
 
-import { cn } from '@/lib/utils'
+import { cn } from "@/lib/utils";
 
-export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+export function Skeleton({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('animate-pulse rounded-md bg-slate-200 dark:bg-slate-800', className)}
+      className={cn(
+        "animate-pulse rounded-md bg-slate-200 dark:bg-slate-800",
+        className,
+      )}
       {...props}
     />
-  )
+  );
 }
 
 export function TableSkeleton() {
@@ -20,7 +26,7 @@ export function TableSkeleton() {
       <Skeleton className="h-10 w-full" />
       <Skeleton className="h-10 w-full" />
     </div>
-  )
+  );
 }
 
 export function CardSkeleton() {
@@ -30,7 +36,7 @@ export function CardSkeleton() {
       <Skeleton className="h-10 w-full mb-2" />
       <Skeleton className="h-4 w-2/3" />
     </div>
-  )
+  );
 }
 
 export function StatsCardSkeleton() {
@@ -43,7 +49,7 @@ export function StatsCardSkeleton() {
       <Skeleton className="h-8 w-32 mt-4" />
       <Skeleton className="h-4 w-48 mt-2" />
     </div>
-  )
+  );
 }
 
 export function DashboardSkeleton() {
@@ -61,5 +67,5 @@ export function DashboardSkeleton() {
       </div>
       <CardSkeleton />
     </div>
-  )
+  );
 }

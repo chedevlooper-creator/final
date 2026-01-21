@@ -1,25 +1,25 @@
-'use client'
+"use client";
 
-import { ReactNode, useState } from 'react'
-import { ChevronDown, ChevronRight } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { ReactNode, useState } from "react";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface FormSectionProps {
-  title: string
-  icon?: ReactNode
-  defaultOpen?: boolean
-  children: ReactNode
-  className?: string
+  title: string;
+  icon?: ReactNode;
+  defaultOpen?: boolean;
+  children: ReactNode;
+  className?: string;
 }
 
-export function FormSection({ 
-  title, 
-  icon, 
-  defaultOpen = true, 
+export function FormSection({
+  title,
+  icon,
+  defaultOpen = true,
   children,
-  className
+  className,
 }: FormSectionProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen)
+  const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
     <div className={cn("border rounded-lg bg-card shadow-sm", className)}>
@@ -42,5 +42,5 @@ export function FormSection({
         </div>
       )}
     </div>
-  )
+  );
 }

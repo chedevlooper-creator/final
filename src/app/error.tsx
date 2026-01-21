@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export default function Error({
   error,
   reset,
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
@@ -20,5 +20,5 @@ export default function Error({
         Tekrar Dene
       </button>
     </div>
-  )
+  );
 }

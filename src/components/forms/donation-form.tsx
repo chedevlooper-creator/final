@@ -1,12 +1,18 @@
-'use client'
+"use client";
 
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { donationSchema, DonationFormValues, DONATION_TYPES, PAYMENT_METHODS, CURRENCIES } from '@/lib/validations/donation'
-import { useCreateDonation } from '@/hooks/queries/use-donations'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  donationSchema,
+  DonationFormValues,
+  DONATION_TYPES,
+  PAYMENT_METHODS,
+  CURRENCIES,
+} from "@/lib/validations/donation";
+import { useCreateDonation } from "@/hooks/queries/use-donations";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -14,44 +20,45 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
+} from "@/components/ui/select";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 interface DonationFormProps {
-  onSuccess?: () => void
+  onSuccess?: () => void;
 }
 
 export function DonationForm({ onSuccess }: DonationFormProps) {
-  const createMutation = useCreateDonation()
+  const createMutation = useCreateDonation();
 
   const form = useForm<DonationFormValues>({
     resolver: zodResolver(donationSchema),
     defaultValues: {
-      currency: 'TRY',
+      currency: "TRY",
       amount: 0,
     },
-  })
+  });
 
   const onSubmit = async (values: DonationFormValues) => {
     try {
-      await createMutation.mutateAsync(values)
-      toast.success('Bağış kaydedildi')
-      onSuccess?.()
+      await createMutation.mutateAsync(values);
+      toast.success("Bağış kaydedildi");
+      onSuccess?.();
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Bir hata oluştu'
-      toast.error(errorMessage)
+      const errorMessage =
+        error instanceof Error ? error.message : "Bir hata oluştu";
+      toast.error(errorMessage);
     }
-  }
+  };
 
-  const isLoading = createMutation.isPending
+  const isLoading = createMutation.isPending;
 
   return (
     <Form {...form}>
@@ -65,7 +72,11 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
               <FormItem>
                 <FormLabel>Bağışçı Adı</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ad Soyad" {...field} value={field.value || ''} />
+                  <Input
+                    placeholder="Ad Soyad"
+                    {...field}
+                    value={field.value || ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -80,7 +91,11 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
               <FormItem>
                 <FormLabel>Telefon</FormLabel>
                 <FormControl>
-                  <Input placeholder="0500 000 00 00" {...field} value={field.value || ''} />
+                  <Input
+                    placeholder="0500 000 00 00"
+                    {...field}
+                    value={field.value || ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -96,7 +111,12 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
             <FormItem>
               <FormLabel>E-posta</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="ornek@email.com" {...field} value={field.value || ''} />
+                <Input
+                  type="email"
+                  placeholder="ornek@email.com"
+                  {...field}
+                  value={field.value || ""}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -137,7 +157,10 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Ödeme Yöntemi</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value || ''}>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ""}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Yöntem seçin" />
@@ -172,7 +195,9 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
                     step="0.01"
                     placeholder="0.00"
                     {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      field.onChange(parseFloat(e.target.value) || 0)
+                    }
                   />
                 </FormControl>
                 <FormMessage />
@@ -218,7 +243,7 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
                 <Textarea
                   placeholder="Bağış hakkında detaylı bilgi..."
                   {...field}
-                  value={field.value || ''}
+                  value={field.value || ""}
                 />
               </FormControl>
               <FormMessage />
@@ -237,7 +262,7 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
                 <Textarea
                   placeholder="Ek notlar..."
                   {...field}
-                  value={field.value || ''}
+                  value={field.value || ""}
                 />
               </FormControl>
               <FormMessage />
@@ -260,5 +285,5 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
         </div>
       </form>
     </Form>
-  )
+  );
 }
