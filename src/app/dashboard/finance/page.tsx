@@ -10,22 +10,46 @@ import {
   TrendingDown,
   ArrowUpRight,
   ArrowDownLeft,
-  Plus,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useFinanceSummary, useFinanceTransactions } from '@/hooks/queries/use-finance'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function FinancePage() {
+  const { data: summary, isLoading: isSummaryLoading } = useFinanceSummary()
+  const { data: transactions, isLoading: isTransLoading } = useFinanceTransactions({ limit: 5 })
+
   const stats = [
-    { title: 'Toplam Gelir (Ay)', value: '₺125.450', change: '+12%', trend: 'up', icon: TrendingUp },
-    { title: 'Toplam Gider (Ay)', value: '₺98.320', change: '+8%', trend: 'up', icon: TrendingDown },
-    { title: 'Kasa Bakiyesi', value: '₺45.230', icon: Wallet },
-    { title: 'Banka Bakiyesi', value: '₺892.150', icon: CreditCard },
+    { 
+      title: 'Toplam Gelir (Ay)', 
+      value: isSummaryLoading ? <Skeleton className="h-8 w-24" /> : `₺${(summary?.monthlyIncome || 0).toLocaleString('tr-TR')}`, 
+      icon: TrendingUp,
+      trend: 'up'
+    },
+    { 
+      title: 'Toplam Gider (Ay)', 
+      value: isSummaryLoading ? <Skeleton className="h-8 w-24" /> : `₺${(summary?.monthlyExpense || 0).toLocaleString('tr-TR')}`, 
+      icon: TrendingDown,
+      trend: 'down'
+    },
+    { 
+      title: 'Kasa Bakiyesi', 
+      value: isSummaryLoading ? <Skeleton className="h-8 w-24" /> : `₺${(summary?.cashBalance || 0).toLocaleString('tr-TR')}`, 
+      icon: Wallet,
+      trend: 'up'
+    },
+    { 
+      title: 'Banka Bakiyesi', 
+      value: isSummaryLoading ? <Skeleton className="h-8 w-24" /> : `₺${(summary?.bankBalance || 0).toLocaleString('tr-TR')}`, 
+      icon: CreditCard,
+      trend: 'up'
+    },
   ]
 
   const quickActions = [
-    { title: 'Kasa İşlemleri', href: '/finance/cash', icon: Wallet, color: 'bg-blue-500' },
-    { title: 'Banka İşlemleri', href: '/finance/bank', icon: CreditCard, color: 'bg-green-500' },
-    { title: 'Raporlar', href: '/finance/reports', icon: TrendingUp, color: 'bg-purple-500' },
+    { title: 'Kasa İşlemleri', href: '/dashboard/finance/cash', icon: Wallet, color: 'bg-blue-500' },
+    { title: 'Banka İşlemleri', href: '/dashboard/finance/bank', icon: CreditCard, color: 'bg-green-500' },
+    { title: 'Raporlar', href: '/dashboard/finance/reports', icon: TrendingUp, color: 'bg-purple-500' },
   ]
 
   return (
@@ -58,15 +82,10 @@ export default function FinancePage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-slate-500">{stat.title}</p>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                    {stat.change && (
-                      <p className={`text-sm ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                        {stat.change}
-                      </p>
-                    )}
+                    <div className="text-2xl font-bold">{stat.value}</div>
                   </div>
-                  <div className={`p-3 rounded-lg ${stat.trend === 'up' ? 'bg-green-100' : 'bg-blue-100'}`}>
-                    <Icon className={`h-6 w-6 ${stat.trend === 'up' ? 'text-green-600' : 'text-blue-600'}`} />
+                  <div className={`p-3 rounded-lg ${stat.trend === 'up' ? 'bg-green-100' : 'bg-red-100'}`}>
+                    <Icon className={`h-6 w-6 ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`} />
                   </div>
                 </div>
               </CardContent>
@@ -106,31 +125,45 @@ export default function FinancePage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {[
-              { type: 'in', desc: 'Bağış - Mehmet Yılmaz', amount: 5000, date: '15.01.2026' },
-              { type: 'out', desc: 'Nakdi Yardım - Ahmet Kaya', amount: 2500, date: '15.01.2026' },
-              { type: 'in', desc: 'Zekat - Anonim', amount: 10000, date: '14.01.2026' },
-              { type: 'out', desc: 'Gıda Alımı', amount: 8500, date: '14.01.2026' },
-            ].map((t, idx) => (
-              <div key={idx} className="flex items-center justify-between py-2 border-b last:border-0">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-full ${t.type === 'in' ? 'bg-green-100' : 'bg-red-100'}`}>
-                    {t.type === 'in' ? (
-                      <ArrowDownLeft className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <ArrowUpRight className="h-4 w-4 text-red-600" />
-                    )}
+            {isTransLoading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between py-2 border-b last:border-0">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <div className="space-y-1">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-3 w-16" />
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">{t.desc}</p>
-                    <p className="text-xs text-slate-500">{t.date}</p>
-                  </div>
+                  <Skeleton className="h-5 w-20" />
                 </div>
-                <p className={`font-medium ${t.type === 'in' ? 'text-green-600' : 'text-red-600'}`}>
-                  {t.type === 'in' ? '+' : '-'}₺{t.amount.toLocaleString('tr-TR')}
-                </p>
-              </div>
-            ))}
+              ))
+            ) : transactions?.data?.length ? (
+              transactions.data.map((t) => (
+                <div key={t.id} className="flex items-center justify-between py-2 border-b last:border-0">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-full ${t.type === 'income' ? 'bg-green-100' : 'bg-red-100'}`}>
+                      {t.type === 'income' ? (
+                        <ArrowDownLeft className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <ArrowUpRight className="h-4 w-4 text-red-600" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium">{t.description || t.category}</p>
+                      <p className="text-xs text-slate-500">
+                        {new Date(t.created_at).toLocaleDateString('tr-TR')}
+                      </p>
+                    </div>
+                  </div>
+                  <p className={`font-medium ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                    {t.type === 'income' ? '+' : '-'}₺{t.amount.toLocaleString('tr-TR')}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-slate-500 py-4">İşlem bulunamadı</p>
+            )}
           </div>
         </CardContent>
       </Card>

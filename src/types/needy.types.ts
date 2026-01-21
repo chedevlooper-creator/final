@@ -168,24 +168,7 @@ export interface Document {
 }
 
 // Bağımlı Kişi
-// @deprecated Import from @/types/linked-records.types for more comprehensive type
-export type { Dependent } from '@/types/linked-records.types'
-
-// Görüşme Kaydı
-// @deprecated Import from @/types/linked-records.types for more comprehensive type
-export type { Interview } from '@/types/linked-records.types'
-
-// Rıza Beyanı
-// @deprecated Import from @/types/linked-records.types for more comprehensive type
-export type { Consent } from '@/types/linked-records.types'
-
-// Sosyal Kart
-// @deprecated Import from @/types/linked-records.types for more comprehensive type
-export type { SocialCard } from '@/types/linked-records.types'
-
-// Referans
-// @deprecated Import from @/types/linked-records.types for more comprehensive type
-export type { NeedyReference } from '@/types/linked-records.types'
+export type { Dependent, Interview, Consent, SocialCard, Reference as NeedyReference } from '@/types/linked-records.types'
 
 // Dropdown Seçenekleri
 export const CATEGORIES = [

@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Users, Plus, Search, MoreHorizontal, Eye, Pencil, Trash2, Filter } from 'lucide-react'
+import { Users, Plus, Search, MoreHorizontal, Eye, Pencil, Trash2, Filter, Download } from 'lucide-react'
 import { ColumnDef } from '@tanstack/react-table'
 import { Tables } from '@/types/database.types'
 import Link from 'next/link'
@@ -28,6 +28,12 @@ import {
 import { toast } from 'sonner'
 import dynamic from 'next/dynamic'
 // import { ExportButton } from '@/components/common/export-button'
+
+// Lazy loading large libraries for performance
+const exportToExcelLazy = async (data: any[]) => {
+  const { exportNeedyPersonsToExcel } = await import('@/lib/export/excel')
+  exportNeedyPersonsToExcel(data)
+}
 
 // Lazy loading modal - reduces initial bundle size by ~13KB
 const AddNeedyModal = dynamic(
@@ -301,6 +307,15 @@ export default function NeedyListPage() {
         <Button size="sm" variant="outline">
           <Filter className="h-4 w-4 mr-1" />
           Filtre
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => exportToExcelLazy(data?.data || [])}
+          disabled={!data?.data?.length}
+        >
+          <Download className="h-4 w-4 mr-1" />
+          Excel
         </Button>
         <Button
           size="sm"

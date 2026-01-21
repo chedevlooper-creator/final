@@ -141,6 +141,21 @@ export interface PaginatedResponse<T> {
   totalPages: number
 }
 
+// Global Constants
+export const CURRENCIES = [
+  { value: 'TRY', label: '₺ TRY', symbol: '₺' },
+  { value: 'USD', label: '$ USD', symbol: '$' },
+  { value: 'EUR', label: '€ EUR', symbol: '€' },
+  { value: 'GBP', label: '£ GBP', symbol: '£' },
+] as const
+
+export const PAYMENT_METHODS = [
+  { value: 'cash', label: 'Nakit' },
+  { value: 'bank_transfer', label: 'Banka Havalesi' },
+  { value: 'credit_card', label: 'Kredi Kartı' },
+  { value: 'online', label: 'Online Ödeme' },
+] as const
+
 /**
  * Query Options
  */

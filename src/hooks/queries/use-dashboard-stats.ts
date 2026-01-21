@@ -114,10 +114,11 @@ export function useDashboardStats() {
         totalAids: completedAidsResult.count || 0,
       }
     },
-    // Cache stats for 2 minutes
-    staleTime: 2 * 60 * 1000,
-    // Auto-refetch every 5 minutes
-    refetchInterval: 5 * 60 * 1000,
+    // Cache stats for 10 minutes
+    staleTime: 10 * 60 * 1000,
+    // Auto-refetch every 15 minutes
+    refetchInterval: 15 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   })
 }
 
