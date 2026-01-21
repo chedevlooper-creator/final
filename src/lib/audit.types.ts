@@ -5,13 +5,13 @@
 
 // Base types - define here to avoid circular dependency
 export enum LogLevel {
-  INFO = 'INFO',
-  WARNING = 'WARNING',
-  ERROR = 'ERROR',
-  CRITICAL = 'CRITICAL'
+  INFO = "INFO",
+  WARNING = "WARNING",
+  ERROR = "ERROR",
+  CRITICAL = "CRITICAL",
 }
 
-export type LogLevelType = 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL';
+export type LogLevelType = "INFO" | "WARNING" | "ERROR" | "CRITICAL";
 
 export interface AuditLog {
   id: string;
@@ -37,33 +37,33 @@ export interface ExtendedAuditLog extends AuditLog {
 
 // Enums
 export enum AuditEventType {
-  USER_LOGIN = 'user_login',
-  USER_LOGOUT = 'user_logout',
-  CREATE_RECORD = 'create_record',
-  READ_RECORD = 'read_record',
-  UPDATE_RECORD = 'update_record',
-  DELETE_RECORD = 'delete_record',
-  SECURITY_ALERT = 'security_alert',
-  SYSTEM_ERROR = 'system_error',
-  CUSTOM = 'custom'
+  USER_LOGIN = "user_login",
+  USER_LOGOUT = "user_logout",
+  CREATE_RECORD = "create_record",
+  READ_RECORD = "read_record",
+  UPDATE_RECORD = "update_record",
+  DELETE_RECORD = "delete_record",
+  SECURITY_ALERT = "security_alert",
+  SYSTEM_ERROR = "system_error",
+  CUSTOM = "custom",
 }
 
 export enum EntityType {
-  USER = 'user',
-  DONOR = 'donor',
-  VOLUNTEER = 'volunteer',
-  MONEY_BOX = 'money_box',
-  INVENTORY = 'inventory',
-  PROJECT = 'project',
-  REPORT = 'report',
-  SYSTEM = 'system'
+  USER = "user",
+  DONOR = "donor",
+  VOLUNTEER = "volunteer",
+  MONEY_BOX = "money_box",
+  INVENTORY = "inventory",
+  PROJECT = "project",
+  REPORT = "report",
+  SYSTEM = "system",
 }
 
 export enum EventPriority {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical'
+  LOW = "low",
+  MEDIUM = "medium",
+  HIGH = "high",
+  CRITICAL = "critical",
 }
 
 // Filter and Pagination
@@ -82,7 +82,7 @@ export interface LogPaginationOptions {
   page?: number;
   limit?: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface LogQueryResult {
@@ -146,7 +146,7 @@ export interface LoggingOptions {
   ipAddress?: string;
   changes?: AuditChanges;
   errorMessage?: string;
-  status?: 'success' | 'failure';
+  status?: "success" | "failure";
   priority?: EventPriority;
   sessionId?: string;
   requestId?: string;
@@ -160,7 +160,7 @@ export interface AuditChanges {
 
 // Export
 export interface LogExportOptions {
-  format: 'json' | 'csv' | 'pdf' | 'excel';
+  format: "json" | "csv" | "pdf" | "excel";
   filters?: LogFilterOptions;
   startDate: Date;
   endDate: Date;
@@ -183,7 +183,7 @@ export interface AuditReport {
   description: string;
   startDate: Date;
   endDate: Date;
-  format: 'pdf' | 'excel' | 'json';
+  format: "pdf" | "excel" | "json";
   generatedAt: Date;
   generatedBy: string;
   fileUrl?: string;

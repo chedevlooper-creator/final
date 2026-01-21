@@ -1,51 +1,52 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils'
-import { menuItems } from '@/lib/menu-config'
-import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { useUIStore } from '@/stores/ui-store'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { useState, useEffect } from 'react'
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { menuItems } from "@/lib/menu-config";
+import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useUIStore } from "@/stores/ui-store";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState, useEffect } from "react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible'
+} from "@/components/ui/collapsible";
 
 export function Sidebar() {
-  const pathname = usePathname()
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const [openGroups, setOpenGroups] = useState<string[]>(['Başlangıç', 'Yardım Yönetimi'])
-  
+  const pathname = usePathname();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [openGroups, setOpenGroups] = useState<string[]>([
+    "Başlangıç",
+    "Yardım Yönetimi",
+  ]);
+
   // Client-side hydration
   useEffect(() => {
-    setMounted(true)
-    const store = useUIStore.getState()
-    setSidebarCollapsed(store.sidebarCollapsed)
-    
+    setMounted(true);
+    const store = useUIStore.getState();
+    setSidebarCollapsed(store.sidebarCollapsed);
+
     // Subscribe to store changes
     const unsubscribe = useUIStore.subscribe((state) => {
-      setSidebarCollapsed(state.sidebarCollapsed)
-    })
-    
-    return unsubscribe
-  }, [])
-  
+      setSidebarCollapsed(state.sidebarCollapsed);
+    });
+
+    return unsubscribe;
+  }, []);
+
   const toggleSidebar = () => {
-    useUIStore.getState().toggleSidebar()
-  }
+    useUIStore.getState().toggleSidebar();
+  };
 
   const toggleGroup = (title: string) => {
     setOpenGroups((prev) =>
-      prev.includes(title)
-        ? prev.filter((t) => t !== title)
-        : [...prev, title]
-    )
-  }
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title],
+    );
+  };
 
   if (!mounted) {
     return (
@@ -56,14 +57,14 @@ export function Sidebar() {
           </h1>
         </div>
       </aside>
-    )
+    );
   }
 
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 z-40 h-screen border-r bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 transition-all duration-200',
-        sidebarCollapsed ? 'w-16' : 'w-64'
+        "fixed left-0 top-0 z-40 h-screen border-r bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 transition-all duration-200",
+        sidebarCollapsed ? "w-16" : "w-64",
       )}
     >
       {/* Header */}
@@ -99,9 +100,9 @@ export function Sidebar() {
               <CollapsibleTrigger asChild>
                 <button
                   className={cn(
-                    'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150',
-                    'text-slate-400 hover:bg-slate-700/50 hover:text-white',
-                    sidebarCollapsed && 'justify-center'
+                    "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150",
+                    "text-slate-400 hover:bg-slate-700/50 hover:text-white",
+                    sidebarCollapsed && "justify-center",
                   )}
                 >
                   <group.icon className="h-4 w-4 shrink-0" />
@@ -110,8 +111,8 @@ export function Sidebar() {
                       <span className="flex-1 text-left">{group.title}</span>
                       <ChevronDown
                         className={cn(
-                          'h-4 w-4 transition-transform',
-                          openGroups.includes(group.title) && 'rotate-180'
+                          "h-4 w-4 transition-transform",
+                          openGroups.includes(group.title) && "rotate-180",
                         )}
                       />
                     </>
@@ -120,23 +121,23 @@ export function Sidebar() {
               </CollapsibleTrigger>
               <CollapsibleContent className="space-y-1 pl-4">
                 {group.items.map((item) => {
-                  const isActive = pathname === item.href
+                  const isActive = pathname === item.href;
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
                       prefetch={true}
                       className={cn(
-                        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-150',
+                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-150",
                         isActive
-                          ? 'bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 border-l-2 border-emerald-400'
-                          : 'text-slate-400 hover:bg-slate-700/50 hover:text-white'
+                          ? "bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 border-l-2 border-emerald-400"
+                          : "text-slate-400 hover:bg-slate-700/50 hover:text-white",
                       )}
                     >
                       <item.icon className="h-4 w-4 shrink-0" />
                       <span>{item.title}</span>
                     </Link>
-                  )
+                  );
                 })}
               </CollapsibleContent>
             </Collapsible>
@@ -144,5 +145,5 @@ export function Sidebar() {
         </nav>
       </ScrollArea>
     </aside>
-  )
+  );
 }

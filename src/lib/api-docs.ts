@@ -2,57 +2,57 @@
 /**
  * API Documentation Configuration
  * OpenAPI/Swagger specification generator
-  * 
-  * @ts-nocheck - Temporarily disabled due to complex decorator type issues
-  */
+ *
+ * @ts-nocheck - Temporarily disabled due to complex decorator type issues
+ */
 
 // Type definition for the decorator parameter
 interface RouteSpec {
-  summary: string
-  description?: string
-  tags?: string[]
-  parameters?: any[]
-  requestBody?: any
-  responses?: any
-  security?: any[]
+  summary: string;
+  description?: string;
+  tags?: string[];
+  parameters?: any[];
+  requestBody?: any;
+  responses?: any;
+  security?: any[];
 }
 
 export interface OpenAPISpec {
-  openapi: string
+  openapi: string;
   info: {
-    title: string
-    version: string
-    description: string
+    title: string;
+    version: string;
+    description: string;
     contact?: {
-      name: string
-      email: string
-    }
+      name: string;
+      email: string;
+    };
     license?: {
-      name: string
-      url: string
-    }
-  }
+      name: string;
+      url: string;
+    };
+  };
   servers: Array<{
-    url: string
-    description: string
-  }>
-  paths: Record<string, any>
+    url: string;
+    description: string;
+  }>;
+  paths: Record<string, any>;
   components: {
-    schemas: Record<string, any>
-    responses: Record<string, any>
-    parameters: Record<string, any>
-  }
+    schemas: Record<string, any>;
+    responses: Record<string, any>;
+    parameters: Record<string, any>;
+  };
   tags: Array<{
-    name: string
-    description: string
-  }>
+    name: string;
+    description: string;
+  }>;
 }
 
 export const apiDocsConfig: OpenAPISpec = {
-  openapi: '3.0.0',
+  openapi: "3.0.0",
   info: {
-    title: 'Yardım Yönetim Paneli API',
-    version: '1.0.0',
+    title: "Yardım Yönetim Paneli API",
+    version: "1.0.0",
     description: `
 Yardım Yönetim Paneli REST API Dokümantasyonu
 
@@ -76,62 +76,73 @@ Tüm error response'ları şu formatta döner:
 \`\`\`
     `,
     contact: {
-      name: 'API Support',
-      email: 'api@yardimyonetim.com',
+      name: "API Support",
+      email: "api@yardimyonetim.com",
     },
     license: {
-      name: 'MIT',
-      url: 'https://opensource.org/licenses/MIT',
+      name: "MIT",
+      url: "https://opensource.org/licenses/MIT",
     },
   },
   servers: [
     {
-      url: process.env['NEXT_PUBLIC_API_URL'] || 'http://localhost:3000',
-      description: 'Development Server',
+      url: process.env["NEXT_PUBLIC_API_URL"] || "http://localhost:3000",
+      description: "Development Server",
     },
     {
-      url: 'https://api.yardimyonetim.com',
-      description: 'Production Server',
+      url: "https://api.yardimyonetim.com",
+      description: "Production Server",
     },
   ],
   paths: {},
   components: {
     schemas: {
       Error: {
-        type: 'object',
+        type: "object",
         properties: {
-          error: { type: 'string', description: 'Hata mesajı' },
-          code: { type: 'string', description: 'Hata kodu' },
-          details: { type: 'object', description: 'Detaylı hata bilgisi' },
+          error: { type: "string", description: "Hata mesajı" },
+          code: { type: "string", description: "Hata kodu" },
+          details: { type: "object", description: "Detaylı hata bilgisi" },
         },
-        required: ['error'],
+        required: ["error"],
       },
       SuccessResponse: {
-        type: 'object',
+        type: "object",
         properties: {
-          success: { type: 'boolean', example: true },
-          message: { type: 'string' },
-          data: { type: 'object' },
+          success: { type: "boolean", example: true },
+          message: { type: "string" },
+          data: { type: "object" },
         },
       },
       PaginationParams: {
-        type: 'object',
+        type: "object",
         properties: {
-          page: { type: 'integer', minimum: 1, default: 1, description: 'Sayfa numarası' },
-          limit: { type: 'integer', minimum: 1, maximum: 100, default: 20, description: 'Sayfa başına öğe sayısı' },
+          page: {
+            type: "integer",
+            minimum: 1,
+            default: 1,
+            description: "Sayfa numarası",
+          },
+          limit: {
+            type: "integer",
+            minimum: 1,
+            maximum: 100,
+            default: 20,
+            description: "Sayfa başına öğe sayısı",
+          },
         },
       },
       PaginationResponse: {
-        type: 'object',
+        type: "object",
         properties: {
-          data: { type: 'array' },
+          data: { type: "array" },
           pagination: {
-            type: 'object',
+            type: "object",
             properties: {
-              page: { type: 'integer' },
-              limit: { type: 'integer' },
-              total: { type: 'integer' },
-              totalPages: { type: 'integer' },
+              page: { type: "integer" },
+              limit: { type: "integer" },
+              total: { type: "integer" },
+              totalPages: { type: "integer" },
             },
           },
         },
@@ -139,74 +150,74 @@ Tüm error response'ları şu formatta döner:
     },
     responses: {
       Unauthorized: {
-        description: 'Yetkisiz erişim',
+        description: "Yetkisiz erişim",
         content: {
-          'application/json': {
+          "application/json": {
             schema: {
-              $ref: '#/components/schemas/Error',
+              $ref: "#/components/schemas/Error",
             },
             example: {
-              error: 'Giriş yapmalısınız',
-              code: 'UNAUTHORIZED',
+              error: "Giriş yapmalısınız",
+              code: "UNAUTHORIZED",
             },
           },
         },
       },
       Forbidden: {
-        description: 'Yetersiz yetki',
+        description: "Yetersiz yetki",
         content: {
-          'application/json': {
+          "application/json": {
             schema: {
-              $ref: '#/components/schemas/Error',
+              $ref: "#/components/schemas/Error",
             },
             example: {
-              error: 'Bu işlem için yetkiniz yok',
-              code: 'FORBIDDEN',
+              error: "Bu işlem için yetkiniz yok",
+              code: "FORBIDDEN",
             },
           },
         },
       },
       NotFound: {
-        description: 'Kaynak bulunamadı',
+        description: "Kaynak bulunamadı",
         content: {
-          'application/json': {
+          "application/json": {
             schema: {
-              $ref: '#/components/schemas/Error',
+              $ref: "#/components/schemas/Error",
             },
             example: {
-              error: 'Kaynak bulunamadı',
-              code: 'NOT_FOUND',
+              error: "Kaynak bulunamadı",
+              code: "NOT_FOUND",
             },
           },
         },
       },
       ValidationError: {
-        description: 'Validasyon hatası',
+        description: "Validasyon hatası",
         content: {
-          'application/json': {
+          "application/json": {
             schema: {
-              type: 'object',
+              type: "object",
               properties: {
-                error: { type: 'string' },
-                code: { type: 'string' },
+                error: { type: "string" },
+                code: { type: "string" },
                 details: {
-                  type: 'object',
+                  type: "object",
                   properties: {
                     fields: {
-                      type: 'object',
-                      description: 'Alan bazlı hata mesajları',
+                      type: "object",
+                      description: "Alan bazlı hata mesajları",
                     },
                   },
                 },
               },
             },
             example: {
-              error: 'Validasyon hatası',
-              code: 'VALIDATION_ERROR',
+              error: "Validasyon hatası",
+              code: "VALIDATION_ERROR",
               details: {
                 fields: {
-                  email: 'Geçerli bir email adresi giriniz',
-                  password: 'Şifre en az 8 karakter olmalı',
+                  email: "Geçerli bir email adresi giriniz",
+                  password: "Şifre en az 8 karakter olmalı",
                 },
               },
             },
@@ -216,103 +227,109 @@ Tüm error response'ları şu formatta döner:
     },
     parameters: {
       AuthHeader: {
-        name: 'Authorization',
-        in: 'header',
-        description: 'JWT access token',
+        name: "Authorization",
+        in: "header",
+        description: "JWT access token",
         required: true,
         schema: {
-          type: 'string',
-          example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+          type: "string",
+          example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
         },
       },
       IdParam: {
-        name: 'id',
-        in: 'path',
-        description: 'Kaynak ID',
+        name: "id",
+        in: "path",
+        description: "Kaynak ID",
         required: true,
         schema: {
-          type: 'string',
-          format: 'uuid',
+          type: "string",
+          format: "uuid",
         },
       },
     },
   },
   tags: [
     {
-      name: 'Auth',
-      description: 'Kimlik doğrulama işlemleri',
+      name: "Auth",
+      description: "Kimlik doğrulama işlemleri",
     },
     {
-      name: 'Donations',
-      description: 'Bağış yönetimi',
+      name: "Donations",
+      description: "Bağış yönetimi",
     },
     {
-      name: 'Needy Persons',
-      description: 'İhtiyaç sahipleri yönetimi',
+      name: "Needy Persons",
+      description: "İhtiyaç sahipleri yönetimi",
     },
     {
-      name: 'Aids',
-      description: 'Yardım işlemleri',
+      name: "Aids",
+      description: "Yardım işlemleri",
     },
     {
-      name: 'Orphans',
-      description: 'Yetim/öğrenci yönetimi',
+      name: "Orphans",
+      description: "Yetim/öğrenci yönetimi",
     },
     {
-      name: 'Volunteers',
-      description: 'Gönüllü yönetimi',
+      name: "Volunteers",
+      description: "Gönüllü yönetimi",
     },
     {
-      name: 'Finance',
-      description: 'Finans işlemleri',
+      name: "Finance",
+      description: "Finans işlemleri",
     },
     {
-      name: 'Reports',
-      description: 'Raporlama',
+      name: "Reports",
+      description: "Raporlama",
     },
     {
-      name: 'Settings',
-      description: 'Sistem ayarları',
+      name: "Settings",
+      description: "Sistem ayarları",
     },
   ],
-}
+};
 
 /**
  * API Route decorator - Add documentation to API routes
  */
 export function DocumentRoute(config: {
-  summary: string
-  description?: string
-  tags?: string[]
-  parameters?: any[]
-  requestBody?: any
-  responses?: any
-  security?: any[]
+  summary: string;
+  description?: string;
+  tags?: string[];
+  parameters?: any[];
+  requestBody?: any;
+  responses?: any;
+  security?: any[];
 }) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor,
+  ) {
     // Store metadata for documentation generation
-    const classConstructor = target.constructor
-   
+    const classConstructor = target.constructor;
+
     // Get existing metadata or create new
-    const existingDocs: any = (classConstructor as any).__api_docs_metadata__ || {}
-    if (typeof existingDocs === 'object' && existingDocs !== null) {
-      existingDocs[propertyKey] = config
-      (classConstructor as any).__api_docs_metadata__ = existingDocs
+    const existingDocs: any =
+      (classConstructor as any).__api_docs_metadata__ || {};
+    if (typeof existingDocs === "object" && existingDocs !== null) {
+      existingDocs[propertyKey] = config(
+        classConstructor as any,
+      ).__api_docs_metadata__ = existingDocs;
     }
-    
-    return descriptor
-  }
+
+    return descriptor;
+  };
 }
 
 /**
  */
 export function generateOpenAPISpec(routes: Record<string, any>): OpenAPISpec {
-  const spec = { ...apiDocsConfig }
-  
+  const spec = { ...apiDocsConfig };
+
   // Process routes and build paths
   for (const [path, routeConfig] of Object.entries(routes)) {
-    spec.paths[path] = routeConfig
+    spec.paths[path] = routeConfig;
   }
-  
-  return spec
+
+  return spec;
 }

@@ -6,52 +6,52 @@
  * Supabase Storage bucket'ları
  */
 export enum Buckets {
-  DOCUMENTS = 'documents',        // Belgeler
-  IMAGES = 'images',             // Resimler
-  VIDEOS = 'videos',             // Videolar
-  PROFILES = 'profiles',         // Profil fotoğrafları
-  EVIDENCE = 'evidence',         // Kanıt/belge dosyaları
-  TEMP = 'temp'                  // Geçici dosyalar
+  DOCUMENTS = "documents", // Belgeler
+  IMAGES = "images", // Resimler
+  VIDEOS = "videos", // Videolar
+  PROFILES = "profiles", // Profil fotoğrafları
+  EVIDENCE = "evidence", // Kanıt/belge dosyaları
+  TEMP = "temp", // Geçici dosyalar
 }
 
 /**
  * Upload sonucu
  */
 export interface UploadResult {
-  path: string;                  // Storage path
-  fullPath: string;              // Full storage path
-  fileName: string;              // Generated file name
-  originalName: string;          // Original file name
-  size: number;                  // File size in bytes
-  mimeType: string;              // MIME type
-  bucket: Buckets;               // Bucket name
-  publicUrl: string;             // Public URL
-  createdAt: string;             // ISO timestamp
+  path: string; // Storage path
+  fullPath: string; // Full storage path
+  fileName: string; // Generated file name
+  originalName: string; // Original file name
+  size: number; // File size in bytes
+  mimeType: string; // MIME type
+  bucket: Buckets; // Bucket name
+  publicUrl: string; // Public URL
+  createdAt: string; // ISO timestamp
 }
 
 /**
  * Upload seçenekleri
  */
 export interface UploadOptions {
-  maxSize?: number;              // Maksimum dosya boyutu (bytes)
-  allowedTypes?: string[];       // İzin verilen dosya türleri
-  path?: string;                 // Yükleme yolu
-  bucket?: Buckets;              // Bucket
-  validate?: boolean;            // Validasyon yap
-  onProgress?: (progress: UploadProgressInfo) => void;  // Progress callback
-  onSuccess?: (result: UploadResult) => void;           // Success callback
-  onError?: (error: UploadError) => void;               // Error callback
+  maxSize?: number; // Maksimum dosya boyutu (bytes)
+  allowedTypes?: string[]; // İzin verilen dosya türleri
+  path?: string; // Yükleme yolu
+  bucket?: Buckets; // Bucket
+  validate?: boolean; // Validasyon yap
+  onProgress?: (progress: UploadProgressInfo) => void; // Progress callback
+  onSuccess?: (result: UploadResult) => void; // Success callback
+  onError?: (error: UploadError) => void; // Error callback
 }
 
 /**
  * Progress bilgisi
  */
 export interface UploadProgressInfo {
-  loaded: number;                // Yüklenen byte
-  total: number;                 // Toplam byte
-  percentage: number;            // Yüzde (0-100)
-  fileName?: string;             // Dosya adı
-  status: 'pending' | 'uploading' | 'success' | 'error';
+  loaded: number; // Yüklenen byte
+  total: number; // Toplam byte
+  percentage: number; // Yüzde (0-100)
+  fileName?: string; // Dosya adı
+  status: "pending" | "uploading" | "success" | "error";
 }
 
 /**
@@ -71,11 +71,11 @@ export interface UploadState {
 export interface FilePreview {
   id: string;
   file: File;
-  preview?: string;              // Base64 preview (for images)
-  url?: string;                  // External URL
-  thumbnail?: string;            // Thumbnail URL
+  preview?: string; // Base64 preview (for images)
+  url?: string; // External URL
+  thumbnail?: string; // Thumbnail URL
   info: FileInfo;
-  state: 'pending' | 'uploading' | 'success' | 'error';
+  state: "pending" | "uploading" | "success" | "error";
   progress?: number;
   error?: string;
   result?: UploadResult;
@@ -96,7 +96,7 @@ export interface FileInfo {
 /**
  * Dosya kategorisi
  */
-export type FileCategory = 'image' | 'video' | 'audio' | 'document' | 'other';
+export type FileCategory = "image" | "video" | "audio" | "document" | "other";
 
 /**
  * Validasyon sonucu
@@ -110,7 +110,7 @@ export interface ValidationResult {
  * Validasyon hatası
  */
 export interface ValidationError {
-  type: 'size' | 'type' | 'count' | 'other';
+  type: "size" | "type" | "count" | "other";
   message: string;
   fileName?: string;
   maxSize?: number;
@@ -134,11 +134,11 @@ export interface UploadStatistics {
  * Dosya seçimi yapılandırması
  */
 export interface FileSelectConfig {
-  multiple?: boolean;            // Çoklu seçim
-  accept?: string;               // Accept attribute (e.g., "image/*,.pdf")
-  maxSize?: number;              // Max size (bytes)
-  maxCount?: number;             // Max file count
-  disabled?: boolean;            // Disabled
+  multiple?: boolean; // Çoklu seçim
+  accept?: string; // Accept attribute (e.g., "image/*,.pdf")
+  maxSize?: number; // Max size (bytes)
+  maxCount?: number; // Max file count
+  disabled?: boolean; // Disabled
 }
 
 /**
@@ -156,8 +156,8 @@ export interface DropZoneState {
 export interface ImageOptions {
   maxWidth?: number;
   maxHeight?: number;
-  quality?: number;              // 1-100
-  format?: 'webp' | 'jpeg' | 'png';
+  quality?: number; // 1-100
+  format?: "webp" | "jpeg" | "png";
   enableThumbnail?: boolean;
   thumbnailSize?: number;
 }
@@ -167,9 +167,9 @@ export interface ImageOptions {
  */
 export interface VideoOptions {
   enableThumbnail?: boolean;
-  thumbnailTime?: number;        // Thumbnail zamanı (saniye)
-  maxSize?: number;              // Max video size
-  quality?: 'low' | 'medium' | 'high';
+  thumbnailTime?: number; // Thumbnail zamanı (saniye)
+  maxSize?: number; // Max video size
+  quality?: "low" | "medium" | "high";
 }
 
 /**
@@ -179,7 +179,7 @@ export interface UploadTask {
   id: string;
   file: File;
   options: UploadOptions;
-  status: 'pending' | 'uploading' | 'success' | 'error' | 'cancelled';
+  status: "pending" | "uploading" | "success" | "error" | "cancelled";
   progress: number;
   result?: UploadResult;
   error?: Error;
@@ -195,10 +195,10 @@ export class UploadError extends Error {
   constructor(
     message: string,
     public code: string,
-    public statusCode?: number
+    public statusCode?: number,
   ) {
     super(message);
-    this.name = 'UploadError';
+    this.name = "UploadError";
   }
 }
 
@@ -235,8 +235,8 @@ export interface ImageTransform {
   width?: number;
   height?: number;
   quality?: number;
-  crop?: 'scale' | 'fit' | 'fill' | 'crop';
-  format?: 'webp' | 'jpg' | 'png';
+  crop?: "scale" | "fit" | "fill" | "crop";
+  format?: "webp" | "jpg" | "png";
 }
 
 /**

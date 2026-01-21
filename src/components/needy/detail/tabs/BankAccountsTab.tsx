@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { useState, useMemo } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -18,120 +18,134 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog'
-import { Pencil, Trash2, Eye, Loader2 } from 'lucide-react'
-import { TabLayout } from './TabLayout'
+} from "@/components/ui/dialog";
+import { Pencil, Trash2, Eye, Loader2 } from "lucide-react";
+import { TabLayout } from "./TabLayout";
 import {
   BankAccount,
   CURRENCY_OPTIONS,
   TRANSACTION_TYPE_OPTIONS,
   StatusFilter,
   Currency,
-  TransactionType
-} from '@/types/linked-records.types'
-import { 
-  useBankAccountsList, 
-  useCreateBankAccount, 
-  useUpdateBankAccount, 
-  useDeleteBankAccount 
-} from '@/hooks/queries/use-bank-accounts'
-import { toast } from 'sonner'
+  TransactionType,
+} from "@/types/linked-records.types";
+import {
+  useBankAccountsList,
+  useCreateBankAccount,
+  useUpdateBankAccount,
+  useDeleteBankAccount,
+} from "@/hooks/queries/use-bank-accounts";
+import { toast } from "sonner";
 
 interface BankAccountsTabProps {
-  needyPersonId: string
-  onClose: () => void
+  needyPersonId: string;
+  onClose: () => void;
 }
 
-export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps) {
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
-  const [searchValue, setSearchValue] = useState('')
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null)
+export function BankAccountsTab({
+  needyPersonId,
+  onClose,
+}: BankAccountsTabProps) {
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("active");
+  const [searchValue, setSearchValue] = useState("");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingAccount, setEditingAccount] = useState<BankAccount | null>(
+    null,
+  );
 
   // Form state
   const [formData, setFormData] = useState({
-    account_holder_name: '',
-    currency: 'TRY' as Currency,
-    transaction_type: '' as TransactionType | '',
-    iban: '',
-    bank_name: '',
-    branch_name: '',
-    branch_code: '',
-    account_number: '',
-    swift_code: '',
-    address: '',
-  })
+    account_holder_name: "",
+    currency: "TRY" as Currency,
+    transaction_type: "" as TransactionType | "",
+    iban: "",
+    bank_name: "",
+    branch_name: "",
+    branch_code: "",
+    account_number: "",
+    swift_code: "",
+    address: "",
+  });
 
   // API hooks
-  const isActiveFilter = statusFilter === 'all' ? undefined : statusFilter === 'inactive' ? false : true
-  const { data: accountsData, isLoading } = useBankAccountsList(needyPersonId, isActiveFilter)
-  const createMutation = useCreateBankAccount()
-  const updateMutation = useUpdateBankAccount()
-  const deleteMutation = useDeleteBankAccount()
+  const isActiveFilter =
+    statusFilter === "all"
+      ? undefined
+      : statusFilter === "inactive"
+        ? false
+        : true;
+  const { data: accountsData, isLoading } = useBankAccountsList(
+    needyPersonId,
+    isActiveFilter,
+  );
+  const createMutation = useCreateBankAccount();
+  const updateMutation = useUpdateBankAccount();
+  const deleteMutation = useDeleteBankAccount();
 
   // Filter accounts by search
   const accounts = useMemo(() => {
-    if (!accountsData) return []
-    if (!searchValue) return accountsData
-    const search = searchValue.toLowerCase()
-    return accountsData.filter(acc => 
-      acc.iban?.toLowerCase().includes(search) ||
-      acc.bank_name?.toLowerCase().includes(search) ||
-      acc.account_holder_name?.toLowerCase().includes(search)
-    )
-  }, [accountsData, searchValue])
+    if (!accountsData) return [];
+    if (!searchValue) return accountsData;
+    const search = searchValue.toLowerCase();
+    return accountsData.filter(
+      (acc) =>
+        acc.iban?.toLowerCase().includes(search) ||
+        acc.bank_name?.toLowerCase().includes(search) ||
+        acc.account_holder_name?.toLowerCase().includes(search),
+    );
+  }, [accountsData, searchValue]);
 
   const columns = [
-    { key: 'account_holder_name', label: 'Alıcı Ünvanı' },
-    { key: 'currency', label: 'Döviz', width: '80px' },
-    { key: 'transaction_type', label: 'İşlem Tür', width: '100px' },
-    { key: 'iban', label: 'IBAN' },
-    { key: 'bank_name', label: 'Banka' },
-    { key: 'branch_name', label: 'Şube' },
-    { key: 'account_number', label: 'Hesap' },
-    { key: 'swift_code', label: 'Swift', width: '100px' },
-  ]
+    { key: "account_holder_name", label: "Alıcı Ünvanı" },
+    { key: "currency", label: "Döviz", width: "80px" },
+    { key: "transaction_type", label: "İşlem Tür", width: "100px" },
+    { key: "iban", label: "IBAN" },
+    { key: "bank_name", label: "Banka" },
+    { key: "branch_name", label: "Şube" },
+    { key: "account_number", label: "Hesap" },
+    { key: "swift_code", label: "Swift", width: "100px" },
+  ];
 
   const handleAdd = () => {
-    setEditingAccount(null)
+    setEditingAccount(null);
     setFormData({
-      account_holder_name: '',
-      currency: 'TRY',
-      transaction_type: '',
-      iban: '',
-      bank_name: '',
-      branch_name: '',
-      branch_code: '',
-      account_number: '',
-      swift_code: '',
-      address: '',
-    })
-    setIsAddModalOpen(true)
-  }
+      account_holder_name: "",
+      currency: "TRY",
+      transaction_type: "",
+      iban: "",
+      bank_name: "",
+      branch_name: "",
+      branch_code: "",
+      account_number: "",
+      swift_code: "",
+      address: "",
+    });
+    setIsAddModalOpen(true);
+  };
 
   const handleEdit = (account: BankAccount) => {
-    setEditingAccount(account)
+    setEditingAccount(account);
     setFormData({
-      account_holder_name: account.account_holder_name || '',
+      account_holder_name: account.account_holder_name || "",
       currency: account.currency,
-      transaction_type: account.transaction_type || '',
-      iban: account.iban || '',
-      bank_name: account.bank_name || '',
-      branch_name: account.branch_name || '',
-      branch_code: account.branch_code || '',
-      account_number: account.account_number || '',
-      swift_code: account.swift_code || '',
-      address: account.address || '',
-    })
-    setIsAddModalOpen(true)
-  }
+      transaction_type: account.transaction_type || "",
+      iban: account.iban || "",
+      bank_name: account.bank_name || "",
+      branch_name: account.branch_name || "",
+      branch_code: account.branch_code || "",
+      account_number: account.account_number || "",
+      swift_code: account.swift_code || "",
+      address: account.address || "",
+    });
+    setIsAddModalOpen(true);
+  };
 
   const handleSave = async () => {
     try {
@@ -151,8 +165,8 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
             swift_code: formData.swift_code || null,
             address: formData.address || null,
           },
-        })
-        toast.success('Banka hesabı güncellendi')
+        });
+        toast.success("Banka hesabı güncellendi");
       } else {
         // Create new
         await createMutation.mutateAsync({
@@ -169,27 +183,27 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
           address: formData.address || null,
           is_active: true,
           is_primary: false,
-        })
-        toast.success('Banka hesabı eklendi')
+        });
+        toast.success("Banka hesabı eklendi");
       }
-      setIsAddModalOpen(false)
+      setIsAddModalOpen(false);
     } catch (error) {
-      toast.error('Kayıt sırasında hata oluştu')
+      toast.error("Kayıt sırasında hata oluştu");
     }
-  }
+  };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Bu banka hesabını silmek istediğinizden emin misiniz?')) {
+    if (confirm("Bu banka hesabını silmek istediğinizden emin misiniz?")) {
       try {
-        await deleteMutation.mutateAsync({ id, needyPersonId })
-        toast.success('Banka hesabı silindi')
+        await deleteMutation.mutateAsync({ id, needyPersonId });
+        toast.success("Banka hesabı silindi");
       } catch (error) {
-        toast.error('Silme işlemi başarısız')
+        toast.error("Silme işlemi başarısız");
       }
     }
-  }
-  
-  const isSaving = createMutation.isPending || updateMutation.isPending
+  };
+
+  const isSaving = createMutation.isPending || updateMutation.isPending;
 
   return (
     <>
@@ -225,7 +239,10 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
             <TableBody>
               {accounts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={columns.length + 2} className="text-center py-8 text-muted-foreground">
+                  <TableCell
+                    colSpan={columns.length + 2}
+                    className="text-center py-8 text-muted-foreground"
+                  >
                     Kayıtlı banka hesabı bulunamadı
                   </TableCell>
                 </TableRow>
@@ -240,9 +257,15 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
                     <TableCell>{account.account_holder_name}</TableCell>
                     <TableCell>{account.currency}</TableCell>
                     <TableCell>
-                      {TRANSACTION_TYPE_OPTIONS.find(t => t.value === account.transaction_type)?.label}
+                      {
+                        TRANSACTION_TYPE_OPTIONS.find(
+                          (t) => t.value === account.transaction_type,
+                        )?.label
+                      }
                     </TableCell>
-                    <TableCell className="font-mono text-xs">{account.iban}</TableCell>
+                    <TableCell className="font-mono text-xs">
+                      {account.iban}
+                    </TableCell>
                     <TableCell>{account.bank_name}</TableCell>
                     <TableCell>{account.branch_name}</TableCell>
                     <TableCell>{account.account_number}</TableCell>
@@ -280,7 +303,9 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              {editingAccount ? 'Banka Hesabı Düzenle' : 'Yeni Banka Hesabı Ekle'}
+              {editingAccount
+                ? "Banka Hesabı Düzenle"
+                : "Yeni Banka Hesabı Ekle"}
             </DialogTitle>
           </DialogHeader>
 
@@ -289,7 +314,12 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
               <Label>Alıcı Ünvanı</Label>
               <Input
                 value={formData.account_holder_name}
-                onChange={(e) => setFormData({ ...formData, account_holder_name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    account_holder_name: e.target.value,
+                  })
+                }
                 placeholder="Hesap sahibinin adı"
               />
             </div>
@@ -298,7 +328,9 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
               <Label>Döviz</Label>
               <Select
                 value={formData.currency}
-                onValueChange={(v) => setFormData({ ...formData, currency: v as Currency })}
+                onValueChange={(v) =>
+                  setFormData({ ...formData, currency: v as Currency })
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -317,7 +349,12 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
               <Label>İşlem Türü</Label>
               <Select
                 value={formData.transaction_type}
-                onValueChange={(v) => setFormData({ ...formData, transaction_type: v as TransactionType })}
+                onValueChange={(v) =>
+                  setFormData({
+                    ...formData,
+                    transaction_type: v as TransactionType,
+                  })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Seçin" />
@@ -336,7 +373,9 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
               <Label>IBAN</Label>
               <Input
                 value={formData.iban}
-                onChange={(e) => setFormData({ ...formData, iban: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, iban: e.target.value })
+                }
                 placeholder="TR00 0000 0000 0000 0000 0000 00"
                 className="font-mono"
               />
@@ -346,7 +385,9 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
               <Label>Banka</Label>
               <Input
                 value={formData.bank_name}
-                onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, bank_name: e.target.value })
+                }
                 placeholder="Banka adı"
               />
             </div>
@@ -355,7 +396,9 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
               <Label>Şube</Label>
               <Input
                 value={formData.branch_name}
-                onChange={(e) => setFormData({ ...formData, branch_name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, branch_name: e.target.value })
+                }
                 placeholder="Şube adı"
               />
             </div>
@@ -364,7 +407,9 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
               <Label>Şube Kodu</Label>
               <Input
                 value={formData.branch_code}
-                onChange={(e) => setFormData({ ...formData, branch_code: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, branch_code: e.target.value })
+                }
                 placeholder="Şube kodu"
               />
             </div>
@@ -373,7 +418,9 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
               <Label>Hesap Numarası</Label>
               <Input
                 value={formData.account_number}
-                onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, account_number: e.target.value })
+                }
                 placeholder="Hesap numarası"
               />
             </div>
@@ -382,7 +429,9 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
               <Label>Swift Kodu</Label>
               <Input
                 value={formData.swift_code}
-                onChange={(e) => setFormData({ ...formData, swift_code: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, swift_code: e.target.value })
+                }
                 placeholder="SWIFT kodu"
               />
             </div>
@@ -391,14 +440,20 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
               <Label>Adres</Label>
               <Input
                 value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, address: e.target.value })
+                }
                 placeholder="Banka şube adresi"
               />
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddModalOpen(false)} disabled={isSaving}>
+            <Button
+              variant="outline"
+              onClick={() => setIsAddModalOpen(false)}
+              disabled={isSaving}
+            >
               İptal
             </Button>
             <Button onClick={handleSave} disabled={isSaving}>
@@ -409,5 +464,5 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

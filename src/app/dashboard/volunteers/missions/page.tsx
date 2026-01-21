@@ -1,91 +1,98 @@
-'use client'
+"use client";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
-import { useState } from 'react'
-import { useMissionsList } from '@/hooks/queries/use-volunteers'
-import { PageHeader } from '@/components/common/page-header'
-import { DataTable } from '@/components/common/data-table'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import { useMissionsList } from "@/hooks/queries/use-volunteers";
+import { PageHeader } from "@/components/common/page-header";
+import { DataTable } from "@/components/common/data-table";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { Calendar, Plus, MoreHorizontal, Eye, Pencil, CheckCircle } from 'lucide-react'
-import { ColumnDef } from '@tanstack/react-table'
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import {
+  Calendar,
+  Plus,
+  MoreHorizontal,
+  Eye,
+  Pencil,
+  CheckCircle,
+} from "lucide-react";
+import { ColumnDef } from "@tanstack/react-table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { format } from 'date-fns'
-import { tr } from 'date-fns/locale'
+} from "@/components/ui/dropdown-menu";
+import { format } from "date-fns";
+import { tr } from "date-fns/locale";
 
 type Mission = {
-  id: string
-  mission_number: string | null
-  title: string
-  volunteer_id: string
+  id: string;
+  mission_number: string | null;
+  title: string;
+  volunteer_id: string;
   volunteer?: {
-    id: string
-    first_name: string
-    last_name: string
-    phone: string | null
-  } | null
-  mission_date: string
-  status: string
-  location: string | null
-  description: string | null
-  created_at: string
-}
+    id: string;
+    first_name: string;
+    last_name: string;
+    phone: string | null;
+  } | null;
+  mission_date: string;
+  status: string;
+  location: string | null;
+  description: string | null;
+  created_at: string;
+};
 
 export default function MissionsPage() {
-  const [page, setPage] = useState(0)
-  const [status, setStatus] = useState<string>('')
+  const [page, setPage] = useState(0);
+  const [status, setStatus] = useState<string>("");
 
   const { data, isLoading } = useMissionsList({
     page,
     status: status || undefined,
-  })
+  });
 
   const getStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
-      assigned: 'bg-blue-100 text-blue-700',
-      in_progress: 'bg-yellow-100 text-yellow-700',
-      completed: 'bg-green-100 text-green-700',
-      cancelled: 'bg-red-100 text-red-700',
-    }
+      assigned: "bg-blue-100 text-blue-700",
+      in_progress: "bg-yellow-100 text-yellow-700",
+      completed: "bg-green-100 text-green-700",
+      cancelled: "bg-red-100 text-red-700",
+    };
     const statusLabels: Record<string, string> = {
-      assigned: 'Atandı',
-      in_progress: 'Devam Ediyor',
-      completed: 'Tamamlandı',
-      cancelled: 'İptal',
-    }
+      assigned: "Atandı",
+      in_progress: "Devam Ediyor",
+      completed: "Tamamlandı",
+      cancelled: "İptal",
+    };
     return (
-      <Badge className={statusColors[status] || 'bg-slate-100'}>
+      <Badge className={statusColors[status] || "bg-slate-100"}>
         {statusLabels[status] || status}
       </Badge>
-    )
-  }
+    );
+  };
 
   const columns: ColumnDef<Mission>[] = [
     {
-      accessorKey: 'mission_number',
-      header: 'Görev No',
+      accessorKey: "mission_number",
+      header: "Görev No",
       cell: ({ row }) => (
         <span className="font-mono text-sm text-slate-600">
-          {row.original.mission_number || '-'}
+          {row.original.mission_number || "-"}
         </span>
       ),
     },
     {
-      accessorKey: 'title',
-      header: 'Görev Başlığı',
+      accessorKey: "title",
+      header: "Görev Başlığı",
       cell: ({ row }) => (
         <div>
           <p className="font-medium">{row.original.title}</p>
@@ -96,35 +103,40 @@ export default function MissionsPage() {
       ),
     },
     {
-      accessorKey: 'volunteer',
-      header: 'Gönüllü',
+      accessorKey: "volunteer",
+      header: "Gönüllü",
       cell: ({ row }) => (
         <div>
           <p className="font-medium">
-            {row.original.volunteer?.first_name} {row.original.volunteer?.last_name}
+            {row.original.volunteer?.first_name}{" "}
+            {row.original.volunteer?.last_name}
           </p>
           {row.original.volunteer?.phone && (
-            <p className="text-xs text-slate-500">{row.original.volunteer.phone}</p>
+            <p className="text-xs text-slate-500">
+              {row.original.volunteer.phone}
+            </p>
           )}
         </div>
       ),
     },
     {
-      accessorKey: 'mission_date',
-      header: 'Görev Tarihi',
+      accessorKey: "mission_date",
+      header: "Görev Tarihi",
       cell: ({ row }) => (
         <span className="text-sm text-slate-500">
-          {format(new Date(row.original.mission_date), 'dd MMM yyyy', { locale: tr })}
+          {format(new Date(row.original.mission_date), "dd MMM yyyy", {
+            locale: tr,
+          })}
         </span>
       ),
     },
     {
-      accessorKey: 'status',
-      header: 'Durum',
+      accessorKey: "status",
+      header: "Durum",
       cell: ({ row }) => getStatusBadge(row.original.status),
     },
     {
-      id: 'actions',
+      id: "actions",
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -141,7 +153,7 @@ export default function MissionsPage() {
               <Pencil className="mr-2 h-4 w-4" />
               Düzenle
             </DropdownMenuItem>
-            {row.original.status !== 'completed' && (
+            {row.original.status !== "completed" && (
               <DropdownMenuItem className="text-green-600">
                 <CheckCircle className="mr-2 h-4 w-4" />
                 Tamamlandı İşaretle
@@ -151,7 +163,7 @@ export default function MissionsPage() {
         </DropdownMenu>
       ),
     },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -169,7 +181,10 @@ export default function MissionsPage() {
 
       {/* Filtreler */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center">
-        <Select value={status || 'all'} onValueChange={(v) => setStatus(v === 'all' ? '' : v)}>
+        <Select
+          value={status || "all"}
+          onValueChange={(v) => setStatus(v === "all" ? "" : v)}
+        >
           <SelectTrigger className="w-48">
             <SelectValue placeholder="Durum" />
           </SelectTrigger>
@@ -193,5 +208,5 @@ export default function MissionsPage() {
         onPageChange={setPage}
       />
     </div>
-  )
+  );
 }
