@@ -58,7 +58,7 @@ export interface CreateSkillCategoryInput {
   status?: 'active' | 'inactive'
 }
 
-export interface UpdateSkillCategoryInput extends Partial<CreateSkillCategoryInput> {}
+export type UpdateSkillCategoryInput = Partial<CreateSkillCategoryInput>
 
 export interface CreateSkillInput {
   name: string
@@ -67,7 +67,7 @@ export interface CreateSkillInput {
   status?: 'active' | 'inactive'
 }
 
-export interface UpdateSkillInput extends Partial<CreateSkillInput> {}
+export type UpdateSkillInput = Partial<CreateSkillInput>
 
 export interface CreateVolunteerSkillInput {
   volunteer_id: string
@@ -77,7 +77,7 @@ export interface CreateVolunteerSkillInput {
   notes?: string
 }
 
-export interface UpdateVolunteerSkillInput extends Partial<CreateVolunteerSkillInput> {}
+export type UpdateVolunteerSkillInput = Partial<CreateVolunteerSkillInput>
 
 export interface SkillFilters {
   category_id?: string

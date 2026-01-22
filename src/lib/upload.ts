@@ -152,7 +152,7 @@ export async function uploadFile(
   onUploadProgress?: ProgressCallback
 ): Promise<UploadResult> {
   try {
-    // @ts-ignore - Supabase client will be imported from proper location
+    // @ts-expect-error - Dynamic import of Supabase client - Supabase client will be imported from proper location
     const { supabase } = await import('@/lib/supabase/client');
 
     const fileName = generateUniqueFileName(file.name);
@@ -260,7 +260,7 @@ export async function uploadMultipleFiles(
  */
 export async function deleteFile(path: string, bucket: Buckets = Buckets.DOCUMENTS): Promise<void> {
   try {
-    // @ts-ignore
+    // @ts-expect-error - Dynamic import of Supabase client
     const { supabase } = await import('@/lib/supabase/client');
 
     const { error } = await supabase.storage
@@ -288,7 +288,7 @@ export async function deleteMultipleFiles(
   bucket: Buckets = Buckets.DOCUMENTS
 ): Promise<void> {
   try {
-    // @ts-ignore
+    // @ts-expect-error - Dynamic import of Supabase client
     const { supabase } = await import('@/lib/supabase/client');
 
     const { error } = await supabase.storage
@@ -317,7 +317,7 @@ export async function getFileUrl(
   bucket: Buckets = Buckets.DOCUMENTS
 ): Promise<string> {
   try {
-    // @ts-ignore
+    // @ts-expect-error - Dynamic import of Supabase client
     const { supabase } = await import('@/lib/supabase/client');
 
     const { data } = supabase.storage
@@ -342,9 +342,9 @@ export async function getFileUrl(
 export async function listFiles(
   path: string = '',
   bucket: Buckets = Buckets.DOCUMENTS
-): Promise<any[]> {
+): Promise<unknown[]> {
   try {
-    // @ts-ignore
+    // @ts-expect-error - Dynamic import of Supabase client
     const { supabase } = await import('@/lib/supabase/client');
 
     const { data, error } = await supabase.storage
