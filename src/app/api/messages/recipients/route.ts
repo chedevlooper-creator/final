@@ -5,7 +5,7 @@
  * Fetches recipient list based on recipient type for bulk messaging
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 interface Recipient {
@@ -48,14 +48,14 @@ const mapDonorToRecipient = (donor: DonorData): Recipient => ({
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createServerSupabaseClient()
     const searchParams = request.nextUrl.searchParams
     const recipientType = searchParams.get('type') || 'all'
 
     let recipients: Recipient[] = []
 
     switch (recipientType) {
-      case 'all':
+      case 'all': {
         // Get all needy persons with phone or email
         const { data: allNeedy, error: allError } = await supabase
           .from('needy_persons')
@@ -65,8 +65,9 @@ export async function GET(request: NextRequest) {
         if (allError) throw allError
         recipients = (allNeedy || []).map(mapPersonToRecipient)
         break
+      }
 
-      case 'active':
+      case 'active': {
         // Get active needy persons with phone or email
         const { data: activeNeedy, error: activeError } = await supabase
           .from('needy_persons')
@@ -77,8 +78,9 @@ export async function GET(request: NextRequest) {
         if (activeError) throw activeError
         recipients = (activeNeedy || []).map(mapPersonToRecipient)
         break
+      }
 
-      case 'volunteers':
+      case 'volunteers': {
         // Get volunteers with phone or email
         const { data: volunteers, error: volError } = await supabase
           .from('volunteers')
@@ -88,8 +90,9 @@ export async function GET(request: NextRequest) {
         if (volError) throw volError
         recipients = (volunteers || []).map(mapPersonToRecipient)
         break
+      }
 
-      case 'donors':
+      case 'donors': {
         // Get donors with phone or email
         const { data: donors, error: donorError } = await supabase
           .from('donors')
@@ -99,6 +102,7 @@ export async function GET(request: NextRequest) {
         if (donorError) throw donorError
         recipients = (donors || []).map(mapDonorToRecipient)
         break
+      }
 
       default:
         return NextResponse.json(

@@ -158,7 +158,7 @@ export class BulkOperation<T = unknown> {
     this.abortController = new AbortController();
     
     // Aktif işlemlere ekle
-    BulkOperation.activeOperations.set(this.id, this);
+    BulkOperation.activeOperations.set(this.id, this as BulkOperation<unknown>);
   }
 
   /**
@@ -298,7 +298,7 @@ export class BulkOperation<T = unknown> {
       BulkOperation.activeOperations.delete(this.id);
 
       if (this.options.onError) {
-        this.options.onError(error);
+        this.options.onError(error instanceof Error ? error : new Error(String(error)));
       }
 
       throw new BulkExecutionError(

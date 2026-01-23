@@ -5,12 +5,12 @@
  * Handles bulk SMS sending by queueing messages and triggering delivery
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createServerSupabaseClient()
 
     const body = await request.json()
     const { recipients, message, messageType } = body

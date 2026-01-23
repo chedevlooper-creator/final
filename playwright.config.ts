@@ -12,13 +12,13 @@ export default defineConfig({
   fullyParallel: true,
   
   // CI ortamında 'only' içeren testleri engelle
-  forbidOnly: !!process.env.CI,
-  
+  forbidOnly: !!process.env['CI'],
+
   // CI ortamında 2 kez dene
-  retries: process.env.CI ? 2 : 0,
-  
+  retries: process.env['CI'] ? 2 : 0,
+
   // Worker sayısı (CI'da 1, lokalde undefined)
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env['CI'] ? 1 : undefined,
   
   // Test raporlayıcı
   reporter: [
@@ -88,7 +88,7 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !process.env['CI'],
     timeout: 120 * 1000, // 2 dakika
   },
 })
