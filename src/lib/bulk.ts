@@ -102,22 +102,22 @@ export interface BulkOperationResult<T = any> {
     averageTimePerItem: number; // ms
     successRate: number; // percentage
   };
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // İşlem öğesi
-export interface BulkOperationItem<T = any> {
+export interface BulkOperationItem<T = unknown> {
   id: string;
   item: T;
   status: 'pending' | 'processing' | 'completed' | 'failed';
-  result?: any;
+  result?: unknown;
   error?: string;
   startTime?: Date;
   endTime?: Date;
 }
 
 // Toplu işlem sınıfı
-export class BulkOperation<T = any> {
+export class BulkOperation<T = unknown> {
   private id: string;
   private options: BulkOperationOptions<T>;
   private status: BulkOperationStatus;
@@ -238,9 +238,9 @@ export class BulkOperation<T = any> {
               
               this.progress.completed++;
               
-            } catch (error: any) {
+            } catch (error: unknown) {
               itemObj.status = 'failed';
-              itemObj.error = error.message || 'Bilinmeyen hata';
+              itemObj.error = error instanceof Error ? error.message : 'Bilinmeyen hata';
               itemObj.endTime = new Date();
               
               this.progress.failed++;
@@ -291,7 +291,7 @@ export class BulkOperation<T = any> {
 
       return result;
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.endTime = new Date();
       this.status = BulkOperationStatus.FAILED;
       
@@ -302,7 +302,7 @@ export class BulkOperation<T = any> {
       }
 
       throw new BulkExecutionError(
-        error.message || 'Toplu işlem başarısız',
+        error instanceof Error ? error.message : 'Toplu işlem başarısız',
         this.items
           .filter(item => item.status === 'failed')
           .map(item => ({ index: this.items.indexOf(item), error: item.error || 'Unknown error' }))

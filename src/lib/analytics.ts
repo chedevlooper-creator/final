@@ -13,9 +13,15 @@ export function trackEvent(
 
   try {
     posthog.capture(eventName, properties)
-    console.log(`📊 Event tracked: ${eventName}`, properties)
+    // Only log in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`📊 Event tracked: ${eventName}`, properties)
+    }
   } catch (error) {
-    console.error('PostHog tracking error:', error)
+    // Only log errors in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('PostHog tracking error:', error)
+    }
   }
 }
 
@@ -38,14 +44,20 @@ export function identifyUser(
   if (typeof window === 'undefined') return
 
   posthog.identify(userId, properties)
-  console.log(`👤 User identified: ${userId}`, properties)
+  // Only log in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`👤 User identified: ${userId}`, properties)
+  }
 }
 
 export function resetUser() {
   if (typeof window === 'undefined') return
 
   posthog.reset()
-  console.log('🔄 User reset')
+  // Only log in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔄 User reset')
+  }
 }
 
 export function trackButtonClick(

@@ -3,13 +3,14 @@
 export const dynamic = 'force-dynamic'
 
 import { useState } from 'react'
-import { useSendBulkSMS, useSendBulkEmail } from '@/hooks/queries/use-messages'
+import { useSendBulkSMS, useSendBulkEmail, useRecipients } from '@/hooks/queries/use-messages'
 import { PageHeader } from '@/components/common/page-header'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { useToast } from '@/hooks/use-toast'
 import {
   Select,
   SelectContent,
@@ -24,13 +25,34 @@ export default function BulkMessagesPage() {
   const [recipientType, setRecipientType] = useState<string>('all')
   const [message, setMessage] = useState('')
   const [subject, setSubject] = useState('')
+  const { toast } = useToast()
   
   const sendBulkSMS = useSendBulkSMS()
   const sendBulkEmail = useSendBulkEmail()
+  const { data: recipientsData } = useRecipients(recipientType)
+
+  // Extract contact info based on message type
+  const getRecipientContacts = (messageType: string): string[] => {
+    return (recipientsData?.recipients || [])
+      .map(r => {
+        if (messageType === 'email') return r.email
+        if (messageType === 'sms') return r.phone
+        return undefined
+      })
+      .filter((contact): contact is string => !!contact)
+  }
 
   const handleSend = async () => {
-    // TODO: Get recipients based on recipientType
-    const recipients: string[] = []
+    const recipients = getRecipientContacts(messageType)
+    
+    if (recipients.length === 0) {
+      toast({
+        title: 'Alıcı Bulunamadı',
+        description: `Seçilen grup için geçerli ${messageType === 'email' ? 'e-posta adresi' : 'telefon numarası'} bulunamadı.`,
+        variant: 'destructive',
+      })
+      return
+    }
     
     if (messageType === 'sms') {
       await sendBulkSMS.mutateAsync({
@@ -141,7 +163,7 @@ export default function BulkMessagesPage() {
               <Users className="h-5 w-5 text-blue-500 mt-0.5" />
               <div>
                 <p className="font-medium text-sm text-blue-900">Alıcı Sayısı</p>
-                <p className="text-2xl font-bold text-blue-600">0</p>
+                <p className="text-2xl font-bold text-blue-600">{recipientsData?.count || 0}</p>
                 <p className="text-xs text-blue-700 mt-1">Tahmini alıcı sayısı</p>
               </div>
             </div>

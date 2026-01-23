@@ -102,3 +102,31 @@ export function useSendBulkEmail() {
     },
   })
 }
+
+export interface Recipient {
+  id: string
+  phone?: string
+  email?: string
+  name: string
+}
+
+export function useRecipients(recipientType: string) {
+  return useQuery({
+    queryKey: ['recipients', recipientType],
+    queryFn: async () => {
+      const response = await fetch(`/api/messages/recipients?type=${recipientType}`)
+      
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to fetch recipients')
+      }
+      
+      return response.json() as Promise<{
+        recipients: Recipient[]
+        count: number
+        type: string
+      }>
+    },
+    enabled: !!recipientType,
+  })
+}
