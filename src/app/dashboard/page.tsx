@@ -50,42 +50,42 @@ export default function DashboardPage() {
       title: 'Toplam İhtiyaç Sahibi',
       value: isStatsLoading ? <Skeleton className="h-7 w-16" /> : (needyData?.count || 0),
       icon: Users,
-      iconColor: 'text-blue-500',
+      iconColor: 'text-primary',
       description: 'Sistemdeki toplam kayıt',
     },
     {
       title: 'Bekleyen Başvuru',
       value: isStatsLoading ? <Skeleton className="h-7 w-16" /> : (applicationsData?.data?.filter((app: Application) => app.status === 'new').length || 0),
       icon: Clock,
-      iconColor: 'text-orange-500',
+      iconColor: 'text-warning',
       description: 'İşlem bekliyor',
     },
     {
       title: 'Bugünkü Bağış',
       value: isStatsLoading ? <Skeleton className="h-7 w-24" /> : `₺${(donationStats?.today || 0).toLocaleString('tr-TR')}`,
       icon: DollarSign,
-      iconColor: 'text-emerald-500',
+      iconColor: 'text-success',
       description: 'Bugün toplanan',
     },
     {
       title: 'Aylık Bağış',
       value: isStatsLoading ? <Skeleton className="h-7 w-24" /> : `₺${(donationStats?.thisMonth || 0).toLocaleString('tr-TR')}`,
       icon: TrendingUp,
-      iconColor: 'text-purple-500',
+      iconColor: 'text-info',
       description: 'Bu ay toplanan',
     },
     {
       title: 'Tamamlanan Yardım',
       value: isStatsLoading ? <Skeleton className="h-7 w-16" /> : (applicationsData?.data?.filter((app: Application) => app.status === 'completed').length || 0),
       icon: CheckCircle,
-      iconColor: 'text-cyan-500',
+      iconColor: 'text-primary',
       description: 'Bu ay tamamlanan',
     },
     {
       title: 'Toplam Bağış',
       value: isStatsLoading ? <Skeleton className="h-7 w-16" /> : (donationStats?.count || 0),
       icon: FileText,
-      iconColor: 'text-red-500',
+      iconColor: 'text-destructive',
       description: 'Tüm zamanlar',
     },
   ], [needyData?.count, applicationsData?.data, donationStats, isStatsLoading])
@@ -110,7 +110,7 @@ export default function DashboardPage() {
               </Button>
             </Link>
             <Link href="/dashboard/applications">
-              <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600">
+              <Button className="bg-gradient-nature hover:opacity-90">
                 <FileText className="mr-2 h-4 w-4" />
                 Yeni Başvuru
               </Button>
@@ -147,8 +147,8 @@ export default function DashboardPage() {
                     className="flex items-center justify-between rounded-lg border p-3 hover:bg-slate-50 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-emerald-100 to-cyan-100">
-                        <FileText className="h-5 w-5 text-emerald-600" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-nature-light">
+                        <FileText className="h-5 w-5 text-primary" />
                       </div>
                       <div>
                         <p className="font-medium text-sm">
@@ -160,9 +160,9 @@ export default function DashboardPage() {
                     <span
                       className={`rounded-full px-2 py-1 text-xs font-medium ${
                         app.status === 'new'
-                          ? 'bg-blue-100 text-blue-700'
+                          ? 'bg-info/10 text-info'
                           : app.status === 'approved'
-                          ? 'bg-green-100 text-green-700'
+                          ? 'bg-success/10 text-success'
                           : 'bg-slate-100 text-slate-700'
                       }`}
                     >
@@ -189,9 +189,9 @@ export default function DashboardPage() {
               <Link href="/dashboard/needy">
                 <Button
                   variant="outline"
-                  className="h-auto w-full flex-col items-start gap-2 p-4 hover:bg-slate-50 hover:border-emerald-300"
+                  className="h-auto w-full flex-col items-start gap-2 p-4 hover:bg-slate-50 hover:border-primary"
                 >
-                  <Users className="h-6 w-6 text-emerald-500" />
+                  <Users className="h-6 w-6 text-primary" />
                   <div className="text-left">
                     <p className="font-medium">İhtiyaç Sahibi Ekle</p>
                     <p className="text-xs text-slate-500">Yeni kayıt oluştur</p>
@@ -201,9 +201,9 @@ export default function DashboardPage() {
               <Link href="/dashboard/applications">
                 <Button
                   variant="outline"
-                  className="h-auto w-full flex-col items-start gap-2 p-4 hover:bg-slate-50 hover:border-blue-300"
+                  className="h-auto w-full flex-col items-start gap-2 p-4 hover:bg-slate-50 hover:border-info"
                 >
-                  <FileText className="h-6 w-6 text-blue-500" />
+                  <FileText className="h-6 w-6 text-info" />
                   <div className="text-left">
                     <p className="font-medium">Yardım Başvurusu</p>
                     <p className="text-xs text-slate-500">Yeni başvuru al</p>
@@ -213,9 +213,9 @@ export default function DashboardPage() {
               <Link href="/dashboard/donations">
                 <Button
                   variant="outline"
-                  className="h-auto w-full flex-col items-start gap-2 p-4 hover:bg-slate-50 hover:border-purple-300"
+                  className="h-auto w-full flex-col items-start gap-2 p-4 hover:bg-slate-50 hover:border-success"
                 >
-                  <DollarSign className="h-6 w-6 text-purple-500" />
+                  <DollarSign className="h-6 w-6 text-success" />
                   <div className="text-left">
                     <p className="font-medium">Bağış Kaydet</p>
                     <p className="text-xs text-slate-500">Yeni bağış gir</p>
@@ -225,9 +225,9 @@ export default function DashboardPage() {
               <Link href="/dashboard/calendar">
                 <Button
                   variant="outline"
-                  className="h-auto w-full flex-col items-start gap-2 p-4 hover:bg-slate-50 hover:border-orange-300"
+                  className="h-auto w-full flex-col items-start gap-2 p-4 hover:bg-slate-50 hover:border-warning"
                 >
-                  <Calendar className="h-6 w-6 text-orange-500" />
+                  <Calendar className="h-6 w-6 text-warning" />
                   <div className="text-left">
                     <p className="font-medium">Takvim</p>
                     <p className="text-xs text-slate-500">Etkinlikleri görüntüle</p>
@@ -245,7 +245,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-emerald-500" />
+              <TrendingUp className="h-5 w-5 text-primary" />
               Aylık Bağış Trendi
             </CardTitle>
           </CardHeader>
@@ -260,7 +260,7 @@ export default function DashboardPage() {
                 labelKey="label"
                 valueKey="value"
                 height={250}
-                color="#10b981"
+                color="hsl(174, 73%, 42%)"
                 showArea={true}
                 formatValue={(v) => `₺${v.toLocaleString('tr-TR')}`}
               />
@@ -276,7 +276,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-500" />
+              <FileText className="h-5 w-5 text-info" />
               Başvuru Durumları
             </CardTitle>
           </CardHeader>
@@ -310,7 +310,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-purple-500" />
+              <CheckCircle className="h-5 w-5 text-success" />
               Yardım Türü Dağılımı
             </CardTitle>
           </CardHeader>
@@ -344,7 +344,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
-              <Users className="h-5 w-5 text-cyan-500" />
+              <Users className="h-5 w-5 text-primary" />
               Şehir Bazlı İhtiyaç Sahipleri (Top 10)
             </CardTitle>
           </CardHeader>
@@ -364,7 +364,7 @@ export default function DashboardPage() {
                 labelKey="label"
                 valueKey="value"
                 height={250}
-                color="#06b6d4"
+                color="hsl(174, 73%, 42%)"
                 horizontal={true}
               />
             ) : (

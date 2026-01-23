@@ -22,12 +22,12 @@ export const StatCard = memo(function StatCard({
   description,
   trend,
   className,
-  iconColor = 'text-emerald-500',
+  iconColor = 'text-primary',
 }: StatCardProps) {
   return (
     <div
       className={cn(
-        'rounded-xl border bg-white p-6 shadow-sm hover:shadow-md transition-shadow',
+        'rounded-xl border border-slate-200 bg-white p-6 shadow-sm hover-card cursor-default',
         className
       )}
     >
@@ -43,7 +43,7 @@ export const StatCard = memo(function StatCard({
               <span
                 className={cn(
                   'text-xs font-medium',
-                  trend.isPositive ? 'text-emerald-600' : 'text-red-600'
+                  trend.isPositive ? 'text-success' : 'text-destructive'
                 )}
               >
                 {trend.isPositive ? '+' : ''}{trend.value}%
@@ -54,13 +54,13 @@ export const StatCard = memo(function StatCard({
         </div>
         <div
           className={cn(
-            'flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br',
-            iconColor === 'text-emerald-500' && 'from-emerald-50 to-emerald-100',
-            iconColor === 'text-blue-500' && 'from-blue-50 to-blue-100',
-            iconColor === 'text-purple-500' && 'from-purple-50 to-purple-100',
-            iconColor === 'text-orange-500' && 'from-orange-50 to-orange-100',
-            iconColor === 'text-red-500' && 'from-red-50 to-red-100',
-            iconColor === 'text-cyan-500' && 'from-cyan-50 to-cyan-100'
+            'flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br transition-all duration-200',
+            iconColor === 'text-primary' && 'from-teal-50 to-emerald-100',
+            iconColor === 'text-blue-500' && 'from-sky-50 to-blue-100',
+            iconColor === 'text-purple-500' && 'from-violet-50 to-purple-100',
+            iconColor === 'text-orange-500' && 'from-amber-50 to-orange-100',
+            iconColor === 'text-red-500' && 'from-red-50 to-rose-100',
+            iconColor === 'text-cyan-500' && 'from-cyan-50 to-teal-100'
           )}
         >
           <Icon className={cn('h-6 w-6', iconColor)} />

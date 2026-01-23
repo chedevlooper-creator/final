@@ -49,9 +49,9 @@ export function Sidebar() {
 
   if (!mounted) {
     return (
-      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
-        <div className="flex h-16 items-center justify-between border-b border-slate-700 px-4">
-          <h1 className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-slate-200 bg-white">
+        <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4">
+          <h1 className="text-lg font-bold text-gradient-nature">
             Yardım Paneli
           </h1>
         </div>
@@ -62,14 +62,14 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 z-40 h-screen border-r bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 transition-all duration-200',
+        'fixed left-0 top-0 z-40 h-screen border-r border-slate-200 bg-white transition-all duration-200 shadow-sm',
         sidebarCollapsed ? 'w-16' : 'w-64'
       )}
     >
       {/* Header */}
-      <div className="flex h-16 items-center justify-between border-b border-slate-700 px-4">
+      <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4 bg-white">
         {!sidebarCollapsed && (
-          <h1 className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+          <h1 className="text-lg font-bold text-gradient-nature">
             Yardım Paneli
           </h1>
         )}
@@ -77,7 +77,7 @@ export function Sidebar() {
           variant="ghost"
           size="icon"
           onClick={toggleSidebar}
-          className="text-slate-400 hover:text-white hover:bg-slate-700"
+          className="text-slate-500 hover:text-primary hover:bg-slate-100"
         >
           {sidebarCollapsed ? (
             <ChevronRight className="h-4 w-4" />
@@ -99,8 +99,8 @@ export function Sidebar() {
               <CollapsibleTrigger asChild>
                 <button
                   className={cn(
-                    'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150',
-                    'text-slate-400 hover:bg-slate-700/50 hover:text-white',
+                    'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150',
+                    'text-slate-600 hover:bg-slate-100 hover:text-primary',
                     sidebarCollapsed && 'justify-center'
                   )}
                 >
@@ -110,7 +110,7 @@ export function Sidebar() {
                       <span className="flex-1 text-left">{group.title}</span>
                       <ChevronDown
                         className={cn(
-                          'h-4 w-4 transition-transform',
+                          'h-4 w-4 transition-transform text-slate-400',
                           openGroups.includes(group.title) && 'rotate-180'
                         )}
                       />
@@ -129,11 +129,11 @@ export function Sidebar() {
                       className={cn(
                         'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-150',
                         isActive
-                          ? 'bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 border-l-2 border-emerald-400'
-                          : 'text-slate-400 hover:bg-slate-700/50 hover:text-white'
+                          ? 'bg-gradient-nature-light text-primary font-medium border-l-2 border-primary'
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-primary'
                       )}
                     >
-                      <item.icon className="h-4 w-4 shrink-0" />
+                      <item.icon className={cn('h-4 w-4 shrink-0', isActive && 'text-primary')} />
                       <span>{item.title}</span>
                     </Link>
                   )

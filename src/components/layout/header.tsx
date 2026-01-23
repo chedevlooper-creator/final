@@ -99,7 +99,7 @@ export function Header() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-2 px-2">
               <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-cyan-500 text-white text-sm">
+                <AvatarFallback className="bg-gradient-nature text-white text-sm">
                   {initials}
                 </AvatarFallback>
               </Avatar>
