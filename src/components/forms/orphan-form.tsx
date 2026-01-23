@@ -67,12 +67,22 @@ export function OrphanForm({ defaultValues, onSuccess }: OrphanFormProps) {
 
     const onSubmit = async (data: OrphanFormValues) => {
         try {
-            // TODO: API call
-            console.log('Form data:', data)
+            const response = await fetch('/api/orphans', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            })
+
+            if (!response.ok) {
+                const error = await response.json()
+                throw new Error(error.error || 'Kayıt başarısız')
+            }
+
             toast.success('Kayıt başarıyla oluşturuldu')
             onSuccess?.()
         } catch (error) {
-            toast.error('Kayıt oluşturulurken hata oluştu')
+            console.error('Orphan form error:', error)
+            toast.error(error instanceof Error ? error.message : 'Kayıt oluşturulurken hata oluştu')
         }
     }
 

@@ -48,25 +48,25 @@ export function useSMSList(filters?: SMSFilters) {
 
 export function useSendBulkSMS() {
   const queryClient = useQueryClient()
-  const supabase = createClient()
 
   return useMutation({
-    mutationFn: async (values: { recipients: string[]; message: string; message_type: string }) => {
-      // TODO: Implement bulk SMS sending logic
-      // This would typically call an SMS service API
-      const { data, error } = await supabase
-        .from('sms_messages')
-        .insert(
-          values.recipients.map((phone) => ({
-            phone,
-            message: values.message,
-            status: 'pending',
-          }))
-        )
-        .select()
+    mutationFn: async (values: { recipients: string[]; message: string; message_type?: string }) => {
+      const response = await fetch('/api/messages/send-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipients: values.recipients,
+          message: values.message,
+          messageType: values.message_type || 'bulk',
+        }),
+      })
 
-      if (error) throw error
-      return data
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to send SMS')
+      }
+
+      return response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sms'] })
@@ -76,26 +76,26 @@ export function useSendBulkSMS() {
 
 export function useSendBulkEmail() {
   const queryClient = useQueryClient()
-  const supabase = createClient()
 
   return useMutation({
-    mutationFn: async (values: { recipients: string[]; subject: string; message: string }) => {
-      // TODO: Implement bulk email sending logic
-      // This would typically call an email service API
-      const { data, error } = await supabase
-        .from('email_messages')
-        .insert(
-          values.recipients.map((email) => ({
-            email,
-            subject: values.subject,
-            message: values.message,
-            status: 'pending',
-          }))
-        )
-        .select()
+    mutationFn: async (values: { recipients: string[]; subject: string; message: string; message_type?: string }) => {
+      const response = await fetch('/api/messages/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipients: values.recipients,
+          subject: values.subject,
+          message: values.message,
+          messageType: values.message_type || 'bulk',
+        }),
+      })
 
-      if (error) throw error
-      return data
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to send email')
+      }
+
+      return response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['emails'] })

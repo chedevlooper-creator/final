@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -30,10 +30,17 @@ import { Plus, Eye, Pencil, Trash2, ExternalLink } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import { OrphanRelation, ORPHAN_RELATION_TYPE_OPTIONS, OrphanRelationType, StatusFilter } from '@/types/linked-records.types'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 interface OrphanRelationsTabProps {
   needyPersonId: string
   onClose: () => void
+}
+
+interface Orphan {
+  id: string
+  first_name: string
+  last_name: string
 }
 
 export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTabProps) {
@@ -41,7 +48,9 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [relations, setRelations] = useState<OrphanRelation[]>([])
+  const [orphans, setOrphans] = useState<Orphan[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
 
   const [formData, setFormData] = useState({
     orphan_id: '',
@@ -50,6 +59,43 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
     start_date: '',
     is_primary_guardian: false,
   })
+
+  // Fetch orphans list for dropdown
+  useEffect(() => {
+    const fetchOrphans = async () => {
+      try {
+        const response = await fetch('/api/orphans?limit=100')
+        if (response.ok) {
+          const data = await response.json()
+          setOrphans(data.data || [])
+        }
+      } catch (error) {
+        console.error('Failed to fetch orphans:', error)
+      }
+    }
+    fetchOrphans()
+  }, [])
+
+  // Fetch existing relations
+  useEffect(() => {
+    const fetchRelations = async () => {
+      setIsLoading(true)
+      try {
+        const response = await fetch(`/api/needy/${needyPersonId}/orphan-relations`)
+        if (response.ok) {
+          const data = await response.json()
+          setRelations(data.data || [])
+        }
+      } catch (error) {
+        console.error('Failed to fetch relations:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    if (needyPersonId) {
+      fetchRelations()
+    }
+  }, [needyPersonId])
 
   const columns = [
     { key: 'orphan_name', label: 'Yetim Adı' },
@@ -71,13 +117,55 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
   }
 
   const handleSave = async () => {
-    // TODO: Implement save functionality
-    setIsAddModalOpen(false)
+    if (!formData.orphan_id || !formData.relation_type) {
+      toast.error('Lütfen gerekli alanları doldurun')
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      const response = await fetch(`/api/needy/${needyPersonId}/orphan-relations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Bağlantı oluşturulamadı')
+      }
+
+      const result = await response.json()
+      setRelations([...relations, result.data])
+      toast.success('Yetim bağlantısı başarıyla oluşturuldu')
+      setIsAddModalOpen(false)
+    } catch (error) {
+      console.error('Save relation error:', error)
+      toast.error(error instanceof Error ? error.message : 'Bir hata oluştu')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm('Bu bağlantıyı kaldırmak istediğinizden emin misiniz?')) {
-      // TODO: Implement delete functionality
+    if (!confirm('Bu bağlantıyı kaldırmak istediğinizden emin misiniz?')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/needy/${needyPersonId}/orphan-relations/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Bağlantı silinemedi')
+      }
+
+      setRelations(relations.filter(r => r.id !== id))
+      toast.success('Bağlantı başarıyla kaldırıldı')
+    } catch (error) {
+      console.error('Delete relation error:', error)
+      toast.error('Bir hata oluştu')
     }
   }
 
@@ -183,7 +271,16 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
                   <SelectValue placeholder="Yetim seçin..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {/* TODO: Yetim listesi API'den gelecek */}
+                  {orphans.map((orphan) => (
+                    <SelectItem key={orphan.id} value={orphan.id}>
+                      {orphan.first_name} {orphan.last_name}
+                    </SelectItem>
+                  ))}
+                  {orphans.length === 0 && (
+                    <div className="px-2 py-1 text-sm text-muted-foreground">
+                      Henüz yetim kaydı yok
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -230,8 +327,8 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
             <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>
               İptal
             </Button>
-            <Button onClick={handleSave}>
-              Bağla
+            <Button onClick={handleSave} disabled={isSaving}>
+              {isSaving ? 'Kaydediliyor...' : 'Bağla'}
             </Button>
           </DialogFooter>
         </DialogContent>
