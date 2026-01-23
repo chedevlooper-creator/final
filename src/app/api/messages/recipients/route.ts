@@ -25,11 +25,11 @@ export async function GET(request: NextRequest) {
 
     switch (recipientType) {
       case 'all':
-        // Get all needy persons
+        // Get all needy persons with phone or email
         const { data: allNeedy, error: allError } = await supabase
           .from('needy_persons')
           .select('id, first_name, last_name, phone, email')
-          .not('phone', 'is', null)
+          .or('phone.not.is.null,email.not.is.null')
 
         if (allError) throw allError
 
@@ -42,12 +42,12 @@ export async function GET(request: NextRequest) {
         break
 
       case 'active':
-        // Get active needy persons
+        // Get active needy persons with phone or email
         const { data: activeNeedy, error: activeError } = await supabase
           .from('needy_persons')
           .select('id, first_name, last_name, phone, email')
           .eq('status', 'active')
-          .not('phone', 'is', null)
+          .or('phone.not.is.null,email.not.is.null')
 
         if (activeError) throw activeError
 
@@ -60,11 +60,11 @@ export async function GET(request: NextRequest) {
         break
 
       case 'volunteers':
-        // Get volunteers
+        // Get volunteers with phone or email
         const { data: volunteers, error: volError } = await supabase
           .from('volunteers')
           .select('id, first_name, last_name, phone, email')
-          .not('phone', 'is', null)
+          .or('phone.not.is.null,email.not.is.null')
 
         if (volError) throw volError
 
@@ -77,11 +77,11 @@ export async function GET(request: NextRequest) {
         break
 
       case 'donors':
-        // Get donors
+        // Get donors with phone or email
         const { data: donors, error: donorError } = await supabase
           .from('donors')
           .select('id, name, phone, email')
-          .not('phone', 'is', null)
+          .or('phone.not.is.null,email.not.is.null')
 
         if (donorError) throw donorError
 

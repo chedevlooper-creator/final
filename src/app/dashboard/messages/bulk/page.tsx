@@ -30,10 +30,21 @@ export default function BulkMessagesPage() {
   const { data: recipientsData } = useRecipients(recipientType)
 
   const handleSend = async () => {
-    // Get recipients based on recipientType
+    // Get recipients based on recipientType and messageType
     const recipients: string[] = (recipientsData?.recipients || [])
-      .map(r => messageType === 'email' ? r.email : r.phone)
+      .map(r => {
+        if (messageType === 'email') {
+          return r.email
+        } else if (messageType === 'sms') {
+          return r.phone
+        }
+        return undefined
+      })
       .filter((contact): contact is string => !!contact)
+    
+    if (recipients.length === 0) {
+      return // Don't send if no valid recipients
+    }
     
     if (messageType === 'sms') {
       await sendBulkSMS.mutateAsync({
