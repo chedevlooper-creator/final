@@ -1,0 +1,71 @@
+import { LucideIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { memo } from 'react'
+
+interface StatCardProps {
+  title: string
+  value: string | number
+  icon: LucideIcon
+  description?: string
+  trend?: {
+    value: number
+    isPositive: boolean
+  }
+  className?: string
+  iconColor?: string
+}
+
+export const StatCard = memo(function StatCard({
+  title,
+  value,
+  icon: Icon,
+  description,
+  trend,
+  className,
+  iconColor = 'text-primary',
+}: StatCardProps) {
+  return (
+    <div
+      className={cn(
+        'rounded-xl border border-slate-200 bg-white p-6 shadow-sm hover-card cursor-default',
+        className
+      )}
+    >
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h3 className="text-sm font-medium text-slate-500">{title}</h3>
+          <div className="text-2xl font-bold text-slate-900">{value}</div>
+          {description && (
+            <p className="text-xs text-slate-400">{description}</p>
+          )}
+          {trend && (
+            <div className="flex items-center gap-1 mt-1">
+              <span
+                className={cn(
+                  'text-xs font-medium',
+                  trend.isPositive ? 'text-success' : 'text-destructive'
+                )}
+              >
+                {trend.isPositive ? '+' : ''}{trend.value}%
+              </span>
+              <span className="text-xs text-slate-400">geçen aya göre</span>
+            </div>
+          )}
+        </div>
+        <div
+          className={cn(
+            'flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br transition-all duration-200',
+            iconColor === 'text-primary' && 'from-teal-50 to-emerald-100',
+            iconColor === 'text-blue-500' && 'from-sky-50 to-blue-100',
+            iconColor === 'text-purple-500' && 'from-violet-50 to-purple-100',
+            iconColor === 'text-orange-500' && 'from-amber-50 to-orange-100',
+            iconColor === 'text-red-500' && 'from-red-50 to-rose-100',
+            iconColor === 'text-cyan-500' && 'from-cyan-50 to-teal-100'
+          )}
+        >
+          <Icon className={cn('h-6 w-6', iconColor)} />
+        </div>
+      </div>
+    </div>
+  )
+})

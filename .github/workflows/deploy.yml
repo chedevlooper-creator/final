@@ -1,0 +1,33 @@
+# ═══════════════════════════════════════════════════════════════
+# Vercel Native Integration - Deployment Status
+# ═══════════════════════════════════════════════════════════════
+# This workflow is kept for reference but deployment is handled
+# automatically by Vercel's native GitHub integration.
+#
+# To enable Vercel native integration:
+# 1. Go to https://vercel.com/dashboard
+# 2. Add New Project → Import Git Repository
+# 3. Connect your GitHub repo
+# 4. Vercel will auto-deploy on push to main branch
+#
+# Environment variables should be set in Vercel dashboard, not GitHub Secrets.
+# ═══════════════════════════════════════════════════════════════
+
+name: Vercel Deployment Status
+
+on:
+  deployment:
+  workflow_dispatch:
+
+jobs:
+  # This job tracks Vercel deployment status
+  deployment-status:
+    name: Check Deployment Status
+    runs-on: ubuntu-latest
+    if: github.event_name == 'deployment'
+    steps:
+      - name: Deployment Info
+        run: |
+          echo "🚀 Deployment triggered by: ${{ github.actor }}"
+          echo "📦 Environment: ${{ github.event.deployment.environment }}"
+          echo "🔗 Status: ${{ github.event.deployment.status }}"

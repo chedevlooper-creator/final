@@ -1,0 +1,148 @@
+name: Security Scanner
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Günlük saat 02:00'da çalış
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  security-events: write
+
+jobs:
+  security-scan:
+    name: Security Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Hardcoded secrets taraması
+      - name: Scan for hardcoded secrets
+        id: secrets_scan
+        run: |
+          echo "🔍 Checking for hardcoded secrets..."
+          
+          # API keys, tokens pattern
+          SECRETS_FOUND=0
+          
+          if grep -r -E "(api[_-]?key|apikey|api[_-]?secret|password|token|secret[_-]?key)[\"']?\s*[:=]\s*[\"'][^\"']{8,}" src/ --exclude-dir=node_modules --exclude-dir=.next || true; then
+            echo "⚠️  Potential hardcoded secrets found!"
+            SECRETS_FOUND=1
+          fi
+          
+          # Supabase keys (except PUBLIC keys)
+          if grep -r "SUPABASE_SERVICE_ROLE_KEY" src/ --exclude-dir=node_modules --exclude-dir=.next || true; then
+            echo "⚠️  Supabase service role key found in code!"
+            SECRETS_FOUND=1
+          fi
+          
+          echo "secrets_found=$SECRETS_FOUND" >> $GITHUB_OUTPUT
+          
+          if [ $SECRETS_FOUND -eq 0 ]; then
+            echo "✅ No hardcoded secrets found"
+          fi
+
+      # RBAC kontrolleri
+      - name: Check RBAC implementation
+        run: |
+          echo "🔍 Checking RBAC implementation..."
+          
+          # Role-based access patterns
+          if grep -r "role\s*===\s*[\"']" src/ --exclude-dir=node_modules || true; then
+            echo "✅ Role-based checks found"
+          else
+            echo "⚠️  No role-based checks detected"
+          fi
+
+      # XSS riski kontrolü
+      - name: Scan for XSS risks
+        run: |
+          echo "🔍 Checking for XSS vulnerabilities..."
+          
+          # dangerouslySetInnerHTML usage
+          if grep -r "dangerouslySetInnerHTML" src/ --exclude-dir=node_modules || true; then
+            echo "⚠️  dangerouslySetInnerHTML usage found - review carefully"
+          fi
+          
+          # innerHTML usage
+          if grep -r "innerHTML" src/ --exclude-dir=node_modules || true; then
+            echo "⚠️  innerHTML usage found - review carefully"
+          fi
+
+      # SQL injection riski (raw queries)
+      - name: Check for SQL injection risks
+        run: |
+          echo "🔍 Checking for SQL injection risks..."
+          
+          # Raw SQL queries
+          if grep -r -E "\.query\(|\.raw\(|\.execute\(" src/ --exclude-dir=node_modules || true; then
+            echo "⚠️  Raw SQL queries found - ensure parameterized queries are used"
+          fi
+
+      # NPM Audit
+      - name: Run npm audit
+        id: npm_audit
+        run: |
+          echo "🔍 Running npm audit..."
+          npm audit --audit-level=high || echo "audit_failed=true" >> $GITHUB_OUTPUT
+
+      # Dependency vulnerability check
+      - name: Check dependencies for known vulnerabilities
+        run: |
+          echo "🔍 Checking dependencies..."
+          npm audit --json > audit-results.json || true
+          
+          # Yüksek ve kritik seviye vulnerability sayısı
+          HIGH_VULN=$(cat audit-results.json | grep -o '"high":[0-9]*' | grep -o '[0-9]*' || echo "0")
+          CRITICAL_VULN=$(cat audit-results.json | grep -o '"critical":[0-9]*' | grep -o '[0-9]*' || echo "0")
+          
+          echo "High vulnerabilities: $HIGH_VULN"
+          echo "Critical vulnerabilities: $CRITICAL_VULN"
+          
+          if [ "$HIGH_VULN" -gt 0 ] || [ "$CRITICAL_VULN" -gt 0 ]; then
+            echo "⚠️  Security vulnerabilities found!"
+            exit 1
+          fi
+
+      # Security summary
+      - name: Security Summary
+        if: always()
+        run: |
+          echo "## 🔒 Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Hardcoded secrets scan completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ RBAC checks completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ XSS risk scan completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ SQL injection check completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Dependency audit completed" >> $GITHUB_STEP_SUMMARY
+
+      # Kritik güvenlik sorunu bulunursa issue aç
+      - name: Create security issue if critical
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🔒 Critical Security Issue Detected',
+              body: `## Security Scan Results\n\nCritical security issues were detected in the scheduled security scan.\n\n**Date:** ${new Date().toISOString()}\n**Workflow Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n\nPlease review the security scan results and take immediate action.`,
+              labels: ['security', 'critical']
+            })

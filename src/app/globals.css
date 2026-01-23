@@ -1,0 +1,191 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Doğa Temalı Gradient'ler */
+  .bg-gradient-nature {
+    background: linear-gradient(135deg, hsl(174, 73%, 42%), hsl(158, 64%, 52%));
+  }
+  .bg-gradient-nature-light {
+    background: linear-gradient(135deg, hsl(174, 73%, 95%), hsl(158, 64%, 95%));
+  }
+  .text-gradient-nature {
+    background: linear-gradient(135deg, hsl(174, 73%, 42%), hsl(158, 64%, 52%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Enhanced Hover States */
+  .hover-card {
+    transition: all 0.2s ease;
+  }
+  .hover-card:hover {
+    box-shadow: 0 10px 40px -10px hsl(174, 73%, 42% / 0.15);
+    transform: translateY(-2px);
+  }
+
+  /* Smooth Focus Rings */
+  .focus-nature:focus-visible {
+    outline: 2px solid hsl(174, 73%, 42%);
+    outline-offset: 2px;
+  }
+
+  /* Semantic Background Colors */
+  .bg-success {
+    background-color: hsl(var(--success));
+  }
+  .bg-success\/10 {
+    background-color: hsl(var(--success) / 0.1);
+  }
+  .text-success {
+    color: hsl(var(--success));
+  }
+  .bg-warning {
+    background-color: hsl(var(--warning));
+  }
+  .bg-warning\/10 {
+    background-color: hsl(var(--warning) / 0.1);
+  }
+  .text-warning {
+    color: hsl(var(--warning));
+  }
+  .bg-info {
+    background-color: hsl(var(--info));
+  }
+  .bg-info\/10 {
+    background-color: hsl(var(--info) / 0.1);
+  }
+  .text-info {
+    color: hsl(var(--info));
+  }
+}
+
+
+
+@layer base {
+  :root {
+    /* Background & Foreground */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+
+    /* Primary - Teal (Doğa Ana Renk) */
+    --primary: 174 73% 42%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Soft Mint */
+    --secondary: 160 60% 95%;
+    --secondary-foreground: 174 73% 32%;
+
+    /* Accent - Forest Green */
+    --accent: 158 64% 52%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Muted */
+    --muted: 160 30% 96%;
+    --muted-foreground: 0 0% 45.1%;
+
+    /* Destructive */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Border & Input */
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 174 73% 42%;
+
+    /* Semantic Colors - Doğa Temalı */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+
+    /* Chart Colors - Nature Palette */
+    --chart-1: 174 73% 42%;    /* Teal */
+    --chart-2: 158 64% 52%;    /* Emerald */
+    --chart-3: 142 76% 36%;    /* Green */
+    --chart-4: 199 89% 48%;    /* Sky */
+    --chart-5: 173 58% 39%;    /* Teal Dark */
+    --chart-6: 160 60% 45%;    /* Nature */
+    --chart-7: 38 92% 50%;     /* Amber */
+    --chart-8: 26 83% 56%;     /* Orange */
+
+    /* Radius */
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Background & Foreground */
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    /* Primary - Light Teal (Dark Mode) */
+    --primary: 174 73% 55%;
+    --primary-foreground: 0 0% 9%;
+
+    /* Secondary */
+    --secondary: 160 20% 20%;
+    --secondary-foreground: 0 0% 98%;
+
+    /* Accent */
+    --accent: 158 64% 40%;
+    --accent-foreground: 0 0% 98%;
+
+    /* Muted */
+    --muted: 160 15% 18%;
+    --muted-foreground: 0 0% 63.9%;
+
+    /* Destructive */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Border & Input */
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 174 73% 55%;
+
+    /* Semantic Colors - Dark Mode */
+    --success: 142 76% 50%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 9%;
+    --info: 199 89% 55%;
+    --info-foreground: 0 0% 9%;
+
+    /* Chart Colors - Dark Mode */
+    --chart-1: 174 73% 55%;
+    --chart-2: 158 64% 60%;
+    --chart-3: 142 76% 50%;
+    --chart-4: 199 89% 60%;
+    --chart-5: 173 58% 55%;
+    --chart-6: 160 60% 55%;
+    --chart-7: 38 92% 60%;
+    --chart-8: 26 83% 60%;
+  }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

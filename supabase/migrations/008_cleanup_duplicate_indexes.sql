@@ -1,0 +1,12 @@
+-- Clean up duplicate indexes
+DROP INDEX IF EXISTS public.idx_needy_persons_category;
+DROP INDEX IF EXISTS public.idx_needy_persons_city;
+DROP INDEX IF EXISTS public.idx_needy_persons_identity;
+DROP INDEX IF EXISTS public.idx_orphans_needy;
+DROP INDEX IF EXISTS public.idx_orphans_durum;
+DROP INDEX IF EXISTS public.idx_payments_beneficiary;
+DROP INDEX IF EXISTS public.idx_applications_basvuran;
+DROP INDEX IF EXISTS public.idx_applications_durum;
+DROP INDEX IF EXISTS public.idx_needy_photos_person;
+DROP INDEX IF EXISTS public.idx_needy_sponsors_person;
+DROP INDEX IF EXISTS public.idx_orphans_sponsor;
