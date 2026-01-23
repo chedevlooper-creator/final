@@ -1,21 +1,19 @@
-# lint
+# Lint
 
-Run ESLint to check code quality and style.
+Run ESLint to check code quality.
 
-## Usage
+## Commands
 
+```bash
+# Run ESLint
+npm run lint
+
+# Auto-fix issues where possible
+npm run lint -- --fix
 ```
-/lint [fix]
-```
 
-## Options
+## Notes
 
-- `fix` - Automatically fix linting errors where possible
-
-## Description
-
-Runs ESLint on the codebase to check for code quality issues, style violations, and potential bugs. Use the `fix` option to automatically apply fixes.
-
-## Output
-
-List of linting errors with file locations and line numbers, or a success message if no issues are found.
+- ESLint is configured for src/ directory
+- Fix all linting errors before committing
+- Use --fix for auto-fixable issues

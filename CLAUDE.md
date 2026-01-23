@@ -8,6 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Key Technologies:** Next.js 16 App Router, Supabase (PostgreSQL + Auth), TanStack Query, Zustand, React Hook Form + Zod, shadcn/ui components
 
+**Required Runtime:** Node.js 24.x (specified in package.json engines)
+
 ---
 
 ## Development Commands
@@ -36,17 +38,20 @@ npm run analyze          # Bundle size analysis (requires ANALYZE=true)
 ### App Router Structure
 
 ```
-src/app/
-├── (auth)/              # Auth route group (no layout pollution)
-│   └── login/           # Authentication pages
-├── api/                 # Route Handlers (RESTful API)
-│   ├── cron/           # Scheduled jobs
-│   ├── docs/           # OpenAPI spec at /api/docs
-│   ├── finance/        # Finance endpoints
-│   └── mernis/         # TC Kimlik verification
-├── dashboard/           # Protected area (middleware-enforced)
-│   └── [module]/       # Feature modules (aids, donations, needy, etc.)
-└── layout.tsx           # Root layout with providers
+src/
+├── app/                  # Next.js App Router
+│   ├── (auth)/          # Auth route group (no layout pollution)
+│   │   └── login/       # Authentication pages
+│   ├── api/             # Route Handlers (RESTful API)
+│   │   ├── cron/       # Scheduled jobs
+│   │   ├── docs/       # OpenAPI spec at /api/docs
+│   │   ├── finance/    # Finance endpoints
+│   │   └── mernis/     # TC Kimlik verification
+│   ├── dashboard/       # Protected area (middleware-enforced)
+│   │   └── [module]/   # Feature modules (aids, donations, needy, etc.)
+│   └── layout.tsx       # Root layout with providers
+├── proxy.ts             # Next.js middleware (auth redirects, non-standard location)
+└── ...
 ```
 
 ### State Management Strategy
@@ -282,6 +287,7 @@ CRON_SECRET=xxx
 - CI/CD: GitHub Actions (lint, test, build, security scan)
 - Auto-deploy on push to `main` branch
 - Environment variables configured in Vercel dashboard
+- **Output Mode**: `standalone` (configured in next.config.ts for Docker/container support)
 
 ---
 
@@ -307,7 +313,9 @@ CRON_SECRET=xxx
 ### Pre-Commit Validation
 ```bash
 # Run all checks before committing
-/validate          # Runs type-check, lint, and test
+npx tsc --noEmit    # Type check
+npm run lint        # ESLint
+npm run test        # Run tests
 ```
 
 ### Deployment Steps

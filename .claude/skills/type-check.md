@@ -1,17 +1,15 @@
-# type-check
+# Type Check
 
-Run TypeScript type checking to ensure type safety before committing.
+Run TypeScript type checking on the codebase.
 
-## Usage
+## Command
 
+```bash
+npx tsc --noEmit
 ```
-/type-check
-```
 
-## Description
+## Notes
 
-Runs `npx tsc --noEmit` to check TypeScript types without emitting files. This is essential before committing changes to catch type errors early.
-
-## Output
-
-Type errors with file locations and line numbers, or a success message if no errors are found.
+- This checks for TypeScript errors without building
+- Run this before committing changes
+- Fix all type errors before proceeding

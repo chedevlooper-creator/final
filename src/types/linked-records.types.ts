@@ -6,8 +6,6 @@
 // =====================================================
 // TAB 1: BANKA HESAPLARI
 // =====================================================
-// Not: Bu interface @/types/needy.types'dan import edilmeli
-// Burada genişletilmiş bir versiyon tutuyoruz
 export interface NeedyPersonBankAccount {
   id: string
   needy_person_id: string
@@ -28,10 +26,6 @@ export interface NeedyPersonBankAccount {
   created_by: string | null
   notes: string | null
 }
-
-// Legacy alias - kullanmayın, NeedyPersonBankAccount kullanın
-/** @deprecated Use NeedyPersonBankAccount instead */
-export type BankAccount = NeedyPersonBankAccount
 
 export type Currency = 'TRY' | 'USD' | 'EUR' | 'GBP' | 'CHF'
 export type TransactionType = 'havale' | 'eft' | 'swift'

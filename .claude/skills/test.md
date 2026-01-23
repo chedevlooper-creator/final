@@ -1,22 +1,23 @@
-# test
+# Test
 
 Run the Vitest test suite.
 
-## Usage
+## Commands
 
+```bash
+# Run all tests
+npm run test
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage
+npm run test:coverage
 ```
-/test [ui|coverage]
-```
 
-## Options
+## Notes
 
-- `ui` - Run tests with Vitest UI interface
-- `coverage` - Run tests with coverage report
-
-## Description
-
-Runs the project's Vitest test suite. By default runs all tests in headless mode. Use the `ui` option for interactive test debugging, or `coverage` to see code coverage metrics.
-
-## Output
-
-Test results summary showing passed/failed tests with details for any failures.
+- Tests use Vitest with Testing Library
+- Test files are in `src/__tests__/` or co-located
+- API routes are excluded from coverage (tested separately)
+- Fix any failing tests before committing
