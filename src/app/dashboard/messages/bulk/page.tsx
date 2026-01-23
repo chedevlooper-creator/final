@@ -29,18 +29,19 @@ export default function BulkMessagesPage() {
   const sendBulkEmail = useSendBulkEmail()
   const { data: recipientsData } = useRecipients(recipientType)
 
-  const handleSend = async () => {
-    // Get recipients based on recipientType and messageType
-    const recipients: string[] = (recipientsData?.recipients || [])
+  // Extract contact info based on message type
+  const getRecipientContacts = (messageType: string): string[] => {
+    return (recipientsData?.recipients || [])
       .map(r => {
-        if (messageType === 'email') {
-          return r.email
-        } else if (messageType === 'sms') {
-          return r.phone
-        }
+        if (messageType === 'email') return r.email
+        if (messageType === 'sms') return r.phone
         return undefined
       })
       .filter((contact): contact is string => !!contact)
+  }
+
+  const handleSend = async () => {
+    const recipients = getRecipientContacts(messageType)
     
     if (recipients.length === 0) {
       return // Don't send if no valid recipients

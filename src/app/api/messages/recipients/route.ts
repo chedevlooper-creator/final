@@ -100,14 +100,9 @@ export async function GET(request: NextRequest) {
         )
     }
 
-    // Filter recipients with valid contact info
-    const validRecipients = recipients.filter(
-      (r) => r.phone || r.email
-    )
-
     return NextResponse.json({
-      recipients: validRecipients,
-      count: validRecipients.length,
+      recipients,
+      count: recipients.length,
       type: recipientType,
     })
   } catch (error) {
