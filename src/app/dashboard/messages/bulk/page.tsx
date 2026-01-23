@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { useToast } from '@/hooks/use-toast'
 import {
   Select,
   SelectContent,
@@ -24,6 +25,7 @@ export default function BulkMessagesPage() {
   const [recipientType, setRecipientType] = useState<string>('all')
   const [message, setMessage] = useState('')
   const [subject, setSubject] = useState('')
+  const { toast } = useToast()
   
   const sendBulkSMS = useSendBulkSMS()
   const sendBulkEmail = useSendBulkEmail()
@@ -44,7 +46,12 @@ export default function BulkMessagesPage() {
     const recipients = getRecipientContacts(messageType)
     
     if (recipients.length === 0) {
-      return // Don't send if no valid recipients
+      toast({
+        title: 'Alıcı Bulunamadı',
+        description: `Seçilen grup için geçerli ${messageType === 'email' ? 'e-posta adresi' : 'telefon numarası'} bulunamadı.`,
+        variant: 'destructive',
+      })
+      return
     }
     
     if (messageType === 'sms') {

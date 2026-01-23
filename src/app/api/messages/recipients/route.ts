@@ -15,6 +15,37 @@ interface Recipient {
   name: string
 }
 
+interface PersonData {
+  id: string
+  first_name: string
+  last_name: string
+  phone?: string | null
+  email?: string | null
+}
+
+interface DonorData {
+  id: string
+  name: string
+  phone?: string | null
+  email?: string | null
+}
+
+// Helper function to map person data to recipient
+const mapPersonToRecipient = (person: PersonData): Recipient => ({
+  id: person.id,
+  phone: person.phone || undefined,
+  email: person.email || undefined,
+  name: `${person.first_name} ${person.last_name}`,
+})
+
+// Helper function to map donor data to recipient
+const mapDonorToRecipient = (donor: DonorData): Recipient => ({
+  id: donor.id,
+  phone: donor.phone || undefined,
+  email: donor.email || undefined,
+  name: donor.name,
+})
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = createClient()
@@ -32,13 +63,7 @@ export async function GET(request: NextRequest) {
           .or('phone.not.is.null,email.not.is.null')
 
         if (allError) throw allError
-
-        recipients = (allNeedy || []).map((person) => ({
-          id: person.id,
-          phone: person.phone || undefined,
-          email: person.email || undefined,
-          name: `${person.first_name} ${person.last_name}`,
-        }))
+        recipients = (allNeedy || []).map(mapPersonToRecipient)
         break
 
       case 'active':
@@ -50,13 +75,7 @@ export async function GET(request: NextRequest) {
           .or('phone.not.is.null,email.not.is.null')
 
         if (activeError) throw activeError
-
-        recipients = (activeNeedy || []).map((person) => ({
-          id: person.id,
-          phone: person.phone || undefined,
-          email: person.email || undefined,
-          name: `${person.first_name} ${person.last_name}`,
-        }))
+        recipients = (activeNeedy || []).map(mapPersonToRecipient)
         break
 
       case 'volunteers':
@@ -67,13 +86,7 @@ export async function GET(request: NextRequest) {
           .or('phone.not.is.null,email.not.is.null')
 
         if (volError) throw volError
-
-        recipients = (volunteers || []).map((volunteer) => ({
-          id: volunteer.id,
-          phone: volunteer.phone || undefined,
-          email: volunteer.email || undefined,
-          name: `${volunteer.first_name} ${volunteer.last_name}`,
-        }))
+        recipients = (volunteers || []).map(mapPersonToRecipient)
         break
 
       case 'donors':
@@ -84,13 +97,7 @@ export async function GET(request: NextRequest) {
           .or('phone.not.is.null,email.not.is.null')
 
         if (donorError) throw donorError
-
-        recipients = (donors || []).map((donor) => ({
-          id: donor.id,
-          phone: donor.phone || undefined,
-          email: donor.email || undefined,
-          name: donor.name,
-        }))
+        recipients = (donors || []).map(mapDonorToRecipient)
         break
 
       default:
@@ -106,7 +113,10 @@ export async function GET(request: NextRequest) {
       type: recipientType,
     })
   } catch (error) {
-    console.error('Recipients fetch error:', error)
+    // Only log errors in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Recipients fetch error:', error)
+    }
     return NextResponse.json(
       { error: 'Failed to fetch recipients' },
       { status: 500 }
