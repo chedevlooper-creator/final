@@ -5,8 +5,10 @@ import { useEffect } from 'react'
 
 export function WebVitals() {
   useReportWebVitals((metric) => {
-    // Console'da göster
-    console.log('[Web Vitals]', metric)
+    // Only log in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Web Vitals]', metric)
+    }
     
     // Analytics servisine gönder
     if (typeof window !== 'undefined' && (window as any).gtag) {
@@ -44,16 +46,19 @@ export function PerformanceMonitor() {
         totalTime: perfData.loadEventEnd - perfData.fetchStart,
       }
       
-      console.log('[Performance Metrics]', metrics)
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Performance Metrics]', metrics)
+      }
       
       // Yavaş yükleme uyarısı
-      if (metrics.totalTime > 3000) {
+      if (metrics.totalTime > 3000 && process.env.NODE_ENV === 'development') {
         console.warn('[Performance] Slow page load detected:', metrics.totalTime)
       }
     }
     
     // Memory usage izleme
-    if ('memory' in performance) {
+    if ('memory' in performance && process.env.NODE_ENV === 'development') {
       const mem = (performance as any).memory
       console.log('[Memory Usage]', {
         usedJSHeapSize: Math.round(mem.usedJSHeapSize / 1048576) + ' MB',

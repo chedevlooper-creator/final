@@ -101,7 +101,7 @@ class AuditLogger {
     endDate?: Date;
     limit?: number;
     offset?: number;
-  }): Promise<{ data: AuditLog[] | null; error: any }> {
+  }): Promise<{ data: AuditLog[] | null; error: Error | null }> {
     let query = this.client
       .from('audit_logs')
       .select('*')

@@ -22,7 +22,7 @@ export class EmailValidationError extends EmailError {
 }
 
 export class EmailSendError extends EmailError {
-  constructor(message: string, public providerError?: any) {
+  constructor(message: string, public providerError?: Error | unknown) {
     super(message, 'SEND_ERROR');
     this.name = 'EmailSendError';
   }
@@ -513,7 +513,7 @@ export class EmailSender {
         timestamp: new Date()
       };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Hata kaydı
       this.statistics.totalFailed++;
       this.statistics.providerStats[this.config.provider].failed++;
@@ -521,7 +521,7 @@ export class EmailSender {
 
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
         provider: this.config.provider,
         timestamp: new Date()
       };

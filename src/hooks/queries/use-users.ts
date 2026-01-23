@@ -2,6 +2,15 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
+import { User, UserRole } from '@/types/common'
+
+// User profile data for creating/updating
+export interface UserProfileData {
+  email: string
+  name?: string
+  avatar_url?: string
+  role?: UserRole
+}
 
 export interface UserFilters {
   search?: string
@@ -66,7 +75,7 @@ export function useCreateUser() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async (values: any) => {
+    mutationFn: async (values: UserProfileData) => {
       const { data, error } = await supabase
         .from('users')
         .insert(values)
@@ -87,7 +96,7 @@ export function useUpdateUser() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async ({ id, values }: { id: string; values: any }) => {
+    mutationFn: async ({ id, values }: { id: string; values: Partial<UserProfileData> }) => {
       const { data, error } = await supabase
         .from('users')
         .update(values)
