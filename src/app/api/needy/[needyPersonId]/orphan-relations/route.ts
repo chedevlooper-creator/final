@@ -4,7 +4,7 @@
  * GET /api/needy/[needyPersonId]/orphan-relations - List orphan relations
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(
@@ -13,7 +13,7 @@ export async function POST(
 ) {
   try {
     const { needyPersonId } = await params
-    const supabase = createClient()
+    const supabase = await createServerSupabaseClient()
     const body = await request.json()
 
     const { orphan_id, relation_type, relation_description, start_date, is_primary_guardian } = body
@@ -93,7 +93,7 @@ export async function GET(
 ) {
   try {
     const { needyPersonId } = await params
-    const supabase = createClient()
+    const supabase = await createServerSupabaseClient()
 
     const { data, error } = await supabase
       .from('needy_orphan_relations')

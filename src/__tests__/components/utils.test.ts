@@ -8,7 +8,8 @@ describe('Utils', () => {
     })
 
     it('should handle conditional classes', () => {
-      expect(cn('foo', 0 ? 'bar' : '', 'baz')).toBe('foo baz')
+      const condition = false
+      expect(cn('foo', condition ? 'bar' : '', 'baz')).toBe('foo baz')
     })
 
     it('should handle Tailwind conflicts', () => {

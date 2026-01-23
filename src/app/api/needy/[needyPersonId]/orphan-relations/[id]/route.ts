@@ -3,7 +3,7 @@
  * DELETE /api/needy/[needyPersonId]/orphan-relations/[id] - Delete orphan relation
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function DELETE(
@@ -12,7 +12,7 @@ export async function DELETE(
 ) {
   try {
     const { needyPersonId, id } = await params
-    const supabase = createClient()
+    const supabase = await createServerSupabaseClient()
 
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser()

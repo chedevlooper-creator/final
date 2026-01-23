@@ -3,12 +3,12 @@
  * POST /api/orphans - Create new orphan record
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createServerSupabaseClient()
     const body = await request.json()
 
     const {
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createServerSupabaseClient()
     const { searchParams } = new URL(request.url)
 
     const page = parseInt(searchParams.get('page') || '0')

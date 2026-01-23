@@ -29,7 +29,7 @@ import {
 import { Pencil, Trash2, Eye, Loader2 } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import {
-  BankAccount,
+  NeedyPersonBankAccount,
   CURRENCY_OPTIONS,
   TRANSACTION_TYPE_OPTIONS,
   StatusFilter,
@@ -53,7 +53,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null)
+  const [editingAccount, setEditingAccount] = useState<NeedyPersonBankAccount | null>(null)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -116,7 +116,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
     setIsAddModalOpen(true)
   }
 
-  const handleEdit = (account: BankAccount) => {
+  const handleEdit = (account: NeedyPersonBankAccount) => {
     setEditingAccount(account)
     setFormData({
       account_holder_name: account.account_holder_name || '',
