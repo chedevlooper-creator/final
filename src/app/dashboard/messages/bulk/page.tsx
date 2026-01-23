@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState } from 'react'
-import { useSendBulkSMS, useSendBulkEmail } from '@/hooks/queries/use-messages'
+import { useSendBulkSMS, useSendBulkEmail, useRecipients } from '@/hooks/queries/use-messages'
 import { PageHeader } from '@/components/common/page-header'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -27,10 +27,13 @@ export default function BulkMessagesPage() {
   
   const sendBulkSMS = useSendBulkSMS()
   const sendBulkEmail = useSendBulkEmail()
+  const { data: recipientsData } = useRecipients(recipientType)
 
   const handleSend = async () => {
-    // TODO: Get recipients based on recipientType
-    const recipients: string[] = []
+    // Get recipients based on recipientType
+    const recipients: string[] = (recipientsData?.recipients || [])
+      .map(r => messageType === 'email' ? r.email : r.phone)
+      .filter((contact): contact is string => !!contact)
     
     if (messageType === 'sms') {
       await sendBulkSMS.mutateAsync({
@@ -141,7 +144,7 @@ export default function BulkMessagesPage() {
               <Users className="h-5 w-5 text-blue-500 mt-0.5" />
               <div>
                 <p className="font-medium text-sm text-blue-900">Alıcı Sayısı</p>
-                <p className="text-2xl font-bold text-blue-600">0</p>
+                <p className="text-2xl font-bold text-blue-600">{recipientsData?.count || 0}</p>
                 <p className="text-xs text-blue-700 mt-1">Tahmini alıcı sayısı</p>
               </div>
             </div>
