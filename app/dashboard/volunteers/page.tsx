@@ -1,6 +1,5 @@
 'use client'
 
-// MIGRATED: Removed export const dynamic = 'force-dynamic' (incompatible with Cache Components)
 
 import { useState } from 'react'
 import { useVolunteersList } from '@/hooks/queries/use-volunteers'

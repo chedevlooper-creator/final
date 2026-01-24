@@ -1,6 +1,5 @@
 'use client'
 
-// MIGRATED: Removed export const dynamic = 'force-dynamic' (incompatible with Cache Components)
 
 import { useEffect, useMemo, useState } from 'react'
 import { useCalendarEvents } from '@/hooks/queries/use-calendar'

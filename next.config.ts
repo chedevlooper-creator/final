@@ -9,8 +9,8 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 
 const nextConfig: NextConfig = {
-  // Enable Cache Components (root level for Canary/Stable 16.1+)
-  cacheComponents: true,
+  // Cache Components disabled due to dynamic route incompatibility
+  // cacheComponents: true,
 
   reactStrictMode: true,
 

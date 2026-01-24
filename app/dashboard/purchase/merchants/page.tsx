@@ -1,6 +1,5 @@
 'use client'
 
-// MIGRATED: Removed export const dynamic = 'force-dynamic' (incompatible with Cache Components)
 
 import { useState } from 'react'
 import { useMerchantsList } from '@/hooks/queries/use-purchase'

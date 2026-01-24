@@ -1,6 +1,5 @@
 'use client'
 
-// MIGRATED: Removed export const dynamic = 'force-dynamic' (incompatible with Cache Components)
 
 import { PageHeader } from '@/components/common/page-header'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'

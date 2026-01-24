@@ -1,6 +1,5 @@
 'use client'
 
-// MIGRATED: Removed export const dynamic = 'force-dynamic' (incompatible with Cache Components)
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'

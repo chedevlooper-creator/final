@@ -1,4 +1,3 @@
-// MIGRATED: Removed export const dynamic = 'force-dynamic' (incompatible with Cache Components)
 
 export default function NotFound() {
   return (
