@@ -41,7 +41,7 @@ export const SimpleBarChart = memo(function SimpleBarChart<T = ChartData>({
     labelKey = 'label',
     valueKey = 'value',
     color,
-    horizontal = false,
+    horizontal: _horizontal = false,
 }: SimpleBarChartProps<T>) {
     const values = data.map((d) => Number(getValue(d, valueKey)))
     const maxValue = Math.max(...values)
@@ -110,14 +110,13 @@ export const SimplePieChart = memo(function SimplePieChart<T = ChartData>({
     const defaultColors = CHART_COLORS
     const total = data.reduce((sum, d) => sum + Number(getValue(d, valueKey)), 0)
 
-    let cumulativePercent = 0
-
     const segments = data.map((item, idx) => {
         const value = Number(getValue(item, valueKey))
         const label = String(getValue(item, labelKey))
         const percent = (value / total) * 100
-        const startPercent = cumulativePercent
-        cumulativePercent += percent
+        // Calculate cumulative from all previous items
+        const startPercent = data.slice(0, idx).reduce((sum, d) => 
+            sum + (Number(getValue(d, valueKey)) / total) * 100, 0)
 
         return {
             label,

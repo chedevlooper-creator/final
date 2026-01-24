@@ -69,18 +69,20 @@ export function LinkedRecordsTabs({ needyPersonId, cardSummary }: LinkedRecordsT
   // Hash değişikliklerini dinle
   useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash
-      if (hash.startsWith('#!')) {
-        const tabPath = hash.replace('#!', '').split('/').pop()
-        const tab = LINKED_RECORD_TABS.find(t => t.hashPath === tabPath)
-        if (tab) {
-          setActiveTab(tab.id)
-          setIsModalOpen(true)
+      setTimeout(() => {
+        const hash = window.location.hash
+        if (hash.startsWith('#!')) {
+          const tabPath = hash.replace('#!', '').split('/').pop()
+          const tab = LINKED_RECORD_TABS.find(t => t.hashPath === tabPath)
+          if (tab) {
+            setActiveTab(tab.id)
+            setIsModalOpen(true)
+          }
+        } else {
+          setIsModalOpen(false)
+          setActiveTab(null)
         }
-      } else {
-        setIsModalOpen(false)
-        setActiveTab(null)
-      }
+      }, 0)
     }
 
     // İlk yüklemede hash kontrolü

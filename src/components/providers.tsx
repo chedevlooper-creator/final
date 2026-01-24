@@ -68,9 +68,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
-    // Inject view transition styles
-    injectViewTransitionStyles()
+    const timeout = setTimeout(() => {
+      setMounted(true)
+      // Inject view transition styles
+      injectViewTransitionStyles()
+    }, 0)
+
+    return () => clearTimeout(timeout)
   }, [])
 
   return (

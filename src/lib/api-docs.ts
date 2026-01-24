@@ -1,9 +1,6 @@
-// @ts-nocheck - Temporarily disabled due to complex decorator type issues
 /**
  * API Documentation Configuration
  * OpenAPI/Swagger specification generator
-  * 
-  * @ts-nocheck - Temporarily disabled due to complex decorator type issues
   */
 
 // Type definition for the decorator parameter
@@ -297,6 +294,7 @@ export function DocumentRoute(config: {
     const existingDocs: any = (classConstructor as any).__api_docs_metadata__ || {}
     if (typeof existingDocs === 'object' && existingDocs !== null) {
       existingDocs[propertyKey] = config
+      // eslint-disable-next-line no-unexpected-multiline
       (classConstructor as any).__api_docs_metadata__ = existingDocs
     }
     

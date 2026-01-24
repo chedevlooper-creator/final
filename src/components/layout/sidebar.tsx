@@ -39,7 +39,11 @@ export function Sidebar() {
 
   // Client-side hydration
   useEffect(() => {
-    setMounted(true)
+    const timeout = setTimeout(() => {
+      setMounted(true)
+    }, 0)
+
+    return () => clearTimeout(timeout)
   }, [])
 
   const toggleGroup = (title: string) => {

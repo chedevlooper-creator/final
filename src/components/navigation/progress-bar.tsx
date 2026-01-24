@@ -17,7 +17,11 @@ export function ProgressBar() {
 
   // Prevent SSR hydration mismatch
   useLayoutEffect(() => {
-    setMounted(true)
+    const timeout = setTimeout(() => {
+      setMounted(true)
+    }, 0)
+
+    return () => clearTimeout(timeout)
   }, [])
 
   useEffect(() => {
