@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
+import type { PurchaseRequestInsert, PurchaseRequestUpdate, MerchantInsert, MerchantUpdate } from '@/types/database.types'
 
 export interface PurchaseRequestFilters {
   merchant_id?: string
@@ -54,7 +55,7 @@ export function useCreatePurchaseRequest() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async (values: any) => {
+    mutationFn: async (values: PurchaseRequestInsert) => {
       const { data, error } = await supabase
         .from('purchase_requests')
         .insert(values)
@@ -75,7 +76,7 @@ export function useUpdatePurchaseRequest() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async ({ id, values }: { id: string; values: any }) => {
+    mutationFn: async ({ id, values }: { id: string; values: PurchaseRequestUpdate }) => {
       const { data, error } = await supabase
         .from('purchase_requests')
         .update(values)
@@ -133,7 +134,7 @@ export function useCreateMerchant() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async (values: any) => {
+    mutationFn: async (values: MerchantInsert) => {
       const { data, error } = await supabase
         .from('merchants')
         .insert(values)
@@ -154,7 +155,7 @@ export function useUpdateMerchant() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async ({ id, values }: { id: string; values: any }) => {
+    mutationFn: async ({ id, values }: { id: string; values: MerchantUpdate }) => {
       const { data, error } = await supabase
         .from('merchants')
         .update(values)

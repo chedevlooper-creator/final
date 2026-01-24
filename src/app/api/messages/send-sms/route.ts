@@ -7,9 +7,21 @@
 
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { withAuth } from '@/lib/permission-middleware'
+import { getSMSProvider } from '@/lib/messaging/sms.provider'
 
 export async function POST(request: NextRequest) {
   try {
+    // RBAC: SMS gönderme için create permission gerekli
+    const authResult = await withAuth(request, {
+      requiredPermission: 'create',
+      resource: 'donations',
+    })
+
+    if (!authResult.success) {
+      return authResult.response!
+    }
+
     const supabase = await createServerSupabaseClient()
 
     const body = await request.json()
@@ -17,14 +29,14 @@ export async function POST(request: NextRequest) {
 
     if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
       return NextResponse.json(
-        { error: 'Recipients are required' },
+        { error: 'Recipients are required', code: 'MISSING_RECIPIENTS' },
         { status: 400 }
       )
     }
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json(
-        { error: 'Message is required' },
+        { error: 'Message is required', code: 'MISSING_MESSAGE' },
         { status: 400 }
       )
     }
@@ -46,37 +58,69 @@ export async function POST(request: NextRequest) {
     if (insertError) {
       console.error('Error inserting SMS messages:', insertError)
       return NextResponse.json(
-        { error: 'Failed to queue SMS messages' },
+        { error: 'Failed to queue SMS messages', code: 'DATABASE_ERROR' },
         { status: 500 }
       )
     }
 
-    // TODO: Integrate with SMS service provider (e.g., Twilio, MessageBird)
-    // For now, messages are queued with 'pending' status
-    // In production, you would:
-    // 1. Call the SMS provider API
-    // 2. Update status based on provider response
-    // 3. Handle retries for failed messages
+    // Send SMS via configured provider
+    const smsProvider = getSMSProvider()
+    const smsResults = await smsProvider.sendBulkSMS(
+      recipients.map((phone: string) => ({ to: phone, message }))
+    )
 
-    // Example integration pattern (commented out):
-    // const { data: { user } } = await supabase.auth.getUser()
-    // const smsResults = await sendViaProvider(recipients, message)
-    // await supabase.from('sms_messages').update({
-    //   status: smsResults.status,
-    //   provider_message_id: smsResults.messageId,
-    //   sent_at: new Date().toISOString()
-    // }).eq('id', smsData.id)
+    // Update status based on provider results
+    for (let i = 0; i < smsData.length; i++) {
+      const result = smsResults[i]
+      const updateData: {
+        status: string
+        provider_message_id?: string
+        error_message?: string
+      } = {
+        status: result.success ? 'sent' : 'failed',
+      }
+
+      if (result.messageId) {
+        updateData.provider_message_id = result.messageId
+      }
+
+      if (result.error) {
+        updateData.error_message = result.error
+      }
+
+      await supabase
+        .from('sms_messages')
+        .update(updateData)
+        .eq('id', smsData[i].id)
+    }
+
+    const successCount = smsResults.filter((r) => r.success).length
+    const failCount = smsResults.filter((r) => !r.success).length
 
     return NextResponse.json({
       success: true,
       queued: smsData?.length || 0,
-      message: 'SMS messages queued successfully',
+      sent: successCount,
+      failed: failCount,
+      message: `SMS processing completed: ${successCount} sent, ${failCount} failed`,
     })
   } catch (error) {
     console.error('SMS send error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', code: 'INTERNAL_ERROR' },
       { status: 500 }
     )
   }
+}
+
+/**
+ * OPTIONS - CORS preflight
+ */
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Allow': 'POST, OPTIONS',
+    },
+  })
 }

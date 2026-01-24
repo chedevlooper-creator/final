@@ -1,5 +1,20 @@
 import { test, expect } from '@playwright/test'
 
+const runFull = process.env['E2E_RUN_FULL'] === 'true'
+const requireEnv = (name: string): string => {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(`Missing required env var: ${name}`)
+  }
+  return value
+}
+
+test.beforeEach(() => {
+  if (!runFull) {
+    test.skip(true, 'E2E_RUN_FULL not set')
+  }
+})
+
 /**
  * Yardım Yönetim Paneli - API Testing Suite
  * API endpoint'lerinin doğrulanması
@@ -9,8 +24,8 @@ test.describe('API - Authentication', () => {
   test('POST /api/auth/login - should return token on valid credentials', async ({ request }) => {
     const response = await request.post('/api/auth/login', {
       data: {
-        email: 'admin@example.com',
-        password: 'admin123'
+        email: requireEnv('TEST_ADMIN_EMAIL'),
+        password: requireEnv('TEST_ADMIN_PASSWORD')
       }
     })
 
@@ -44,8 +59,8 @@ test.describe('API - İhtiyaç Sahipleri', () => {
     // Login ve token al
     const response = await request.post('/api/auth/login', {
       data: {
-        email: 'admin@example.com',
-        password: 'admin123'
+        email: requireEnv('TEST_ADMIN_EMAIL'),
+        password: requireEnv('TEST_ADMIN_PASSWORD')
       }
     })
 
@@ -135,8 +150,8 @@ test.describe('API - Bağışlar', () => {
   test.beforeAll(async ({ request }) => {
     const response = await request.post('/api/auth/login', {
       data: {
-        email: 'admin@example.com',
-        password: 'admin123'
+        email: requireEnv('TEST_ADMIN_EMAIL'),
+        password: requireEnv('TEST_ADMIN_PASSWORD')
       }
     })
 
@@ -200,8 +215,8 @@ test.describe('API - Dashboard Stats', () => {
   test.beforeAll(async ({ request }) => {
     const response = await request.post('/api/auth/login', {
       data: {
-        email: 'admin@example.com',
-        password: 'admin123'
+        email: requireEnv('TEST_ADMIN_EMAIL'),
+        password: requireEnv('TEST_ADMIN_PASSWORD')
       }
     })
 

@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
+import type { VolunteerInsert, VolunteerUpdate, VolunteerMissionInsert, VolunteerMissionUpdate } from '@/types/database.types'
 
 export interface VolunteerFilters {
   search?: string
@@ -63,7 +64,7 @@ export function useCreateVolunteer() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async (values: any) => {
+    mutationFn: async (values: VolunteerInsert) => {
       const { data, error } = await supabase
         .from('volunteers')
         .insert(values)
@@ -84,7 +85,7 @@ export function useUpdateVolunteer() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async ({ id, values }: { id: string; values: any }) => {
+    mutationFn: async ({ id, values }: { id: string; values: VolunteerUpdate }) => {
       const { data, error } = await supabase
         .from('volunteers')
         .update(values)
@@ -153,7 +154,7 @@ export function useCreateMission() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async (values: any) => {
+    mutationFn: async (values: VolunteerMissionInsert) => {
       const { data, error } = await supabase
         .from('volunteer_missions')
         .insert(values)
@@ -174,7 +175,7 @@ export function useUpdateMission() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async ({ id, values }: { id: string; values: any }) => {
+    mutationFn: async ({ id, values }: { id: string; values: VolunteerMissionUpdate }) => {
       const { data, error } = await supabase
         .from('volunteer_missions')
         .update(values)

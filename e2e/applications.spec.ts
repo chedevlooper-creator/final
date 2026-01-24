@@ -1,7 +1,12 @@
 import { test, expect } from './fixtures'
 
+const runFull = process.env['E2E_RUN_FULL'] === 'true'
+
 test.describe('Applications Module', () => {
   test.beforeEach(async ({ authenticatedPage }) => {
+    if (!runFull) {
+      test.skip(true, 'E2E_RUN_FULL not set')
+    }
     await authenticatedPage.goto('/applications')
   })
 

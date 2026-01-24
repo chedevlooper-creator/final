@@ -17,27 +17,24 @@ import {
 
 export function Sidebar() {
   const pathname = usePathname()
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const { sidebarCollapsed, sidebarOpen, setSidebarOpen, toggleSidebar } = useUIStore((state) => ({
+    sidebarCollapsed: state.sidebarCollapsed,
+    sidebarOpen: state.sidebarOpen,
+    setSidebarOpen: state.setSidebarOpen,
+    toggleSidebar: state.toggleSidebar,
+  }))
   const [mounted, setMounted] = useState(false)
   const [openGroups, setOpenGroups] = useState<string[]>(['Başlangıç', 'Yardım Yönetimi'])
   
   // Client-side hydration
   useEffect(() => {
     setMounted(true)
-    const store = useUIStore.getState()
-    setSidebarCollapsed(store.sidebarCollapsed)
     
-    // Subscribe to store changes
-    const unsubscribe = useUIStore.subscribe((state) => {
-      setSidebarCollapsed(state.sidebarCollapsed)
-    })
-    
-    return unsubscribe
-  }, [])
-  
-  const toggleSidebar = () => {
-    useUIStore.getState().toggleSidebar()
-  }
+    // Mobile: Close sidebar on navigation
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false)
+    }
+  }, [pathname, setSidebarOpen])
 
   const toggleGroup = (title: string) => {
     setOpenGroups((prev) =>
@@ -49,7 +46,7 @@ export function Sidebar() {
 
   if (!mounted) {
     return (
-      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-slate-200 bg-white">
+      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-slate-200 bg-white hidden md:block">
         <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4">
           <h1 className="text-lg font-bold text-gradient-nature">
             Yardım Paneli
@@ -60,32 +57,51 @@ export function Sidebar() {
   }
 
   return (
-    <aside
-      className={cn(
-        'fixed left-0 top-0 z-40 h-screen border-r border-slate-200 bg-white transition-all duration-200 shadow-sm',
-        sidebarCollapsed ? 'w-16' : 'w-64'
+    <>
+      {/* Mobile Backdrop */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/50 md:hidden backdrop-blur-sm transition-opacity"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
-    >
-      {/* Header */}
-      <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4 bg-white">
-        {!sidebarCollapsed && (
-          <h1 className="text-lg font-bold text-gradient-nature">
-            Yardım Paneli
-          </h1>
+
+      <aside
+        className={cn(
+          'fixed left-0 top-0 z-50 h-screen border-r border-slate-200 bg-white transition-all duration-300 shadow-xl md:shadow-none md:z-40',
+          sidebarCollapsed ? 'w-16' : 'w-64',
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleSidebar}
-          className="text-slate-500 hover:text-primary hover:bg-slate-100"
-        >
-          {sidebarCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
+      >
+        {/* Header */}
+        <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4 bg-white">
+          {!sidebarCollapsed && (
+            <h1 className="text-lg font-bold text-gradient-nature">
+              Yardım Paneli
+            </h1>
           )}
-        </Button>
-      </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            className="text-slate-500 hover:text-primary hover:bg-slate-100 hidden md:flex"
+          >
+            {sidebarCollapsed ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
+          </Button>
+          {/* Mobile Close Button */}
+           <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarOpen(false)}
+            className="text-slate-500 hover:text-red-500 md:hidden ml-auto"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+        </div>
 
       {/* Menu */}
       <ScrollArea className="h-[calc(100vh-4rem)]">
@@ -144,5 +160,6 @@ export function Sidebar() {
         </nav>
       </ScrollArea>
     </aside>
+    </>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
+import type { CalendarEventInsert, CalendarEventUpdate } from '@/types/database.types'
 
 export interface CalendarEventFilters {
   event_type?: string
@@ -81,7 +82,7 @@ export function useCreateEvent() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async (values: any) => {
+    mutationFn: async (values: CalendarEventInsert) => {
       const { data, error } = await supabase
         .from('calendar_events')
         .insert(values)
@@ -103,7 +104,7 @@ export function useUpdateEvent() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async ({ id, values }: { id: string; values: any }) => {
+    mutationFn: async ({ id, values }: { id: string; values: CalendarEventUpdate }) => {
       const { data, error } = await supabase
         .from('calendar_events')
         .update(values)

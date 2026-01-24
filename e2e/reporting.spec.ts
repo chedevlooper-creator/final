@@ -1,7 +1,19 @@
 import { test, expect } from './fixtures'
 
+const runFull = process.env['E2E_RUN_FULL'] === 'true'
+const requireEnv = (name: string): string => {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(`Missing required env var: ${name}`)
+  }
+  return value
+}
+
 test.describe('Reporting Module', () => {
   test.beforeEach(async ({ authenticatedPage }) => {
+    if (!runFull) {
+      test.skip(true, 'E2E_RUN_FULL not set')
+    }
     await authenticatedPage.goto('/reports')
   })
 
@@ -204,7 +216,7 @@ test.describe('Reporting Module', () => {
       await authenticatedPage.fill('input[name="reportName"]', 'Haftalık Rapor')
       await authenticatedPage.selectOption('select[name="frequency"]', 'Haftalık')
       await authenticatedPage.selectOption('select[name="reportType"]', 'Bağış Özeti')
-      await authenticatedPage.fill('input[name="recipients"]', 'admin@example.com')
+      await authenticatedPage.fill('input[name="recipients"]', requireEnv('TEST_ADMIN_EMAIL'))
       
       await authenticatedPage.click('button:has-text("Kaydet")')
       

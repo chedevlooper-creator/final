@@ -1,5 +1,20 @@
 // İhtiyaç Sahibi - Tam Type Tanımları
 
+// Re-export linked records types to maintain backward compatibility
+export type {
+  NeedyPersonBankAccount,
+  Document as NeedyDocument,
+  Dependent,
+  Interview,
+  Consent,
+  SocialCard,
+  Reference as NeedyReference,
+  LinkedRecordTab,
+} from '@/types/linked-records.types'
+
+// Re-export LINKED_RECORD_TABS constant
+export { LINKED_RECORD_TABS } from '@/types/linked-records.types'
+
 export interface NeedyPerson {
   id: string
   file_number?: string
@@ -134,25 +149,8 @@ export interface NeedyPerson {
   profession?: { id: string; name: string }
 }
 
-// Banka Hesabı (Needy Person için)
-// Not: Genel BankAccount için @/types/finance.types kullanın
-export interface NeedyPersonBankAccount {
-  id: string
-  needy_person_id: string
-  account_holder: string
-  currency: string
-  transaction_type?: string
-  iban?: string
-  bank_name?: string
-  branch_name?: string
-  account_number?: string
-  swift_code?: string
-  address?: string
-  is_active: boolean
-  created_at: string
-}
-
-// Doküman
+// Generic Document type (used across all entities, not just needy persons)
+// For Needy Person specific documents, use NeedyDocument from linked-records.types
 export interface Document {
   id: string
   entity_type: string
@@ -166,9 +164,6 @@ export interface Document {
   is_active: boolean
   uploaded_at: string
 }
-
-// Bağımlı Kişi
-export type { Dependent, Interview, Consent, SocialCard, Reference as NeedyReference } from '@/types/linked-records.types'
 
 // Dropdown Seçenekleri
 export const CATEGORIES = [
@@ -345,22 +340,4 @@ export const RELIGIONS = [
   { value: 'jewish', label: 'Yahudi' },
   { value: 'buddhist', label: 'Budist' },
   { value: 'other', label: 'Diğer' },
-]
-
-// Linked Records Tab Types
-export const LINKED_RECORD_TABS = [
-  { id: 'bank_accounts', label: 'Banka Hesapları', icon: 'CreditCard' },
-  { id: 'documents', label: 'Dokümanlar', icon: 'FileText' },
-  { id: 'photos', label: 'Fotoğraflar', icon: 'Image' },
-  { id: 'orphans', label: 'Baktığı Yetimler', icon: 'Baby' },
-  { id: 'dependents', label: 'Baktığı Kişiler', icon: 'Users' },
-  { id: 'sponsors', label: 'Sponsorlar', icon: 'Heart' },
-  { id: 'references', label: 'Referanslar', icon: 'UserCheck' },
-  { id: 'interviews', label: 'Görüşme Kayıtları', icon: 'MessageSquare' },
-  { id: 'sessions', label: 'Görüşme Seans Takibi', icon: 'Calendar' },
-  { id: 'applications', label: 'Yardım Talepleri', icon: 'ClipboardList', badge: true },
-  { id: 'aids', label: 'Yapılan Yardımlar', icon: 'Gift' },
-  { id: 'consents', label: 'Rıza Beyanları', icon: 'Shield' },
-  { id: 'cards', label: 'Sosyal Kartlar', icon: 'Wallet' },
-  { id: 'summary', label: 'Kart Özeti', icon: 'BarChart' },
 ]

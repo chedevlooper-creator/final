@@ -1,7 +1,19 @@
 import { test, expect } from './fixtures'
 
+const runFull = process.env['E2E_RUN_FULL'] === 'true'
+const requireEnv = (name: string): string => {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(`Missing required env var: ${name}`)
+  }
+  return value
+}
+
 test.describe('Settings Module', () => {
   test.beforeEach(async ({ authenticatedPage }) => {
+    if (!runFull) {
+      test.skip(true, 'E2E_RUN_FULL not set')
+    }
     await authenticatedPage.goto('/settings')
   })
 
@@ -61,7 +73,7 @@ test.describe('Settings Module', () => {
       await authenticatedPage.click('button:has-text("Profil")')
       await authenticatedPage.click('button:has-text("Şifre Değiştir")')
       
-      await authenticatedPage.fill('input[name="currentPassword"]', 'admin123')
+      await authenticatedPage.fill('input[name="currentPassword"]', requireEnv('TEST_ADMIN_PASSWORD'))
       await authenticatedPage.fill('input[name="newPassword"]', 'newPassword123')
       await authenticatedPage.fill('input[name="confirmPassword"]', 'newPassword123')
       
@@ -74,7 +86,7 @@ test.describe('Settings Module', () => {
       await authenticatedPage.click('button:has-text("Profil")')
       await authenticatedPage.click('button:has-text("Şifre Değiştir")')
       
-      await authenticatedPage.fill('input[name="currentPassword"]', 'admin123')
+      await authenticatedPage.fill('input[name="currentPassword"]', requireEnv('TEST_ADMIN_PASSWORD'))
       await authenticatedPage.fill('input[name="newPassword"]', 'newPassword123')
       await authenticatedPage.fill('input[name="confirmPassword"]', 'differentPassword')
       

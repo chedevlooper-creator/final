@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
+import type { AidInsert, AidUpdate } from '@/types/database.types'
 
 export interface AidFilters {
   needy_person_id?: string
@@ -80,7 +81,7 @@ export function useCreateAid() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async (values: any) => {
+    mutationFn: async (values: AidInsert) => {
       const { data, error } = await supabase
         .from('needy_aids_received')
         .insert(values)
@@ -101,7 +102,7 @@ export function useUpdateAid() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async ({ id, values }: { id: string; values: any }) => {
+    mutationFn: async ({ id, values }: { id: string; values: AidUpdate }) => {
       const { data, error } = await supabase
         .from('needy_aids_received')
         .update(values)

@@ -1,5 +1,14 @@
 import { test, expect } from '@playwright/test'
 
+const runFull = process.env['E2E_RUN_FULL'] === 'true'
+const requireEnv = (name: string): string => {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(`Missing required env var: ${name}`)
+  }
+  return value
+}
+
 /**
  * Yardım Yönetim Paneli - Dashboard Test Suite
  * Ana sayfa ve dashboard elementleri testleri
@@ -7,12 +16,15 @@ import { test, expect } from '@playwright/test'
 
 // Authentication fixture - tüm testler için login gerekli
 test.beforeEach(async ({ page }) => {
+  if (!runFull) {
+    test.skip(true, 'E2E_RUN_FULL not set')
+  }
   // Login sayfasına git
   await page.goto('/login')
   
   // Login bilgilerini gir
-  await page.fill('input[type="email"], input[name="email"]', 'admin@example.com')
-  await page.fill('input[type="password"], input[name="password"]', 'admin123')
+  await page.fill('input[type="email"], input[name="email"]', requireEnv('TEST_ADMIN_EMAIL'))
+  await page.fill('input[type="password"], input[name="password"]', requireEnv('TEST_ADMIN_PASSWORD'))
   await page.click('button[type="submit"]')
   
   // Dashboard'a yönlendirilmeyi bekle

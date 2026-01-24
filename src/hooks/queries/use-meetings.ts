@@ -13,6 +13,7 @@ import type {
   MeetingNote,
   MeetingVote,
   VoteResponse,
+  VoteResponseValue,
   MeetingFile,
   CreateMeetingInput,
   UpdateMeetingInput,
@@ -497,7 +498,7 @@ export function useUpdateTaskStatus() {
       
       if (!task) throw new Error('Task not found');
       
-      const updates: any = { status };
+      const updates: { status: TaskStatus; completed_at?: string } = { status };
       if (status === TaskStatus.COMPLETED) {
         updates.completed_at = new Date().toISOString();
       }
@@ -607,7 +608,7 @@ export function useUsersList() {
       
       if (error) throw error;
       
-      return (data || []).map((user: any) => ({
+      return (data || []).map((user: { id: string; email: string; full_name?: string; avatar_url?: string }) => ({
         id: user.id,
         email: user.email,
         name: user.full_name || user.email,
@@ -839,7 +840,7 @@ export function useSubmitVote() {
   const supabase = createClient();
   
   return useMutation({
-    mutationFn: async ({ voteId, response }: { voteId: string; response: any }) => {
+    mutationFn: async ({ voteId, response }: { voteId: string; response: VoteResponseValue }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
       

@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { withAuth } from '@/lib/permission-middleware';
+import type { MeetingDetail } from '@/types/meeting.types';
 
 /**
  * GET /api/meetings/[id] - Toplantı detayını getir
@@ -61,13 +62,11 @@ export async function GET(
       .eq('meeting_id', id)
       .order('priority', { ascending: false });
     
-    // TypeScript için type assertion
-    const meetingResponse: any = meeting;
-    
+    // Combine meeting with participants and tasks
     return NextResponse.json({
-      ...meetingResponse,
-      participants: participants || [],
-      tasks: tasks || []
+      ...(meeting as unknown as Record<string, unknown>),
+      participants: participants ?? [],
+      tasks: tasks ?? []
     });
   } catch (error) {
     // Error logged securely without exposing sensitive data

@@ -1,4 +1,4 @@
-import { test as base } from '@playwright/test'
+import { test as base, expect as baseExpect } from '@playwright/test'
 
 /**
  * Yardım Yönetim Paneli - Custom Test Fixtures
@@ -6,7 +6,6 @@ import { test as base } from '@playwright/test'
  */
 
 export type TestOptions = {
-  // Test kullanıcısı bilgileri
   testUser?: {
     email: string
     password: string
@@ -14,93 +13,60 @@ export type TestOptions = {
   }
 }
 
-// Authenticated page fixture
+const requireEnv = (name: string): string => {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(`Missing required env var: ${name}`)
+  }
+  return value
+}
+
+// Tüm fixture'ları tek bir test objesinde birleştir
 export const test = base.extend<{
-  authenticatedPage: any
+  authenticatedPage: typeof base['page']
+  adminPage: typeof base['page']
+  moderatorPage: typeof base['page']
+  viewerPage: typeof base['page']
 }>({
+  // Default authenticated page (admin)
   authenticatedPage: async ({ page }, use) => {
-    // Login işlemi
     await page.goto('/login')
-    await page.fill('input[type="email"], input[name="email"]', 'admin@example.com')
-    await page.fill('input[type="password"], input[name="password"]', 'admin123')
+    await page.fill('input[type="email"], input[name="email"]', requireEnv('TEST_ADMIN_EMAIL'))
+    await page.fill('input[type="password"], input[name="password"]', requireEnv('TEST_ADMIN_PASSWORD'))
     await page.click('button[type="submit"]')
-    await page.waitForURL(/.*dashboard/, { timeout: 10000 })
-    
-    // Page'i kullan
+    await page.waitForURL(/.*dashboard/, { timeout: 15000 })
     await use(page)
   },
-})
 
-// Admin user fixture
-export const adminTest = base.extend<{
-  adminPage: any
-}>({
+  // Admin user fixture
   adminPage: async ({ page }, use) => {
     await page.goto('/login')
-    await page.fill('input[type="email"]', 'admin@example.com')
-    await page.fill('input[type="password"]', 'admin123')
+    await page.fill('input[type="email"], input[name="email"]', requireEnv('TEST_ADMIN_EMAIL'))
+    await page.fill('input[type="password"], input[name="password"]', requireEnv('TEST_ADMIN_PASSWORD'))
     await page.click('button[type="submit"]')
-    await page.waitForURL(/.*dashboard/)
-    
+    await page.waitForURL(/.*dashboard/, { timeout: 15000 })
     await use(page)
   },
-})
 
-// Moderator user fixture
-export const moderatorTest = base.extend<{
-  moderatorPage: any
-}>({
+  // Moderator user fixture
   moderatorPage: async ({ page }, use) => {
     await page.goto('/login')
-    await page.fill('input[type="email"]', 'moderator@example.com')
-    await page.fill('input[type="password"]', 'moderator123')
+    await page.fill('input[type="email"], input[name="email"]', requireEnv('TEST_MODERATOR_EMAIL'))
+    await page.fill('input[type="password"], input[name="password"]', requireEnv('TEST_MODERATOR_PASSWORD'))
     await page.click('button[type="submit"]')
-    await page.waitForURL(/.*dashboard/)
-    
+    await page.waitForURL(/.*dashboard/, { timeout: 15000 })
     await use(page)
   },
-})
 
-// Viewer user fixture
-export const viewerTest = base.extend<{
-  viewerPage: any
-}>({
+  // Viewer user fixture
   viewerPage: async ({ page }, use) => {
     await page.goto('/login')
-    await page.fill('input[type="email"]', 'viewer@example.com')
-    await page.fill('input[type="password"]', 'viewer123')
+    await page.fill('input[type="email"], input[name="email"]', requireEnv('TEST_USER_EMAIL'))
+    await page.fill('input[type="password"], input[name="password"]', requireEnv('TEST_USER_PASSWORD'))
     await page.click('button[type="submit"]')
-    await page.waitForURL(/.*dashboard/)
-    
+    await page.waitForURL(/.*dashboard/, { timeout: 15000 })
     await use(page)
   },
 })
 
-// Screenshot helper fixture
-export const screenshotTest = base.extend<{
-  screenshotHelper: any
-}>({
-  screenshotHelper: async ({ page }, use) => {
-    const helper = {
-      async takeScreenshot(name: string) {
-        await page.screenshot({
-          path: `screenshots/${name}.png`,
-          fullPage: true
-        })
-      },
-      
-      async takeScreenshotOnError() {
-        page.on('pageerror', async (error) => {
-          const timestamp = new Date().toISOString()
-          await page.screenshot({
-            path: `screenshots/errors/${timestamp}.png`
-          })
-        })
-      }
-    }
-    
-    await use(helper)
-  },
-})
-
-export const expect = base.expect
+export const expect = baseExpect

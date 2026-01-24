@@ -14,6 +14,10 @@ const Header = dynamic(() => import('@/components/layout/header').then(mod => ({
   ssr: false,
 })
 
+const BottomNav = dynamic(() => import('@/components/layout/bottom-nav').then(mod => ({ default: mod.BottomNav })), {
+  ssr: false,
+})
+
 function DashboardLayoutClient({
   children,
 }: {
@@ -45,13 +49,15 @@ function DashboardLayoutClient({
         className={cn(
           'min-h-screen transition-all duration-200',
           !isDetailPage && 'pt-16',
-          sidebarCollapsed ? 'pl-16' : 'pl-64'
+          sidebarCollapsed ? 'md:pl-16' : 'md:pl-64',
+          'pb-20 md:pb-0'
         )}
       >
         <div className={cn('container mx-auto', !isDetailPage && 'p-6')}>
           {children}
         </div>
       </main>
+      <BottomNav />
     </div>
   )
 }

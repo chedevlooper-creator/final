@@ -401,6 +401,16 @@ export interface MeetingNote {
 }
 
 /**
+ * Oylama seçenekleri - Vote options can be string array or structured object
+ */
+export type VoteOptions = string[] | Record<string, { label: string; description?: string; votes?: number }>
+
+/**
+ * Oy yanıtı - Vote response can be string, string array, or structured object
+ */
+export type VoteResponseValue = string | string[] | Record<string, unknown>
+
+/**
  * Oylama / Vote
  */
 export interface MeetingVote {
@@ -409,7 +419,7 @@ export interface MeetingVote {
   title: string
   description?: string
   vote_type: VoteType
-  options: any
+  options: VoteOptions
   created_by: string
   status: VoteStatus
   created_at: string
@@ -428,7 +438,7 @@ export interface VoteResponse {
   id: string
   vote_id: string
   user_id: string
-  response: any
+  response: VoteResponseValue
   created_at: string
   user?: {
     id: string

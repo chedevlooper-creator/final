@@ -169,7 +169,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
     
-    const updates: any = {};
+    const updates: { status?: string; completed_at?: string } = {};
     if (status) {
       updates.status = status;
       if (status === TaskStatus.COMPLETED) {

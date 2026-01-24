@@ -65,17 +65,18 @@ export function Header() {
   return (
     <header
       className={cn(
-        'fixed top-0 z-30 flex h-16 items-center justify-between border-b bg-white/80 backdrop-blur-sm px-4 transition-all duration-300',
-        sidebarCollapsed ? 'left-16' : 'left-64',
-        'right-0'
+        'fixed top-0 z-30 flex h-16 items-center justify-between border-b bg-white/80 backdrop-blur-sm px-4 transition-all duration-300 lg:right-0 right-0',
+        sidebarCollapsed ? 'md:left-16' : 'md:left-64',
+        'left-0' // Mobile default
       )}
     >
       <div className="flex items-center gap-4">
+        {/* Mobile: Hidden because BottomNav has Menu. Tablet: Visible to toggle sidebar. */}
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleSidebar}
-          className="lg:hidden"
+          className="hidden md:flex lg:hidden"
         >
           <Menu className="h-5 w-5" />
         </Button>

@@ -67,7 +67,11 @@ export async function POST(
     }
     
     // Update existing participant
-    const updates: any = {
+    const updates: {
+      status: string;
+      availability_confirmed: boolean;
+      joined_at?: string;
+    } = {
       status,
       availability_confirmed: availability_confirmed ?? true
     };

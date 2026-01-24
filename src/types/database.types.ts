@@ -565,3 +565,356 @@ export type UpdateTables<T extends keyof Database['public']['Tables']> = Databas
 export type Profile = Database['public']['Tables']['profiles']['Row']
 export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
 export type ProfileUpdate = Database['public']['Tables']['profiles']['Update']
+
+// ============================================
+// Additional Types (Not in generated types yet)
+// ============================================
+
+/**
+ * Purchase Requests - Satın Alma Talepleri
+ */
+export interface PurchaseRequest {
+  id: string
+  request_number: string | null
+  merchant_id: string | null
+  requested_date: string | null
+  required_date: string | null
+  status: string
+  priority: string | null
+  item_description: string
+  quantity: number | null
+  estimated_cost: number | null
+  approved_amount: number | null
+  approval_date: string | null
+  approved_by: string | null
+  notes: string | null
+  created_by: string | null
+  updated_by: string | null
+  created_at: string
+  updated_at: string
+  merchant?: {
+    id: string
+    name: string
+  }
+}
+
+export interface PurchaseRequestInsert {
+  id?: string
+  request_number?: string | null
+  merchant_id?: string | null
+  requested_date?: string | null
+  required_date?: string | null
+  status?: string
+  priority?: string | null
+  item_description?: string
+  quantity?: number | null
+  estimated_cost?: number | null
+  approved_amount?: number | null
+  approval_date?: string | null
+  approved_by?: string | null
+  notes?: string | null
+  created_by?: string | null
+  updated_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface PurchaseRequestUpdate {
+  id?: string
+  request_number?: string | null
+  merchant_id?: string | null
+  requested_date?: string | null
+  required_date?: string | null
+  status?: string
+  priority?: string | null
+  item_description?: string
+  quantity?: number | null
+  estimated_cost?: number | null
+  approved_amount?: number | null
+  approval_date?: string | null
+  approved_by?: string | null
+  notes?: string | null
+  created_by?: string | null
+  updated_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+/**
+ * Merchants - Tedarikçiler
+ */
+export interface Merchant {
+  id: string
+  name: string
+  tax_number: string | null
+  contact_person: string | null
+  phone: string | null
+  email: string | null
+  address: string | null
+  city: string | null
+  status: string
+  notes: string | null
+  created_by: string | null
+  updated_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface MerchantInsert {
+  id?: string
+  name?: string
+  tax_number?: string | null
+  contact_person?: string | null
+  phone?: string | null
+  email?: string | null
+  address?: string | null
+  city?: string | null
+  status?: string
+  notes?: string | null
+  created_by?: string | null
+  updated_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface MerchantUpdate {
+  id?: string
+  name?: string
+  tax_number?: string | null
+  contact_person?: string | null
+  phone?: string | null
+  email?: string | null
+  address?: string | null
+  city?: string | null
+  status?: string
+  notes?: string | null
+  created_by?: string | null
+  updated_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+/**
+ * Volunteers - Gönüllüler (Extended)
+ */
+export interface Volunteer {
+  id: string
+  first_name: string
+  last_name: string
+  phone: string | null
+  email: string | null
+  address: string | null
+  city: string | null
+  birth_date: string | null
+  skills: string[] | null
+  availability: string | null
+  status: string
+  notes: string | null
+  created_by: string | null
+  updated_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface VolunteerInsert {
+  id?: string
+  first_name?: string
+  last_name?: string
+  phone?: string | null
+  email?: string | null
+  address?: string | null
+  city?: string | null
+  birth_date?: string | null
+  skills?: string[] | null
+  availability?: string | null
+  status?: string
+  notes?: string | null
+  created_by?: string | null
+  updated_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface VolunteerUpdate {
+  id?: string
+  first_name?: string
+  last_name?: string
+  phone?: string | null
+  email?: string | null
+  address?: string | null
+  city?: string | null
+  birth_date?: string | null
+  skills?: string[] | null
+  availability?: string | null
+  status?: string
+  notes?: string | null
+  created_by?: string | null
+  updated_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+/**
+ * Volunteer Missions - Gönüllü Görevleri
+ */
+export interface VolunteerMission {
+  id: string
+  volunteer_id: string
+  mission_date: string
+  title: string
+  description: string | null
+  location: string | null
+  status: string
+  start_time: string | null
+  end_time: string | null
+  notes: string | null
+  created_by: string | null
+  updated_by: string | null
+  created_at: string
+  updated_at: string
+  volunteer?: {
+    id: string
+    first_name: string
+    last_name: string
+    phone: string | null
+  }
+}
+
+export interface VolunteerMissionInsert {
+  id?: string
+  volunteer_id?: string
+  mission_date?: string
+  title?: string
+  description?: string | null
+  location?: string | null
+  status?: string
+  start_time?: string | null
+  end_time?: string | null
+  notes?: string | null
+  created_by?: string | null
+  updated_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface VolunteerMissionUpdate {
+  id?: string
+  volunteer_id?: string
+  mission_date?: string
+  title?: string
+  description?: string | null
+  location?: string | null
+  status?: string
+  start_time?: string | null
+  end_time?: string | null
+  notes?: string | null
+  created_by?: string | null
+  updated_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+/**
+ * Aids - Yardım Kayıtları (Extended)
+ */
+export interface Aid {
+  id: string
+  needy_person_id: string | null
+  aid_type: string
+  amount: number | null
+  description: string | null
+  distribution_date: string | null
+  status: string
+  notes: string | null
+  created_by: string | null
+  updated_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AidInsert {
+  id?: string
+  needy_person_id?: string | null
+  aid_type?: string
+  amount?: number | null
+  description?: string | null
+  distribution_date?: string | null
+  status?: string
+  notes?: string | null
+  created_by?: string | null
+  updated_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface AidUpdate {
+  id?: string
+  needy_person_id?: string | null
+  aid_type?: string
+  amount?: number | null
+  description?: string | null
+  distribution_date?: string | null
+  status?: string
+  notes?: string | null
+  created_by?: string | null
+  updated_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+/**
+ * Calendar Events - Takvim Etkinlikleri
+ */
+export interface CalendarEvent {
+  id: string
+  title: string
+  description: string | null
+  start_date: string
+  end_date: string | null
+  all_day: boolean
+  location: string | null
+  event_type: string
+  status: string
+  attendees: string[] | null
+  notes: string | null
+  created_by: string | null
+  updated_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface CalendarEventInsert {
+  id?: string
+  title?: string
+  description?: string | null
+  start_date?: string
+  end_date?: string | null
+  all_day?: boolean
+  location?: string | null
+  event_type?: string
+  status?: string
+  attendees?: string[] | null
+  notes?: string | null
+  created_by?: string | null
+  updated_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface CalendarEventUpdate {
+  id?: string
+  title?: string
+  description?: string | null
+  start_date?: string
+  end_date?: string | null
+  all_day?: boolean
+  location?: string | null
+  event_type?: string
+  status?: string
+  attendees?: string[] | null
+  notes?: string | null
+  created_by?: string | null
+  updated_by?: string | null
+  created_at?: string
+  updated_at?: string
+}
