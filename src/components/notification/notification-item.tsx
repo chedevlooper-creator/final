@@ -15,47 +15,51 @@ import { useNotifications } from '@/lib/notification.context'
 // Bildirim tipi renkleri ve ikonları
 const notificationStyles: Record<
   NotificationType,
-  { bg: string; border: string; icon: React.ReactNode; iconBg: string }
+  { bg: string; border: string; icon: React.ReactNode; iconBg: string; textColor: string }
 > = {
   success: {
-    bg: 'bg-green-50 dark:bg-green-900/20',
-    border: 'border-green-200 dark:border-green-800',
+    bg: 'bg-success/5',
+    border: 'border-success/20',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
       </svg>
     ),
-    iconBg: 'bg-green-100 dark:bg-green-800',
+    iconBg: 'bg-success/10 text-success',
+    textColor: 'text-success',
   },
   error: {
-    bg: 'bg-red-50 dark:bg-red-900/20',
-    border: 'border-red-200 dark:border-red-800',
+    bg: 'bg-danger/5',
+    border: 'border-danger/20',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
       </svg>
     ),
-    iconBg: 'bg-red-100 dark:bg-red-800',
+    iconBg: 'bg-danger/10 text-danger',
+    textColor: 'text-danger',
   },
   warning: {
-    bg: 'bg-yellow-50 dark:bg-yellow-900/20',
-    border: 'border-yellow-200 dark:border-yellow-800',
+    bg: 'bg-warning/5',
+    border: 'border-warning/20',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>
     ),
-    iconBg: 'bg-yellow-100 dark:bg-yellow-800',
+    iconBg: 'bg-warning/10 text-warning',
+    textColor: 'text-warning',
   },
   info: {
-    bg: 'bg-blue-50 dark:bg-blue-900/20',
-    border: 'border-blue-200 dark:border-blue-800',
+    bg: 'bg-info/5',
+    border: 'border-info/20',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
-    iconBg: 'bg-blue-100 dark:bg-blue-800',
+    iconBg: 'bg-info/10 text-info',
+    textColor: 'text-info',
   },
 }
 
@@ -105,7 +109,7 @@ export function NotificationItem({ notification }: NotificationItemProps) {
           {/* İkon */}
           {notification.showIcon !== false && (
             <div className={`flex-shrink-0 ${style.iconBg} rounded-full p-2`}>
-              <div className="text-current dark:text-inherit">
+              <div className="text-current">
                 {style.icon}
               </div>
             </div>
@@ -114,13 +118,13 @@ export function NotificationItem({ notification }: NotificationItemProps) {
           {/* İçerik */}
           <div className="flex-1 min-w-0">
             {/* Başlık */}
-            <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            <h4 className="text-sm font-semibold text-foreground">
               {notification.title}
             </h4>
 
             {/* Mesaj */}
             {notification.message && (
-              <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {notification.message}
               </p>
             )}
@@ -131,10 +135,10 @@ export function NotificationItem({ notification }: NotificationItemProps) {
                 onClick={notification.action.onClick}
                 className={`mt-2 text-sm font-medium ${
                   notification.action.variant === 'danger'
-                    ? 'text-red-600 hover:text-red-700 dark:text-red-400'
+                    ? 'text-danger hover:text-danger/80'
                     : notification.action.variant === 'secondary'
-                    ? 'text-gray-600 hover:text-gray-700 dark:text-gray-400'
-                    : 'text-blue-600 hover:text-blue-700 dark:text-blue-400'
+                    ? 'text-muted-foreground hover:text-foreground'
+                    : 'text-primary hover:text-primary/80'
                 }`}
               >
                 {notification.action.label}
@@ -146,7 +150,7 @@ export function NotificationItem({ notification }: NotificationItemProps) {
           {notification.showClose !== false && (
             <button
               onClick={() => remove(notification.id)}
-              className="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              className="flex-shrink-0 text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Bildirimi kapat"
             >
               <X className="w-5 h-5" />
@@ -156,16 +160,16 @@ export function NotificationItem({ notification }: NotificationItemProps) {
 
         {/* Progress Bar */}
         {duration > 0 && (
-          <div className="mt-3 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div className="mt-3 h-1 bg-muted rounded-full overflow-hidden">
             <motion.div
               className={`h-full ${
                 notification.type === 'success'
-                  ? 'bg-green-500'
+                  ? 'bg-success'
                   : notification.type === 'error'
-                  ? 'bg-red-500'
+                  ? 'bg-danger'
                   : notification.type === 'warning'
-                  ? 'bg-yellow-500'
-                  : 'bg-blue-500'
+                  ? 'bg-warning'
+                  : 'bg-info'
               }`}
               initial={{ width: '100%' }}
               animate={{ width: `${progress}%` }}

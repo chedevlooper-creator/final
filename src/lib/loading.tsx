@@ -1,16 +1,27 @@
 /**
  * Loading States System
  *
- * Comprehensive loading state management for Aid Management Panel
- * Provides skeleton loaders, spinner components, and loading utilities
+ * Unified loading state management for Aid Management Panel
+ * Uses shadcn/ui Skeleton components as base, with additional loading utilities
  *
- * @version 1.0.0
- * @since 2026-01-18
+ * @version 2.0.0
+ * @since 2026-01-24
  */
 
 'use client'
 
 import React from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@/components/ui/button'
+
+// Re-export shadcn/ui skeleton components for convenience
+export {
+  Skeleton,
+  TableSkeleton,
+  CardSkeleton,
+  StatsCardSkeleton,
+  DashboardSkeleton,
+} from '@/components/ui/skeleton'
 
 /**
  * Loading Sizes
@@ -28,7 +39,6 @@ export enum LoadingVariant {
   SPINNER = 'spinner',
   DOTS = 'dots',
   PULSE = 'pulse',
-  SKELETON = 'skeleton',
   PROGRESS = 'progress',
 }
 
@@ -68,7 +78,7 @@ const sizeClasses = {
 /**
  * Spinner Component
  */
-export function Spinner({ size = LoadingSize.MEDIUM, color = 'text-blue-600' }: LoadingProps) {
+export function Spinner({ size = LoadingSize.MEDIUM, color = 'text-primary' }: LoadingProps) {
   const sizeClass = sizeClasses[size].spinner
 
   return (
@@ -101,7 +111,7 @@ export function Spinner({ size = LoadingSize.MEDIUM, color = 'text-blue-600' }: 
 /**
  * Dots Component
  */
-export function Dots({ size = LoadingSize.MEDIUM, color = 'bg-blue-600' }: LoadingProps) {
+export function Dots({ size = LoadingSize.MEDIUM, color = 'bg-primary' }: LoadingProps) {
   const sizeClass = sizeClasses[size].dots
 
   return (
@@ -124,7 +134,7 @@ export function Dots({ size = LoadingSize.MEDIUM, color = 'bg-blue-600' }: Loadi
 /**
  * Pulse Component
  */
-export function Pulse({ size = LoadingSize.MEDIUM, color = 'bg-blue-600' }: LoadingProps) {
+export function Pulse({ size = LoadingSize.MEDIUM, color = 'bg-primary' }: LoadingProps) {
   const sizeClass = sizeClasses[size].pulse
 
   return (
@@ -144,13 +154,13 @@ export function ProgressBar({ progress = 0, text }: LoadingProps) {
     <div className="w-full" role="status" aria-valuenow={clampedProgress} aria-valuemin={0} aria-valuemax={100}>
       {text && (
         <div className="flex justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">{text}</span>
-          <span className="text-sm font-medium text-gray-700">%{Math.round(clampedProgress)}</span>
+          <span className="text-sm font-medium text-foreground">{text}</span>
+          <span className="text-sm font-medium text-foreground">%{Math.round(clampedProgress)}</span>
         </div>
       )}
-      <div className="w-full bg-gray-200 rounded-full h-2.5">
+      <div className="w-full bg-muted rounded-full h-2.5">
         <div
-          className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out"
+          className="bg-primary h-2.5 rounded-full transition-all duration-300 ease-out"
           style={{ width: `${clampedProgress}%` }}
         />
       </div>
@@ -164,7 +174,7 @@ export function ProgressBar({ progress = 0, text }: LoadingProps) {
 export function Loading({
   size = LoadingSize.MEDIUM,
   variant = LoadingVariant.SPINNER,
-  color = 'text-blue-600',
+  color = 'text-primary',
   text,
   fullScreen = false,
   progress,
@@ -177,14 +187,14 @@ export function Loading({
       {variant === LoadingVariant.PROGRESS && <ProgressBar progress={progress} text={text} />}
       
       {text && variant !== LoadingVariant.PROGRESS && (
-        <p className="text-sm font-medium text-gray-700">{text}</p>
+        <p className="text-sm font-medium text-muted-foreground">{text}</p>
       )}
     </div>
   )
 
   if (fullScreen) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-90 backdrop-blur-sm">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-sm">
         {content}
       </div>
     )
@@ -201,81 +211,8 @@ export function FullScreenLoading({ ...props }: LoadingProps) {
 }
 
 /**
- * Skeleton Loading Components
+ * Additional Skeleton Components (shadcn/ui doesn't have these)
  */
-
-/**
- * Skeleton Text
- */
-export function SkeletonText({ lines = 3, className = '' }: { lines?: number; className?: string }) {
-  return (
-    <div className={`space-y-2 ${className}`} role="status">
-      {Array.from({ length: lines }).map((_, index) => (
-        <div
-          key={index}
-          className="h-4 bg-gray-200 rounded animate-pulse"
-          style={{
-            width: index === lines - 1 ? '60%' : '100%',
-          }}
-        />
-      ))}
-      <span className="sr-only">Yükleniyor...</span>
-    </div>
-  )
-}
-
-/**
- * Skeleton Card
- */
-export function SkeletonCard({ className = '' }: { className?: string }) {
-  return (
-    <div className={`bg-white rounded-lg shadow p-4 ${className}`} role="status">
-      <div className="animate-pulse space-y-3">
-        <div className="h-4 bg-gray-200 rounded w-3/4" />
-        <div className="h-3 bg-gray-200 rounded w-1/2" />
-        <div className="space-y-2">
-          <div className="h-3 bg-gray-200 rounded" />
-          <div className="h-3 bg-gray-200 rounded w-5/6" />
-        </div>
-      </div>
-      <span className="sr-only">Yükleniyor...</span>
-    </div>
-  )
-}
-
-/**
- * Skeleton Table
- */
-export function SkeletonTable({ rows = 5, columns = 4 }: { rows?: number; columns?: number }) {
-  return (
-    <div className="w-full" role="status">
-      {/* Header */}
-      <div className="flex gap-4 mb-4 pb-2 border-b">
-        {Array.from({ length: columns }).map((_, index) => (
-          <div key={index} className="h-4 bg-gray-200 rounded animate-pulse flex-1" />
-        ))}
-      </div>
-      
-      {/* Rows */}
-      <div className="space-y-3">
-        {Array.from({ length: rows }).map((_, rowIndex) => (
-          <div key={rowIndex} className="flex gap-4">
-            {Array.from({ length: columns }).map((_, colIndex) => (
-              <div
-                key={colIndex}
-                className="h-3 bg-gray-100 rounded animate-pulse flex-1"
-                style={{
-                  animationDelay: `${(rowIndex * columns + colIndex) * 0.05}s`,
-                }}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-      <span className="sr-only">Yükleniyor...</span>
-    </div>
-  )
-}
 
 /**
  * Skeleton Avatar
@@ -288,7 +225,7 @@ export function SkeletonAvatar({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
   }
 
   return (
-    <div className={`${sizeClasses[size]} bg-gray-200 rounded-full animate-pulse`} role="status">
+    <div className={`${sizeClasses[size]} bg-muted rounded-full animate-pulse`} role="status">
       <span className="sr-only">Yükleniyor...</span>
     </div>
   )
@@ -299,24 +236,7 @@ export function SkeletonAvatar({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
  */
 export function SkeletonButton({ width = '100px' }: { width?: string }) {
   return (
-    <div className="h-10 bg-gray-200 rounded animate-pulse" style={{ width }} role="status">
-      <span className="sr-only">Yükleniyor...</span>
-    </div>
-  )
-}
-
-/**
- * Skeleton Form
- */
-export function SkeletonForm({ fields = 4 }: { fields?: number }) {
-  return (
-    <div className="space-y-4" role="status">
-      {Array.from({ length: fields }).map((_, index) => (
-        <div key={index} className="space-y-2">
-          <div className="h-3 bg-gray-200 rounded w-1/4 animate-pulse" />
-          <div className="h-10 bg-gray-100 rounded animate-pulse" />
-        </div>
-      ))}
+    <div className="h-10 bg-muted rounded animate-pulse" style={{ width }} role="status">
       <span className="sr-only">Yükleniyor...</span>
     </div>
   )

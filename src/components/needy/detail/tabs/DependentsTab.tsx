@@ -188,7 +188,7 @@ export function DependentsTab({ needyPersonId, onClose }: DependentsTabProps) {
                     </TableCell>
                     <TableCell>-</TableCell>
                     <TableCell>
-                      <span className={`text-xs px-2 py-1 rounded ${dep.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                      <span className={`text-xs px-2 py-1 rounded ${dep.is_active ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'}`}>
                         {dep.is_active ? 'Aktif' : 'Pasif'}
                       </span>
                     </TableCell>

@@ -52,9 +52,6 @@
   .bg-gradient-surface {
     background: linear-gradient(180deg, hsl(30 20% 92%) 0%, hsl(30 15% 88%) 100%);
   }
-  .dark .bg-gradient-surface {
-    background: linear-gradient(180deg, hsl(0 0% 8%) 0%, hsl(160 15% 12%) 100%);
-  }
 
   /* ========================================
      GLASS MORPHISM
@@ -65,20 +62,12 @@
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid hsl(0 0% 100% / 0.5);
   }
-  .dark .glass {
-    background: hsl(0 0% 8% / 0.8);
-    border: 1px solid hsl(0 0% 100% / 0.1);
-  }
 
   .glass-strong {
     background: hsl(0 0% 100% / 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid hsl(0 0% 100% / 0.8);
-  }
-  .dark .glass-strong {
-    background: hsl(0 0% 8% / 0.95);
-    border: 1px solid hsl(0 0% 100% / 0.15);
   }
 
   /* ========================================
@@ -265,14 +254,6 @@
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
   }
-  .dark .shimmer {
-    background: linear-gradient(
-      90deg,
-      hsl(0 0% 20%) 0%,
-      hsl(0 0% 25%) 50%,
-      hsl(0 0% 20%) 100%
-    );
-  }
   @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
@@ -361,41 +342,21 @@
     background-color: hsl(142 76% 36% / 0.1);
     color: hsl(142 76% 36%);
   }
-  .dark .badge-success {
-    background-color: hsl(142 76% 50% / 0.15);
-    color: hsl(142 76% 60%);
-  }
   .badge-warning {
     background-color: hsl(38 92% 50% / 0.1);
     color: hsl(38 92% 50%);
-  }
-  .dark .badge-warning {
-    background-color: hsl(38 92% 55% / 0.15);
-    color: hsl(38 92% 65%);
   }
   .badge-danger {
     background-color: hsl(0 84% 60% / 0.1);
     color: hsl(0 84% 60%);
   }
-  .dark .badge-danger {
-    background-color: hsl(0 62% 50% / 0.15);
-    color: hsl(0 72% 60%);
-  }
   .badge-info {
     background-color: hsl(199 89% 48% / 0.1);
     color: hsl(199 89% 48%);
   }
-  .dark .badge-info {
-    background-color: hsl(199 89% 55% / 0.15);
-    color: hsl(199 89% 65%);
-  }
   .badge-neutral {
     background-color: hsl(0 0% 90%);
     color: hsl(0 0% 40%);
-  }
-  .dark .badge-neutral {
-    background-color: hsl(0 0% 20%);
-    color: hsl(0 0% 60%);
   }
 
   /* ========================================
@@ -546,10 +507,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 25 15% 12%;
 
-    /* Primary - Teal (Doğa Ana Renk) */
-    --primary: 174 73% 42%;
-    --primary-hover: 174 73% 38%;
-    --primary-active: 174 73% 34%;
+    /* Primary - Teal Dark (Koyu Teal - WCAG AAA Uyumlu) */
+    --primary: 175 70% 22%;
+    --primary-hover: 175 70% 18%;
+    --primary-active: 175 70% 15%;
     --primary-foreground: 0 0% 100%;
 
     /* Secondary - Warm Gray */
@@ -637,84 +598,6 @@
     --shadow: 0 2px 8px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.04);
     --shadow-md: 0 4px 12px rgb(0 0 0 / 0.05), 0 16px 40px rgb(0 0 0 / 0.06);
     --shadow-lg: 0 8px 24px rgb(0 0 0 / 0.06), 0 32px 64px rgb(0 0 0 / 0.08);
-  }
-
-  /* ========================================
-     DARK MODE
-     ======================================== */
-  .dark {
-    /* Background Colors */
-    --background: 0 0% 3.9%;
-    --background-subtle: 160 15% 10%;
-    --foreground: 0 0% 98%;
-    --foreground-muted: 0 0% 63.9%;
-
-    /* Card & Surface */
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --card-subtle: 160 15% 10%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-
-    /* Primary - Light Teal */
-    --primary: 174 73% 55%;
-    --primary-hover: 174 73% 50%;
-    --primary-active: 174 73% 60%;
-    --primary-foreground: 0 0% 9%;
-
-    /* Secondary */
-    --secondary: 160 20% 20%;
-    --secondary-hover: 160 20% 25%;
-    --secondary-foreground: 0 0% 98%;
-
-    /* Accent */
-    --accent: 158 64% 40%;
-    --accent-hover: 158 64% 45%;
-    --accent-foreground: 0 0% 98%;
-
-    /* Muted */
-    --muted: 160 15% 18%;
-    --muted-hover: 160 15% 22%;
-    --muted-foreground: 0 0% 63.9%;
-
-    /* Destructive */
-    --destructive: 0 62.8% 30.6%;
-    --destructive-hover: 0 62% 35%;
-    --destructive-foreground: 0 0% 98%;
-
-    /* Danger */
-    --danger: 0 62% 45%;
-    --danger-hover: 0 62% 50%;
-    --danger-foreground: 0 0% 98%;
-
-    /* Border & Input */
-    --border: 0 0% 14.9%;
-    --border-subtle: 0 0% 10%;
-    --input: 0 0% 14.9%;
-    --ring: 174 73% 55%;
-
-    /* Semantic Colors */
-    --success: 142 76% 50%;
-    --success-hover: 142 76% 55%;
-    --success-foreground: 0 0% 100%;
-
-    --warning: 38 92% 55%;
-    --warning-hover: 38 92% 60%;
-    --warning-foreground: 0 0% 9%;
-
-    --info: 199 89% 55%;
-    --info-hover: 199 89% 60%;
-    --info-foreground: 0 0% 9%;
-
-    /* Chart Colors */
-    --chart-1: 174 73% 55%;
-    --chart-2: 158 64% 60%;
-    --chart-3: 142 76% 50%;
-    --chart-4: 199 89% 60%;
-    --chart-5: 173 58% 55%;
-    --chart-6: 160 60% 55%;
-    --chart-7: 38 92% 60%;
-    --chart-8: 26 83% 60%;
   }
 
   /* ========================================

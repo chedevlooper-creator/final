@@ -97,10 +97,10 @@ export function ApplicationsTab({ needyPersonId, onClose }: ApplicationsTabProps
 
   const getStageColor = (stage: string) => {
     switch (stage) {
-      case 'approved': return 'bg-green-100 text-green-700'
-      case 'rejected': return 'bg-red-100 text-red-700'
-      case 'pending': return 'bg-yellow-100 text-yellow-700'
-      default: return 'bg-gray-100 text-gray-700'
+      case 'approved': return 'bg-success/10 text-success'
+      case 'rejected': return 'bg-danger/10 text-danger'
+      case 'pending': return 'bg-warning/10 text-warning'
+      default: return 'bg-muted text-muted-foreground'
     }
   }
 

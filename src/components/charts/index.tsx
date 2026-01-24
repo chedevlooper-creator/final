@@ -2,7 +2,26 @@
 
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieLabelRenderProps } from 'recharts'
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
+// CSS değişkenlerinden renk değerlerini al
+const getCSSColor = (varName: string): string => {
+  if (typeof window === 'undefined') return '#10b981' // SSR fallback
+  const root = document.documentElement
+  const hsl = getComputedStyle(root).getPropertyValue(varName).trim()
+  if (!hsl) return '#10b981'
+  return `hsl(${hsl})`
+}
+
+// Chart renkleri - CSS değişkenlerini kullanır
+const CHART_COLORS = [
+  'hsl(var(--chart-1))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+  'hsl(var(--chart-5))',
+  'hsl(var(--chart-6))',
+  'hsl(var(--chart-7))',
+  'hsl(var(--chart-8))',
+]
 
 interface PieLabelProps {
   category: string
@@ -28,17 +47,17 @@ export function DonationChart({ data }: DonationChartProps) {
         <XAxis dataKey="date" />
         <YAxis />
         <Tooltip 
-          contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', borderRadius: '8px' }}
+          contentStyle={{ backgroundColor: 'hsl(var(--popover))', borderRadius: '8px', border: '1px solid hsl(var(--border))' }}
           formatter={(value?: number) => value !== undefined ? `${value.toLocaleString('tr-TR')} TL` : ''}
         />
         <Legend />
         <Line 
           type="monotone" 
           dataKey="amount" 
-          stroke="#10b981" 
+          stroke="hsl(var(--success))" 
           strokeWidth={2}
           name="Bağış Tutarı"
-          dot={{ fill: '#10b981' }}
+          dot={{ fill: 'hsl(var(--success))' }}
         />
       </LineChart>
     </ResponsiveContainer>
@@ -63,11 +82,11 @@ export function CategoryChart({ data }: CategoryChartProps) {
           labelLine={false}
           label={({ category, percent }: any) => `${category}: ${(percent * 100).toFixed(0)}%`}
           outerRadius={80}
-          fill="#8884d8"
+          fill="hsl(var(--chart-1))"
           dataKey="amount"
         >
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
           ))}
         </Pie>
         <Tooltip formatter={(value?: number) => value !== undefined ? `${value.toLocaleString('tr-TR')} TL` : ''} />
@@ -92,7 +111,7 @@ export function AidDistributionChart({ data }: BarChartProps) {
         <YAxis />
         <Tooltip formatter={(value?: number) => value !== undefined ? `${value.toLocaleString('tr-TR')} TL` : ''} />
         <Legend />
-        <Bar dataKey="value" fill="#3b82f6" name="Yardım Tutarı" />
+        <Bar dataKey="value" fill="hsl(var(--info))" name="Yardım Tutarı" />
       </BarChart>
     </ResponsiveContainer>
   )
@@ -116,35 +135,35 @@ export function StatsCards({ stats }: StatsCardsProps) {
       title: 'Toplam Bağış',
       value: `${stats.totalDonations.toLocaleString('tr-TR')} TL`,
       icon: '💰',
-      color: 'bg-green-500',
+      color: 'bg-success',
     },
     {
       title: 'Dağıtılan Yardım',
       value: `${stats.totalAids.toLocaleString('tr-TR')} TL`,
       icon: '🤝',
-      color: 'bg-blue-500',
+      color: 'bg-info',
     },
     {
       title: 'Aktif İhtiyaç Sahibi',
       value: stats.activeNeedy.toLocaleString('tr-TR'),
       icon: '👥',
-      color: 'bg-purple-500',
+      color: 'bg-accent',
     },
     {
       title: 'Aylık Büyüme',
       value: `%${stats.monthlyGrowth}`,
       icon: '📈',
-      color: stats.monthlyGrowth >= 0 ? 'bg-emerald-500' : 'bg-red-500',
+      color: stats.monthlyGrowth >= 0 ? 'bg-success' : 'bg-danger',
     },
   ]
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {cards.map((card) => (
-        <div key={card.title} className="bg-white rounded-lg shadow p-6 border-l-4">
+        <div key={card.title} className="bg-card rounded-lg shadow p-6 border-l-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">{card.title}</p>
+              <p className="text-sm text-muted-foreground">{card.title}</p>
               <p className="text-2xl font-bold mt-1">{card.value}</p>
             </div>
             <div className={`p-3 rounded-full ${card.color} text-white text-2xl`}>

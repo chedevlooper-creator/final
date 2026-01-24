@@ -103,7 +103,7 @@ export function SponsorsTab({ needyPersonId, onClose }: SponsorsTabProps) {
                     <TableCell>{sp.monthly_amount?.toLocaleString('tr-TR')} {sp.currency}</TableCell>
                     <TableCell>{sp.start_date}</TableCell>
                     <TableCell>
-                      <span className={`text-xs px-2 py-1 rounded ${sp.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                      <span className={`text-xs px-2 py-1 rounded ${sp.status === 'active' ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'}`}>
                         {SPONSOR_STATUS_OPTIONS.find(s => s.value === sp.status)?.label}
                       </span>
                     </TableCell>

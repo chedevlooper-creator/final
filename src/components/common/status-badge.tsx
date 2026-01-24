@@ -32,11 +32,11 @@ const DEFAULT_MAPPING: Record<string, { label: string; variant: BadgeVariant }> 
 
 const VARIANT_CLASSES: Record<BadgeVariant, string> = {
   default: '',
-  success: 'bg-green-100 text-green-700 hover:bg-green-100 border-green-200',
-  warning: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-yellow-200',
-  error: 'bg-red-100 text-red-700 hover:bg-red-100 border-red-200',
-  info: 'bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200',
-  outline: 'bg-slate-100 text-slate-700 hover:bg-slate-100 border-slate-200',
+  success: 'bg-success/10 text-success hover:bg-success/20 border-success/20',
+  warning: 'bg-warning/10 text-warning hover:bg-warning/20 border-warning/20',
+  error: 'bg-danger/10 text-danger hover:bg-danger/20 border-danger/20',
+  info: 'bg-info/10 text-info hover:bg-info/20 border-info/20',
+  outline: 'bg-muted text-muted-foreground hover:bg-muted/80 border-border',
 }
 
 export function StatusBadge({ status, label, mapping, className }: StatusBadgeProps) {

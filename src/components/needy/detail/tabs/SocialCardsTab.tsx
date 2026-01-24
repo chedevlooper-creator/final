@@ -86,13 +86,13 @@ export function SocialCardsTab({ needyPersonId, onClose }: SocialCardsTabProps) 
                 </TableRow>
               ) : (
                 cards.map((card) => (
-                  <TableRow key={card.id} className={isExpired(card.expiry_date) ? 'bg-red-50' : ''}>
+                  <TableRow key={card.id} className={isExpired(card.expiry_date) ? 'bg-danger/5' : ''}>
                     <TableCell>
                       <div className={`p-2 rounded ${
-                        card.card_type === 'green_card' ? 'bg-green-100' :
-                        card.card_type === 'refugee_card' ? 'bg-blue-100' :
+                        card.card_type === 'green_card' ? 'bg-success/10' :
+                        card.card_type === 'refugee_card' ? 'bg-info/10' :
                         card.card_type === 'disability_card' ? 'bg-purple-100' :
-                        'bg-gray-100'
+                        'bg-muted'
                       }`}>
                         <CreditCard className="h-4 w-4" />
                       </div>
@@ -101,14 +101,14 @@ export function SocialCardsTab({ needyPersonId, onClose }: SocialCardsTabProps) 
                     <TableCell>{card.card_name}</TableCell>
                     <TableCell className="font-mono text-sm">{card.card_number}</TableCell>
                     <TableCell>{card.issue_date && format(new Date(card.issue_date), 'dd.MM.yyyy', { locale: tr })}</TableCell>
-                    <TableCell className={isExpired(card.expiry_date) ? 'text-red-600 font-medium' : ''}>
+                    <TableCell className={isExpired(card.expiry_date) ? 'text-danger font-medium' : ''}>
                       {card.expiry_date ? format(new Date(card.expiry_date), 'dd.MM.yyyy', { locale: tr }) : 'Süresiz'}
                     </TableCell>
                     <TableCell>
                       <span className={`text-xs px-2 py-1 rounded ${
-                        card.status === 'active' ? 'bg-green-100 text-green-700' :
-                        card.status === 'expired' ? 'bg-red-100 text-red-700' :
-                        'bg-gray-100 text-gray-700'
+                        card.status === 'active' ? 'bg-success/10 text-success' :
+                        card.status === 'expired' ? 'bg-danger/10 text-danger' :
+                        'bg-muted text-muted-foreground'
                       }`}>
                         {SOCIAL_CARD_STATUS_OPTIONS.find(s => s.value === card.status)?.label}
                       </span>

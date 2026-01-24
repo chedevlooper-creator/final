@@ -1,6 +1,18 @@
 import { memo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
+// CSS değişkenlerini kullanan chart renkleri
+const CHART_COLORS = [
+  'hsl(var(--chart-1))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+  'hsl(var(--chart-5))',
+  'hsl(var(--chart-6))',
+  'hsl(var(--chart-7))',
+  'hsl(var(--chart-8))',
+]
+
 interface ChartData {
     label: string
     value: number
@@ -39,15 +51,15 @@ export const SimpleBarChart = memo(function SimpleBarChart<T = ChartData>({
             {data.map((item, idx) => {
                 const label = String(getValue(item, labelKey))
                 const value = Number(getValue(item, valueKey))
-                const itemColor = (item as ChartData).color || color || `hsl(${160 + idx * 30}, 70%, 50%)`
+                const itemColor = (item as ChartData).color || color || CHART_COLORS[idx % CHART_COLORS.length]
                 
                 return (
                     <div key={idx} className="space-y-1">
                         <div className="flex justify-between text-sm">
-                            <span className="text-slate-600">{label}</span>
+                            <span className="text-muted-foreground">{label}</span>
                             <span className="font-medium">{value.toLocaleString('tr-TR')}</span>
                         </div>
-                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
                             <div
                                 className="h-full rounded-full transition-all duration-500"
                                 style={{
@@ -95,7 +107,7 @@ export const SimplePieChart = memo(function SimplePieChart<T = ChartData>({
     valueKey = 'value',
     showLegend = true,
 }: SimplePieChartProps<T>) {
-    const defaultColors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16']
+    const defaultColors = CHART_COLORS
     const total = data.reduce((sum, d) => sum + Number(getValue(d, valueKey)), 0)
 
     let cumulativePercent = 0
@@ -143,7 +155,7 @@ export const SimplePieChart = memo(function SimplePieChart<T = ChartData>({
                                     className="w-3 h-3 rounded-full flex-shrink-0"
                                     style={{ backgroundColor: item.color }}
                                 />
-                                <span className="text-slate-600 truncate">{item.label}</span>
+                                <span className="text-muted-foreground truncate">{item.label}</span>
                             </div>
                             <span className="font-medium flex-shrink-0">{item.percent.toFixed(0)}%</span>
                         </div>
@@ -182,7 +194,7 @@ export const TrendChart = memo(function TrendChart<T = ChartData>({
     title, 
     data, 
     height = 120, 
-    color = '#10b981',
+    color = 'hsl(var(--success))',
     labelKey = 'label',
     valueKey = 'value',
     showArea = true,
@@ -241,12 +253,12 @@ export const TrendChart = memo(function TrendChart<T = ChartData>({
                 </svg>
             </div>
             {/* Labels */}
-            <div className="flex justify-between mt-2 text-xs text-slate-500">
+            <div className="flex justify-between mt-2 text-xs text-muted-foreground">
                 {points.map((p, idx) => (
                     <div key={idx} className="text-center">
                         <div>{p.label}</div>
                         {formatValue && (
-                            <div className="font-medium text-slate-700">{formatValue(p.value)}</div>
+                            <div className="font-medium text-foreground">{formatValue(p.value)}</div>
                         )}
                     </div>
                 ))}

@@ -86,7 +86,7 @@ export function InterviewsTab({ needyPersonId, onClose }: InterviewsTabProps) {
                     <TableCell className="truncate max-w-[200px]">{int.subject}</TableCell>
                     <TableCell>{INTERVIEW_OUTCOME_OPTIONS.find(o => o.value === int.outcome)?.label}</TableCell>
                     <TableCell>
-                      <span className={`text-xs px-2 py-1 rounded ${int.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                      <span className={`text-xs px-2 py-1 rounded ${int.status === 'completed' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>
                         {INTERVIEW_STATUS_OPTIONS.find(s => s.value === int.status)?.label}
                       </span>
                     </TableCell>

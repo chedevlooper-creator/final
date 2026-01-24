@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Search, LogOut, User, Menu, Sparkles, ChevronRight } from 'lucide-react'
+import { Search, LogOut, User, Sparkles, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { useUIStore } from '@/stores/ui-store'
 import {
@@ -18,11 +18,9 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 import { NotificationDropdown } from '@/components/layout/notification-dropdown'
 import { useEffect, useState } from 'react'
-import { usePathname } from 'next/navigation'
 
 export function Header() {
   const { user, profile, signOut } = useAuth()
-  const pathname = usePathname()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [searchFocused, setSearchFocused] = useState(false)
@@ -41,29 +39,15 @@ export function Header() {
     return unsubscribe
   }, [])
 
-  const toggleSidebar = () => {
-    useUIStore.getState().toggleSidebar()
-  }
-
-  // Get page title from pathname
-  const getPageTitle = () => {
-    if (pathname === '/dashboard') return 'Panel'
-    const segments = pathname.split('/').filter(Boolean)
-    if (segments.length > 1) {
-      return segments[segments.length - 1].charAt(0).toUpperCase() + segments[segments.length - 1].slice(1)
-    }
-    return segments[segments.length - 1]?.charAt(0).toUpperCase() + segments[segments.length - 1]?.slice(1) || 'Panel'
-  }
-
   const initials = user?.email
     ? user.email.slice(0, 2).toUpperCase()
     : 'U'
 
   if (!mounted) {
     return (
-      <header className="fixed top-0 right-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card/80 backdrop-blur-md px-4 md:left-64 animate-fade-in">
+      <header className="fixed top-0 right-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card/80 backdrop-blur-md px-4 left-64 animate-fade-in">
         <div className="flex items-center gap-4">
-          <div className="relative hidden md:block">
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Ara... (⌘K)"
@@ -79,32 +63,15 @@ export function Header() {
   return (
     <header
       className={cn(
-        'fixed top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card/80 backdrop-blur-md px-4 transition-all duration-300 lg:right-0 right-0 shadow-soft',
-        sidebarCollapsed ? 'md:left-16' : 'md:left-64',
-        'left-0' // Mobile default
+        'fixed top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card/80 backdrop-blur-md px-4 transition-all duration-300 right-0 shadow-soft',
+        sidebarCollapsed ? 'left-16' : 'left-64'
       )}
       role="banner"
     >
       {/* Left Section */}
       <div className="flex items-center gap-4">
-        {/* Mobile: Hidden because BottomNav has Menu. Tablet: Visible to toggle sidebar. */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleSidebar}
-          className="hidden md:flex lg:hidden hover:bg-muted transition-colors"
-          aria-label="Sidebar'ı aç/kapat"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
-
-        {/* Page Title - Mobile Only */}
-        <div className="md:hidden">
-          <h1 className="text-base font-semibold text-foreground">{getPageTitle()}</h1>
-        </div>
-
         {/* Search */}
-        <div className="relative hidden md:block">
+        <div className="relative">
           <label htmlFor="global-search" className="sr-only">Ara</label>
           <Search className={cn(
             'absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors pointer-events-none',
@@ -132,8 +99,8 @@ export function Header() {
 
       {/* Right Section */}
       <div className="flex items-center gap-2">
-        {/* Quick Actions - Desktop */}
-        <div className="hidden lg:flex items-center gap-1">
+        {/* Quick Actions */}
+        <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="sm"
@@ -145,7 +112,7 @@ export function Header() {
         </div>
 
         {/* Divider */}
-        <div className="hidden md:block h-6 w-px bg-border" aria-hidden="true" />
+        <div className="h-6 w-px bg-border" aria-hidden="true" />
 
         {/* Notifications */}
         <NotificationDropdown />
@@ -163,7 +130,7 @@ export function Header() {
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <div className="hidden md:flex flex-col items-start mr-1">
+              <div className="flex flex-col items-start mr-1">
                 <span className="text-sm font-medium text-foreground leading-tight">
                   {profile?.name || user?.email?.split('@')[0]}
                 </span>
@@ -171,7 +138,7 @@ export function Header() {
                   {profile?.role || 'user'}
                 </span>
               </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground rotate-90 md:rotate-0" aria-hidden="true" />
+              <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 animate-scale-in">

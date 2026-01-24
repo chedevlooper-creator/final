@@ -59,19 +59,19 @@ export function CardSummaryTab({ needyPersonId, onClose, cardSummary }: CardSumm
   }
 
   const items: SummaryItem[] = [
-    { icon: <CreditCard className="h-5 w-5" />, label: 'Banka Hesapları', value: summary.active_bank_accounts, subLabel: 'Aktif hesap', color: 'text-blue-600 bg-blue-50' },
-    { icon: <FileText className="h-5 w-5" />, label: 'Dokümanlar', value: summary.total_documents, subLabel: 'Toplam belge', color: 'text-orange-600 bg-orange-50' },
-    { icon: <Image className="h-5 w-5" />, label: 'Fotoğraflar', value: summary.total_photos, subLabel: 'Toplam fotoğraf', color: 'text-purple-600 bg-purple-50' },
-    { icon: <Baby className="h-5 w-5" />, label: 'Baktığı Yetimler', value: summary.active_orphan_relations, subLabel: 'Aktif ilişki', color: 'text-pink-600 bg-pink-50' },
-    { icon: <Users className="h-5 w-5" />, label: 'Baktığı Kişiler', value: summary.active_dependents, subLabel: 'Bağımlı kişi', color: 'text-indigo-600 bg-indigo-50' },
-    { icon: <Heart className="h-5 w-5" />, label: 'Sponsorlar', value: summary.active_sponsors, subLabel: 'Aktif sponsor', color: 'text-red-600 bg-red-50' },
-    { icon: <UserCheck className="h-5 w-5" />, label: 'Referanslar', value: summary.total_references, subLabel: 'Toplam referans', color: 'text-teal-600 bg-teal-50' },
-    { icon: <MessageSquare className="h-5 w-5" />, label: 'Görüşme Kayıtları', value: summary.total_interviews, subLabel: 'Toplam görüşme', color: 'text-cyan-600 bg-cyan-50' },
-    { icon: <Calendar className="h-5 w-5" />, label: 'Seanslar', value: summary.total_sessions, subLabel: 'Toplam seans', color: 'text-emerald-600 bg-emerald-50' },
-    { icon: <ClipboardList className="h-5 w-5" />, label: 'Yardım Talepleri', value: summary.total_applications, subLabel: `${summary.pending_applications} beklemede`, color: 'text-amber-600 bg-amber-50' },
-    { icon: <Gift className="h-5 w-5" />, label: 'Yapılan Yardımlar', value: summary.total_aids_received, subLabel: 'Toplam yardım', color: 'text-green-600 bg-green-50' },
-    { icon: <FileCheck className="h-5 w-5" />, label: 'Rıza Beyanları', value: summary.given_consents, subLabel: 'Alınan rıza', color: 'text-violet-600 bg-violet-50' },
-    { icon: <Wallet className="h-5 w-5" />, label: 'Sosyal Kartlar', value: summary.active_social_cards, subLabel: 'Aktif kart', color: 'text-lime-600 bg-lime-50' },
+    { icon: <CreditCard className="h-5 w-5" />, label: 'Banka Hesapları', value: summary.active_bank_accounts, subLabel: 'Aktif hesap', color: 'text-info bg-info/10' },
+    { icon: <FileText className="h-5 w-5" />, label: 'Dokümanlar', value: summary.total_documents, subLabel: 'Toplam belge', color: 'text-warning bg-warning/10' },
+    { icon: <Image className="h-5 w-5" />, label: 'Fotoğraflar', value: summary.total_photos, subLabel: 'Toplam fotoğraf', color: 'text-purple-600 bg-purple-100' },
+    { icon: <Baby className="h-5 w-5" />, label: 'Baktığı Yetimler', value: summary.active_orphan_relations, subLabel: 'Aktif ilişki', color: 'text-pink-600 bg-pink-100' },
+    { icon: <Users className="h-5 w-5" />, label: 'Baktığı Kişiler', value: summary.active_dependents, subLabel: 'Bağımlı kişi', color: 'text-indigo-600 bg-indigo-100' },
+    { icon: <Heart className="h-5 w-5" />, label: 'Sponsorlar', value: summary.active_sponsors, subLabel: 'Aktif sponsor', color: 'text-danger bg-danger/10' },
+    { icon: <UserCheck className="h-5 w-5" />, label: 'Referanslar', value: summary.total_references, subLabel: 'Toplam referans', color: 'text-teal-600 bg-teal-100' },
+    { icon: <MessageSquare className="h-5 w-5" />, label: 'Görüşme Kayıtları', value: summary.total_interviews, subLabel: 'Toplam görüşme', color: 'text-cyan-600 bg-cyan-100' },
+    { icon: <Calendar className="h-5 w-5" />, label: 'Seanslar', value: summary.total_sessions, subLabel: 'Toplam seans', color: 'text-success bg-success/10' },
+    { icon: <ClipboardList className="h-5 w-5" />, label: 'Yardım Talepleri', value: summary.total_applications, subLabel: `${summary.pending_applications} beklemede`, color: 'text-warning bg-warning/10' },
+    { icon: <Gift className="h-5 w-5" />, label: 'Yapılan Yardımlar', value: summary.total_aids_received, subLabel: 'Toplam yardım', color: 'text-success bg-success/10' },
+    { icon: <FileCheck className="h-5 w-5" />, label: 'Rıza Beyanları', value: summary.given_consents, subLabel: 'Alınan rıza', color: 'text-violet-600 bg-violet-100' },
+    { icon: <Wallet className="h-5 w-5" />, label: 'Sosyal Kartlar', value: summary.active_social_cards, subLabel: 'Aktif kart', color: 'text-lime-600 bg-lime-100' },
   ]
 
   return (
@@ -86,9 +86,9 @@ export function CardSummaryTab({ needyPersonId, onClose, cardSummary }: CardSumm
           {summary.category && <span>Kategori: {summary.category}</span>}
           {summary.status && (
             <span className={`px-2 py-0.5 rounded text-xs ${
-              summary.status === 'approved' ? 'bg-green-100 text-green-700' :
-              summary.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-              'bg-gray-100 text-gray-700'
+              summary.status === 'approved' ? 'bg-success/10 text-success' :
+              summary.status === 'pending' ? 'bg-warning/10 text-warning' :
+              'bg-muted text-muted-foreground'
             }`}>
               {summary.status}
             </span>

@@ -8,7 +8,6 @@ import { usePathname } from 'next/navigation'
 // Import components directly to avoid dynamic import issues with Zustand
 import { Sidebar } from '@/components/layout/sidebar'
 import { Header } from '@/components/layout/header'
-import { BottomNav } from '@/components/layout/bottom-nav'
 import { SkipToContent } from '@/components/layout/skip-to-content'
 
 function DashboardLayoutClient({
@@ -33,17 +32,15 @@ function DashboardLayoutClient({
         className={cn(
           'min-h-screen transition-all duration-300 ease-out',
           !isDetailPage && 'pt-16',
-          sidebarCollapsed ? 'md:pl-16' : 'md:pl-64',
-          'pb-20 md:pb-0'
+          sidebarCollapsed ? 'pl-16' : 'pl-64'
         )}
       >
-        <div className={cn('container mx-auto px-4 md:px-6 py-6', !isDetailPage && 'p-6')}>
+        <div className={cn('container mx-auto px-6 py-6', !isDetailPage && 'p-6')}>
           <div className="animate-fade-in">
             {children}
           </div>
         </div>
       </main>
-      <BottomNav />
     </div>
   )
 }
