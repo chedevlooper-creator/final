@@ -1,4 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
+import dotenv from 'dotenv'
+import path from 'path'
+
+// .env.test dosyasını yükle
+dotenv.config({ path: path.resolve(__dirname, '.env.test') })
 
 /**
  * Yardım Yönetim Paneli - Playwright E2E Test Konfigürasyonu
@@ -86,9 +91,13 @@ export default defineConfig({
 
   // Development server'ı başlat
   webServer: {
-    command: 'npm run dev',
+    command: 'dotenv -e .env.test -- npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env['CI'],
     timeout: 120 * 1000, // 2 dakika
+    env: {
+      NEXT_PUBLIC_SUPABASE_URL: process.env['NEXT_PUBLIC_SUPABASE_URL'] || '',
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'] || '',
+    },
   },
 })
