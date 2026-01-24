@@ -9,6 +9,7 @@ export const applicationSchema = z.object({
   priority: z.enum(['low', 'medium', 'high', 'urgent']),
   description: z.string().nullable().optional(),
   requested_amount: z.number().min(0).nullable().optional(),
+  approved_amount: z.number().min(0).nullable().optional(),
   notes: z.string().nullable().optional(),
 })
 

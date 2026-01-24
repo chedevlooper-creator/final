@@ -3,7 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ThemeProvider } from 'next-themes'
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 import { Toaster } from '@/components/ui/sonner'
 import { WebVitals, PerformanceMonitor } from '@/components/performance/web-vitals'
 import { ViewTransitions, injectViewTransitionStyles } from '@/components/navigation/view-transitions'
@@ -66,21 +66,27 @@ function getQueryClient() {
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(getQueryClient)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     // Inject view transition styles
     injectViewTransitionStyles()
   }, [])
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+      storageKey="yardim-theme"
+    >
       <QueryClientProvider client={queryClient}>
-        <Suspense fallback={null}>
-          <ProgressBar />
-        </Suspense>
-        <ViewTransitions />
-        <WebVitals />
-        <PerformanceMonitor />
+        {mounted && <ProgressBar />}
+        {mounted && <ViewTransitions />}
+        {mounted && <WebVitals />}
+        {mounted && <PerformanceMonitor />}
         {children}
         <Toaster position="top-right" richColors closeButton />
         {process.env['NODE_ENV'] === 'development' && (

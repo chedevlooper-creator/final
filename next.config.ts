@@ -9,6 +9,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 
 const nextConfig: NextConfig = {
+  // Enable Cache Components (root level for Canary/Stable 16.1+)
+  cacheComponents: true,
+
   reactStrictMode: true,
 
   // TypeScript build configuration
@@ -40,6 +43,7 @@ const nextConfig: NextConfig = {
 
   // Experimental features for better performance
   experimental: {
+    // cacheComponents moved to root
     optimizePackageImports: [
 
       'lucide-react',

@@ -1,7 +1,7 @@
 'use client'
 
 import { useReportWebVitals } from 'next/web-vitals'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export function WebVitals() {
   useReportWebVitals((metric) => {
@@ -35,28 +35,37 @@ export function WebVitals() {
 }
 
 export function PerformanceMonitor() {
+  const [mounted, setMounted] = useState(false)
+
+  // Only run on client
   useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+
     // Sayfa yüklenme süresini izle
     const perfData = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
-    
+
     if (perfData) {
       const metrics = {
         domContentLoaded: perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
         loadComplete: perfData.loadEventEnd - perfData.loadEventStart,
         totalTime: perfData.loadEventEnd - perfData.fetchStart,
       }
-      
+
       // Only log in development
       if (process.env.NODE_ENV === 'development') {
         console.log('[Performance Metrics]', metrics)
       }
-      
+
       // Yavaş yükleme uyarısı
       if (metrics.totalTime > 3000 && process.env.NODE_ENV === 'development') {
         console.warn('[Performance] Slow page load detected:', metrics.totalTime)
       }
     }
-    
+
     // Memory usage izleme
     if ('memory' in performance && process.env.NODE_ENV === 'development') {
       const mem = (performance as any).memory
@@ -66,7 +75,7 @@ export function PerformanceMonitor() {
         jsHeapSizeLimit: Math.round(mem.jsHeapSizeLimit / 1048576) + ' MB',
       })
     }
-  }, [])
-  
+  }, [mounted])
+
   return null
 }

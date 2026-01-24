@@ -3,55 +3,11 @@
 -- Tarih: 18 Ocak 2026
 -- Tanım: Temel veritabanı tabloları ve RLS politikaları
 
--- ============================================
--- 1. İHTİYAÇ SAHİPLERİ (Needy Persons)
--- ============================================
-CREATE TABLE IF NOT EXISTS needy_persons (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL,
-  tc_no TEXT UNIQUE,
-  phone TEXT,
-  email TEXT,
-  address TEXT,
-  city TEXT,
-  district TEXT,
-  postal_code TEXT,
-  birth_date DATE,
-  gender TEXT CHECK (gender IN ('male', 'female', 'other')),
-  family_size INTEGER,
-  monthly_income DECIMAL(10,2),
-  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'pending')),
-  needs_description TEXT,
-  priority TEXT DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high', 'critical')),
-  category_id UUID,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Indexes
-CREATE INDEX idx_needy_persons_status ON needy_persons(status);
-CREATE INDEX idx_needy_persons_city ON needy_persons(city);
-CREATE INDEX idx_needy_persons_priority ON needy_persons(priority);
-CREATE INDEX idx_needy_persons_created_at ON needy_persons(created_at DESC);
-
--- RLS
-ALTER TABLE needy_persons ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Public read access" ON needy_persons
-  FOR SELECT USING (true);
-
-CREATE POLICY "Authenticated insert" ON needy_persons
-  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-
-CREATE POLICY "Authenticated update" ON needy_persons
-  FOR UPDATE USING (auth.role() = 'authenticated');
-
-CREATE POLICY "Admin delete" ON needy_persons
-  FOR DELETE USING (auth.jwt() ->> 'role' = 'admin');
+-- NOT: needy_persons tablosu 001_initial_schema.sql dosyasında tanımlanmıştır
+-- Burada tekrar tanımlanmamıştır.
 
 -- ============================================
--- 2. BAĞIŞÇILAR (Donors)
+-- 1. BAĞIŞÇILAR (Donors)
 -- ============================================
 CREATE TABLE IF NOT EXISTS donors (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

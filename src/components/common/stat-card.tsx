@@ -1,18 +1,18 @@
 import { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { memo } from 'react'
+import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
 
 interface StatCardProps {
   title: string
-  value: string | number
+  value: string | number | React.ReactNode
   icon: LucideIcon
   description?: string
-  trend?: {
-    value: number
-    isPositive: boolean
-  }
+  trend?: string
+  trendUp?: boolean
   className?: string
   iconColor?: string
+  iconBg?: string
 }
 
 export const StatCard = memo(function StatCard({
@@ -21,48 +21,44 @@ export const StatCard = memo(function StatCard({
   icon: Icon,
   description,
   trend,
+  trendUp,
   className,
   iconColor = 'text-primary',
+  iconBg = 'bg-primary/10',
 }: StatCardProps) {
   return (
     <div
       className={cn(
-        'rounded-xl border border-slate-200 bg-white p-6 shadow-sm hover-card cursor-default',
+        'group rounded-xl border border-border bg-card p-5 shadow-soft hover:shadow-medium hover:border-primary/20 transition-all duration-200 cursor-default',
         className
       )}
     >
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h3 className="text-sm font-medium text-slate-500">{title}</h3>
-          <div className="text-2xl font-bold text-slate-900">{value}</div>
-          {description && (
-            <p className="text-xs text-slate-400">{description}</p>
-          )}
-          {trend && (
-            <div className="flex items-center gap-1 mt-1">
-              <span
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 space-y-2">
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
+            {trend && (
+              <div
                 className={cn(
-                  'text-xs font-medium',
-                  trend.isPositive ? 'text-success' : 'text-destructive'
+                  'flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-medium',
+                  trendUp ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'
                 )}
               >
-                {trend.isPositive ? '+' : ''}{trend.value}%
-              </span>
-              <span className="text-xs text-slate-400">geçen aya göre</span>
-            </div>
+                {trendUp ? (
+                  <ArrowUpRight className="h-3 w-3" />
+                ) : (
+                  <ArrowDownRight className="h-3 w-3" />
+                )}
+                <span>{trend}</span>
+              </div>
+            )}
+          </div>
+          <div className="text-2xl font-bold text-foreground">{value}</div>
+          {description && (
+            <p className="text-xs text-muted-foreground">{description}</p>
           )}
         </div>
-        <div
-          className={cn(
-            'flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br transition-all duration-200',
-            iconColor === 'text-primary' && 'from-teal-50 to-emerald-100',
-            iconColor === 'text-blue-500' && 'from-sky-50 to-blue-100',
-            iconColor === 'text-purple-500' && 'from-violet-50 to-purple-100',
-            iconColor === 'text-orange-500' && 'from-amber-50 to-orange-100',
-            iconColor === 'text-red-500' && 'from-red-50 to-rose-100',
-            iconColor === 'text-cyan-500' && 'from-cyan-50 to-teal-100'
-          )}
-        >
+        <div className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-all duration-200', iconBg)}>
           <Icon className={cn('h-6 w-6', iconColor)} />
         </div>
       </div>

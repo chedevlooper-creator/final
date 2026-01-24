@@ -1,65 +1,180 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
-/node_modules
+# ===================
+# Dependencies
+# ===================
+node_modules/
 /.pnp
 .pnp.js
+.pnp.cjs
 .yarn/install-state.gz
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+package-lock.json.bak
+pnpm-lock.yaml.bak
 
-# testing
-/coverage
-
-# next.js
+# ===================
+# Next.js
+# ===================
 /.next/
 /out/
+.next/
+out/
+.swc/
 
-# production
+# ===================
+# Production Build
+# ===================
 /build
+/dist
+/.output
 
-# misc
-.DS_Store
-*.pem
+# ===================
+# Testing
+# ===================
+/coverage
+coverage/
+.nyc_output/
+/test-results/
+/playwright-report/
+/playwright/.cache/
+*.lcov
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
+# ===================
+# Environment Files
+# ===================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 .env*.local
+*.env
 
-# vercel
+# ===================
+# Vercel
+# ===================
 .vercel
 
-# typescript
+# ===================
+# TypeScript
+# ===================
 *.tsbuildinfo
 next-env.d.ts
 
+# ===================
 # Sentry
+# ===================
 .sentryclirc
 
-# OS
-Thumbs.db
+# ===================
+# Supabase
+# ===================
+supabase/.temp/
+supabase/.branches/
+.supabase/
 
-# IDE
+# ===================
+# Logs
+# ===================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ===================
+# OS Files
+# ===================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ===================
+# IDE / Editors
+# ===================
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+!.vscode/*.code-snippets
 .idea/
-
-# Misc
+*.sublime-project
+*.sublime-workspace
 *.swp
 *.swo
 *~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+
+# ===================
+# Cache
+# ===================
 .cache/
+.parcel-cache/
+.turbo/
+.eslintcache
+.stylelintcache
+*.cache
+
+# ===================
+# Temp Files
+# ===================
 temp/
 tmp/
+*.tmp
+*.temp
 nul
 
-# Local Setup Scripts
+# ===================
+# Security / Keys
+# ===================
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+.secrets/
+
+# ===================
+# Local Scripts
+# ===================
 scripts/create-user.js
 setup_secrets.sh
 src/instrumentation-client.ts
-supabase/.temp/
+run-migrations.bat
+run-migrations.sh
+
+# ===================
+# Misc
+# ===================
+.turbo
+*.pid
+*.seed
+*.pid.lock
+*.tgz
+.npm
+.yarn-integrity
+*.csv
+
+# ===================
+# Claude / AI Skills
+# ===================
+.claude/
+skills/
