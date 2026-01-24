@@ -102,7 +102,7 @@ export function PhotosTab({ needyPersonId, onClose }: PhotosTabProps) {
                 
                 {/* Primary badge */}
                 {photo.is_primary && (
-                  <div className="absolute top-2 left-2 bg-yellow-500 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
+                  <div className="absolute top-2 left-2 bg-warning text-warning-foreground px-2 py-1 rounded text-xs flex items-center gap-1">
                     <Star className="h-3 w-3" />
                     Profil
                   </div>

@@ -109,17 +109,17 @@ export function AidsReceivedTab({ needyPersonId, onClose }: AidsReceivedTabProps
       >
         {/* Özet Kartı */}
         {aids.length > 0 && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4 flex items-center justify-between">
+          <div className="bg-success/5 border border-success/20 rounded-lg p-4 mb-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Gift className="h-8 w-8 text-green-600" />
+              <Gift className="h-8 w-8 text-success" />
               <div>
-                <p className="text-sm text-green-700">Toplam Yardım Tutarı</p>
-                <p className="text-2xl font-bold text-green-800">{totalAmount.toLocaleString('tr-TR')} ₺</p>
+                <p className="text-sm text-success">Toplam Yardım Tutarı</p>
+                <p className="text-2xl font-bold text-success">{totalAmount.toLocaleString('tr-TR')} ₺</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-sm text-green-700">Yardım Sayısı</p>
-              <p className="text-xl font-bold text-green-800">{aids.length}</p>
+              <p className="text-sm text-success">Yardım Sayısı</p>
+              <p className="text-xl font-bold text-success">{aids.length}</p>
             </div>
           </div>
         )}
@@ -151,9 +151,9 @@ export function AidsReceivedTab({ needyPersonId, onClose }: AidsReceivedTabProps
                     <TableCell className="font-medium">{aid.amount?.toLocaleString('tr-TR')} {aid.currency}</TableCell>
                     <TableCell>
                       <span className={`text-xs px-2 py-1 rounded flex items-center gap-1 w-fit ${
-                        aid.delivery_status === 'delivered' ? 'bg-green-100 text-green-700' : 
-                        aid.delivery_status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 
-                        'bg-gray-100 text-gray-700'
+                        aid.delivery_status === 'delivered' ? 'bg-success/10 text-success' : 
+                        aid.delivery_status === 'pending' ? 'bg-warning/10 text-warning' : 
+                        'bg-muted text-muted-foreground'
                       }`}>
                         <Truck className="h-3 w-3" />
                         {DELIVERY_STATUS_OPTIONS.find(s => s.value === aid.delivery_status)?.label}

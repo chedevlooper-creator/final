@@ -86,9 +86,9 @@ export function SessionsTab({ needyPersonId, onClose }: SessionsTabProps) {
                     <TableCell>{sess.duration_minutes ? `${sess.duration_minutes} dk` : '-'}</TableCell>
                     <TableCell>
                       <span className={`text-xs px-2 py-1 rounded ${
-                        sess.status === 'completed' ? 'bg-green-100 text-green-700' : 
-                        sess.status === 'scheduled' ? 'bg-blue-100 text-blue-700' : 
-                        'bg-gray-100 text-gray-700'
+                        sess.status === 'completed' ? 'bg-success/10 text-success' : 
+                        sess.status === 'scheduled' ? 'bg-info/10 text-info' : 
+                        'bg-muted text-muted-foreground'
                       }`}>
                         {SESSION_STATUS_OPTIONS.find(s => s.value === sess.status)?.label}
                       </span>

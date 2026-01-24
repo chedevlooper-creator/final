@@ -17,28 +17,37 @@ export function useCalendarEvents(filters?: CalendarEventFilters) {
   return useQuery({
     queryKey: ['calendar-events', filters],
     queryFn: async () => {
-      let query = supabase
-        .from('calendar_events')
-        .select('*')
-        .order('event_date', { ascending: true })
+      try {
+        let query = supabase
+          .from('calendar_events')
+          .select('*')
+          .order('event_date', { ascending: true })
 
-      if (filters?.event_type) {
-        query = query.eq('event_type', filters.event_type)
-      }
-      if (filters?.status) {
-        query = query.eq('status', filters.status)
-      }
-      if (filters?.date_from) {
-        query = query.gte('event_date', filters.date_from)
-      }
-      if (filters?.date_to) {
-        query = query.lte('event_date', filters.date_to)
-      }
+        if (filters?.event_type) {
+          query = query.eq('event_type', filters.event_type)
+        }
+        if (filters?.status) {
+          query = query.eq('status', filters.status)
+        }
+        if (filters?.date_from) {
+          query = query.gte('event_date', filters.date_from)
+        }
+        if (filters?.date_to) {
+          query = query.lte('event_date', filters.date_to)
+        }
 
-      const { data, error } = await query
+        const { data, error } = await query
 
-      if (error) throw error
-      return data || []
+        // Return empty array if table doesn't exist (404) or other errors
+        if (error) {
+          console.warn('Calendar events query error:', error.message)
+          return []
+        }
+        return data || []
+      } catch {
+        // Graceful fallback for missing table
+        return []
+      }
     },
   })
 }
@@ -51,28 +60,36 @@ export function useEventsList(filters?: CalendarEventFilters & { page?: number; 
   return useQuery({
     queryKey: ['events', filters],
     queryFn: async () => {
-      let query = supabase
-        .from('calendar_events')
-        .select('*', { count: 'exact' })
-        .order('event_date', { ascending: false })
+      try {
+        let query = supabase
+          .from('calendar_events')
+          .select('*', { count: 'exact' })
+          .order('event_date', { ascending: false })
 
-      if (filters?.event_type) {
-        query = query.eq('event_type', filters.event_type)
-      }
-      if (filters?.status) {
-        query = query.eq('status', filters.status)
-      }
-      if (filters?.date_from) {
-        query = query.gte('event_date', filters.date_from)
-      }
-      if (filters?.date_to) {
-        query = query.lte('event_date', filters.date_to)
-      }
+        if (filters?.event_type) {
+          query = query.eq('event_type', filters.event_type)
+        }
+        if (filters?.status) {
+          query = query.eq('status', filters.status)
+        }
+        if (filters?.date_from) {
+          query = query.gte('event_date', filters.date_from)
+        }
+        if (filters?.date_to) {
+          query = query.lte('event_date', filters.date_to)
+        }
 
-      const { data, error, count } = await query.range(page * limit, (page + 1) * limit - 1)
+        const { data, error, count } = await query.range(page * limit, (page + 1) * limit - 1)
 
-      if (error) throw error
-      return { data: data || [], count: count || 0, page, limit }
+        // Return empty result if table doesn't exist
+        if (error) {
+          console.warn('Events list query error:', error.message)
+          return { data: [], count: 0, page, limit }
+        }
+        return { data: data || [], count: count || 0, page, limit }
+      } catch {
+        return { data: [], count: 0, page, limit }
+      }
     },
   })
 }

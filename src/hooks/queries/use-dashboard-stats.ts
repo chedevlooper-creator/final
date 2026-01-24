@@ -83,14 +83,14 @@ export function useDashboardStats() {
         supabase.from('needy_persons').select('*', { count: 'exact', head: true }).eq('status', 'active'),
         // Pending applications
         supabase.from('applications').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-        // Today's donations (amount sum) - use donation_date instead of created_at for index
-        supabase.from('donations').select('amount').gte('donation_date', startOfDay.toISOString()).eq('payment_status', 'approved'),
+        // Today's donations (amount sum) - use created_at which exists in schema
+        supabase.from('donations').select('amount').gte('created_at', startOfDay.toISOString()).eq('payment_status', 'completed'),
         // Monthly donations (amount sum)
-        supabase.from('donations').select('amount').gte('donation_date', startOfMonth.toISOString()).eq('payment_status', 'approved'),
+        supabase.from('donations').select('amount').gte('created_at', startOfMonth.toISOString()).eq('payment_status', 'completed'),
         // Yearly donations (amount sum)
-        supabase.from('donations').select('amount').gte('donation_date', startOfYear.toISOString()).eq('payment_status', 'approved'),
+        supabase.from('donations').select('amount').gte('created_at', startOfYear.toISOString()).eq('payment_status', 'completed'),
         // Total donation count
-        supabase.from('donations').select('*', { count: 'exact', head: true }).eq('payment_status', 'approved'),
+        supabase.from('donations').select('*', { count: 'exact', head: true }).eq('payment_status', 'completed'),
         // Completed aids this month
         supabase.from('aids').select('*', { count: 'exact', head: true }).eq('status', 'distributed').gte('aid_date', startOfMonth.toISOString()),
         // Active volunteers
@@ -148,14 +148,14 @@ export function useMonthlyDonationTrend(months: number = 6) {
       // Fallback: Manual aggregation
       const { data: donations } = await supabase
         .from('donations')
-        .select('donation_date, amount')
-        .gte('donation_date', startDate.toISOString())
-        .eq('payment_status', 'approved')
+        .select('created_at, amount')
+        .gte('created_at', startDate.toISOString())
+        .eq('payment_status', 'completed')
 
       const monthlyTotals: Record<string, number> = {}
 
-      donations?.forEach((d: { donation_date?: string | null; amount?: number | null }) => {
-        const monthKey = d.donation_date?.slice(0, 7) || new Date().toISOString().slice(0, 7)
+      donations?.forEach((d: { created_at?: string | null; amount?: number | null }) => {
+        const monthKey = d.created_at?.slice(0, 7) || new Date().toISOString().slice(0, 7)
         monthlyTotals[monthKey] = (monthlyTotals[monthKey] || 0) + (d.amount || 0)
       })
 

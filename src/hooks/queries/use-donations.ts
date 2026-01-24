@@ -31,7 +31,6 @@ export function useDonationsList(filters?: DonationFilters) {
         .select(`
           id,
           amount,
-          donation_date,
           donation_type,
           payment_status,
           donor_name,
@@ -40,7 +39,7 @@ export function useDonationsList(filters?: DonationFilters) {
           category:categories(id, name),
           created_at
         `, { count: 'exact' })
-        .order('donation_date', { ascending: false })
+        .order('created_at', { ascending: false })
 
       // Type filtering
       if (filters?.donation_type) {
@@ -54,10 +53,10 @@ export function useDonationsList(filters?: DonationFilters) {
 
       // Date range filtering - using index-friendly columns
       if (filters?.date_from) {
-        query = query.gte('donation_date', filters.date_from)
+        query = query.gte('created_at', filters.date_from)
       }
       if (filters?.date_to) {
-        query = query.lte('donation_date', filters.date_to)
+        query = query.lte('created_at', filters.date_to)
       }
 
       // Full-text search - uses pg_trgm index
@@ -240,17 +239,17 @@ export function useDonationStats() {
           supabase
             .from('donations')
             .select('amount')
-            .gte('donation_date', today.toISOString())
-            .eq('payment_status', 'approved'),
+            .gte('created_at', today.toISOString())
+            .eq('payment_status', 'completed'),
           supabase
             .from('donations')
             .select('amount')
-            .gte('donation_date', thisMonth.toISOString())
-            .eq('payment_status', 'approved'),
+            .gte('created_at', thisMonth.toISOString())
+            .eq('payment_status', 'completed'),
           supabase
             .from('donations')
             .select('amount')
-            .eq('payment_status', 'approved')
+            .eq('payment_status', 'completed')
         ])
 
         const todayTotal = todayResult.data?.reduce((sum: number, d: { amount?: number | null }) => sum + (d.amount || 0), 0) || 0

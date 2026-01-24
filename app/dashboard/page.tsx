@@ -49,7 +49,7 @@ function PageTransition({ children }: { children: React.ReactNode }) {
 // Stats grid with stagger animation
 function StatsGrid({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+    <div className="grid gap-4 grid-cols-6">
       {React.Children.map(children, (child, index) => (
         <div
           key={index}
@@ -137,8 +137,8 @@ export default function DashboardPage() {
       title: 'Tamamlanan Yardım',
       value: isStatsLoading ? <Skeleton className="h-7 w-16" /> : (applicationsData?.data?.filter((app: Application) => app.status === 'completed').length || 0),
       icon: CheckCircle,
-      iconColor: 'text-primary',
-      iconBg: 'bg-primary/10',
+      iconColor: 'text-purple-500',
+      iconBg: 'bg-purple-500/10',
       description: 'Bu ay tamamlanan',
       trend: '+5',
       trendUp: true,
@@ -198,7 +198,7 @@ export default function DashboardPage() {
                 </Button>
               </Link>
               <Link href="/dashboard/applications">
-                <Button size="sm" className="bg-gradient-to-r from-primary to-accent hover:opacity-90">
+                <Button size="sm">
                   <FileText className="mr-2 h-4 w-4" />
                   Yeni Başvuru
                 </Button>
@@ -215,7 +215,7 @@ export default function DashboardPage() {
         </StatsGrid>
 
         {/* Main Content Grid */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 grid-cols-2">
           {/* Recent Applications */}
           <StaggerCard delay={300}>
             <CardHeader className="flex flex-row items-center justify-between pb-3">
@@ -263,7 +263,13 @@ export default function DashboardPage() {
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-center animate-fade-in">
                     <FileText className="h-12 w-12 text-muted-foreground/30 mb-3" />
-                    <p className="text-sm text-muted-foreground">Henüz başvuru bulunmuyor</p>
+                    <p className="text-sm text-muted-foreground mb-3">Henüz başvuru bulunmuyor</p>
+                    <Link href="/dashboard/applications">
+                      <Button size="sm" variant="outline" className="gap-2">
+                        <FileText className="h-4 w-4" />
+                        İlk Başvuruyu Oluştur
+                      </Button>
+                    </Link>
                   </div>
                 )}
               </div>
@@ -276,7 +282,7 @@ export default function DashboardPage() {
               <CardTitle className="text-lg font-semibold">Hızlı İşlemler</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 grid-cols-2">
                 <Link href="/dashboard/needy" className="group">
                   <Button
                     variant="outline"
@@ -351,7 +357,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Charts Section */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 grid-cols-2">
           {/* Monthly Donation Trend */}
           <StaggerCard delay={400}>
             <CardHeader className="flex flex-row items-center justify-between pb-3">
@@ -385,7 +391,13 @@ export default function DashboardPage() {
               ) : (
                 <div className="flex flex-col items-center justify-center h-[250px] text-center">
                   <TrendingUp className="h-12 w-12 text-muted-foreground/30 mb-3" />
-                  <p className="text-sm text-muted-foreground">Veri bulunamadı</p>
+                  <p className="text-sm text-muted-foreground mb-3">Aylık bağış verisi bulunmuyor</p>
+                  <Link href="/dashboard/donations">
+                    <Button size="sm" variant="ghost" className="gap-2 text-xs">
+                      <DollarSign className="h-3 w-3" />
+                      Bağış Ekleyerek Başlayın
+                    </Button>
+                  </Link>
                 </div>
               )}
             </CardContent>
@@ -425,7 +437,13 @@ export default function DashboardPage() {
               ) : (
                 <div className="flex flex-col items-center justify-center h-[250px] text-center">
                   <FileText className="h-12 w-12 text-muted-foreground/30 mb-3" />
-                  <p className="text-sm text-muted-foreground">Veri bulunamadı</p>
+                  <p className="text-sm text-muted-foreground mb-3">Başvuru durumu verisi bulunmuyor</p>
+                  <Link href="/dashboard/applications">
+                    <Button size="sm" variant="ghost" className="gap-2 text-xs">
+                      <FileText className="h-3 w-3" />
+                      Başvuru Oluşturun
+                    </Button>
+                  </Link>
                 </div>
               )}
             </CardContent>
@@ -465,7 +483,13 @@ export default function DashboardPage() {
               ) : (
                 <div className="flex flex-col items-center justify-center h-[250px] text-center">
                   <CheckCircle className="h-12 w-12 text-muted-foreground/30 mb-3" />
-                  <p className="text-sm text-muted-foreground">Veri bulunamadı</p>
+                  <p className="text-sm text-muted-foreground mb-3">Yardım türü verisi bulunmuyor</p>
+                  <Link href="/dashboard/aids">
+                    <Button size="sm" variant="ghost" className="gap-2 text-xs">
+                      <CheckCircle className="h-3 w-3" />
+                      Yardım Kaydı Oluşturun
+                    </Button>
+                  </Link>
                 </div>
               )}
             </CardContent>
@@ -506,7 +530,13 @@ export default function DashboardPage() {
               ) : (
                 <div className="flex flex-col items-center justify-center h-[250px] text-center">
                   <Users className="h-12 w-12 text-muted-foreground/30 mb-3" />
-                  <p className="text-sm text-muted-foreground">Veri bulunamadı</p>
+                  <p className="text-sm text-muted-foreground mb-3">Şehir bazlı dağılım verisi bulunmuyor</p>
+                  <Link href="/dashboard/needy">
+                    <Button size="sm" variant="ghost" className="gap-2 text-xs">
+                      <Users className="h-3 w-3" />
+                      İhtiyaç Sahibi Ekleyin
+                    </Button>
+                  </Link>
                 </div>
               )}
             </CardContent>

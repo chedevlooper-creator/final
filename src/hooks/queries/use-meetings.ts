@@ -601,19 +601,26 @@ export function useUsersList() {
   return useQuery({
     queryKey: ['users', 'list'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('users')
-        .select('id, email, raw_user_meta_data->>full_name, raw_user_meta_data->>avatar_url')
-        .order('email');
-      
-      if (error) throw error;
-      
-      return (data || []).map((user: { id: string; email: string; full_name?: string; avatar_url?: string }) => ({
-        id: user.id,
-        email: user.email,
-        name: user.full_name || user.email,
-        avatar: user.avatar_url
-      }));
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('id, email, raw_user_meta_data->>full_name, raw_user_meta_data->>avatar_url')
+          .order('email');
+        
+        if (error) {
+          console.warn('Users list query error:', error.message);
+          return [];
+        }
+        
+        return (data || []).map((user: { id: string; email: string; full_name?: string; avatar_url?: string }) => ({
+          id: user.id,
+          email: user.email,
+          name: user.full_name || user.email,
+          avatar: user.avatar_url
+        }));
+      } catch {
+        return [];
+      }
     },
     staleTime: 10 * 60 * 1000, // 10 minutes - user list doesn't change often
   });

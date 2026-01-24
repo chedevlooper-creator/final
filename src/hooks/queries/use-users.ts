@@ -28,25 +28,32 @@ export function useUsersList(filters?: UserFilters) {
   return useQuery({
     queryKey: ['users', filters],
     queryFn: async () => {
-      let query = supabase
-        .from('users')
-        .select('*', { count: 'exact' })
-        .order('created_at', { ascending: false })
+      try {
+        let query = supabase
+          .from('users')
+          .select('*', { count: 'exact' })
+          .order('created_at', { ascending: false })
 
-      if (filters?.role) {
-        query = query.eq('role', filters.role)
-      }
-      if (filters?.status) {
-        query = query.eq('status', filters.status)
-      }
-      if (filters?.search) {
-        query = query.or(`email.ilike.%${filters.search}%,full_name.ilike.%${filters.search}%,phone.ilike.%${filters.search}%`)
-      }
+        if (filters?.role) {
+          query = query.eq('role', filters.role)
+        }
+        if (filters?.status) {
+          query = query.eq('status', filters.status)
+        }
+        if (filters?.search) {
+          query = query.or(`email.ilike.%${filters.search}%,full_name.ilike.%${filters.search}%,phone.ilike.%${filters.search}%`)
+        }
 
-      const { data, error, count } = await query.range(page * limit, (page + 1) * limit - 1)
+        const { data, error, count } = await query.range(page * limit, (page + 1) * limit - 1)
 
-      if (error) throw error
-      return { data: data || [], count: count || 0, page, limit }
+        if (error) {
+          console.warn('Users list query error:', error.message)
+          return { data: [], count: 0, page, limit }
+        }
+        return { data: data || [], count: count || 0, page, limit }
+      } catch {
+        return { data: [], count: 0, page, limit }
+      }
     },
   })
 }
@@ -57,14 +64,21 @@ export function useUserDetail(id: string) {
   return useQuery({
     queryKey: ['users', id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', id)
-        .single()
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', id)
+          .single()
 
-      if (error) throw error
-      return data
+        if (error) {
+          console.warn('User detail query error:', error.message)
+          return null
+        }
+        return data
+      } catch {
+        return null
+      }
     },
     enabled: !!id,
   })

@@ -28,6 +28,7 @@ import {
   Eye,
   RefreshCw
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { 
   uploadFile, 
   uploadMultipleFiles,
@@ -50,39 +51,6 @@ import {
   ValidationError
 } from '@/lib/upload.types';
 
-// Button component (shadcn/ui style)
-const Button = React.forwardRef<
-  HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement> & {
-    variant?: 'default' | 'outline' | 'ghost' | 'destructive';
-    size?: 'sm' | 'md' | 'lg';
-  }
->(({ className, variant = 'default', size = 'md', ...props }, ref) => {
-  const baseStyles = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50';
-  
-  const variants = {
-    default: 'bg-blue-600 text-white hover:bg-blue-700',
-    outline: 'border border-gray-300 bg-white hover:bg-gray-50 text-gray-700',
-    ghost: 'hover:bg-gray-100 text-gray-700',
-    destructive: 'bg-red-600 text-white hover:bg-red-700'
-  };
-  
-  const sizes = {
-    sm: 'h-8 px-3 text-sm',
-    md: 'h-10 px-4 py-2',
-    lg: 'h-12 px-6 text-lg'
-  };
-  
-  return (
-    <button
-      ref={ref}
-      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className || ''}`}
-      {...props}
-    />
-  );
-});
-Button.displayName = 'Button';
-
 // Progress bar component
 const ProgressBar = ({ 
   value, 
@@ -100,13 +68,13 @@ const ProgressBar = ({
   return (
     <div className={`relative w-full ${className}`}>
       {showLabel && (
-        <span className="absolute left-0 top-[-20px] text-xs text-gray-600">
+        <span className="absolute left-0 top-[-20px] text-xs text-muted-foreground">
           {Math.round(percentage)}%
         </span>
       )}
-      <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div className="h-2 bg-muted rounded-full overflow-hidden">
         <div
-          className="h-full bg-blue-600 transition-all duration-300 ease-out"
+          className="h-full bg-primary transition-all duration-300 ease-out"
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -139,10 +107,10 @@ const FilePreviewCard = ({
 }) => {
   const info = preview.info;
   const statusColor = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    uploading: 'bg-blue-100 text-blue-800',
-    success: 'bg-green-100 text-green-800',
-    error: 'bg-red-100 text-red-800'
+    pending: 'bg-warning/10 text-warning',
+    uploading: 'bg-info/10 text-info',
+    success: 'bg-success/10 text-success',
+    error: 'bg-danger/10 text-danger'
   }[preview.state];
 
   const statusIcon = {
@@ -153,7 +121,7 @@ const FilePreviewCard = ({
   }[preview.state];
 
   return (
-    <div className="relative p-4 border rounded-lg hover:border-gray-400 transition-colors">
+    <div className="relative p-4 border rounded-lg hover:border-border transition-colors">
       {/* Status indicator */}
       <div className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${statusColor}`}>
         {statusIcon}
@@ -166,7 +134,7 @@ const FilePreviewCard = ({
       {/* File info */}
       <div className="flex items-start gap-3 pr-20">
         {/* File icon */}
-        <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+        <div className="flex-shrink-0 w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
           {preview.preview ? (
             <img 
               src={preview.preview} 
@@ -174,15 +142,15 @@ const FilePreviewCard = ({
               className="w-full h-full object-cover rounded-lg"
             />
           ) : (
-            <FileIcon type={info.type} className="w-6 h-6 text-gray-600" />
+            <FileIcon type={info.type} className="w-6 h-6 text-muted-foreground" />
           )}
         </div>
 
         {/* Details */}
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-gray-900 truncate">{info.name}</p>
-          <p className="text-sm text-gray-600">{info.sizeFormatted}</p>
-          <p className="text-xs text-gray-500">{info.category}</p>
+          <p className="font-medium text-foreground truncate">{info.name}</p>
+          <p className="text-sm text-muted-foreground">{info.sizeFormatted}</p>
+          <p className="text-xs text-muted-foreground">{info.category}</p>
 
           {/* Progress bar for uploading files */}
           {preview.state === 'uploading' && preview.progress !== undefined && (
@@ -191,7 +159,7 @@ const FilePreviewCard = ({
 
           {/* Error message */}
           {preview.state === 'error' && preview.error && (
-            <p className="mt-2 text-sm text-red-600">{preview.error}</p>
+            <p className="mt-2 text-sm text-danger">{preview.error}</p>
           )}
 
           {/* Success with link */}
@@ -200,7 +168,7 @@ const FilePreviewCard = ({
               href={preview.result.publicUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-2 text-sm text-blue-600 hover:underline inline-flex items-center gap-1"
+              className="mt-2 text-sm text-primary hover:underline inline-flex items-center gap-1"
             >
               <Download className="w-3 h-3" />
               Dosyayı görüntüle
@@ -237,7 +205,7 @@ const FilePreviewCard = ({
             variant="ghost"
             size="sm"
             onClick={onRemove}
-            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+            className="h-8 w-8 p-0 text-danger hover:text-danger hover:bg-danger/10"
           >
             <Trash2 className="w-4 h-4" />
           </Button>
@@ -603,7 +571,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       <div
         className={`
           relative border-2 border-dashed rounded-lg p-8 text-center transition-colors
-          ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}
+          ${isDragging ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
         `}
         onDragEnter={handleDragEnter}
@@ -622,24 +590,24 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           className="hidden"
         />
 
-        <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+        <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
         
-        <p className="text-lg font-medium text-gray-900 mb-1">
+        <p className="text-lg font-medium text-foreground mb-1">
           {isDragging ? dragActiveLabel : label}
         </p>
         
-        <p className="text-sm text-gray-600 mb-2">
+        <p className="text-sm text-muted-foreground mb-2">
           {description}
         </p>
         
         {maxSize && (
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             Maksimum dosya boyutu: {formatFileSize(maxSize)}
           </p>
         )}
         
         {allowedTypes && allowedTypes.length > 0 && (
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             İzin verilen türler: {allowedTypes.join(', ')}
           </p>
         )}
@@ -647,22 +615,22 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
       {/* Statistics */}
       {statistics.total > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted/50 rounded-lg">
           <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900">{statistics.total}</p>
-            <p className="text-sm text-gray-600">Toplam</p>
+            <p className="text-2xl font-bold text-foreground">{statistics.total}</p>
+            <p className="text-sm text-muted-foreground">Toplam</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-green-600">{statistics.successful}</p>
-            <p className="text-sm text-gray-600">Başarılı</p>
+            <p className="text-2xl font-bold text-success">{statistics.successful}</p>
+            <p className="text-sm text-muted-foreground">Başarılı</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-yellow-600">{statistics.pending}</p>
-            <p className="text-sm text-gray-600">Bekleyen</p>
+            <p className="text-2xl font-bold text-warning">{statistics.pending}</p>
+            <p className="text-sm text-muted-foreground">Bekleyen</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-red-600">{statistics.failed}</p>
-            <p className="text-sm text-gray-600">Başarısız</p>
+            <p className="text-2xl font-bold text-danger">{statistics.failed}</p>
+            <p className="text-sm text-muted-foreground">Başarısız</p>
           </div>
           </div>
       )}
@@ -671,7 +639,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       {showPreview && previews.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <h3 className="font-medium text-gray-900">
+            <h3 className="font-medium text-foreground">
               Dosyalar ({previews.length})
             </h3>
             <div className="flex gap-2">
@@ -680,7 +648,6 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                   onClick={uploadFiles}
                   disabled={isUploading}
                   size="sm"
-                  variant="default"
                 >
                   {isUploading ? 'Yükleniyor...' : 'Yükle'}
                 </Button>
@@ -720,10 +687,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
       {/* Global progress */}
       {showProgress && isUploading && (
-        <div className="p-4 bg-blue-50 rounded-lg">
+        <div className="p-4 bg-info/10 rounded-lg">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-blue-900">Yükleniyor...</span>
-            <span className="text-sm text-blue-700">
+            <span className="text-sm font-medium text-info">Yükleniyor...</span>
+            <span className="text-sm text-info/80">
               {formatFileSize(statistics.uploadedSize)} / {formatFileSize(statistics.totalSize)}
             </span>
           </div>

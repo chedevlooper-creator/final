@@ -230,7 +230,7 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className={`text-xs px-2 py-1 rounded ${relation.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                      <span className={`text-xs px-2 py-1 rounded ${relation.is_active ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'}`}>
                         {relation.is_active ? 'Aktif' : 'Pasif'}
                       </span>
                     </TableCell>
