@@ -39,7 +39,11 @@ export function PerformanceMonitor() {
 
   // Only run on client
   useEffect(() => {
-    setMounted(true)
+    const timeout = setTimeout(() => {
+      setMounted(true)
+    }, 0)
+
+    return () => clearTimeout(timeout)
   }, [])
 
   useEffect(() => {

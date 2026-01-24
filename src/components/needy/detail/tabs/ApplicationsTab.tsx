@@ -67,11 +67,15 @@ export function ApplicationsTab({ needyPersonId, onClose }: ApplicationsTabProps
 
   // Load data
   useEffect(() => {
-    if (USE_MOCK_DATA) {
-      setApplications(mockApplicationsData[needyPersonId] || [])
-    } else {
-      // TODO: Real API call to aid_applications table
-    }
+    const timeout = setTimeout(() => {
+      if (USE_MOCK_DATA) {
+        setApplications(mockApplicationsData[needyPersonId] || [])
+      } else {
+        // TODO: Real API call to aid_applications table
+      }
+    }, 0)
+
+    return () => clearTimeout(timeout)
   }, [needyPersonId])
 
   const columns = [

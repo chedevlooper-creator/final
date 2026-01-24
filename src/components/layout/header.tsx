@@ -27,16 +27,21 @@ export function Header() {
 
   // Client-side hydration
   useEffect(() => {
-    setMounted(true)
-    const store = useUIStore.getState()
-    setSidebarCollapsed(store.sidebarCollapsed)
+    const timeout = setTimeout(() => {
+      setMounted(true)
+      const store = useUIStore.getState()
+      setSidebarCollapsed(store.sidebarCollapsed)
+    }, 0)
 
     // Subscribe to store changes
     const unsubscribe = useUIStore.subscribe((state) => {
       setSidebarCollapsed(state.sidebarCollapsed)
     })
 
-    return unsubscribe
+    return () => {
+      clearTimeout(timeout)
+      unsubscribe()
+    }
   }, [])
 
   const initials = user?.email

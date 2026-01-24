@@ -53,6 +53,6 @@ export function useCSPNonce(): string {
  * Get the nonce attribute for inline scripts/styles
  * Usage: <script nonce={getNonce()} />
  */
-export function getNonceAttribute(nonce: string): { nonce: string } | {} {
+export function getNonceAttribute(nonce: string): { nonce: string } | Record<string, never> {
   return nonce ? { nonce } : {}
 }
