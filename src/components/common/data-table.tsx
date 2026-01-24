@@ -90,7 +90,7 @@ function DataTableInner<TData, TValue>({
     <div className="space-y-4">
       {searchKey && (
         <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder={searchPlaceholder}
             value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ''}
@@ -106,9 +106,9 @@ function DataTableInner<TData, TValue>({
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="bg-slate-50 hover:bg-slate-50">
+              <TableRow key={headerGroup.id} className="bg-muted hover:bg-muted">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="font-semibold text-slate-700">
+                  <TableHead key={header.id} className="font-semibold text-foreground">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -126,7 +126,7 @@ function DataTableInner<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className={onRowClick ? "cursor-pointer hover:bg-slate-50/50" : "hover:bg-slate-50/50"}
+                  className={onRowClick ? "cursor-pointer hover:bg-muted/50" : "hover:bg-muted/50"}
                   onClick={() => onRowClick?.(row.original)}
                 >
                   {row.getVisibleCells().map((cell) => (
@@ -138,7 +138,7 @@ function DataTableInner<TData, TValue>({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-slate-500">
+                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
                   Kayıt bulunamadı.
                 </TableCell>
               </TableRow>
@@ -149,7 +149,7 @@ function DataTableInner<TData, TValue>({
 
       {/* Pagination */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           Toplam {data.length} kayıt
         </p>
         <div className="flex items-center gap-2">
@@ -162,7 +162,7 @@ function DataTableInner<TData, TValue>({
             <ChevronLeft className="h-4 w-4" />
             Önceki
           </Button>
-          <span className="text-sm text-slate-600">
+          <span className="text-sm text-muted-foreground">
             Sayfa {pageIndex + 1} / {pageCount || 1}
           </span>
           <Button

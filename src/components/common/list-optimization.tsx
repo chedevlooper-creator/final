@@ -118,21 +118,21 @@ export function PaginatedList<T>({
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <div className="text-sm text-slate-600">
+          <div className="text-sm text-muted-foreground">
             Toplam {items.length} kayıt • Sayfa {currentPage} / {totalPages}
           </div>
           <div className="flex gap-2">
             <button
               onClick={handlePrevious}
               disabled={currentPage === 1}
-              className="px-3 py-1 text-sm border rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 text-sm border rounded hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Önceki
             </button>
             <button
               onClick={handleNext}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 text-sm border rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 text-sm border rounded hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Sonraki
             </button>
@@ -196,9 +196,9 @@ export function InfiniteScrollList<T>({
       {hasMore && (
         <div ref={observerTarget} className="py-4 text-center">
           {isLoading ? (
-            loader || <div className="text-slate-500">Yükleniyor...</div>
+            loader || <div className="text-muted-foreground">Yükleniyor...</div>
           ) : (
-            <div className="text-slate-400">Daha fazla kayıt yüklemek için kaydırın</div>
+            <div className="text-muted-foreground/70">Daha fazla kayıt yüklemek için kaydırın</div>
           )}
         </div>
       )}

@@ -168,7 +168,7 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
                     </TableCell>
                     <TableCell>
                       {doc.is_verified && (
-                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <CheckCircle2 className="h-4 w-4 text-success" />
                       )}
                     </TableCell>
                     <TableCell>

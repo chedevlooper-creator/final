@@ -90,11 +90,11 @@ export const DISEASES = [
 
 // Etiketler
 export const TAGS = [
-  { id: 'criminal_record', label: 'Sabıka Kaydı Var', color: 'text-red-600' },
-  { id: 'regular_aid', label: 'Düzenli Yardım Yapılabilir', color: 'text-green-600' },
-  { id: 'reject_future', label: 'Gelecekteki Başvuruları Reddedilmeli', color: 'text-red-600' },
-  { id: 'negative', label: 'Olumsuz', color: 'text-orange-600' },
-  { id: 'fake_document', label: 'Sahte Evrak Getirdi / Yalan Beyanda Bulundu', color: 'text-red-700' },
+  { id: 'criminal_record', label: 'Sabıka Kaydı Var', color: 'text-danger' },
+  { id: 'regular_aid', label: 'Düzenli Yardım Yapılabilir', color: 'text-success' },
+  { id: 'reject_future', label: 'Gelecekteki Başvuruları Reddedilmeli', color: 'text-danger' },
+  { id: 'negative', label: 'Olumsuz', color: 'text-warning' },
+  { id: 'fake_document', label: 'Sahte Evrak Getirdi / Yalan Beyanda Bulundu', color: 'text-danger' },
 ]
 
 // Özel Durumlar
@@ -123,7 +123,7 @@ export function IncomeSourcesSection({ selectedItems, onChange }: MultiSelectPro
   return (
     <FormSection 
       title="Gelir Kaynakları" 
-      icon={<DollarSign className="h-4 w-4 text-green-500" />}
+      icon={<DollarSign className="h-4 w-4 text-success" />}
       defaultOpen={false}
     >
       <div className="grid grid-cols-3 gap-3">
@@ -157,7 +157,7 @@ export function DiseasesSection({ selectedItems, onChange }: MultiSelectProps) {
   return (
     <FormSection 
       title="Hastalık(lar)" 
-      icon={<Stethoscope className="h-4 w-4 text-red-500" />}
+      icon={<Stethoscope className="h-4 w-4 text-danger" />}
       defaultOpen={false}
     >
       <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto">
@@ -191,7 +191,7 @@ export function TagsSection({ selectedItems, onChange }: MultiSelectProps) {
   return (
     <FormSection 
       title="Etiketler" 
-      icon={<Tags className="h-4 w-4 text-blue-500" />}
+      icon={<Tags className="h-4 w-4 text-info" />}
       defaultOpen={true}
     >
       <div className="grid grid-cols-2 gap-3">
@@ -225,7 +225,7 @@ export function SpecialConditionsSection({ selectedItems, onChange }: MultiSelec
   return (
     <FormSection 
       title="Özel Durumlar" 
-      icon={<AlertTriangle className="h-4 w-4 text-yellow-500" />}
+      icon={<AlertTriangle className="h-4 w-4 text-warning" />}
       defaultOpen={true}
     >
       <div className="grid grid-cols-2 gap-3">

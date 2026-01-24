@@ -93,11 +93,11 @@ export function ConsentsTab({ needyPersonId, onClose }: ConsentsTabProps) {
                     <TableCell>{SIGNATURE_TYPE_OPTIONS.find(s => s.value === consent.signature_type)?.label}</TableCell>
                     <TableCell>
                       {consent.is_given && !consent.revoked ? (
-                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                        <CheckCircle2 className="h-5 w-5 text-success" />
                       ) : consent.revoked ? (
-                        <XCircle className="h-5 w-5 text-red-600" />
+                        <XCircle className="h-5 w-5 text-danger" />
                       ) : (
-                        <XCircle className="h-5 w-5 text-gray-400" />
+                        <XCircle className="h-5 w-5 text-muted-foreground" />
                       )}
                     </TableCell>
                     <TableCell></TableCell>

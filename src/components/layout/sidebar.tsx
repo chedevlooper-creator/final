@@ -52,13 +52,13 @@ export function Sidebar() {
 
   if (!mounted) {
     return (
-      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-white/10 bg-slate-900" aria-label="Ana navigasyon">
-        <div className="flex h-16 items-center justify-between border-b border-white/10 px-4">
+      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card shadow-soft" aria-label="Ana navigasyon">
+        <div className="flex h-16 items-center justify-between border-b border-border px-4">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white shadow-primary">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary text-white shadow-primary">
               <Heart className="h-5 w-5" />
             </div>
-            <h1 className="text-lg font-bold text-white">Yardım Paneli</h1>
+            <h1 className="text-lg font-bold text-foreground">Yardım Paneli</h1>
           </div>
         </div>
       </aside>
@@ -69,22 +69,22 @@ export function Sidebar() {
     <TooltipProvider delayDuration={200}>
       <aside
         className={cn(
-          'fixed left-0 top-0 z-40 h-screen border-r border-border/10 bg-slate-900 transition-all duration-300 ease-out shadow-xl',
+          'fixed left-0 top-0 z-40 h-screen border-r border-border bg-card transition-all duration-300 ease-out shadow-soft',
           sidebarCollapsed ? 'w-16' : 'w-64'
         )}
         aria-label="Ana navigasyon"
       >
         {/* Header */}
-        <div className="flex h-16 items-center justify-between border-b border-white/10 bg-slate-900 px-3">
+        <div className="flex h-16 items-center justify-between border-b border-border bg-card px-3">
           {!sidebarCollapsed ? (
             <Link
               href="/dashboard"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity animate-slide-in-right"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white shadow-primary hover:shadow-lg transition-all duration-200">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary text-white shadow-primary hover:shadow-lg transition-all duration-200">
                 <Heart className="h-5 w-5" />
               </div>
-              <h1 className="text-lg font-bold text-white">
+              <h1 className="text-lg font-bold text-foreground">
                 Yardım Paneli
               </h1>
             </Link>
@@ -93,7 +93,7 @@ export function Sidebar() {
               <TooltipPrimitive.Trigger asChild>
                 <Link
                   href="/dashboard"
-                  className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white shadow-primary hover:shadow-lg transition-all duration-200"
+                  className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary text-white shadow-primary hover:shadow-lg transition-all duration-200"
                   aria-label="Yardım Paneli - Ana sayfaya dön"
                 >
                   <Home className="h-5 w-5" />
@@ -113,7 +113,7 @@ export function Sidebar() {
                 size="icon"
                 onClick={toggleSidebar}
                 className={cn(
-                  'text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200',
+                  'text-muted-foreground hover:text-foreground hover:bg-muted transition-all duration-200',
                   sidebarCollapsed && 'mx-auto'
                 )}
                 aria-label={sidebarCollapsed ? 'Sidebar\'ı genişlet' : 'Sidebar\'ı daralt'}
@@ -146,20 +146,20 @@ export function Sidebar() {
                           href={item.href}
                           prefetch={true}
                           className={cn(
-                            'group flex items-center justify-center rounded-xl p-2.5 transition-all duration-200 outline-none focus-visible focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-slate-900',
-                            'hover:bg-white/5 cursor-pointer mx-auto w-10 h-10',
+                            'group flex items-center justify-center rounded-xl p-2.5 transition-all duration-200 outline-none focus-visible focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 focus:ring-offset-card',
+                            'hover:bg-muted cursor-pointer mx-auto w-10 h-10',
                             isActive
-                              ? 'bg-white/10 text-white'
-                              : 'text-gray-400 hover:text-white',
+                              ? 'bg-primary/10 text-primary'
+                              : 'text-muted-foreground hover:text-foreground',
                           )}
                           aria-current={isActive ? 'page' : undefined}
                         >
                           <item.icon className={cn(
                             'shrink-0 transition-all duration-200',
-                            isActive ? 'h-5 w-5 text-white' : 'h-5 w-5'
+                            isActive ? 'h-5 w-5 text-primary' : 'h-5 w-5'
                           )} />
                           {isActive && (
-                            <div className="absolute right-2 top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-white shadow-white/50" />
+                            <div className="absolute right-2 top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-primary" />
                           )}
                         </Link>
                       </TooltipPrimitive.Trigger>
@@ -181,20 +181,20 @@ export function Sidebar() {
                   <CollapsibleTrigger asChild>
                     <button
                       className={cn(
-                        'group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 outline-none focus-visible focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-slate-900',
-                        'text-gray-400 hover:bg-white/5 hover:text-white cursor-pointer',
+                        'group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 outline-none focus-visible focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 focus:ring-offset-card',
+                        'text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer',
                       )}
                       style={{ animationDelay: `${groupIndex * 50}ms` }}
                       aria-expanded={openGroups.includes(group.title)}
                       aria-controls={`menu-${group.title.toLowerCase().replace(/\s+/g, '-')}`}
                     >
-                      <div className="flex items-center justify-center rounded-lg bg-white/5 group-hover:bg-white/10 p-2 transition-all duration-200 w-8 h-8">
+                      <div className="flex items-center justify-center rounded-lg bg-muted group-hover:bg-primary/10 p-2 transition-all duration-200 w-8 h-8">
                         <group.icon className="shrink-0 h-4 w-4" />
                       </div>
                       <span className="flex-1 text-left">{group.title}</span>
                       <ChevronDown
                         className={cn(
-                          'h-4 w-4 shrink-0 transition-transform duration-200 text-gray-500',
+                          'h-4 w-4 shrink-0 transition-transform duration-200 text-muted-foreground',
                           openGroups.includes(group.title) && 'rotate-180'
                         )}
                       />
@@ -209,22 +209,22 @@ export function Sidebar() {
                           href={item.href}
                           prefetch={true}
                           className={cn(
-                            'group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all duration-200 outline-none focus-visible focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-slate-900',
-                            'hover:bg-white/5 cursor-pointer',
+                            'group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all duration-200 outline-none focus-visible focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 focus:ring-offset-card',
+                            'hover:bg-muted cursor-pointer',
                             isActive
-                              ? 'bg-white/10 text-white font-medium'
-                              : 'text-gray-400 hover:text-white',
+                              ? 'bg-primary/10 text-primary font-medium'
+                              : 'text-muted-foreground hover:text-foreground',
                           )}
                           style={{ animationDelay: `${(groupIndex * 50) + (itemIndex * 25)}ms` }}
                           aria-current={isActive ? 'page' : undefined}
                         >
                           <item.icon className={cn(
                             'shrink-0 transition-all duration-200',
-                            isActive ? 'h-4 w-4 text-white' : 'h-4 w-4 text-gray-400 group-hover:text-white'
+                            isActive ? 'h-4 w-4 text-primary' : 'h-4 w-4 text-muted-foreground group-hover:text-foreground'
                           )} />
                           <span>{item.title}</span>
                           {isActive && (
-                            <div className="ml-auto h-1.5 w-1.5 rounded-full bg-white shadow-white/50" />
+                            <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
                           )}
                         </Link>
                       )
@@ -237,14 +237,14 @@ export function Sidebar() {
         </ScrollArea>
 
         {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 border-t border-white/10 bg-slate-900 p-2">
+        <div className="absolute bottom-0 left-0 right-0 border-t border-border bg-card p-2">
           {sidebarCollapsed ? (
             <Tooltip>
               <TooltipPrimitive.Trigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="mx-auto h-10 w-10 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl"
+                  className="mx-auto h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl"
                   aria-label="Ayarlar"
                   asChild
                 >
@@ -260,12 +260,12 @@ export function Sidebar() {
           ) : (
             <Button
               variant="ghost"
-              className="w-full justify-start gap-3 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl px-3 py-2.5"
+              className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl px-3 py-2.5"
               aria-label="Ayarlar"
               asChild
             >
               <Link href="/dashboard/settings/definitions">
-                <div className="flex items-center justify-center rounded-lg bg-white/5 p-2 w-8 h-8">
+                <div className="flex items-center justify-center rounded-lg bg-muted p-2 w-8 h-8">
                   <Settings className="h-4 w-4" />
                 </div>
                 <span className="text-sm font-medium">Ayarlar</span>

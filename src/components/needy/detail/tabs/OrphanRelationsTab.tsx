@@ -226,7 +226,7 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
                     <TableCell>{relation.start_date}</TableCell>
                     <TableCell>
                       {relation.is_primary_guardian && (
-                        <span className="text-green-600 text-sm">✓</span>
+                        <span className="text-success text-sm">✓</span>
                       )}
                     </TableCell>
                     <TableCell>

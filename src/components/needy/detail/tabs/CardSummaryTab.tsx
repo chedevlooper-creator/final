@@ -97,10 +97,10 @@ export function CardSummaryTab({ needyPersonId, onClose, cardSummary }: CardSumm
       </div>
 
       {/* Toplam Yardım Tutarı - Öne Çıkan */}
-      <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl p-6 text-white">
+      <div className="bg-gradient-primary rounded-xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-green-100 text-sm mb-1">Toplam Yardım Tutarı</p>
+            <p className="text-white/80 text-sm mb-1">Toplam Yardım Tutarı</p>
             <p className="text-3xl font-bold">{summary.total_aid_amount_try.toLocaleString('tr-TR')} ₺</p>
           </div>
           <div className="bg-white/20 rounded-full p-4">
