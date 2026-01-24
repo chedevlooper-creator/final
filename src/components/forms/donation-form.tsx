@@ -252,7 +252,7 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
           <Button
             type="submit"
             disabled={isLoading}
-            className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600"
+            className="bg-gradient-primary hover:opacity-90"
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Bağış Kaydet

@@ -59,7 +59,7 @@ export function SystemInfoPanel({
       {showStatus && (
         <FormSection 
           title="Durum" 
-          icon={<FileCheck className="h-4 w-4 text-blue-500" />}
+          icon={<FileCheck className="h-4 w-4 text-info" />}
           defaultOpen={true}
         >
           <RadioGroup
@@ -73,15 +73,15 @@ export function SystemInfoPanel({
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="active" id="status-active" />
-              <Label htmlFor="status-active" className="cursor-pointer text-green-600">Onaylandı</Label>
+              <Label htmlFor="status-active" className="cursor-pointer text-success">Onaylandı</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="inactive" id="status-inactive" />
-              <Label htmlFor="status-inactive" className="cursor-pointer text-slate-600">Pasif</Label>
+              <Label htmlFor="status-inactive" className="cursor-pointer text-muted-foreground">Pasif</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="rejected" id="status-rejected" />
-              <Label htmlFor="status-rejected" className="cursor-pointer text-red-600">Reddedildi</Label>
+              <Label htmlFor="status-rejected" className="cursor-pointer text-danger">Reddedildi</Label>
             </div>
           </RadioGroup>
         </FormSection>

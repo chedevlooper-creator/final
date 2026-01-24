@@ -39,16 +39,16 @@ export function OptimizedImage({
   if (error) {
     return (
       <div
-        className={`flex items-center justify-center bg-slate-100 ${className}`}
+        className={`flex items-center justify-center bg-muted ${className}`}
         style={{ width, height }}
       >
-        <span className="text-slate-400 text-sm">Yüklenemedi</span>
+        <span className="text-muted-foreground text-sm">Yüklenemedi</span>
       </div>
     )
   }
 
   return (
-    <div className={`relative overflow-hidden ${isLoading ? 'animate-pulse bg-slate-100' : ''} ${className}`}>
+    <div className={`relative overflow-hidden ${isLoading ? 'animate-pulse bg-muted' : ''} ${className}`}>
       <Image
         src={src}
         alt={alt}

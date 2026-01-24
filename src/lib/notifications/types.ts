@@ -62,11 +62,11 @@ export const NOTIFICATION_TYPE_ICONS: Record<NotificationType, string> = {
 }
 
 export const NOTIFICATION_TYPE_COLORS: Record<NotificationType, string> = {
-  info: 'text-blue-500 bg-blue-50',
-  success: 'text-green-500 bg-green-50',
-  warning: 'text-yellow-500 bg-yellow-50',
-  error: 'text-red-500 bg-red-50',
-  application: 'text-purple-500 bg-purple-50',
-  donation: 'text-emerald-500 bg-emerald-50',
-  system: 'text-slate-500 bg-slate-50',
+  info: 'text-info bg-info/10',
+  success: 'text-success bg-success/10',
+  warning: 'text-warning bg-warning/10',
+  error: 'text-danger bg-danger/10',
+  application: 'text-primary bg-primary/10',
+  donation: 'text-accent bg-accent/10',
+  system: 'text-muted-foreground bg-muted',
 }

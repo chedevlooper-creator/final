@@ -78,7 +78,7 @@ export function DetailHeader({
               variant="ghost" 
               size="sm"
               onClick={onDeleteRequest}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="text-danger hover:text-danger hover:bg-danger/10"
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Kaydı Sil

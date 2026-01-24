@@ -196,7 +196,7 @@ export function PhotoSection({
 
           {/* Error Message */}
           {error && (
-            <div className="flex items-center gap-1 text-xs text-red-500">
+            <div className="flex items-center gap-1 text-xs text-danger">
               <AlertCircle className="h-3 w-3" />
               <span>{error}</span>
             </div>

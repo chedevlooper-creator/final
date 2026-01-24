@@ -79,7 +79,7 @@ export function ReferencesTab({ needyPersonId, onClose }: ReferencesTabProps) {
                     <TableCell>{REFERENCE_TYPE_OPTIONS.find(t => t.value === ref.reference_type)?.label}</TableCell>
                     <TableCell>{ref.relation}</TableCell>
                     <TableCell>{ref.phone}</TableCell>
-                    <TableCell>{ref.is_verified && <CheckCircle2 className="h-4 w-4 text-green-600" />}</TableCell>
+                    <TableCell>{ref.is_verified && <CheckCircle2 className="h-4 w-4 text-success" />}</TableCell>
                     <TableCell>
                       <Button variant="ghost" size="icon" className="h-8 w-8"><Pencil className="h-4 w-4" /></Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive"><Trash2 className="h-4 w-4" /></Button>

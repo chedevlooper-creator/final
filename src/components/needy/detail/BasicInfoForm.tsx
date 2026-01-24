@@ -58,7 +58,7 @@ export function BasicInfoForm({
   return (
     <div className="space-y-4">
       {/* Temel Bilgiler */}
-      <FormSection title="Temel Bilgiler" icon={<User className="h-4 w-4 text-blue-500" />}>
+      <FormSection title="Temel Bilgiler" icon={<User className="h-4 w-4 text-info" />}>
         {/* Kimlik Bilgileri - 4 Kolonlu Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <FormField
@@ -66,7 +66,7 @@ export function BasicInfoForm({
             name="first_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xs font-medium">Ad <span className="text-red-500">*</span></FormLabel>
+                <FormLabel className="text-xs font-medium">Ad <span className="text-danger">*</span></FormLabel>
                 <FormControl>
                   <Input {...field} value={field.value || ''} placeholder="Ad" className="h-9" />
                 </FormControl>
@@ -79,7 +79,7 @@ export function BasicInfoForm({
             name="last_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xs font-medium">Soyad <span className="text-red-500">*</span></FormLabel>
+                <FormLabel className="text-xs font-medium">Soyad <span className="text-danger">*</span></FormLabel>
                 <FormControl>
                   <Input {...field} value={field.value || ''} placeholder="Soyad" className="h-9" />
                 </FormControl>
@@ -457,7 +457,7 @@ export function BasicInfoForm({
       </FormSection>
 
       {/* İletişim Bilgileri */}
-      <FormSection title="İletişim Bilgileri" icon={<Phone className="h-4 w-4 text-green-500" />}>
+      <FormSection title="İletişim Bilgileri" icon={<Phone className="h-4 w-4 text-success" />}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <FormField
             control={control}
@@ -723,7 +723,7 @@ export function BasicInfoForm({
       </FormSection>
 
       {/* İş ve Gelir Durumu */}
-      <FormSection title="İş ve Gelir Durumu" icon={<Briefcase className="h-4 w-4 text-orange-500" />} defaultOpen={false}>
+      <FormSection title="İş ve Gelir Durumu" icon={<Briefcase className="h-4 w-4 text-warning" />} defaultOpen={false}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <FormField
             control={control}
@@ -1103,7 +1103,7 @@ export function BasicInfoForm({
       </FormSection>
 
       {/* Acil Durum İletişimi */}
-      <FormSection title="Acil Durum İletişimi" icon={<Shield className="h-4 w-4 text-red-500" />} defaultOpen={false}>
+      <FormSection title="Acil Durum İletişimi" icon={<Shield className="h-4 w-4 text-danger" />} defaultOpen={false}>
         {/* 1. Kişi */}
         <div className="p-3 border rounded-lg bg-muted/30 mb-3">
           <Label className="text-xs font-medium text-muted-foreground mb-2 block">1. Acil Durum Kişisi</Label>

@@ -92,7 +92,7 @@ export function ApplicationsTab({ needyPersonId, onClose }: ApplicationsTabProps
   }
 
   const CheckIcon = ({ checked }: { checked: boolean }) => (
-    checked ? <Check className="h-4 w-4 text-green-600" /> : <X className="h-4 w-4 text-gray-300" />
+    checked ? <Check className="h-4 w-4 text-success" /> : <X className="h-4 w-4 text-muted-foreground" />
   )
 
   const getStageColor = (stage: string) => {

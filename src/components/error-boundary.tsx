@@ -38,16 +38,16 @@ function DefaultErrorFallback({ error, resetError }: ErrorFallbackProps) {
   const recoveryActions = appError?.getRecoveryActions() || []
   const severity = appError?.severity || ErrorSeverity.MEDIUM
 
-  // Severity colors
+  // Severity colors - Using design system semantic colors
   const severityColors = {
-    [ErrorSeverity.LOW]: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-    [ErrorSeverity.MEDIUM]: 'bg-orange-50 border-orange-200 text-orange-800',
-    [ErrorSeverity.HIGH]: 'bg-red-50 border-red-200 text-red-800',
-    [ErrorSeverity.CRITICAL]: 'bg-red-100 border-red-300 text-red-900',
+    [ErrorSeverity.LOW]: 'bg-warning/10 border-warning/20 text-warning',
+    [ErrorSeverity.MEDIUM]: 'bg-warning/20 border-warning/30 text-warning',
+    [ErrorSeverity.HIGH]: 'bg-danger/10 border-danger/20 text-danger',
+    [ErrorSeverity.CRITICAL]: 'bg-danger/20 border-danger/30 text-danger',
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className={`max-w-lg w-full rounded-lg border-2 p-6 ${severityColors[severity]}`}>
         {/* Error Icon */}
         <div className="flex justify-center mb-4">
