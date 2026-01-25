@@ -8,6 +8,7 @@
 interface RateLimitConfig {
   interval: number // Time window in milliseconds
   uniqueTokenPerInterval: number // Max requests per interval
+  maxCacheSize?: number // Maximum cache entries (default: 10000)
 }
 
 class RateLimiter {
@@ -16,7 +17,10 @@ class RateLimiter {
 
   constructor(config: RateLimitConfig) {
     this.cache = new Map()
-    this.config = config
+    this.config = {
+      ...config,
+      maxCacheSize: config.maxCacheSize || 10000
+    }
   }
 
   check(identifier: string, limit: number): { success: boolean; remaining: number; resetAt: number } {
@@ -45,8 +49,8 @@ class RateLimiter {
     validTokens.push(now)
     this.cache.set(identifier, validTokens)
 
-    // Cleanup old entries periodically
-    if (this.cache.size > this.config.uniqueTokenPerInterval) {
+    // Cleanup old entries if cache is too large
+    if (this.cache.size > (this.config.maxCacheSize || 10000)) {
       this.cleanup(windowStart)
     }
 

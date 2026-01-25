@@ -27,21 +27,39 @@ export function sanitizeString(input: string): string {
  * Encodes all special characters to prevent HTML injection
  * 
  * For production use with rich text, use a library like DOMPurify
+ * 
+ * Note: This function encodes all HTML entities. For already-encoded input,
+ * use this only once to avoid double-encoding.
  */
 export function sanitizeHTML(input: string): string {
   if (typeof input !== 'string') {
     return ''
   }
 
-  // Encode special HTML characters first to prevent XSS
-  // This prevents any HTML from being interpreted
+  // Create a text node to leverage browser's built-in encoding
+  // This is the safest way to encode HTML without double-escaping issues
+  if (typeof document !== 'undefined') {
+    const div = document.createElement('div')
+    div.textContent = input
+    return div.innerHTML
+  }
+
+  // Server-side fallback: manual encoding
+  // Process each character to avoid double-encoding
   return input
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;')
+    .split('')
+    .map(char => {
+      switch (char) {
+        case '<': return '&lt;'
+        case '>': return '&gt;'
+        case '"': return '&quot;'
+        case "'": return '&#x27;'
+        case '/': return '&#x2F;'
+        case '&': return '&amp;'
+        default: return char
+      }
+    })
+    .join('')
 }
 
 /**
@@ -101,6 +119,7 @@ export function sanitizeTCKN(tckn: string): string | null {
 
 /**
  * Sanitize numeric input
+ * Returns null if input is invalid or out of bounds
  */
 export function sanitizeNumber(
   input: string | number,
@@ -112,21 +131,20 @@ export function sanitizeNumber(
     return null
   }
   
-  // Apply min/max constraints
-  let result = num
-  if (options.min !== undefined && result < options.min) {
-    result = options.min
+  // Check bounds - return null if out of range
+  if (options.min !== undefined && num < options.min) {
+    return null
   }
-  if (options.max !== undefined && result > options.max) {
-    result = options.max
+  if (options.max !== undefined && num > options.max) {
+    return null
   }
   
   // Apply decimal precision
   if (options.decimals !== undefined) {
-    result = parseFloat(result.toFixed(options.decimals))
+    return parseFloat(num.toFixed(options.decimals))
   }
   
-  return result
+  return num
 }
 
 /**
