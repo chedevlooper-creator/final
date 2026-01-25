@@ -9,7 +9,7 @@ vi.mock('@/lib/supabase/server', () => ({
   createServerSupabaseClient: vi.fn(),
 }))
 
-import { POST } from '@/app/api/auth/login/route'
+import { POST } from '@app/api/auth/login/route'
 import { NextRequest } from 'next/server'
 
 describe('POST /api/auth/login', () => {

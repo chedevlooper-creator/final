@@ -293,8 +293,7 @@ export function DocumentRoute(config: {
     // Get existing metadata or create new
     const existingDocs: any = (classConstructor as any).__api_docs_metadata__ || {}
     if (typeof existingDocs === 'object' && existingDocs !== null) {
-      existingDocs[propertyKey] = config
-      // eslint-disable-next-line no-unexpected-multiline
+      existingDocs[propertyKey] = config;
       (classConstructor as any).__api_docs_metadata__ = existingDocs
     }
     
