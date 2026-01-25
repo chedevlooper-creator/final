@@ -277,24 +277,15 @@ Tüm error response'ları şu formatta döner:
 /**
  * API Route decorator - Add documentation to API routes
  */
-export function DocumentRoute(config: {
-  summary: string
-  description?: string
-  tags?: string[]
-  parameters?: any[]
-  requestBody?: any
-  responses?: any
-  security?: any[]
-}) {
+export function DocumentRoute(config: RouteSpec) {
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     // Store metadata for documentation generation
     const classConstructor = target.constructor
    
     // Get existing metadata or create new
-    const existingDocs: any = (classConstructor as any).__api_docs_metadata__ || {}
+    const existingDocs = (classConstructor as any).__api_docs_metadata__ || {} as Record<string, RouteSpec>
     if (typeof existingDocs === 'object' && existingDocs !== null) {
-      existingDocs[propertyKey] = config
-      // eslint-disable-next-line no-unexpected-multiline
+      existingDocs[propertyKey] = config;
       (classConstructor as any).__api_docs_metadata__ = existingDocs
     }
     
