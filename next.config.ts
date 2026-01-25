@@ -1,5 +1,5 @@
 import type { NextConfig } from 'next'
-// import { withWorkflow } from 'workflow/next'
+import type { Configuration } from 'webpack'
 import { securityHeaders } from '@/lib/security'
 import path from 'path'
 
@@ -62,9 +62,10 @@ const nextConfig: NextConfig = {
   },
 
   // Webpack optimizations for bundle size
-  webpack: (config, { isServer }) => {
+  webpack: (config: Configuration, { isServer }: { isServer: boolean }) => {
     // Optimize package imports
     if (!isServer) {
+      config.resolve = config.resolve || {}
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
