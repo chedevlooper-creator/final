@@ -1,5 +1,15 @@
 # 🚀 Vercel Deployment Guide
 
+## ⚠️ IMPORTANT: Environment Variables Required for Build
+
+**Note:** This application requires environment variables to build successfully. During local development and CI/CD, you can create a `.env.local` file with placeholder values (this file is in `.gitignore` and won't be committed).
+
+For production deployment on Vercel, **all environment variables MUST be configured in the Vercel dashboard** before deployment.
+
+See [VERCEL_DEPLOYMENT_GUIDE.md](VERCEL_DEPLOYMENT_GUIDE.md) for detailed deployment instructions.
+
+---
+
 ## Pre-Deployment Checklist
 
 ### 1. Environment Variables

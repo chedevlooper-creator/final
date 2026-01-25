@@ -203,6 +203,30 @@ npm run analyze      # Bundle analyzer
 
 ---
 
+## 🔒 Security
+
+### Security Features
+- ✅ **Authentication**: Supabase Auth with JWT
+- ✅ **Authorization**: Role-Based Access Control (RBAC)
+- ✅ **Input Validation**: Zod schemas + custom sanitization
+- ✅ **Rate Limiting**: API request throttling
+- ✅ **XSS Protection**: Input sanitization, no dangerouslySetInnerHTML
+- ✅ **SQL Injection Protection**: Parameterized queries via Supabase
+- ✅ **CSRF Protection**: Next.js built-in protection
+- ✅ **Security Headers**: CSP, HSTS, X-Frame-Options, etc.
+- ✅ **Audit Logging**: All critical operations logged
+- ✅ **Row Level Security**: Supabase RLS policies
+
+### Security Documentation
+- [Production Security Checklist](PRODUCTION_SECURITY_CHECKLIST.md)
+- [Security Audit Report](SECURITY_AUDIT_REPORT.md)
+- [Vercel Deployment Guide](VERCEL_DEPLOYMENT_GUIDE.md)
+
+### Reporting Security Issues
+Please report security vulnerabilities to **security@yardimyonetim.com** (do not create public issues).
+
+---
+
 ## 🤝 Katkıda Bulunma
 
 Katkılarınızı bekliyoruz! Lütfen [Contributing Guide](docs/CONTRIBUTING.md) dokümanını inceleyin.

@@ -24,27 +24,24 @@ export function sanitizeString(input: string): string {
 
 /**
  * Sanitize HTML to prevent XSS attacks
- * Removes all HTML tags except for allowed ones
+ * Encodes all special characters to prevent HTML injection
+ * 
+ * For production use with rich text, use a library like DOMPurify
  */
-export function sanitizeHTML(input: string, allowedTags: string[] = []): string {
+export function sanitizeHTML(input: string): string {
   if (typeof input !== 'string') {
     return ''
   }
 
-  // If no tags are allowed, strip all HTML
-  if (allowedTags.length === 0) {
-    return input
-      .replace(/<[^>]*>/g, '')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&amp;/g, '&')
-      .replace(/&quot;/g, '"')
-      .replace(/&#x27;/g, "'")
-  }
-
-  // Basic tag filtering (for production, use a library like DOMPurify)
-  const tagRegex = new RegExp(`<(?!\/?(${allowedTags.join('|')})\\s*\/?>)[^>]+>`, 'gi')
-  return input.replace(tagRegex, '')
+  // Encode special HTML characters first to prevent XSS
+  // This prevents any HTML from being interpreted
+  return input
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;')
 }
 
 /**
