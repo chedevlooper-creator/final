@@ -6,9 +6,33 @@
  * SECURITY NOTE: xlsx package has known vulnerabilities (Prototype Pollution & ReDoS).
  * However, it's only used for exporting trusted internal data (not parsing user uploads).
  * Risk is minimal as we control all input data. Monitor for updates: https://github.com/SheetJS/sheetjs
+ *
+ * MITIGATIONS IN PLACE:
+ * 1. Only used for EXPORT (write) operations, never for parsing user uploads
+ * 2. All data comes from trusted internal database queries
+ * 3. Input validation added to prevent prototype pollution patterns
+ * 4. Consider migrating to 'exceljs' in future release for enhanced security
  */
 
 import * as XLSX from 'xlsx'
+
+/**
+ * Sanitize data to prevent prototype pollution patterns
+ * Removes __proto__, constructor, and prototype keys from objects
+ */
+function sanitizeData<T extends Record<string, unknown>>(data: T[]): T[] {
+  const dangerousKeys = ['__proto__', 'constructor', 'prototype']
+
+  return data.map(item => {
+    const sanitized = { ...item }
+    dangerousKeys.forEach(key => {
+      if (key in sanitized) {
+        delete (sanitized as Record<string, unknown>)[key]
+      }
+    })
+    return sanitized as T
+  })
+}
 
 export interface ExcelExportOptions {
   filename: string
@@ -32,8 +56,11 @@ export function exportToExcel<T extends Record<string, unknown>>(
   data: T[],
   options: ExcelExportOptions
 ): void {
+  // Sanitize data to prevent prototype pollution
+  const sanitizedData = sanitizeData(data)
+
   const workbook = XLSX.utils.book_new()
-  const worksheet = XLSX.utils.json_to_sheet(data)
+  const worksheet = XLSX.utils.json_to_sheet(sanitizedData)
   
   // Sheet ismi
   const sheetName = options.sheetName || 'Sheet1'
@@ -84,9 +111,11 @@ export function exportToExcelMultipleSheets(
   options: ExcelExportOptions
 ): void {
   const workbook = XLSX.utils.book_new()
-  
+
   sheets.forEach((sheet) => {
-    const worksheet = XLSX.utils.json_to_sheet(sheet.data)
+    // Sanitize data to prevent prototype pollution
+    const sanitizedData = sanitizeData(sheet.data)
+    const worksheet = XLSX.utils.json_to_sheet(sanitizedData)
     XLSX.utils.book_append_sheet(workbook, worksheet, sheet.name)
   })
   

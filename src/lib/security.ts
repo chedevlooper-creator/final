@@ -22,21 +22,87 @@ export function generateCSPNonce(): string {
 /**
  * Build CSP header with nonce for inline scripts
  * @param nonce - The cryptographic nonce for this request
+ * @param options - Additional CSP options
  */
-export function buildCSPHeader(nonce?: string): string {
-  const nonceStr = nonce ? ` 'nonce-${nonce}'` : " 'unsafe-inline'"
+export function buildCSPHeader(
+  nonce?: string,
+  options: {
+    reportUri?: string
+    reportOnly?: boolean
+  } = {}
+): string {
+  // In development, allow unsafe-inline for hot reload
+  const isDev = process.env['NODE_ENV'] !== 'production'
 
-  return [
+  // Nonce-based CSP for production, unsafe-inline for development
+  const scriptSrc = nonce
+    ? ` 'nonce-${nonce}'`
+    : isDev
+      ? " 'unsafe-inline' 'unsafe-eval'"
+      : " 'unsafe-inline'" // Fallback when no nonce provided
+
+  const styleSrc = nonce
+    ? ` 'nonce-${nonce}' 'unsafe-inline'`
+    : " 'unsafe-inline'" // Styles often need unsafe-inline for CSS-in-JS
+
+  const directives = [
+    // Default policy - restrict to same origin
     "default-src 'self'",
-    `script-src 'self'${nonceStr}`, // nonce-based CSP when available
-    `style-src 'self'${nonceStr}`, // nonce-based CSP when available
+
+    // Scripts - prefer nonce-based, fallback to unsafe-inline
+    `script-src 'self'${scriptSrc}`,
+
+    // Styles - need unsafe-inline for CSS-in-JS libraries
+    `style-src 'self'${styleSrc}`,
+
+    // Images - allow Supabase storage and data URIs
     "img-src 'self' data: blob: https://*.supabase.co https://*.githubusercontent.com",
+
+    // Fonts - allow self and data URIs
     "font-src 'self' data:",
-    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel-scripts.com",
+
+    // API connections - allow Supabase, Vercel, and Sentry
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel-scripts.com https://*.sentry.io",
+
+    // Media - restrict to same origin
+    "media-src 'self'",
+
+    // Objects - disallow plugins (Flash, Java, etc.)
+    "object-src 'none'",
+
+    // Child/frame sources - disallow embedding
+    "child-src 'none'",
+    "frame-src 'none'",
+
+    // Prevent framing of this site
     "frame-ancestors 'none'",
+
+    // Restrict base URI to prevent base tag hijacking
     "base-uri 'self'",
+
+    // Restrict form submissions to same origin
     "form-action 'self'",
-  ].join('; ')
+
+    // Require HTTPS for all resources in production
+    ...(isDev ? [] : ['upgrade-insecure-requests']),
+
+    // Block all mixed content
+    "block-all-mixed-content",
+
+    // Report URI for CSP violations (if configured)
+    ...(options.reportUri ? [`report-uri ${options.reportUri}`] : []),
+  ]
+
+  return directives.join('; ')
+}
+
+/**
+ * Get CSP header name based on mode
+ */
+export function getCSPHeaderName(reportOnly: boolean = false): string {
+  return reportOnly
+    ? 'Content-Security-Policy-Report-Only'
+    : 'Content-Security-Policy'
 }
 
 export const securityHeaders = {
@@ -63,6 +129,30 @@ export const securityHeaders = {
    * Disables browser features that could be exploited
    */
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+
+  /**
+   * X-DNS-Prefetch-Control
+   * Controls browser DNS prefetching
+   */
+  'X-DNS-Prefetch-Control': 'on',
+
+  /**
+   * X-Download-Options
+   * Prevents IE from executing downloads in site's context
+   */
+  'X-Download-Options': 'noopen',
+
+  /**
+   * Cross-Origin-Opener-Policy
+   * Prevents cross-origin attacks via window references
+   */
+  'Cross-Origin-Opener-Policy': 'same-origin',
+
+  /**
+   * Cross-Origin-Resource-Policy
+   * Controls which origins can load resources
+   */
+  'Cross-Origin-Resource-Policy': 'same-origin',
 
   /**
    * Strict-Transport-Security (HSTS)
@@ -103,10 +193,9 @@ export const securityHeaders = {
  * Configure which origins are allowed to access your API
  */
 export const corsConfig = {
-  // In production, replace with your actual domain
-  // In development, restrict to localhost only for better security
+  // Use NEXT_PUBLIC_APP_URL in production, restrict to localhost in development
   origin: process.env['NODE_ENV'] === 'production'
-    ? 'https://yourdomain.com'
+    ? process.env['NEXT_PUBLIC_APP_URL'] || 'https://yourdomain.com'
     : ['http://localhost:3000', 'http://127.0.0.1:3000'],
 
   credentials: true,
@@ -120,5 +209,16 @@ export const corsConfig = {
     'Authorization',
     'X-Requested-With',
     'apikey',
+    'x-request-id', // For request tracing
   ],
+
+  // Expose headers to the client
+  exposedHeaders: [
+    'X-Request-Id',
+    'X-RateLimit-Limit',
+    'X-RateLimit-Remaining',
+  ],
+
+  // Max age for preflight cache (24 hours)
+  maxAge: 86400,
 }
