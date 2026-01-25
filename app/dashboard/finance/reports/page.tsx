@@ -20,7 +20,7 @@ export default function FinanceReportsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-500" />
+              <FileText className="h-5 w-5 text-icon-blue" />
               Kasa Özet
             </CardTitle>
             <CardDescription>Kasa işlem özeti ve detayları</CardDescription>
@@ -37,7 +37,7 @@ export default function FinanceReportsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-green-500" />
+              <FileText className="h-5 w-5 text-icon-green" />
               Banka Özet
             </CardTitle>
             <CardDescription>Banka işlem özeti ve detayları</CardDescription>
@@ -54,7 +54,7 @@ export default function FinanceReportsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-emerald-500" />
+              <BarChart3 className="h-5 w-5 text-icon-emerald" />
               Gelir-Gider
             </CardTitle>
             <CardDescription>Gelir ve gider karşılaştırması</CardDescription>
@@ -71,7 +71,7 @@ export default function FinanceReportsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-purple-500" />
+              <BarChart3 className="h-5 w-5 text-icon-purple" />
               Aylık Özet
             </CardTitle>
             <CardDescription>Aylık finans özeti</CardDescription>
@@ -88,7 +88,7 @@ export default function FinanceReportsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-orange-500" />
+              <BarChart3 className="h-5 w-5 text-icon-orange" />
               Döviz Raporu
             </CardTitle>
             <CardDescription>Döviz bazlı işlem özeti</CardDescription>
@@ -105,7 +105,7 @@ export default function FinanceReportsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-red-500" />
+              <BarChart3 className="h-5 w-5 text-icon-red" />
               Tarih Aralığı
             </CardTitle>
             <CardDescription>Belirli tarih aralığı finans raporu</CardDescription>

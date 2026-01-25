@@ -54,6 +54,16 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Semantic icon colors for consistent UI
+        icon: {
+          blue: "hsl(var(--icon-blue))",
+          green: "hsl(var(--icon-green))",
+          emerald: "hsl(var(--icon-emerald))",
+          purple: "hsl(var(--icon-purple))",
+          orange: "hsl(var(--icon-orange))",
+          red: "hsl(var(--icon-red))",
+          cyan: "hsl(var(--icon-cyan))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

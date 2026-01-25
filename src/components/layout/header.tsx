@@ -21,7 +21,7 @@ import { useEffect, useState } from 'react'
 
 export function Header() {
   const { user, profile, signOut } = useAuth()
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed)
   const [mounted, setMounted] = useState(false)
   const [searchFocused, setSearchFocused] = useState(false)
 
@@ -29,18 +29,10 @@ export function Header() {
   useEffect(() => {
     const timeout = setTimeout(() => {
       setMounted(true)
-      const store = useUIStore.getState()
-      setSidebarCollapsed(store.sidebarCollapsed)
     }, 0)
-
-    // Subscribe to store changes
-    const unsubscribe = useUIStore.subscribe((state) => {
-      setSidebarCollapsed(state.sidebarCollapsed)
-    })
 
     return () => {
       clearTimeout(timeout)
-      unsubscribe()
     }
   }, [])
 

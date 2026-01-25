@@ -73,13 +73,13 @@ export function Sidebar() {
     <TooltipProvider delayDuration={200}>
       <aside
         className={cn(
-          'fixed left-0 top-0 z-40 h-screen border-r border-border bg-card transition-all duration-300 ease-out shadow-soft',
+          'fixed left-0 top-0 z-40 h-screen border-r border-border bg-card/95 backdrop-blur-sm transition-all duration-300 ease-out shadow-soft',
           sidebarCollapsed ? 'w-16' : 'w-64'
         )}
         aria-label="Ana navigasyon"
       >
         {/* Header */}
-        <div className="flex h-16 items-center justify-between border-b border-border bg-card px-3">
+        <div className="flex h-16 items-center justify-between border-b border-border bg-transparent px-3">
           {!sidebarCollapsed ? (
             <Link
               href="/dashboard"
@@ -241,7 +241,7 @@ export function Sidebar() {
         </ScrollArea>
 
         {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 border-t border-border bg-card p-2">
+        <div className="absolute bottom-0 left-0 right-0 border-t border-border bg-transparent p-2">
           {sidebarCollapsed ? (
             <Tooltip>
               <TooltipPrimitive.Trigger asChild>

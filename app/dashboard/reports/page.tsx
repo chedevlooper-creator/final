@@ -20,7 +20,7 @@ export default function ReportsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-500" />
+              <FileText className="h-5 w-5 text-icon-blue" />
               İhtiyaç Sahipleri
             </CardTitle>
             <CardDescription>İhtiyaç sahipleri listesi ve detayları</CardDescription>
@@ -37,7 +37,7 @@ export default function ReportsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-green-500" />
+              <FileText className="h-5 w-5 text-icon-green" />
               Yardım Başvuruları
             </CardTitle>
             <CardDescription>Yardım başvuruları ve durumları</CardDescription>
@@ -54,7 +54,7 @@ export default function ReportsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-emerald-500" />
+              <FileText className="h-5 w-5 text-icon-emerald" />
               Yapılan Yardımlar
             </CardTitle>
             <CardDescription>Yapılan yardımların detaylı listesi</CardDescription>
@@ -71,7 +71,7 @@ export default function ReportsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-purple-500" />
+              <BarChart3 className="h-5 w-5 text-icon-purple" />
               Aylık Özet
             </CardTitle>
             <CardDescription>Aylık yardım ve başvuru özeti</CardDescription>
@@ -88,7 +88,7 @@ export default function ReportsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-orange-500" />
+              <BarChart3 className="h-5 w-5 text-icon-orange" />
               Kategori Bazlı
             </CardTitle>
             <CardDescription>Kategori bazında yardım dağılımı</CardDescription>
@@ -105,7 +105,7 @@ export default function ReportsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-red-500" />
+              <BarChart3 className="h-5 w-5 text-icon-red" />
               Tarih Aralığı
             </CardTitle>
             <CardDescription>Belirli tarih aralığı raporu</CardDescription>

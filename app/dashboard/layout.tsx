@@ -35,7 +35,7 @@ function DashboardLayoutClient({
           sidebarCollapsed ? 'pl-16' : 'pl-64'
         )}
       >
-        <div className={cn('container mx-auto px-6 py-6', !isDetailPage && 'p-6')}>
+        <div className={cn('container mx-auto', isDetailPage ? 'px-0 py-0' : 'px-6 py-6')}>
           <div className="animate-fade-in">
             {children}
           </div>
