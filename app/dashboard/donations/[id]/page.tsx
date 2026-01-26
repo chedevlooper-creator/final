@@ -7,7 +7,6 @@ import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
     Select,
@@ -39,8 +38,8 @@ import { useDonationDetail, useUpdateDonation } from '@/hooks/queries/use-donati
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { DONATION_TYPES, PAYMENT_METHODS, CURRENCIES, donationSchema, type DonationFormValues } from '@/lib/validations/donation'
-import { StatusBadge } from '@/components/common/status-badge'
+import { DONATION_TYPES, PAYMENT_METHODS, CURRENCIES, donationSchema } from '@/lib/validations/donation'
+import { Badge } from '@/components/ui/badge'
 import { CardSkeleton } from '@/components/ui/skeleton'
 
 const PAYMENT_STATUSES = [
@@ -141,14 +140,9 @@ export default function DonationDetailPage() {
                         <div className="flex items-center gap-3">
                             <h1 className="text-2xl font-bold">Bağış #{donation.donation_number || donation.id?.slice(0, 8)}</h1>
                             {statusConfig && (
-                                <StatusBadge
-                                    status={donation.payment_status}
-                                    mapping={{
-                                        pending: { label: statusConfig.label, variant: statusConfig.variant },
-                                        completed: { label: statusConfig.label, variant: statusConfig.variant },
-                                        cancelled: { label: statusConfig.label, variant: statusConfig.variant },
-                                    }}
-                                />
+                                <Badge status={donation.payment_status}>
+                                    {statusConfig.label}
+                                </Badge>
                             )}
                         </div>
                         <p className="text-sm text-muted-foreground">
@@ -156,7 +150,7 @@ export default function DonationDetailPage() {
                         </p>
                     </div>
                 </div>
-                <Button onClick={form.handleSubmit(onSubmit)} disabled={isSaving} className="bg-gradient-to-r from-emerald-500 to-cyan-500">
+                <Button onClick={form.handleSubmit(onSubmit)} disabled={isSaving} className="bg-gradient-to-r from-primary to-primary/80">
                     {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                     {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
                 </Button>
@@ -326,7 +320,7 @@ export default function DonationDetailPage() {
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    <User className="h-5 w-5 text-blue-500" />
+                                    <User className="h-5 w-5 text-info" />
                                     Bağışçı Bilgileri
                                 </CardTitle>
                             </CardHeader>

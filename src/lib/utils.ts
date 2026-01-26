@@ -187,15 +187,16 @@ export function generateId(length: number = 8): string {
 
 /**
  * Renk classleri - durum göstergeleri için
+ * Design system semantic renklerini kullanır
  */
 export const statusColors: Record<string, string> = {
-  active: 'bg-green-100 text-green-800 border-green-200',
-  passive: 'bg-gray-100 text-gray-800 border-gray-200',
-  pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  approved: 'bg-blue-100 text-blue-800 border-blue-200',
-  rejected: 'bg-red-100 text-red-800 border-red-200',
-  completed: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  cancelled: 'bg-slate-100 text-slate-800 border-slate-200',
+  active: 'bg-success/10 text-success border-success/20',
+  passive: 'bg-muted text-muted-foreground border-border',
+  pending: 'bg-warning/10 text-warning border-warning/20',
+  approved: 'bg-info/10 text-info border-info/20',
+  rejected: 'bg-destructive/10 text-destructive border-destructive/20',
+  completed: 'bg-success/10 text-success border-success/20',
+  cancelled: 'bg-muted text-muted-foreground border-border',
 }
 
 /**

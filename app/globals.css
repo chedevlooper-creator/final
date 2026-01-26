@@ -8,8 +8,7 @@
 @tailwind utilities;
 
 /* ============================================
-   ENHANCED DESIGN SYSTEM - YARDIM YÖNETİM PANELİ
-   Modern, Accessible, Professional UI Components
+   DESIGN SYSTEM - YARDIM YONETIM PANELI
    ============================================ */
 
 @layer utilities {
@@ -17,45 +16,12 @@
     text-wrap: balance;
   }
 
-  /* ========================================
-     GRADIENT SYSTEM
-     ======================================== */
-
-  /* Primary Gradients - Nature Theme */
+  /* Gradients */
   .bg-gradient-primary {
-    background: linear-gradient(135deg, hsl(174, 73%, 42%) 0%, hsl(158, 64%, 52%) 100%);
-  }
-  .bg-gradient-primary-subtle {
-    background: linear-gradient(135deg, hsl(174, 73%, 97%) 0%, hsl(158, 64%, 97%) 100%);
-  }
-  .bg-gradient-primary-dark {
-    background: linear-gradient(135deg, hsl(174, 73%, 35%) 0%, hsl(158, 64%, 45%) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, color-mix(in srgb, hsl(var(--primary)), white 20%) 100%);
   }
 
-  /* Text Gradient */
-  .text-gradient-primary {
-    background: linear-gradient(135deg, hsl(174, 73%, 42%) 0%, hsl(158, 64%, 52%) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  /* Accent Gradients */
-  .bg-gradient-accent {
-    background: linear-gradient(135deg, hsl(199, 89%, 48%) 0%, hsl(174, 73%, 42%) 100%);
-  }
-  .bg-gradient-accent-warm {
-    background: linear-gradient(135deg, hsl(38, 92%, 50%) 0%, hsl(26, 83%, 56%) 100%);
-  }
-
-  /* Surface Gradients - Warmer beige */
-  .bg-gradient-surface {
-    background: linear-gradient(180deg, hsl(30 20% 92%) 0%, hsl(30 15% 88%) 100%);
-  }
-
-  /* ========================================
-     GLASS MORPHISM
-     ======================================== */
+  /* Glass Effect */
   .glass {
     background: hsl(0 0% 100% / 0.8);
     backdrop-filter: blur(12px);
@@ -63,129 +29,32 @@
     border: 1px solid hsl(0 0% 100% / 0.5);
   }
 
-  .glass-strong {
-    background: hsl(0 0% 100% / 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid hsl(0 0% 100% / 0.8);
-  }
-
-  /* ========================================
-     SHADOW SYSTEM
-     ======================================== */
+  /* Shadows */
   .shadow-soft {
-    box-shadow:
-      0 1px 3px hsl(0 0% 0% / 0.04),
-      0 4px 12px hsl(0 0% 0% / 0.03);
+    box-shadow: 0 1px 3px hsl(0 0% 0% / 0.04), 0 4px 12px hsl(0 0% 0% / 0.03);
   }
   .shadow-medium {
-    box-shadow:
-      0 2px 8px hsl(0 0% 0% / 0.04),
-      0 8px 24px hsl(0 0% 0% / 0.04);
-  }
-  .shadow-large {
-    box-shadow:
-      0 4px 12px hsl(0 0% 0% / 0.05),
-      0 16px 40px hsl(0 0% 0% / 0.06);
-  }
-  .shadow-xl {
-    box-shadow:
-      0 8px 24px hsl(0 0% 0% / 0.06),
-      0 32px 64px hsl(0 0% 0% / 0.08);
+    box-shadow: 0 2px 8px hsl(0 0% 0% / 0.04), 0 8px 24px hsl(0 0% 0% / 0.04);
   }
 
-  /* Colored Shadows */
-  .shadow-primary {
-    box-shadow: 0 10px 40px -10px hsl(174, 73%, 42% / 0.25);
-  }
-  .shadow-success {
-    box-shadow: 0 10px 40px -10px hsl(142, 76%, 36% / 0.25);
-  }
-  .shadow-warning {
-    box-shadow: 0 10px 40px -10px hsl(38, 92%, 50% / 0.25);
-  }
-  .shadow-danger {
-    box-shadow: 0 10px 40px -10px hsl(0, 84%, 60% / 0.25);
-  }
-
-  /* Inner Shadow */
-  .shadow-inner-soft {
-    box-shadow: inset 0 2px 8px hsl(0 0% 0% / 0.03);
-  }
-
-  /* ========================================
-     CARD ENHANCEMENTS
-     ======================================== */
+  /* Card Interactive - Unified hover effect */
   .card-interactive {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .card-interactive:hover {
-    transform: translateY(-3px);
-    box-shadow:
-      0 12px 40px -12px hsl(174, 73%, 42% / 0.2),
-      0 4px 12px -4px hsl(0 0% 0% / 0.1);
-  }
-  .card-interactive:active {
-    transform: translateY(-1px);
+    @apply transition-all duration-200 cursor-pointer;
+    @apply hover:shadow-medium hover:border-primary/30 hover:-translate-y-0.5;
+    @apply focus-within:ring-2 focus-within:ring-primary/20;
+    will-change: transform, box-shadow;
   }
 
-  /* ========================================
-     BUTTON ENHANCEMENTS
-     ======================================== */
-  .btn-shine {
-    position: relative;
-    overflow: hidden;
-  }
-  .btn-shine::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      hsl(0 0% 100% / 0.3),
-      transparent
-    );
-    transition: left 0.5s;
-  }
-  .btn-shine:hover::after {
-    left: 100%;
+  /* Card Hover - Alternative subtle effect */
+  .card-hover {
+    @apply transition-all duration-200 cursor-pointer;
+    @apply hover:shadow-md hover:border-primary/20;
+    @apply focus-visible:ring-2 focus-visible:ring-primary/20;
   }
 
-  /* ========================================
-     FOCUS STYLES
-     ======================================== */
-  .focus-ring {
-    outline: none;
-    position: relative;
-  }
-  .focus-ring::after {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    opacity: 0;
-    transition: opacity 0.2s;
-    pointer-events: none;
-    box-shadow: 0 0 0 2px hsl(174, 73%, 42%);
-  }
-  .focus-ring:focus-visible::after {
-    opacity: 1;
-  }
-
-  .focus-inset:focus-visible {
-    outline: none;
-    box-shadow: inset 0 0 0 2px hsl(174, 73%, 42%);
-  }
-
-  /* ========================================
-     ANIMATIONS
-     ======================================== */
+  /* Animations */
   .animate-fade-in {
-    animation: fadeIn 0.3s ease-out;
+    animation: fadeIn 0.2s ease-out;
   }
   @keyframes fadeIn {
     from { opacity: 0; }
@@ -193,64 +62,24 @@
   }
 
   .animate-slide-up {
-    animation: slideUp 0.3s ease-out;
+    animation: slideUp 0.2s ease-out;
   }
   @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .animate-slide-in-right {
-    animation: slideInRight 0.3s ease-out;
-  }
-  @keyframes slideInRight {
-    from {
-      opacity: 0;
-      transform: translateX(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .animate-scale-in {
-    animation: scaleIn 0.2s ease-out;
+    animation: scaleIn 0.15s ease-out;
   }
   @keyframes scaleIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
   }
 
-  /* Pulse Subtle */
-  .animate-pulse-subtle {
-    animation: pulseSubtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-  @keyframes pulseSubtle {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.8; }
-  }
-
-  /* Shimmer Loading Effect */
+  /* Shimmer Loading */
   .shimmer {
-    background: linear-gradient(
-      90deg,
-      hsl(0 0% 90%) 0%,
-      hsl(0 0% 97%) 50%,
-      hsl(0 0% 90%) 100%
-    );
+    background: linear-gradient(90deg, hsl(0 0% 90%) 0%, hsl(0 0% 97%) 50%, hsl(0 0% 90%) 100%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
   }
@@ -259,141 +88,7 @@
     100% { background-position: 200% 0; }
   }
 
-  /* ========================================
-     SEMANTIC COLOR BACKGROUNDS
-     ======================================== */
-  .bg-success {
-    background-color: hsl(var(--success));
-  }
-  .bg-success\/10 {
-    background-color: hsl(var(--success) / 0.1);
-  }
-  .bg-success\/20 {
-    background-color: hsl(var(--success) / 0.2);
-  }
-  .text-success {
-    color: hsl(var(--success));
-  }
-  .border-success {
-    border-color: hsl(var(--success));
-  }
-
-  .bg-warning {
-    background-color: hsl(var(--warning));
-  }
-  .bg-warning\/10 {
-    background-color: hsl(var(--warning) / 0.1);
-  }
-  .bg-warning\/20 {
-    background-color: hsl(var(--warning) / 0.2);
-  }
-  .text-warning {
-    color: hsl(var(--warning));
-  }
-  .border-warning {
-    border-color: hsl(var(--warning));
-  }
-
-  .bg-info {
-    background-color: hsl(var(--info));
-  }
-  .bg-info\/10 {
-    background-color: hsl(var(--info) / 0.1);
-  }
-  .bg-info\/20 {
-    background-color: hsl(var(--info) / 0.2);
-  }
-  .text-info {
-    color: hsl(var(--info));
-  }
-  .border-info {
-    border-color: hsl(var(--info));
-  }
-
-  .bg-danger {
-    background-color: hsl(var(--danger));
-  }
-  .bg-danger\/10 {
-    background-color: hsl(var(--danger) / 0.1);
-  }
-  .bg-danger\/20 {
-    background-color: hsl(var(--danger) / 0.2);
-  }
-  .text-danger {
-    color: hsl(var(--danger));
-  }
-  .border-danger {
-    border-color: hsl(var(--danger));
-  }
-
-  /* ========================================
-     STATUS BADGES
-     ======================================== */
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.25rem 0.625rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-  .badge-success {
-    background-color: hsl(142 76% 36% / 0.1);
-    color: hsl(142 76% 36%);
-  }
-  .badge-warning {
-    background-color: hsl(38 92% 50% / 0.1);
-    color: hsl(38 92% 50%);
-  }
-  .badge-danger {
-    background-color: hsl(0 84% 60% / 0.1);
-    color: hsl(0 84% 60%);
-  }
-  .badge-info {
-    background-color: hsl(199 89% 48% / 0.1);
-    color: hsl(199 89% 48%);
-  }
-  .badge-neutral {
-    background-color: hsl(0 0% 90%);
-    color: hsl(0 0% 40%);
-  }
-
-  /* ========================================
-     LAYOUT UTILITIES
-     ======================================== */
-  .page-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 1.5rem;
-  }
-  @media (min-width: 768px) {
-    .page-container {
-      padding: 2rem;
-    }
-  }
-
-  .section-header {
-    margin-bottom: 1.5rem;
-  }
-  .section-header h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    letter-spacing: -0.025em;
-  }
-  .section-header h2 {
-    font-size: 1.375rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-  }
-  .section-header p {
-    color: hsl(var(--muted-foreground));
-    margin-top: 0.375rem;
-  }
-
-  /* ========================================
-     SCROLLBAR STYLING
-     ======================================== */
+  /* Scrollbar */
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--border)) transparent;
@@ -409,78 +104,12 @@
     background: hsl(var(--border));
     border-radius: 3px;
   }
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--muted-foreground) / 0.5);
-  }
 
-  /* ========================================
-     DIVIDER ENHANCEMENTS
-     ======================================== */
-  .divider-vertical {
-    width: 1px;
-    height: 100%;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      hsl(var(--border)),
-      transparent
-    );
-  }
-  .divider-horizontal {
-    height: 1px;
-    width: 100%;
-    background: linear-gradient(
-      to right,
-      transparent,
-      hsl(var(--border)),
-      transparent
-    );
-  }
-
-  /* ========================================
-     ACCESSIBILITY UTILITIES
-     ======================================== */
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-  }
-
-  .not-sr-only {
-    position: static;
-    width: auto;
-    height: auto;
-    padding: 0;
-    margin: 0;
-    overflow: visible;
-    clip: auto;
-    white-space: normal;
-  }
-
-  .focus:not(.focus-visible) {
-    outline: none;
-  }
-
-  .focus-visible {
-    outline: 2px solid hsl(174, 73%, 42%);
-    outline-offset: 2px;
-  }
-
-  /* Reduced motion support */
+  /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    *, *::before, *::after {
       animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
     }
   }
 }
@@ -488,121 +117,72 @@
 /* ============================================
    CSS VARIABLES - DESIGN TOKENS
    ============================================ */
+:root {
+  /* Background */
+  --background: 210 20% 98%;
+  --foreground: 210 15% 15%;
+
+  /* Card & Surface */
+  --card: 0 0% 100%;
+  --card-foreground: 210 15% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 210 15% 15%;
+
+  /* Sidebar - Dark Blue */
+  --sidebar: 222 47% 11%;
+  --sidebar-foreground: 215 20% 75%;
+  --sidebar-border: 217 33% 15%;
+
+  /* Header */
+  --header: 0 0% 100% / 0.85;
+  --header-foreground: 222 47% 11%;
+  --header-border: 214 32% 91%;
+
+  /* Primary - Corporate Blue */
+  --primary: 210 100% 45%;
+  --primary-foreground: 0 0% 100%;
+
+  /* Secondary */
+  --secondary: 210 15% 92%;
+  --secondary-foreground: 210 100% 40%;
+
+  /* Accent - Teal */
+  --accent: 180 60% 45%;
+  --accent-foreground: 0 0% 100%;
+
+  /* Muted */
+  --muted: 210 15% 94%;
+  --muted-foreground: 210 12% 40%;
+
+  /* Destructive */
+  --destructive: 0 80% 55%;
+  --destructive-foreground: 0 0% 100%;
+
+  /* Border & Input */
+  --border: 210 15% 88%;
+  --input: 0 0% 100%;
+  --ring: 210 100% 45%;
+
+  /* Semantic Colors */
+  --success: 142 70% 40%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 90% 50%;
+  --warning-foreground: 0 0% 100%;
+  --info: 199 85% 48%;
+  --info-foreground: 0 0% 100%;
+
+  /* Chart Colors */
+  --chart-1: 210 100% 45%;
+  --chart-2: 180 60% 45%;
+  --chart-3: 142 70% 40%;
+  --chart-4: 199 85% 48%;
+  --chart-5: 260 60% 50%;
+
+  /* Radius */
+  --radius: 0.75rem;
+}
+
 @layer base {
-  :root {
-    /* ========================================
-       COLOR PALETTE - LIGHT MODE (Eye-Friendly)
-       ======================================== */
-
-    /* Background Colors - Warm gray-beige (eye-friendly) */
-    --background: 30 20% 92%;      /* Warmer beige #e8e4dd */
-    --background-subtle: 30 15% 88%;
-    --foreground: 25 15% 10%;      /* Softer dark text */
-    --foreground-muted: 25 10% 35%;
-
-    /* Card & Surface - Slightly darker than background */
-    --card: 0 0% 100%;             /* White cards */
-    --card-foreground: 25 15% 12%;
-    --card-subtle: 30 20% 95%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 25 15% 12%;
-
-    /* Primary - Teal Dark (Koyu Teal - WCAG AAA Uyumlu) */
-    --primary: 175 70% 22%;
-    --primary-hover: 175 70% 18%;
-    --primary-active: 175 70% 15%;
-    --primary-foreground: 0 0% 100%;
-
-    /* Secondary - Warm Gray */
-    --secondary: 40 20% 90%;
-    --secondary-hover: 40 20% 85%;
-    --secondary-foreground: 174 73% 32%;
-
-    /* Accent - Forest Green */
-    --accent: 158 64% 52%;
-    --accent-hover: 158 64% 48%;
-    --accent-foreground: 0 0% 100%;
-
-    /* Muted - Softer, warmer */
-    --muted: 40 15% 92%;
-    --muted-hover: 40 15% 88%;
-    --muted-foreground: 20 10% 40%;
-
-    /* Destructive */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-hover: 0 84% 55%;
-    --destructive-foreground: 0 0% 98%;
-
-    /* Danger Alias */
-    --danger: 0 84% 60%;
-    --danger-hover: 0 84% 55%;
-    --danger-foreground: 0 0% 98%;
-
-    /* Border & Input - More visible borders */
-    --border: 20 10% 88%;
-    --border-subtle: 20 10% 92%;
-    --input: 0 0% 100%;
-    --ring: 174 73% 42%;
-
-    /* ========================================
-       SEMANTIC COLORS
-       ======================================== */
-    --success: 142 76% 36%;
-    --success-hover: 142 76% 32%;
-    --success-foreground: 0 0% 100%;
-
-    --warning: 38 92% 50%;
-    --warning-hover: 38 92% 45%;
-    --warning-foreground: 0 0% 100%;
-
-    --info: 199 89% 48%;
-    --info-hover: 199 89% 44%;
-    --info-foreground: 0 0% 100%;
-
-    /* ========================================
-       CHART COLORS - Nature Palette
-       ======================================== */
-    --chart-1: 174 73% 42%;
-    --chart-2: 158 64% 52%;
-    --chart-3: 142 76% 36%;
-    --chart-4: 199 89% 48%;
-    --chart-5: 173 58% 39%;
-    --chart-6: 160 60% 45%;
-    --chart-7: 38 92% 50%;
-    --chart-8: 26 83% 56%;
-
-    /* ========================================
-       SPACING TOKENS
-       ======================================== */
-    --spacing-xs: 0.25rem;    /* 4px */
-    --spacing-sm: 0.5rem;     /* 8px */
-    --spacing-md: 1rem;       /* 16px */
-    --spacing-lg: 1.5rem;     /* 24px */
-    --spacing-xl: 2rem;       /* 32px */
-    --spacing-2xl: 3rem;      /* 48px */
-
-    /* ========================================
-       RADIUS TOKENS
-       ======================================== */
-    --radius-sm: 0.375rem;    /* 6px */
-    --radius: 0.5rem;         /* 8px */
-    --radius-md: 0.625rem;    /* 10px */
-    --radius-lg: 0.75rem;     /* 12px */
-    --radius-xl: 1rem;        /* 16px */
-    --radius-full: 9999px;
-
-    /* ========================================
-       SHADOW TOKENS
-       ======================================== */
-    --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.04), 0 4px 12px rgb(0 0 0 / 0.03);
-    --shadow: 0 2px 8px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.04);
-    --shadow-md: 0 4px 12px rgb(0 0 0 / 0.05), 0 16px 40px rgb(0 0 0 / 0.06);
-    --shadow-lg: 0 8px 24px rgb(0 0 0 / 0.06), 0 32px 64px rgb(0 0 0 / 0.08);
-  }
-
-  /* ========================================
-     BASE STYLES
-     ======================================== */
   * {
     @apply border-border;
   }
@@ -610,76 +190,48 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Fira Sans', system-ui, -apple-system, sans-serif;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
   }
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
-  }
 
-  /* Focus visible styles */
   :focus-visible {
     outline: 2px solid hsl(var(--ring));
     outline-offset: 2px;
+    border-radius: 4px;
   }
 
-  /* Selection */
+  /* Enhanced focus for interactive elements */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px hsl(var(--primary) / 0.15);
+  }
+
   ::selection {
-    background-color: hsl(174 73% 42% / 0.2);
-    color: inherit;
+    background-color: hsl(var(--primary) / 0.2);
   }
 
-  /* Heading styles */
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight;
   }
-
-  h1 {
-    @apply text-2xl md:text-3xl;
-  }
-  h2 {
-    @apply text-xl md:text-2xl;
-  }
-  h3 {
-    @apply text-lg md:text-xl;
-  }
 }
 
-/* ============================================
-   COMPONENT BASE STYLES
-   ============================================ */
 @layer components {
-  /* Button Base Enhancements */
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200;
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
-    @apply disabled:pointer-events-none disabled:opacity-50;
-  }
-
-  /* Input Base Enhancements */
-  .input-base {
-    @apply w-full rounded-md border border-input bg-background px-3 py-2;
-    @apply text-sm placeholder:text-muted-foreground;
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
-    @apply disabled:cursor-not-allowed disabled:opacity-50;
-    @apply transition-all duration-200;
-  }
-
-  /* Card Base */
   .card-base {
     @apply rounded-xl border bg-card text-card-foreground shadow-soft;
   }
 
-  /* Separator */
-  .separator {
-    @apply border-t border-border;
+  .sidebar-bg {
+    background-color: hsl(var(--sidebar)) !important;
+    border-color: hsl(var(--sidebar-border)) !important;
   }
 }

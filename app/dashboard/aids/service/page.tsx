@@ -73,9 +73,9 @@ const SERVICE_TYPE_CONFIG: Record<string, { label: string; icon: typeof Stethosc
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-    pending: { label: 'Beklemede', color: 'bg-yellow-100 text-yellow-700' },
-    in_progress: { label: 'Devam Ediyor', color: 'bg-blue-100 text-blue-700' },
-    completed: { label: 'Tamamlandı', color: 'bg-green-100 text-green-700' },
+    pending: { label: 'Beklemede', color: 'bg-warning/10 text-warning' },
+    in_progress: { label: 'Devam Ediyor', color: 'bg-info/10 text-info' },
+    completed: { label: 'Tamamlandı', color: 'bg-success/10 text-success' },
 }
 
 export default function ServicePage() {
@@ -95,7 +95,7 @@ export default function ServicePage() {
                 description="Sağlık, eğitim ve diğer hizmet sevkleri"
                 icon={Stethoscope}
                 actions={
-                    <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500">
+                    <Button className="bg-gradient-to-r from-primary to-primary/80">
                         <Plus className="mr-2 h-4 w-4" />
                         Yeni Sevk
                     </Button>
@@ -106,7 +106,7 @@ export default function ServicePage() {
             <div className="grid gap-4 md:grid-cols-3">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Toplam Sevk</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Toplam Sevk</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold">{mockServices.length}</p>
@@ -114,20 +114,20 @@ export default function ServicePage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Devam Eden</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Devam Eden</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold text-blue-600">
+                        <p className="text-2xl font-bold text-info">
                             {mockServices.filter((s) => s.status === 'in_progress').length}
                         </p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Tamamlanan</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Tamamlanan</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold text-green-600">
+                        <p className="text-2xl font-bold text-success">
                             {mockServices.filter((s) => s.status === 'completed').length}
                         </p>
                     </CardContent>
@@ -137,7 +137,7 @@ export default function ServicePage() {
             {/* Filters */}
             <div className="flex gap-4">
                 <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         placeholder="Kişi adı ile ara..."
                         value={search}
@@ -177,7 +177,7 @@ export default function ServicePage() {
                         <TableBody>
                             {filteredServices.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={8} className="text-center py-8 text-slate-500">
+                                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                                         Kayıt bulunamadı
                                     </TableCell>
                                 </TableRow>
@@ -196,18 +196,18 @@ export default function ServicePage() {
                                             <TableCell>
                                                 <div>
                                                     <p className="font-medium">{service.needy_person.name}</p>
-                                                    <p className="text-xs text-slate-500">{service.needy_person.phone}</p>
+                                                    <p className="text-xs text-muted-foreground">{service.needy_person.phone}</p>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant="outline">{serviceConfig?.label}</Badge>
                                             </TableCell>
                                             <TableCell className="text-sm">{service.institution}</TableCell>
-                                            <TableCell className="text-sm text-slate-500">{service.description}</TableCell>
+                                            <TableCell className="text-sm text-muted-foreground">{service.description}</TableCell>
                                             <TableCell>
                                                 <Badge className={statusConfig.color}>{statusConfig.label}</Badge>
                                             </TableCell>
-                                            <TableCell className="text-sm text-slate-500">
+                                            <TableCell className="text-sm text-muted-foreground">
                                                 {service.appointment_date
                                                     ? format(new Date(service.appointment_date), 'dd.MM.yyyy HH:mm', { locale: tr })
                                                     : '-'}

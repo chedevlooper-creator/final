@@ -21,13 +21,10 @@ import {
 } from '@/components/ui/select'
 import { toast } from 'sonner'
 import {
-    Calendar,
     ArrowLeft,
     Save,
     MapPin,
-    Clock,
     Users,
-    Image,
 } from 'lucide-react'
 import Link from 'next/link'
 import { format } from 'date-fns'
@@ -58,21 +55,21 @@ const EVENT_TYPES = [
 ]
 
 const STATUS_OPTIONS = [
-    { value: 'draft', label: 'Taslak', color: 'bg-slate-100 text-slate-700' },
-    { value: 'upcoming', label: 'Yaklaşan', color: 'bg-blue-100 text-blue-700' },
-    { value: 'ongoing', label: 'Devam Ediyor', color: 'bg-green-100 text-green-700' },
-    { value: 'completed', label: 'Tamamlandı', color: 'bg-slate-100 text-slate-700' },
-    { value: 'cancelled', label: 'İptal', color: 'bg-red-100 text-red-700' },
+    { value: 'draft', label: 'Taslak', color: 'bg-muted text-muted-foreground' },
+    { value: 'upcoming', label: 'Yaklaşan', color: 'bg-info/10 text-info' },
+    { value: 'ongoing', label: 'Devam Ediyor', color: 'bg-success/10 text-success' },
+    { value: 'completed', label: 'Tamamlandı', color: 'bg-muted text-muted-foreground' },
+    { value: 'cancelled', label: 'İptal', color: 'bg-destructive/10 text-destructive' },
 ]
 
 export default function EventDetailPage() {
     const params = useParams()
-    const router = useRouter()
+    const _router = useRouter()
     const id = params['id'] as string
 
     const [isLoading, setIsLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)
-    const [event, setEvent] = useState(mockEvent)
+    const [event, _setEvent] = useState(mockEvent)
 
     useEffect(() => {
         setTimeout(() => setIsLoading(false), 500)
@@ -111,12 +108,12 @@ export default function EventDetailPage() {
                             <h1 className="text-2xl font-bold">{event.title}</h1>
                             <Badge className={statusConfig?.color}>{statusConfig?.label}</Badge>
                         </div>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-muted-foreground">
                             {format(new Date(event.start_date), 'dd MMMM yyyy', { locale: tr })}
                         </p>
                     </div>
                 </div>
-                <Button onClick={handleSave} disabled={isSaving} className="bg-gradient-to-r from-emerald-500 to-cyan-500">
+                <Button onClick={handleSave} disabled={isSaving} className="bg-gradient-to-r from-primary to-primary/80">
                     <Save className="mr-2 h-4 w-4" />
                     {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
                 </Button>
@@ -208,7 +205,7 @@ export default function EventDetailPage() {
                             <div className="space-y-4">
                                 <div>
                                     <div className="flex justify-between mb-1">
-                                        <span className="text-sm text-slate-500">Kayıtlı</span>
+                                        <span className="text-sm text-muted-foreground">Kayıtlı</span>
                                         <span className="font-medium">{event.registered} / {event.capacity}</span>
                                     </div>
                                     <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -232,7 +229,7 @@ export default function EventDetailPage() {
                         </CardHeader>
                         <CardContent>
                             <p className="font-medium">{event.organizer}</p>
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-muted-foreground">
                                 Oluşturulma: {format(new Date(event.created_at), 'dd.MM.yyyy', { locale: tr })}
                             </p>
                         </CardContent>

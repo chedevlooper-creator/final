@@ -46,12 +46,12 @@ export default function CalendarPage() {
 
   const getEventTypeColor = (type: string) => {
     const colors: Record<string, string> = {
-      meeting: 'bg-blue-100 text-blue-700',
-      task: 'bg-green-100 text-green-700',
+      meeting: 'bg-info/10 text-info',
+      task: 'bg-success/10 text-success',
       event: 'bg-purple-100 text-purple-700',
       reminder: 'bg-orange-100 text-orange-700',
     }
-    return colors[type] || 'bg-slate-100 text-slate-700'
+    return colors[type] || 'bg-muted text-muted-foreground'
   }
 
   const weekDays = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
@@ -63,7 +63,7 @@ export default function CalendarPage() {
         description="Etkinlikleri ve görevleri takvim üzerinde görüntüleyin"
         icon={CalendarIcon}
         actions={
-          <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600">
+          <Button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
             <Plus className="mr-2 h-4 w-4" />
             Yeni Etkinlik
           </Button>
@@ -107,7 +107,7 @@ export default function CalendarPage() {
             {/* Hafta günleri */}
             <div className="grid grid-cols-7 gap-1 mb-2">
               {weekDays.map((day) => (
-                <div key={day} className="text-center text-sm font-medium text-slate-500 p-2">
+                <div key={day} className="text-center text-sm font-medium text-muted-foreground p-2">
                   {day}
                 </div>
               ))}
@@ -129,7 +129,7 @@ export default function CalendarPage() {
                   >
                     <div
                       className={`text-sm font-medium mb-1 ${
-                        isToday ? 'text-emerald-600' : isCurrentMonth ? 'text-slate-900' : 'text-slate-400'
+                        isToday ? 'text-success' : isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'
                       }`}
                     >
                       {format(day, 'd')}
@@ -145,7 +145,7 @@ export default function CalendarPage() {
                         </Badge>
                       ))}
                       {dayEvents.length > 2 && (
-                        <div className="text-xs text-slate-500">
+                        <div className="text-xs text-muted-foreground">
                           +{dayEvents.length - 2} daha
                         </div>
                       )}
@@ -175,7 +175,7 @@ export default function CalendarPage() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <p className="font-medium text-sm">{event.title}</p>
-                          <p className="text-xs text-slate-500 mt-1">
+                          <p className="text-xs text-muted-foreground mt-1">
                             {format(new Date(event.date), 'dd MMM yyyy', { locale: tr })}
                             {event.time && ` • ${event.time}`}
                           </p>
@@ -187,7 +187,7 @@ export default function CalendarPage() {
                     </div>
                   ))
               ) : (
-                <p className="text-center text-slate-500 text-sm py-8">
+                <p className="text-center text-muted-foreground text-sm py-8">
                   Yaklaşan etkinlik bulunmuyor
                 </p>
               )}

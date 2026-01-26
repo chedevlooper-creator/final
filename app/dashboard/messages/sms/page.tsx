@@ -49,22 +49,22 @@ export default function SMSPage() {
     const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
       pending: {
         label: 'Bekliyor',
-        color: 'bg-yellow-100 text-yellow-700',
+        color: 'bg-warning/10 text-warning',
         icon: null,
       },
       sent: {
         label: 'Gönderildi',
-        color: 'bg-blue-100 text-blue-700',
+        color: 'bg-info/10 text-info',
         icon: CheckCircle,
       },
       delivered: {
         label: 'Teslim Edildi',
-        color: 'bg-green-100 text-green-700',
+        color: 'bg-success/10 text-success',
         icon: CheckCircle,
       },
       failed: {
         label: 'Başarısız',
-        color: 'bg-red-100 text-red-700',
+        color: 'bg-destructive/10 text-destructive',
         icon: XCircle,
       },
     }
@@ -88,7 +88,7 @@ export default function SMSPage() {
         <div>
           <p className="font-medium">{row.original.phone}</p>
           {row.original.recipient_name && (
-            <p className="text-xs text-slate-500">{row.original.recipient_name}</p>
+            <p className="text-xs text-muted-foreground">{row.original.recipient_name}</p>
           )}
         </div>
       ),
@@ -109,7 +109,7 @@ export default function SMSPage() {
       accessorKey: 'sent_at',
       header: 'Gönderim Tarihi',
       cell: ({ row }) => (
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-muted-foreground">
           {row.original.sent_at
             ? format(new Date(row.original.sent_at), 'dd MMM yyyy HH:mm', { locale: tr })
             : '-'}
@@ -120,7 +120,7 @@ export default function SMSPage() {
       accessorKey: 'delivered_at',
       header: 'Teslim Tarihi',
       cell: ({ row }) => (
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-muted-foreground">
           {row.original.delivered_at
             ? format(new Date(row.original.delivered_at), 'dd MMM yyyy HH:mm', { locale: tr })
             : '-'}

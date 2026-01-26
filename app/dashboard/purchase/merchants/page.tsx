@@ -40,8 +40,8 @@ export default function MerchantsPage() {
 
   const getStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
-      active: 'bg-green-100 text-green-700',
-      inactive: 'bg-slate-100 text-slate-700',
+      active: 'bg-success/10 text-success',
+      inactive: 'bg-muted text-muted-foreground',
     }
     const statusLabels: Record<string, string> = {
       active: 'Aktif',
@@ -62,7 +62,7 @@ export default function MerchantsPage() {
         <div>
           <p className="font-medium">{row.original.name}</p>
           {row.original.tax_number && (
-            <p className="text-xs text-slate-500">Vergi No: {row.original.tax_number}</p>
+            <p className="text-xs text-muted-foreground">Vergi No: {row.original.tax_number}</p>
           )}
         </div>
       ),
@@ -77,13 +77,13 @@ export default function MerchantsPage() {
           )}
           <div className="flex flex-col gap-1">
             {row.original.phone && (
-              <span className="text-xs text-slate-500 flex items-center gap-1">
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
                 <Phone className="h-3 w-3" />
                 {row.original.phone}
               </span>
             )}
             {row.original.email && (
-              <span className="text-xs text-slate-500 flex items-center gap-1">
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
                 <Mail className="h-3 w-3" />
                 {row.original.email}
               </span>
@@ -99,8 +99,8 @@ export default function MerchantsPage() {
         <div className="flex items-start gap-1 max-w-xs">
           {row.original.address && (
             <>
-              <MapPin className="h-3 w-3 text-slate-400 mt-0.5 shrink-0" />
-              <p className="text-xs text-slate-500 truncate">{row.original.address}</p>
+              <MapPin className="h-3 w-3 text-muted-foreground mt-0.5 shrink-0" />
+              <p className="text-xs text-muted-foreground truncate">{row.original.address}</p>
             </>
           )}
         </div>
@@ -142,7 +142,7 @@ export default function MerchantsPage() {
         description="Tedarikçi ve cari hesapları görüntüleyin ve yönetin"
         icon={Users}
         actions={
-          <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600">
+          <Button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
             <Plus className="mr-2 h-4 w-4" />
             Yeni Cari Hesap
           </Button>
@@ -152,7 +152,7 @@ export default function MerchantsPage() {
       {/* Filtreler */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Cari hesap ara..."
             value={search}

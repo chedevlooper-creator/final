@@ -71,7 +71,7 @@ export function useDonationsList(filters?: DonationFilters) {
         .range(page * limit, (page + 1) * limit - 1)
 
       if (error) throw error
-      
+
       return {
         data: data || [],
         count: count || 0,
@@ -125,8 +125,8 @@ export function useCreateDonation() {
     mutationFn: async (values: DonationFormValues) => {
       const { data, error } = await supabase
         .from('donations')
-        .insert({ 
-          ...values, 
+        .insert({
+          ...values,
           payment_status: 'pending',
           created_at: new Date().toISOString()
         })
@@ -138,13 +138,13 @@ export function useCreateDonation() {
     },
     onSuccess: (newDonation) => {
       // Invalidate and refetch
-      queryClient.invalidateQueries({ 
-        queryKey: ['donations', 'list'] 
+      queryClient.invalidateQueries({
+        queryKey: ['donations', 'list']
       })
-      queryClient.invalidateQueries({ 
-        queryKey: ['donations', 'stats'] 
+      queryClient.invalidateQueries({
+        queryKey: ['donations', 'stats']
       })
-      
+
       // Add new item to cache immediately
       queryClient.setQueryData(
         ['donations', 'detail', newDonation.id],
@@ -162,9 +162,9 @@ export function useUpdateDonation() {
   const supabase = createClient()
 
   return useMutation({
-    mutationFn: async ({ id, values }: { 
+    mutationFn: async ({ id, values }: {
       id: string
-      values: Partial<DonationFormValues & { payment_status: string }> 
+      values: Partial<DonationFormValues & { payment_status: string }>
     }) => {
       const { data, error } = await supabase
         .from('donations')
@@ -200,13 +200,13 @@ export function useUpdateDonation() {
         )
       }
     },
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       // Invalidate list query
-      queryClient.invalidateQueries({ 
-        queryKey: ['donations', 'list'] 
+      queryClient.invalidateQueries({
+        queryKey: ['donations', 'list']
       })
-      queryClient.invalidateQueries({ 
-        queryKey: ['donations', 'stats'] 
+      queryClient.invalidateQueries({
+        queryKey: ['donations', 'stats']
       })
     },
   })
@@ -226,49 +226,34 @@ export function useDonationStats() {
       today.setHours(0, 0, 0, 0)
       const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1)
 
-      // Single query with aggregation - much faster!
-      const { data, error } = await supabase
-        .rpc('calculate_donation_stats', {
-          p_start_date: thisMonth.toISOString(),
-          p_end_date: today.toISOString()
-        })
+      // Use direct parallel queries for maximum availability and to avoid 404 console logs
+      // These are optimized by Supabase automatically
+      const [todayResult, monthResult, totalResult] = await Promise.all([
+        supabase
+          .from('donations')
+          .select('amount')
+          .gte('created_at', today.toISOString())
+          .eq('payment_status', 'completed'),
+        supabase
+          .from('donations')
+          .select('amount')
+          .gte('created_at', thisMonth.toISOString())
+          .eq('payment_status', 'completed'),
+        supabase
+          .from('donations')
+          .select('amount', { count: 'exact' })
+          .eq('payment_status', 'completed')
+      ])
 
-      if (error) {
-        // Fallback to manual calculation if RPC doesn't exist
-        const [todayResult, monthResult, totalResult] = await Promise.all([
-          supabase
-            .from('donations')
-            .select('amount')
-            .gte('created_at', today.toISOString())
-            .eq('payment_status', 'completed'),
-          supabase
-            .from('donations')
-            .select('amount')
-            .gte('created_at', thisMonth.toISOString())
-            .eq('payment_status', 'completed'),
-          supabase
-            .from('donations')
-            .select('amount')
-            .eq('payment_status', 'completed')
-        ])
+      const todayTotal = todayResult.data?.reduce((sum: number, d: { amount?: number | null }) => sum + (d.amount || 0), 0) || 0
+      const monthTotal = monthResult.data?.reduce((sum: number, d: { amount?: number | null }) => sum + (d.amount || 0), 0) || 0
+      const allTimeTotal = totalResult.data?.reduce((sum: number, d: { amount?: number | null }) => sum + (d.amount || 0), 0) || 0
 
-        const todayTotal = todayResult.data?.reduce((sum: number, d: { amount?: number | null }) => sum + (d.amount || 0), 0) || 0
-        const monthTotal = monthResult.data?.reduce((sum: number, d: { amount?: number | null }) => sum + (d.amount || 0), 0) || 0
-        const allTimeTotal = totalResult.data?.reduce((sum: number, d: { amount?: number | null }) => sum + (d.amount || 0), 0) || 0
-
-        return {
-          today: todayTotal,
-          thisMonth: monthTotal,
-          allTime: allTimeTotal,
-          count: totalResult.data?.length || 0,
-        }
-      }
-
-      return data || {
-        today: 0,
-        thisMonth: 0,
-        allTime: 0,
-        count: 0,
+      return {
+        today: todayTotal,
+        thisMonth: monthTotal,
+        allTime: allTimeTotal,
+        count: totalResult.count || 0,
       }
     },
     // Cache stats for 2 minutes
@@ -295,11 +280,11 @@ export function useBulkDeleteDonations() {
       return ids
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
-        queryKey: ['donations', 'list'] 
+      queryClient.invalidateQueries({
+        queryKey: ['donations', 'list']
       })
-      queryClient.invalidateQueries({ 
-        queryKey: ['donations', 'stats'] 
+      queryClient.invalidateQueries({
+        queryKey: ['donations', 'stats']
       })
     },
   })

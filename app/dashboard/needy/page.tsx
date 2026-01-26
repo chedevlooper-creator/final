@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Users, Plus, Search, MoreHorizontal, Eye, Pencil, Trash2, Filter, Download, X, AlertCircle } from 'lucide-react'
+import { Users, Plus, Search, MoreHorizontal, Eye, Pencil, Trash2, Filter, Download, X } from 'lucide-react'
 import { ColumnDef } from '@tanstack/react-table'
 import { Tables } from '@/types/database.types'
 import Link from 'next/link'
@@ -302,7 +302,7 @@ export default function NeedyListPage() {
 
   return (
     <PageTransition>
-      <div className="space-y-4">
+      <div className="space-y-6">
         <PageHeader
           title="İhtiyaç Sahipleri"
           description="Sistemdeki tüm ihtiyaç sahiplerini yönetin"

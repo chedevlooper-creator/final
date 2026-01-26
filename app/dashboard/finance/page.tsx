@@ -47,8 +47,8 @@ export default function FinancePage() {
   ]
 
   const quickActions = [
-    { title: 'Kasa İşlemleri', href: '/dashboard/finance/cash', icon: Wallet, color: 'bg-blue-500' },
-    { title: 'Banka İşlemleri', href: '/dashboard/finance/bank', icon: CreditCard, color: 'bg-green-500' },
+    { title: 'Kasa İşlemleri', href: '/dashboard/finance/cash', icon: Wallet, color: 'bg-info' },
+    { title: 'Banka İşlemleri', href: '/dashboard/finance/bank', icon: CreditCard, color: 'bg-success' },
     { title: 'Raporlar', href: '/dashboard/finance/reports', icon: TrendingUp, color: 'bg-purple-500' },
   ]
 
@@ -61,10 +61,10 @@ export default function FinancePage() {
         actions={
           <div className="flex gap-2">
             <Button variant="outline">
-              <ArrowDownLeft className="mr-2 h-4 w-4 text-green-600" />
+              <ArrowDownLeft className="mr-2 h-4 w-4 text-success" />
               Gelir Ekle
             </Button>
-            <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500">
+            <Button className="bg-gradient-to-r from-primary to-primary/80">
               <ArrowUpRight className="mr-2 h-4 w-4" />
               Gider Ekle
             </Button>
@@ -81,11 +81,11 @@ export default function FinancePage() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-slate-500">{stat.title}</p>
+                    <p className="text-sm text-muted-foreground">{stat.title}</p>
                     <div className="text-2xl font-bold">{stat.value}</div>
                   </div>
-                  <div className={`p-3 rounded-lg ${stat.trend === 'up' ? 'bg-green-100' : 'bg-red-100'}`}>
-                    <Icon className={`h-6 w-6 ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`} />
+                  <div className={`p-3 rounded-lg ${stat.trend === 'up' ? 'bg-success/10' : 'bg-destructive/10'}`}>
+                    <Icon className={`h-6 w-6 ${stat.trend === 'up' ? 'text-success' : 'text-destructive'}`} />
                   </div>
                 </div>
               </CardContent>
@@ -108,7 +108,7 @@ export default function FinancePage() {
                     </div>
                     <div>
                       <p className="font-medium">{action.title}</p>
-                      <p className="text-sm text-slate-500">Detayları görüntüle</p>
+                      <p className="text-sm text-muted-foreground">Detayları görüntüle</p>
                     </div>
                   </div>
                 </CardContent>
@@ -142,27 +142,27 @@ export default function FinancePage() {
               transactions.data.map((t) => (
                 <div key={t.id} className="flex items-center justify-between py-2 border-b last:border-0">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full ${t.type === 'income' ? 'bg-green-100' : 'bg-red-100'}`}>
+                    <div className={`p-2 rounded-full ${t.type === 'income' ? 'bg-success/10' : 'bg-destructive/10'}`}>
                       {t.type === 'income' ? (
-                        <ArrowDownLeft className="h-4 w-4 text-green-600" />
+                        <ArrowDownLeft className="h-4 w-4 text-success" />
                       ) : (
-                        <ArrowUpRight className="h-4 w-4 text-red-600" />
+                        <ArrowUpRight className="h-4 w-4 text-destructive" />
                       )}
                     </div>
                     <div>
                       <p className="font-medium">{t.description || t.category}</p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-muted-foreground">
                         {new Date(t.created_at).toLocaleDateString('tr-TR')}
                       </p>
                     </div>
                   </div>
-                  <p className={`font-medium ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                  <p className={`font-medium ${t.type === 'income' ? 'text-success' : 'text-destructive'}`}>
                     {t.type === 'income' ? '+' : '-'}₺{t.amount.toLocaleString('tr-TR')}
                   </p>
                 </div>
               ))
             ) : (
-              <p className="text-center text-slate-500 py-4">İşlem bulunamadı</p>
+              <p className="text-center text-muted-foreground py-4">İşlem bulunamadı</p>
             )}
           </div>
         </CardContent>

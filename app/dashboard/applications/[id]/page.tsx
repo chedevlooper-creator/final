@@ -103,12 +103,12 @@ function ApplicationForm({
   const getStatusBadge = (statusValue: string) => {
     const statusConfig = APPLICATION_STATUSES.find((s) => s.value === statusValue)
     const colorClasses: Record<string, string> = {
-      blue: 'bg-blue-100 text-blue-700',
-      yellow: 'bg-yellow-100 text-yellow-700',
-      green: 'bg-green-100 text-green-700',
-      red: 'bg-red-100 text-red-700',
+      blue: 'bg-info/10 text-info',
+      yellow: 'bg-warning/10 text-warning',
+      green: 'bg-success/10 text-success',
+      red: 'bg-destructive/10 text-destructive',
       orange: 'bg-orange-100 text-orange-700',
-      gray: 'bg-slate-100 text-slate-700',
+      gray: 'bg-muted text-muted-foreground',
     }
     return (
       <Badge className={colorClasses[statusConfig?.color || 'gray']}>
@@ -121,10 +121,10 @@ function ApplicationForm({
     if (!priorityValue) return null
     const priorityConfig = PRIORITY_LEVELS.find((p) => p.value === priorityValue)
     const colorClasses: Record<string, string> = {
-      gray: 'bg-slate-100 text-slate-600',
-      blue: 'bg-blue-100 text-blue-600',
+      gray: 'bg-slate-100 text-muted-foreground',
+      blue: 'bg-info/10 text-info',
       orange: 'bg-orange-100 text-orange-600',
-      red: 'bg-red-100 text-red-600',
+      red: 'bg-destructive/10 text-destructive',
     }
     return (
       <Badge variant="outline" className={colorClasses[priorityConfig?.color || 'gray']}>
@@ -151,7 +151,7 @@ function ApplicationForm({
               {getStatusBadge(status)}
               {getPriorityBadge(priority)}
             </div>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground">
               {format(new Date(application.created_at), 'dd MMMM yyyy HH:mm', { locale: tr })}
             </p>
           </div>
@@ -159,7 +159,7 @@ function ApplicationForm({
         <Button
           onClick={handleSave}
           disabled={updateMutation.isPending}
-          className="bg-gradient-to-r from-emerald-500 to-cyan-500"
+          className="bg-gradient-to-r from-primary to-primary/80"
         >
           {updateMutation.isPending ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -185,13 +185,13 @@ function ApplicationForm({
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <Label className="text-sm text-slate-500">Başvuru Türü</Label>
+                  <Label className="text-sm text-muted-foreground">Başvuru Türü</Label>
                   <p className="font-medium">
                     {APPLICATION_TYPES.find((t) => t.value === application.application_type)?.label || application.application_type}
                   </p>
                 </div>
                 <div>
-                  <Label className="text-sm text-slate-500">Talep Edilen Tutar</Label>
+                  <Label className="text-sm text-muted-foreground">Talep Edilen Tutar</Label>
                   <p className="font-medium text-lg">
                     {application.requested_amount
                       ? `₺${application.requested_amount.toLocaleString('tr-TR')}`
@@ -201,7 +201,7 @@ function ApplicationForm({
               </div>
 
               <div>
-                <Label className="text-sm text-slate-500">Açıklama</Label>
+                <Label className="text-sm text-muted-foreground">Açıklama</Label>
                 <p className="mt-1">{application.description || 'Açıklama girilmemiş'}</p>
               </div>
 
@@ -241,7 +241,7 @@ function ApplicationForm({
               <div>
                 <Label htmlFor="approvedAmount">Onaylanan Tutar</Label>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-slate-500">₺</span>
+                  <span className="text-muted-foreground">₺</span>
                   <input
                     type="number"
                     id="approvedAmount"
@@ -294,7 +294,7 @@ function ApplicationForm({
                 </TabsList>
 
                 <TabsContent value="products" className="mt-4">
-                  <div className="text-center py-8 text-slate-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     <Package className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p>Henüz ürün/hizmet eklenmemiş</p>
                     <Button variant="outline" size="sm" className="mt-2">
@@ -304,7 +304,7 @@ function ApplicationForm({
                 </TabsContent>
 
                 <TabsContent value="documents" className="mt-4">
-                  <div className="text-center py-8 text-slate-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     <FileCheck className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p>Henüz doküman yüklenmemiş</p>
                     <Button variant="outline" size="sm" className="mt-2">
@@ -314,7 +314,7 @@ function ApplicationForm({
                 </TabsContent>
 
                 <TabsContent value="purchases" className="mt-4">
-                  <div className="text-center py-8 text-slate-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     <ShoppingCart className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p>Satın alma talebi bulunmuyor</p>
                     <Button variant="outline" size="sm" className="mt-2">
@@ -324,7 +324,7 @@ function ApplicationForm({
                 </TabsContent>
 
                 <TabsContent value="aids" className="mt-4">
-                  <div className="text-center py-8 text-slate-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     <Gift className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p>Yardım kaydı bulunmuyor</p>
                     <Button variant="outline" size="sm" className="mt-2">
@@ -335,26 +335,26 @@ function ApplicationForm({
 
                 <TabsContent value="stages" className="mt-4">
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    <div className="flex items-center gap-3 p-3 bg-success/5 rounded-lg">
+                      <CheckCircle className="h-5 w-5 text-success" />
                       <div className="flex-1">
-                        <p className="font-medium text-green-800">Başvuru Alındı</p>
-                        <p className="text-xs text-green-600">
+                        <p className="font-medium text-success">Başvuru Alındı</p>
+                        <p className="text-xs text-success">
                           {format(new Date(application.created_at), 'dd.MM.yyyy HH:mm', { locale: tr })}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
-                      <Clock className="h-5 w-5 text-yellow-600" />
+                    <div className="flex items-center gap-3 p-3 bg-warning/5 rounded-lg">
+                      <Clock className="h-5 w-5 text-warning" />
                       <div className="flex-1">
-                        <p className="font-medium text-yellow-800">İnceleniyor</p>
-                        <p className="text-xs text-yellow-600">Devam ediyor</p>
+                        <p className="font-medium text-warning">İnceleniyor</p>
+                        <p className="text-xs text-warning">Devam ediyor</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg opacity-50">
-                      <AlertCircle className="h-5 w-5 text-slate-400" />
+                      <AlertCircle className="h-5 w-5 text-muted-foreground" />
                       <div className="flex-1">
-                        <p className="font-medium text-slate-500">Onay Bekliyor</p>
+                        <p className="font-medium text-muted-foreground">Onay Bekliyor</p>
                       </div>
                     </div>
                   </div>
@@ -370,7 +370,7 @@ function ApplicationForm({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5 text-blue-500" />
+                <User className="h-5 w-5 text-info" />
                 İhtiyaç Sahibi
               </CardTitle>
             </CardHeader>
@@ -378,26 +378,26 @@ function ApplicationForm({
               <div>
                 <Link
                   href={`/needy/${application.needy_person?.id}`}
-                  className="text-lg font-semibold text-blue-600 hover:underline"
+                  className="text-lg font-semibold text-info hover:underline"
                 >
                   {application.needy_person?.first_name} {application.needy_person?.last_name}
                 </Link>
               </div>
               {application.needy_person?.identity_number && (
                 <div>
-                  <Label className="text-xs text-slate-500">Kimlik No</Label>
+                  <Label className="text-xs text-muted-foreground">Kimlik No</Label>
                   <p className="font-mono">{application.needy_person.identity_number}</p>
                 </div>
               )}
               {application.needy_person?.phone && (
                 <div>
-                  <Label className="text-xs text-slate-500">Telefon</Label>
+                  <Label className="text-xs text-muted-foreground">Telefon</Label>
                   <p>{application.needy_person.phone}</p>
                 </div>
               )}
               {application.needy_person?.address && (
                 <div>
-                  <Label className="text-xs text-slate-500">Adres</Label>
+                  <Label className="text-xs text-muted-foreground">Adres</Label>
                   <p className="text-sm">{application.needy_person.address}</p>
                 </div>
               )}
@@ -418,7 +418,7 @@ function ApplicationForm({
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full justify-start text-green-600 hover:text-green-700 hover:bg-green-50"
+                className="w-full justify-start text-success hover:text-success/80 hover:bg-success/5"
                 onClick={() => handleStatusChange('approved')}
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
@@ -427,7 +427,7 @@ function ApplicationForm({
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="w-full justify-start text-destructive hover:text-destructive/80 hover:bg-destructive/5"
                 onClick={() => handleStatusChange('rejected')}
               >
                 <XCircle className="mr-2 h-4 w-4" />
@@ -454,11 +454,11 @@ function ApplicationForm({
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-500">Oluşturulma:</span>
+                <span className="text-muted-foreground">Oluşturulma:</span>
                 <span>{format(new Date(application.created_at), 'dd.MM.yyyy HH:mm', { locale: tr })}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Güncelleme:</span>
+                <span className="text-muted-foreground">Güncelleme:</span>
                 <span>{format(new Date(application.updated_at), 'dd.MM.yyyy HH:mm', { locale: tr })}</span>
               </div>
             </CardContent>
@@ -502,7 +502,7 @@ export default function ApplicationDetailPage() {
   if (!application) {
     return (
       <div className="text-center py-12">
-        <p className="text-slate-500">Başvuru bulunamadı</p>
+        <p className="text-muted-foreground">Başvuru bulunamadı</p>
         <Link href="/applications">
           <Button variant="link">Listeye Dön</Button>
         </Link>

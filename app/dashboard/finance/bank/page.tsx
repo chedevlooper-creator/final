@@ -25,7 +25,6 @@ import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { useBankTransactions, useDeleteFinanceTransaction, FinanceTransaction } from '@/hooks/queries/use-finance'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
 
 // Page transition wrapper
 function PageTransition({ children }: { children: React.ReactNode }) {

@@ -7,9 +7,7 @@ import { menuItems } from '@/lib/menu-config'
 import {
   ChevronLeft,
   ChevronRight,
-  ChevronDown,
   Heart,
-  Home,
   Settings,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -17,11 +15,7 @@ import { useUIStore } from '@/stores/ui-store'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useState, useEffect } from 'react'
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
+
 import {
   Tooltip,
   TooltipContent,
@@ -35,34 +29,22 @@ export function Sidebar() {
   const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed)
   const toggleSidebar = useUIStore((state) => state.toggleSidebar)
   const [mounted, setMounted] = useState(false)
-  const [openGroups, setOpenGroups] = useState<string[]>(['Başlangıç', 'Yardım Yönetimi'])
 
   // Client-side hydration
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setMounted(true)
-    }, 0)
-
-    return () => clearTimeout(timeout)
+    const timer = setTimeout(() => setMounted(true), 0)
+    return () => clearTimeout(timer)
   }, [])
 
-  const toggleGroup = (title: string) => {
-    setOpenGroups((prev) =>
-      prev.includes(title)
-        ? prev.filter((t) => t !== title)
-        : [...prev, title]
-    )
-  }
-
-  if (!mounted) {
+if (!mounted) {
     return (
-      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card shadow-soft" aria-label="Ana navigasyon">
-        <div className="flex h-16 items-center justify-between border-b border-border px-4">
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary text-white shadow-primary">
-              <Heart className="h-5 w-5" />
+      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r shadow-xl bg-sidebar border-sidebar-border" aria-label="Ana navigasyon">
+        <div className="flex h-16 items-center border-b px-6 border-sidebar-border">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20">
+              <Heart className="h-4 w-4 fill-current" />
             </div>
-            <h1 className="text-lg font-bold text-foreground">Yardım Paneli</h1>
+            <span className="text-sm font-bold tracking-tight text-white uppercase">YARDIM PANELİ</span>
           </div>
         </div>
       </aside>
@@ -71,211 +53,134 @@ export function Sidebar() {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <aside
+<aside
         className={cn(
-          'fixed left-0 top-0 z-40 h-screen border-r border-border bg-card transition-all duration-300 ease-out shadow-soft',
-          sidebarCollapsed ? 'w-16' : 'w-64'
+          'fixed left-0 top-0 z-40 h-screen border-r transition-all duration-300 ease-in-out shadow-xl flex flex-col bg-sidebar border-sidebar-border',
+          sidebarCollapsed ? 'w-20' : 'w-64'
         )}
         aria-label="Ana navigasyon"
       >
-        {/* Header */}
-        <div className="flex h-16 items-center justify-between border-b border-border bg-card px-3">
+        {/* Header Section */}
+        <div className="flex h-16 items-center justify-between border-b px-4 shrink-0 relative z-10 bg-sidebar border-sidebar-border">
           {!sidebarCollapsed ? (
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity animate-slide-in-right"
-            >
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary text-white shadow-primary hover:shadow-lg transition-all duration-200">
-                <Heart className="h-5 w-5" />
+            <Link href="/dashboard" className="flex items-center gap-3 px-2 group">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-200">
+                <Heart className="h-4 w-4 fill-current" />
               </div>
-              <h1 className="text-lg font-bold text-foreground">
-                Yardım Paneli
-              </h1>
+              <span className="text-xs font-bold tracking-widest text-white uppercase">
+                YARDIM PANELİ
+              </span>
             </Link>
           ) : (
-            <Tooltip>
-              <TooltipPrimitive.Trigger asChild>
-                <Link
-                  href="/dashboard"
-                  className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary text-white shadow-primary hover:shadow-lg transition-all duration-200"
-                  aria-label="Yardım Paneli - Ana sayfaya dön"
-                >
-                  <Home className="h-5 w-5" />
-                </Link>
-              </TooltipPrimitive.Trigger>
-              <TooltipContent side="right" align="center">
-                Yardım Paneli - Ana sayfa
-              </TooltipContent>
-            </Tooltip>
+            <Link href="/dashboard" className="mx-auto flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20 hover:scale-105 transition-transform duration-200">
+              <Heart className="h-5 w-5 fill-current" />
+            </Link>
           )}
-
-          {/* Toggle Button */}
-          <Tooltip>
-            <TooltipPrimitive.Trigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleSidebar}
-                className={cn(
-                  'text-muted-foreground hover:text-foreground hover:bg-muted transition-all duration-200',
-                  sidebarCollapsed && 'mx-auto'
-                )}
-                aria-label={sidebarCollapsed ? 'Sidebar\'ı genişlet' : 'Sidebar\'ı daralt'}
-              >
-                {sidebarCollapsed ? (
-                  <ChevronRight className="h-4 w-4 transition-transform duration-200" />
-                ) : (
-                  <ChevronLeft className="h-4 w-4 transition-transform duration-200" />
-                )}
-              </Button>
-            </TooltipPrimitive.Trigger>
-            <TooltipContent side="right" align="center">
-              {sidebarCollapsed ? 'Sidebar\'ı genişlet' : 'Sidebar\'ı daralt'}
-            </TooltipContent>
-          </Tooltip>
+          {!sidebarCollapsed && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSidebar}
+              className="h-8 w-8 text-sidebar-foreground/40 hover:text-white hover:bg-white/5 transition-colors"
+            >
+              <ChevronLeft size={16} />
+            </Button>
+          )}
         </div>
 
-        {/* Menu */}
-        <ScrollArea className="h-[calc(100vh-8rem)] scrollbar-thin">
-          <nav className="space-y-1 p-2" role="navigation" aria-label="Ana menü">
-            {sidebarCollapsed ? (
-              // Collapsed mode - flat list with tooltips
-              <div className="space-y-1">
-                {menuItems.flatMap((group) => group.items).map((item) => {
-                  const isActive = pathname === item.href
-                  return (
-                    <Tooltip key={item.href}>
-                      <TooltipPrimitive.Trigger asChild>
-                        <Link
-                          href={item.href}
-                          prefetch={true}
-                          className={cn(
-                            'group flex items-center justify-center rounded-xl p-2.5 transition-all duration-200 outline-none focus-visible focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 focus:ring-offset-card',
-                            'hover:bg-muted cursor-pointer mx-auto w-10 h-10',
-                            isActive
-                              ? 'bg-primary/10 text-primary'
-                              : 'text-muted-foreground hover:text-foreground',
-                          )}
-                          aria-current={isActive ? 'page' : undefined}
-                        >
-                          <item.icon className={cn(
-                            'shrink-0 transition-all duration-200',
-                            isActive ? 'h-5 w-5 text-primary' : 'h-5 w-5'
-                          )} />
-                          {isActive && (
-                            <div className="absolute right-2 top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-primary" />
-                          )}
-                        </Link>
-                      </TooltipPrimitive.Trigger>
-                      <TooltipContent side="right" align="center">
-                        <span>{item.title}</span>
-                      </TooltipContent>
-                    </Tooltip>
-                  )
-                })}
-              </div>
-            ) : (
-              // Expanded mode - grouped collapsible menu
-              menuItems.map((group, groupIndex) => (
-                <Collapsible
-                  key={group.title}
-                  open={openGroups.includes(group.title)}
-                  onOpenChange={() => toggleGroup(group.title)}
-                >
-                  <CollapsibleTrigger asChild>
-                    <button
-                      className={cn(
-                        'group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 outline-none focus-visible focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 focus:ring-offset-card',
-                        'text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer',
-                      )}
-                      style={{ animationDelay: `${groupIndex * 50}ms` }}
-                      aria-expanded={openGroups.includes(group.title)}
-                      aria-controls={`menu-${group.title.toLowerCase().replace(/\s+/g, '-')}`}
-                    >
-                      <div className="flex items-center justify-center rounded-lg bg-muted group-hover:bg-primary/10 p-2 transition-all duration-200 w-8 h-8">
-                        <group.icon className="shrink-0 h-4 w-4" />
-                      </div>
-                      <span className="flex-1 text-left">{group.title}</span>
-                      <ChevronDown
-                        className={cn(
-                          'h-4 w-4 shrink-0 transition-transform duration-200 text-muted-foreground',
-                          openGroups.includes(group.title) && 'rotate-180'
-                        )}
-                      />
-                    </button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="space-y-0.5 pl-2" id={`menu-${group.title.toLowerCase().replace(/\s+/g, '-')}`}>
-                    {group.items.map((item, itemIndex) => {
-                      const isActive = pathname === item.href
+        {sidebarCollapsed && (
+          <div className="p-4 flex justify-center shrink-0 border-b relative z-10 bg-sidebar border-sidebar-border">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSidebar}
+              className="h-8 w-8 text-sidebar-foreground/40 hover:text-white hover:bg-white/5 transition-colors"
+            >
+              <ChevronRight size={16} />
+            </Button>
+          </div>
+        )}
+
+{/* Navigation Area */}
+        <ScrollArea className="flex-1 px-3 py-4 overflow-hidden">
+          <nav className="space-y-6" role="navigation">
+            {menuItems.map((group) => (
+              <div key={group.title} className="space-y-1">
+                {!sidebarCollapsed && (
+                  <h3 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-sidebar-foreground/40 mb-3">
+                    {group.title}
+                  </h3>
+                )}
+                <div className="space-y-1">
+                  {group.items.map((item) => {
+                    const isActive = pathname === item.href
+                    if (sidebarCollapsed) {
                       return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          prefetch={true}
-                          className={cn(
-                            'group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all duration-200 outline-none focus-visible focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 focus:ring-offset-card',
-                            'hover:bg-muted cursor-pointer',
-                            isActive
-                              ? 'bg-primary/10 text-primary font-medium'
-                              : 'text-muted-foreground hover:text-foreground',
-                          )}
-                          style={{ animationDelay: `${(groupIndex * 50) + (itemIndex * 25)}ms` }}
-                          aria-current={isActive ? 'page' : undefined}
-                        >
-                          <item.icon className={cn(
-                            'shrink-0 transition-all duration-200',
-                            isActive ? 'h-4 w-4 text-primary' : 'h-4 w-4 text-muted-foreground group-hover:text-foreground'
-                          )} />
-                          <span>{item.title}</span>
-                          {isActive && (
-                            <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
-                          )}
-                        </Link>
+                        <Tooltip key={item.href}>
+                          <TooltipPrimitive.Trigger asChild>
+                            <Link
+                              href={item.href}
+                              aria-label={item.title}
+                              aria-current={isActive ? 'page' : undefined}
+                              className={cn(
+                                'group relative flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-200 outline-none mx-auto',
+                                isActive
+                                  ? 'bg-primary text-white shadow-lg shadow-primary/40'
+                                  : 'text-sidebar-foreground hover:text-white hover:bg-white/5',
+                              )}
+                            >
+                              <item.icon className={cn('h-5 w-5 shrink-0 transition-transform duration-200 group-hover:scale-110')} />
+                            </Link>
+                          </TooltipPrimitive.Trigger>
+                          <TooltipContent side="right" className="bg-sidebar text-white border-sidebar-border font-medium">
+                            {item.title}
+                          </TooltipContent>
+                        </Tooltip>
                       )
-                    })}
-                  </CollapsibleContent>
-                </Collapsible>
-              ))
-            )}
+                    }
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        aria-current={isActive ? 'page' : undefined}
+                        className={cn(
+                          'group flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition-all duration-200 outline-none',
+                          isActive
+                            ? 'bg-primary text-white shadow-lg shadow-primary/40 font-medium'
+                            : 'text-sidebar-foreground hover:text-white hover:bg-white/5',
+                        )}
+                      >
+                        <item.icon className={cn(
+                          'shrink-0 transition-all duration-200 h-4 w-4',
+                          isActive ? 'text-white' : 'group-hover:scale-110'
+                        )} />
+                        <span className="flex-1">{item.title}</span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
         </ScrollArea>
 
-        {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 border-t border-border bg-card p-2">
-          {sidebarCollapsed ? (
-            <Tooltip>
-              <TooltipPrimitive.Trigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="mx-auto h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl"
-                  aria-label="Ayarlar"
-                  asChild
-                >
-                  <Link href="/dashboard/settings/definitions">
-                    <Settings className="h-5 w-5" />
-                  </Link>
-                </Button>
-              </TooltipPrimitive.Trigger>
-              <TooltipContent side="right" align="center">
-                Ayarlar
-              </TooltipContent>
-            </Tooltip>
-          ) : (
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl px-3 py-2.5"
-              aria-label="Ayarlar"
-              asChild
-            >
-              <Link href="/dashboard/settings/definitions">
-                <div className="flex items-center justify-center rounded-lg bg-muted p-2 w-8 h-8">
-                  <Settings className="h-4 w-4" />
-                </div>
-                <span className="text-sm font-medium">Ayarlar</span>
-              </Link>
-            </Button>
-          )}
+{/* Footer Settings */}
+        <div className="p-3 border-t shrink-0 relative z-10 bg-sidebar border-sidebar-border">
+          <Link
+            href="/dashboard/settings/definitions"
+            aria-label="Ayarlar"
+            aria-current={pathname.includes('/settings') ? 'page' : undefined}
+            className={cn(
+              'group flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition-all duration-200 outline-none',
+              pathname.includes('/settings')
+                ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                : 'text-sidebar-foreground hover:text-white hover:bg-white/5',
+              sidebarCollapsed && 'justify-center px-0 h-11 w-11 mx-auto'
+            )}
+          >
+            <Settings className={cn('shrink-0 h-4 w-4 transition-transform duration-200 group-hover:rotate-45')} />
+            {!sidebarCollapsed && <span className="flex-1 font-medium text-sm">Ayarlar</span>}
+          </Link>
         </div>
       </aside>
     </TooltipProvider>

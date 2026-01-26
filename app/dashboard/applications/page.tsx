@@ -21,7 +21,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
-import { FileText, Plus, MoreHorizontal, Eye, Pencil, CheckCircle, X, Users, AlertCircle } from 'lucide-react'
+import { FileText, Plus, MoreHorizontal, Eye, Pencil, CheckCircle, X } from 'lucide-react'
 import { ColumnDef } from '@tanstack/react-table'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -35,7 +35,6 @@ import { APPLICATION_TYPES, APPLICATION_STATUSES, PRIORITY_LEVELS } from '@/lib/
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { ApplicationForm } from '@/components/forms/application-form'
-import { cn } from '@/lib/utils'
 
 // Page transition wrapper
 function PageTransition({ children }: { children: React.ReactNode }) {
@@ -63,7 +62,7 @@ type Application = {
 }
 
 export default function ApplicationsListPage() {
-  const router = useRouter()
+  const _router = useRouter()
   const [page, setPage] = useState(0)
   const [status, setStatus] = useState<string>('')
   const [applicationType, setApplicationType] = useState<string>('')

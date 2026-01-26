@@ -73,9 +73,9 @@ const mockTransfers = [
 ]
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Clock }> = {
-    pending: { label: 'Beklemede', color: 'bg-yellow-100 text-yellow-700', icon: Clock },
-    completed: { label: 'Tamamlandı', color: 'bg-green-100 text-green-700', icon: CheckCircle },
-    failed: { label: 'Başarısız', color: 'bg-red-100 text-red-700', icon: XCircle },
+    pending: { label: 'Beklemede', color: 'bg-warning/10 text-warning', icon: Clock },
+    completed: { label: 'Tamamlandı', color: 'bg-success/10 text-success', icon: CheckCircle },
+    failed: { label: 'Başarısız', color: 'bg-destructive/10 text-destructive', icon: XCircle },
 }
 
 export default function BankTransferPage() {
@@ -103,7 +103,7 @@ export default function BankTransferPage() {
                             <FileText className="mr-2 h-4 w-4" />
                             Toplu Liste
                         </Button>
-                        <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500">
+                        <Button className="bg-gradient-to-r from-primary to-primary/80">
                             <Plus className="mr-2 h-4 w-4" />
                             Yeni Ödeme Emri
                         </Button>
@@ -115,15 +115,15 @@ export default function BankTransferPage() {
             <div className="grid gap-4 md:grid-cols-3">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Bekleyen Emirler</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Bekleyen Emirler</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold text-yellow-600">{pendingCount}</p>
+                        <p className="text-2xl font-bold text-warning">{pendingCount}</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Bekleyen Tutar</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Bekleyen Tutar</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold">₺{pendingAmount.toLocaleString('tr-TR')}</p>
@@ -131,10 +131,10 @@ export default function BankTransferPage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Bugün Tamamlanan</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Bugün Tamamlanan</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold text-green-600">
+                        <p className="text-2xl font-bold text-success">
                             {mockTransfers.filter((t) => t.status === 'completed').length}
                         </p>
                     </CardContent>
@@ -144,7 +144,7 @@ export default function BankTransferPage() {
             {/* Filters */}
             <div className="flex gap-4">
                 <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         placeholder="Alıcı adı ile ara..."
                         value={search}
@@ -183,7 +183,7 @@ export default function BankTransferPage() {
                         <TableBody>
                             {filteredTransfers.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center py-8 text-slate-500">
+                                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                                         Ödeme emri bulunamadı
                                     </TableCell>
                                 </TableRow>
@@ -203,7 +203,7 @@ export default function BankTransferPage() {
                                             <TableCell>
                                                 <div>
                                                     <p className="font-medium">{transfer.recipient_name}</p>
-                                                    <p className="text-xs text-slate-500">{transfer.description}</p>
+                                                    <p className="text-xs text-muted-foreground">{transfer.description}</p>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="font-mono text-xs">{transfer.iban}</TableCell>
@@ -215,7 +215,7 @@ export default function BankTransferPage() {
                                                     {statusConfig.label}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="text-sm text-slate-500">
+                                            <TableCell className="text-sm text-muted-foreground">
                                                 {format(new Date(transfer.created_at), 'dd.MM.yyyy HH:mm', { locale: tr })}
                                             </TableCell>
                                         </TableRow>

@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation'
 import { Sidebar } from '@/components/layout/sidebar'
 import { Header } from '@/components/layout/header'
 import { SkipToContent } from '@/components/layout/skip-to-content'
+import { CommandPalette } from '@/components/common/command-palette'
 
 function DashboardLayoutClient({
   children,
@@ -23,10 +24,11 @@ function DashboardLayoutClient({
   const isDetailPage = pathname?.includes('/needy/') && pathname !== '/needy'
 
   return (
-    <div className="min-h-screen bg-gradient-surface" suppressHydrationWarning>
+    <div className="min-h-screen bg-background" suppressHydrationWarning>
       <SkipToContent />
       <Sidebar />
       {!isDetailPage && <Header />}
+      <CommandPalette />
       <main
         id="main-content"
         className={cn(

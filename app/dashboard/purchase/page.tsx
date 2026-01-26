@@ -52,11 +52,11 @@ export default function PurchasePage() {
 
   const getStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
-      draft: 'bg-slate-100 text-slate-700',
-      pending: 'bg-yellow-100 text-yellow-700',
-      approved: 'bg-green-100 text-green-700',
-      rejected: 'bg-red-100 text-red-700',
-      completed: 'bg-blue-100 text-blue-700',
+      draft: 'bg-muted text-muted-foreground',
+      pending: 'bg-warning/10 text-warning',
+      approved: 'bg-success/10 text-success',
+      rejected: 'bg-destructive/10 text-destructive',
+      completed: 'bg-info/10 text-info',
     }
     const statusLabels: Record<string, string> = {
       draft: 'Taslak',
@@ -82,7 +82,7 @@ export default function PurchasePage() {
       accessorKey: 'request_number',
       header: 'Talep No',
       cell: ({ row }) => (
-        <span className="font-mono text-sm text-slate-600">
+        <span className="font-mono text-sm text-muted-foreground">
           {row.original.request_number || '-'}
         </span>
       ),
@@ -105,7 +105,7 @@ export default function PurchasePage() {
       accessorKey: 'requested_amount',
       header: 'Talep Tutarı',
       cell: ({ row }) => (
-        <span className="font-bold text-emerald-600">
+        <span className="font-bold text-success">
           {formatAmount(row.original.requested_amount, row.original.currency)}
         </span>
       ),
@@ -117,12 +117,12 @@ export default function PurchasePage() {
         try {
           const date = row.original.requested_date ? new Date(row.original.requested_date) : null
           return (
-            <span className="text-sm text-slate-500">
+            <span className="text-sm text-muted-foreground">
               {date && !isNaN(date.getTime()) ? format(date, 'dd MMM yyyy', { locale: tr }) : '-'}
             </span>
           )
         } catch (e) {
-          return <span className="text-sm text-slate-500">-</span>
+          return <span className="text-sm text-muted-foreground">-</span>
         }
       },
     },
@@ -150,7 +150,7 @@ export default function PurchasePage() {
               Düzenle
             </DropdownMenuItem>
             {row.original.status === 'pending' && (
-              <DropdownMenuItem className="text-green-600">
+              <DropdownMenuItem className="text-success">
                 <CheckCircle className="mr-2 h-4 w-4" />
                 Onayla
               </DropdownMenuItem>
@@ -168,7 +168,7 @@ export default function PurchasePage() {
         description="Satın alma taleplerini görüntüleyin ve yönetin"
         icon={ShoppingCart}
         actions={
-          <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600">
+          <Button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
             <Plus className="mr-2 h-4 w-4" />
             Yeni Talep
           </Button>

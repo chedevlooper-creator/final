@@ -25,8 +25,8 @@ export default function AidsError({
       <div className="max-w-2xl mx-auto pt-20">
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-blue-200">
           <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
-              <svg className="w-12 h-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="w-20 h-20 bg-info/10 rounded-full flex items-center justify-center">
+              <svg className="w-12 h-12 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
             </div>
@@ -55,7 +55,7 @@ export default function AidsError({
           <div className="space-y-3">
             <button
               onClick={reset}
-              className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
+              className="w-full px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold transition-colors"
             >
               Tekrar Dene
             </button>

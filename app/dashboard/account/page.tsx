@@ -37,7 +37,7 @@ export default function AccountPage() {
               <Label htmlFor="phone">Telefon</Label>
               <Input id="phone" placeholder="0500 000 00 00" />
             </div>
-            <Button className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600">
+            <Button className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
               Bilgileri Güncelle
             </Button>
           </CardContent>
@@ -62,7 +62,7 @@ export default function AccountPage() {
               <Label htmlFor="confirm-password">Yeni Şifre (Tekrar)</Label>
               <Input id="confirm-password" type="password" placeholder="••••••••" />
             </div>
-            <Button className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600">
+            <Button className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
               Şifreyi Değiştir
             </Button>
           </CardContent>

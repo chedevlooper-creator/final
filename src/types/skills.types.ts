@@ -1,19 +1,33 @@
+// Skill Category Types
 export interface SkillCategory {
   id: string
   name: string
   description: string | null
-  color: string
-  icon: string | null
   sort_order: number
   status: 'active' | 'inactive'
   created_at: string
   updated_at: string
 }
 
+export interface CreateSkillCategoryInput {
+  name: string
+  description?: string | null
+  sort_order?: number
+  status?: 'active' | 'inactive'
+}
+
+export interface UpdateSkillCategoryInput {
+  name?: string
+  description?: string | null
+  sort_order?: number
+  status?: 'active' | 'inactive'
+}
+
+// Skill Types
 export interface Skill {
   id: string
+  category_id: string
   name: string
-  category_id: string | null
   description: string | null
   status: 'active' | 'inactive'
   created_at: string
@@ -21,84 +35,81 @@ export interface Skill {
 }
 
 export interface SkillWithCategory extends Skill {
-  category_id: string | null
-  category_name: string | null
-  category_description: string | null
-  category_color: string | null
-  category_icon: string | null
+  category_name: string
+  category_sort_order: number
 }
-
-export interface VolunteerSkill {
-  id: string
-  volunteer_id: string
-  skill_id: string
-  proficiency_level: 'beginner' | 'intermediate' | 'advanced' | 'expert' | null
-  verified: boolean
-  verified_at: string | null
-  notes: string | null
-  created_at: string
-  updated_at: string
-}
-
-export interface VolunteerSkillDetail extends VolunteerSkill {
-  first_name: string
-  last_name: string
-  email: string | null
-  skill_name: string
-  category_name: string | null
-  category_color: string | null
-}
-
-export interface CreateSkillCategoryInput {
-  name: string
-  description?: string
-  color?: string
-  icon?: string
-  sort_order?: number
-  status?: 'active' | 'inactive'
-}
-
-export type UpdateSkillCategoryInput = Partial<CreateSkillCategoryInput>
 
 export interface CreateSkillInput {
-  name: string
   category_id: string
-  description?: string
+  name: string
+  description?: string | null
   status?: 'active' | 'inactive'
 }
 
-export type UpdateSkillInput = Partial<CreateSkillInput>
-
-export interface CreateVolunteerSkillInput {
-  volunteer_id: string
-  skill_id: string
-  proficiency_level?: 'beginner' | 'intermediate' | 'advanced' | 'expert'
-  verified?: boolean
-  notes?: string
+export interface UpdateSkillInput {
+  category_id?: string
+  name?: string
+  description?: string | null
+  status?: 'active' | 'inactive'
 }
-
-export type UpdateVolunteerSkillInput = Partial<CreateVolunteerSkillInput>
 
 export interface SkillFilters {
   category_id?: string
-  status?: string
+  status?: 'active' | 'inactive'
   search?: string
   page?: number
   limit?: number
 }
 
+// Volunteer Skill Types
+export type ProficiencyLevel = 'beginner' | 'intermediate' | 'advanced' | 'expert'
+
+export interface VolunteerSkill {
+  id: string
+  volunteer_id: string
+  skill_id: string
+  proficiency_level: ProficiencyLevel
+  years_of_experience: number | null
+  notes: string | null
+  verified: boolean
+  verified_by: string | null
+  verified_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface VolunteerSkillDetail extends VolunteerSkill {
+  skill_name: string
+  skill_description: string | null
+  category_id: string
+  category_name: string
+  volunteer_first_name: string
+  volunteer_last_name: string
+}
+
+export interface CreateVolunteerSkillInput {
+  volunteer_id: string
+  skill_id: string
+  proficiency_level?: ProficiencyLevel
+  years_of_experience?: number | null
+  notes?: string | null
+  verified?: boolean
+}
+
+export interface UpdateVolunteerSkillInput {
+  proficiency_level?: ProficiencyLevel
+  years_of_experience?: number | null
+  notes?: string | null
+  verified?: boolean
+  verified_by?: string | null
+  verified_at?: string | null
+}
+
 export interface VolunteerSkillFilters {
   volunteer_id?: string
   skill_id?: string
-  proficiency_level?: string
+  proficiency_level?: ProficiencyLevel
   verified?: boolean
   page?: number
   limit?: number
 }
-
-export const PROFICIENCY_LEVELS = [
-  { value: 'beginner', label: 'Başlangıç', color: 'bg-slate-100 text-slate-700' },
-  { value: 'intermediate', label: 'Orta', color: 'bg-blue-100 text-blue-700' },
-  { value: 'advanced', label: 'İleri', color: 'bg-purple-100 text-purple-700' },
-  { value: 'expert', label: 'Uzman', color: 'bg-green-100 text-green-700' },
-] as const

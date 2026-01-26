@@ -29,9 +29,14 @@ export const StatCard = memo(function StatCard({
   return (
     <div
       className={cn(
-        'group rounded-xl border border-border bg-card p-5 shadow-soft hover:shadow-medium hover:border-primary/20 transition-all duration-200 cursor-default',
+        'group rounded-xl border border-border bg-card p-5 shadow-soft',
+        'hover:shadow-medium hover:border-primary/30 hover:-translate-y-0.5',
+        'transition-all duration-200 cursor-pointer',
+        'focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/30',
         className
       )}
+      role="article"
+      tabIndex={0}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 space-y-2">
