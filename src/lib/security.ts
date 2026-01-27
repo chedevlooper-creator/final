@@ -52,14 +52,14 @@ export function buildCSPHeader(
     // Scripts - prefer nonce-based, fallback to unsafe-inline
     `script-src 'self'${scriptSrc}`,
 
-    // Styles - need unsafe-inline for CSS-in-JS libraries
-    `style-src 'self'${styleSrc}`,
+    // Styles - need unsafe-inline for CSS-in-JS libraries and Google Fonts
+    `style-src 'self'${styleSrc} https://fonts.googleapis.com`,
 
     // Images - allow Supabase storage and data URIs
     "img-src 'self' data: blob: https://*.supabase.co https://*.githubusercontent.com",
 
-    // Fonts - allow self and data URIs
-    "font-src 'self' data:",
+    // Fonts - allow self, data URIs, and Google Fonts
+    "font-src 'self' data: https://fonts.gstatic.com",
 
     // API connections - allow Supabase, Vercel, and Sentry
     "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel-scripts.com https://*.sentry.io",

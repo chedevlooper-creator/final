@@ -42,6 +42,7 @@ const PUBLIC_PATHS = [
   '/_next',
   '/favicon.ico',
   '/public',
+  '/manifest.webmanifest',
 ]
 
 /**
