@@ -8,6 +8,14 @@ import { DataTable } from '@/components/common/data-table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { VolunteerForm } from '@/components/forms/volunteer-form'
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -41,6 +49,7 @@ export default function VolunteersPage() {
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<string>('')
+  const [isFormOpen, setIsFormOpen] = useState(false)
 
   const { data, isLoading } = useVolunteersList({
     page,
@@ -163,7 +172,7 @@ export default function VolunteersPage() {
         description="Gönüllüleri görüntüleyin ve yönetin"
         icon={UserCheck}
         actions={
-          <Button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
+          <Button onClick={() => setIsFormOpen(true)} className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
             <Plus className="mr-2 h-4 w-4" />
             Yeni Gönüllü
           </Button>
@@ -203,6 +212,19 @@ export default function VolunteersPage() {
         pageIndex={page}
         onPageChange={setPage}
       />
+
+      {/* Gönüllü Ekleme Modal */}
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Yeni Gönüllü Ekle</DialogTitle>
+            <DialogDescription>
+              Yeni gönüllü kaydı oluşturun
+            </DialogDescription>
+          </DialogHeader>
+          <VolunteerForm onSuccess={() => setIsFormOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

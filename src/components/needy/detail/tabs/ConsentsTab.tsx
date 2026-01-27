@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Plus, Eye, Upload, CheckCircle2, XCircle, FileCheck } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import { Consent, CONSENT_TYPE_OPTIONS, SIGNATURE_TYPE_OPTIONS, ConsentType, SignatureType } from '@/types/linked-records.types'
@@ -111,7 +111,12 @@ export function ConsentsTab({ needyPersonId, onClose }: ConsentsTabProps) {
 
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Rıza Beyanı Ekle</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Rıza Beyanı Ekle</DialogTitle>
+            <DialogDescription>
+              Kişinin rıza beyanı bilgilerini girin ve ilgili belgeleri yükleyin.
+            </DialogDescription>
+          </DialogHeader>
           <div className="space-y-4 py-4">
             <div><Label>Rıza Türü *</Label>
               <Select value={formData.consent_type} onValueChange={(v) => setFormData({ ...formData, consent_type: v as ConsentType })}>

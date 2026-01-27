@@ -8,9 +8,11 @@ import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { useCategories, usePartners, useCountries } from '@/hooks/queries/use-lookups'
 import {
   Form,
   FormControl,
@@ -32,6 +34,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Save, X, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import { formatDateForInput } from '@/lib/utils'
 
 // Basit kayıt için minimal schema
 const addNeedySchema = z.object({
@@ -40,7 +43,10 @@ const addNeedySchema = z.object({
   last_name: z.string().min(2, 'Soyad en az 2 karakter olmalı'),
   nationality_id: z.string().optional(),
   date_of_birth: z.string().optional(),
-  identity_number: z.string().optional(),
+  identity_number: z.string()
+    .regex(/^\d{11}$/, 'TC Kimlik numarası 11 haneli olmalıdır')
+    .optional()
+    .or(z.literal('')),
   check_mernis: z.boolean().optional().default(false),
   fund_region: z.string().optional(),
   partner_type: z.string().optional(),
@@ -49,19 +55,6 @@ const addNeedySchema = z.object({
 })
 
 type AddNeedyFormValues = z.input<typeof addNeedySchema>
-
-// Kategori seçenekleri
-const CATEGORIES = [
-  { value: 'yetim_ailesi', label: 'Yetim Ailesi' },
-  { value: 'multeci_aile', label: 'Mülteci Aile' },
-  { value: 'ihtiyac_sahibi_aile', label: 'İhtiyaç Sahibi Aile' },
-  { value: 'ogrenci_yabanci', label: 'Öğrenci (Yabancı)' },
-  { value: 'ogrenci_tc', label: 'Öğrenci (TC)' },
-  { value: 'vakif_dernek', label: 'Vakıf & Dernek' },
-  { value: 'devlet_okulu', label: 'Devlet Okulu' },
-  { value: 'kamu_kurumu', label: 'Kamu Kurumu' },
-  { value: 'ozel_egitim_kurumu', label: 'Özel Eğitim Kurumu' },
-]
 
 const FUND_REGIONS = [
   { value: '', label: '(Boş)' },
@@ -82,11 +75,19 @@ interface AddNeedyModalProps {
 export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [isMernisVerifying, setIsMernisVerifying] = useState(false)
+  const [mernisStatus, setMernisStatus] = useState<'idle' | 'verifying' | 'success' | 'error'>('idle')
+  const [mernisMessage, setMernisMessage] = useState('')
+
+  // Fetch categories, partners, and countries from database
+  const { data: categories } = useCategories('needy') as { data: Array<{ id: string; name: string; type: string | null }> | undefined }
+  const { data: partners } = usePartners() as { data: Array<{ id: string; name: string; type: string | null }> | undefined }
+  const { data: countries } = useCountries() as { data: Array<{ id: string; name: string; code: string }> | undefined }
 
   const form = useForm<AddNeedyFormValues>({
     resolver: zodResolver(addNeedySchema),
     defaultValues: {
-      category_id: 'yetim_ailesi', // Varsayılan: Yetim Ailesi
+      category_id: '', // Will be set to first category if available
       first_name: '',
       last_name: '',
       nationality_id: '',
@@ -108,7 +109,13 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
       // Mernis kontrolü yapılacaksa
       if (values.check_mernis && values.identity_number && values.date_of_birth) {
         const birthYear = new Date(values.date_of_birth).getFullYear()
-        
+
+        // Show loading state for MERNIS verification
+        setIsMernisVerifying(true)
+        setMernisStatus('verifying')
+        setMernisMessage('MERNIS doğrulaması yapılıyor...')
+        toast.loading('MERNIS doğrulaması yapılıyor...', { id: 'mernis-verify' })
+
         const mernisResponse = await fetch('/api/mernis/verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -122,13 +129,19 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
 
         const mernisResult = await mernisResponse.json()
 
+        setIsMernisVerifying(false)
+
         if (!mernisResult.verified) {
-          toast.error(`Mernis Doğrulama: ${mernisResult.message}`)
+          setMernisStatus('error')
+          setMernisMessage(mernisResult.message || 'Doğrulama başarısız')
+          toast.error(`Mernis Doğrulama: ${mernisResult.message}`, { id: 'mernis-verify' })
           setIsLoading(false)
           return
         }
 
-        toast.success('TC Kimlik doğrulaması başarılı')
+        setMernisStatus('success')
+        setMernisMessage('TC Kimlik doğrulaması başarılı')
+        toast.success('TC Kimlik doğrulaması başarılı', { id: 'mernis-verify' })
       }
 
       // Kayıt oluştur
@@ -155,7 +168,7 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
       toast.success('Kayıt başarıyla oluşturuldu')
       onOpenChange(false)
       form.reset()
-      
+
       // Detay sayfasına yönlendir
       router.push(`/needy/${data.id}`)
     } catch (error) {
@@ -166,37 +179,40 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
     }
   }
 
-  const isFormValid = form.watch('first_name') && form.watch('last_name') && form.watch('category_id')
+  const { isValid, isDirty } = form.formState
+  const isFormValid = isValid && isDirty
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
-        <DialogHeader className="flex flex-row items-center justify-between border-b pb-4">
-          <DialogTitle className="text-lg font-semibold">
-            Yeni İhtiyaç Sahibi Ekle
-          </DialogTitle>
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={form.handleSubmit(onSubmit)}
-              disabled={!isFormValid || isLoading}
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Save className="h-4 w-4 mr-2" />
-              )}
-              Kaydet
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              <X className="h-4 w-4 mr-2" />
-              Kapat
-            </Button>
-          </div>
+        <DialogHeader>
+          <DialogTitle>Yeni İhtiyaç Sahibi Ekle</DialogTitle>
+          <DialogDescription className="sr-only">
+            Yeni ihtiyaç sahibi kişisi eklemek için aşağıdaki formu doldurun
+          </DialogDescription>
         </DialogHeader>
+        <div className="flex items-center justify-end gap-2 border-b pb-4">
+          <Button
+            onClick={form.handleSubmit(onSubmit)}
+            disabled={!isFormValid || isLoading || isMernisVerifying}
+            className="bg-emerald-600 hover:bg-emerald-700"
+            data-testid="save-button"
+          >
+            {isLoading || isMernisVerifying ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Save className="h-4 w-4 mr-2" />
+            )}
+            {isMernisVerifying ? 'Doğrulanıyor...' : isLoading ? 'Kaydediliyor...' : 'Kaydet'}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
+            <X className="h-4 w-4 mr-2" />
+            Kapat
+          </Button>
+        </div>
 
         <Form {...form}>
           <form className="space-y-4 pt-4">
@@ -207,18 +223,22 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Kategori *</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value || ''} disabled={!categories || categories.length === 0}>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Kategori seçin" />
+                      <SelectTrigger data-testid="category-select">
+                        <SelectValue placeholder={categories && categories.length > 0 ? "Kategori seçin" : "Kategoriler yükleniyor..."} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {CATEGORIES.map((cat) => (
-                        <SelectItem key={cat.value} value={cat.value}>
-                          {cat.label}
-                        </SelectItem>
-                      ))}
+                      {categories && categories.length > 0 ? (
+                        categories.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="none" disabled>Kategoriler yükleniyor...</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -233,9 +253,9 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
                 name="first_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Ad *</FormLabel>
+                    <FormLabel htmlFor="first_name">Ad *</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Ad" />
+                      <Input id="first_name" {...field} placeholder="Ad" data-testid="first-name-input" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -246,9 +266,9 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
                 name="last_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Soyad *</FormLabel>
+                    <FormLabel htmlFor="last_name">Soyad *</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Soyad" />
+                      <Input id="last_name" {...field} placeholder="Soyad" data-testid="last-name-input" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -263,10 +283,25 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
                 name="nationality_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Uyruk</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Türkiye" />
-                    </FormControl>
+                    <FormLabel htmlFor="nationality_id">Uyruk</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || ''} disabled={!countries || countries.length === 0}>
+                      <FormControl>
+                        <SelectTrigger id="nationality_id" data-testid="nationality-select">
+                          <SelectValue placeholder={countries && countries.length > 0 ? "Ülke seçin" : "Ülkeler yükleniyor..."} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {countries && countries.length > 0 ? (
+                          countries.map((country) => (
+                            <SelectItem key={country.id} value={country.id}>
+                              {country.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="none" disabled>Ülkeler yükleniyor...</SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -276,9 +311,9 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
                 name="date_of_birth"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Doğum Tarihi</FormLabel>
+                    <FormLabel htmlFor="date_of_birth">Doğum Tarihi</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input id="date_of_birth" type="date" {...field} value={formatDateForInput(field.value)} data-testid="date-of-birth-input" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -293,9 +328,9 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
                 name="identity_number"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Kimlik No</FormLabel>
+                    <FormLabel htmlFor="identity_number">Kimlik No</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="11 haneli TC Kimlik No" maxLength={11} />
+                      <Input id="identity_number" data-testid="identity-number-input" {...field} placeholder="11 haneli TC Kimlik No" maxLength={11} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -310,11 +345,23 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
                       <Checkbox
                         checked={field.value}
                         onCheckedChange={field.onChange}
+                        data-testid="mernis-checkbox"
+                        disabled={isMernisVerifying}
                       />
                     </FormControl>
-                    <FormLabel className="!mt-0 cursor-pointer">
-                      Mernis Kontrolü Yap
-                    </FormLabel>
+                    <div className="flex flex-col gap-1">
+                      <FormLabel className="!mt-0 cursor-pointer flex items-center gap-2">
+                        Mernis Kontrolü Yap
+                        {isMernisVerifying && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
+                        {mernisStatus === 'success' && <span className="text-success text-sm">✓ Doğrulandı</span>}
+                        {mernisStatus === 'error' && <span className="text-destructive text-sm">✗ Başarısız</span>}
+                      </FormLabel>
+                      {mernisMessage && (
+                        <span className={`text-xs ${mernisStatus === 'error' ? 'text-destructive' : mernisStatus === 'success' ? 'text-success' : 'text-muted-foreground'}`}>
+                          {mernisMessage}
+                        </span>
+                      )}
+                    </div>
                   </FormItem>
                 )}
               />
@@ -329,7 +376,7 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
                   <FormLabel>Fon Bölgesi</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger data-testid="fund-region-select">
                         <SelectValue placeholder="Fon bölgesi seçin" />
                       </SelectTrigger>
                     </FormControl>
@@ -356,7 +403,7 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
                     <FormLabel>Dosya Bağlantısı</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger data-testid="partner-type-select">
                           <SelectValue placeholder="Tür seçin" />
                         </SelectTrigger>
                       </FormControl>
@@ -378,15 +425,19 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>&nbsp;</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value || ''} disabled={!partners || partners.length === 0}>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Kurum/Saha seçin" />
+                        <SelectTrigger data-testid="partner-id-select">
+                          <SelectValue placeholder={partners && partners.length > 0 ? "Kurum/Saha seçin" : "Yükleniyor..."} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="none">(Boş)</SelectItem>
-                        {/* Dinamik olarak yüklenecek */}
+                        {partners && partners.map((p) => (
+                          <SelectItem key={p.id} value={p.id}>
+                            {p.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -403,7 +454,7 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
                 <FormItem>
                   <FormLabel>Dosya Numarası</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="45.645.645" />
+                    <Input {...field} placeholder="45.645.645" data-testid="file-number-input" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

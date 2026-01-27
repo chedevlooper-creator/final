@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Plus, Pencil, Trash2, Phone, CheckCircle2 } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import { Reference, REFERENCE_TYPE_OPTIONS, ReferenceType } from '@/types/linked-records.types'
@@ -94,7 +94,12 @@ export function ReferencesTab({ needyPersonId, onClose }: ReferencesTabProps) {
 
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Referans Ekle</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Referans Ekle</DialogTitle>
+            <DialogDescription>
+              Bu kişi hakkında referans verebilecek kişi bilgilerini ekleyin.
+            </DialogDescription>
+          </DialogHeader>
           <div className="space-y-4 py-4">
             <div><Label>İsim *</Label><Input value={formData.reference_name} onChange={(e) => setFormData({ ...formData, reference_name: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-4">

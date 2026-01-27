@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
   CreditCard,
   FileText,
@@ -205,7 +205,12 @@ export function LinkedRecordsTabs({ needyPersonId, cardSummary }: LinkedRecordsT
         <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <div className="flex items-center justify-between">
-              <DialogTitle>{getActiveTabTitle()}</DialogTitle>
+              <div>
+                <DialogTitle>{getActiveTabTitle()}</DialogTitle>
+                <DialogDescription className="sr-only">
+                  İlgili kayıtların detaylarını görüntüleyin ve yönetin
+                </DialogDescription>
+              </div>
               <Button variant="ghost" size="icon" onClick={handleCloseModal}>
                 <X className="h-4 w-4" />
               </Button>

@@ -35,6 +35,21 @@ export function formatDateShort(date: string | Date): string {
 }
 
 /**
+ * Tarih formatlama - HTML5 date input için (yyyy-MM-dd)
+ * Bu format tarayıcının date input'u için gereklidir
+ */
+export function formatDateForInput(date: string | Date | null | undefined): string {
+  if (!date) return ''
+  const d = typeof date === 'string' ? new Date(date) : date
+  if (isNaN(d.getTime())) return ''
+  // UTC kullanarak timezone sorunlarını önle
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+/**
  * Tarih ve saat formatlama
  */
 export function formatDateTime(date: string | Date): string {

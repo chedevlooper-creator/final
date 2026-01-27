@@ -1,7 +1,7 @@
 /* ============================================
    FIRA SANS TYPOGRAPHY - Import must be first
    ============================================ */
-@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -16,170 +16,141 @@
     text-wrap: balance;
   }
 
-  /* Gradients */
+  /* Gradients - More Premium */
   .bg-gradient-primary {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, color-mix(in srgb, hsl(var(--primary)), white 20%) 100%);
+    background: linear-gradient(
+      135deg,
+      hsl(230 90% 55%) 0%,
+      hsl(260 80% 50%) 100%
+    );
   }
 
-  /* Glass Effect */
+  .bg-gradient-surface {
+    background: linear-gradient(
+      180deg,
+      hsl(var(--card)) 0%,
+      color-mix(in srgb, hsl(var(--card)), white 5%) 100%
+    );
+  }
+
+  /* Glass Effect - Enhanced */
   .glass {
-    background: hsl(0 0% 100% / 0.8);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid hsl(0 0% 100% / 0.5);
+    background: hsl(0 0% 100% / 0.7);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid hsl(0 0% 100% / 0.4);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
   }
 
-  /* Shadows */
+  /* Shadows - Layered & Natural */
   .shadow-soft {
-    box-shadow: 0 1px 3px hsl(0 0% 0% / 0.04), 0 4px 12px hsl(0 0% 0% / 0.03);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.02),
+      0 4px 12px rgba(0, 0, 0, 0.02),
+      0 12px 24px rgba(0, 0, 0, 0.03);
   }
   .shadow-medium {
-    box-shadow: 0 2px 8px hsl(0 0% 0% / 0.04), 0 8px 24px hsl(0 0% 0% / 0.04);
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.03),
+      0 8px 24px rgba(0, 0, 0, 0.04),
+      0 16px 48px rgba(0, 0, 0, 0.05);
   }
 
-  /* Card Interactive - Unified hover effect */
+  /* Card Interactive - Smoother & More Feedback */
   .card-interactive {
-    @apply transition-all duration-200 cursor-pointer;
-    @apply hover:shadow-medium hover:border-primary/30 hover:-translate-y-0.5;
-    @apply focus-within:ring-2 focus-within:ring-primary/20;
+    @apply transition-all duration-300 cursor-pointer border;
+    @apply hover:shadow-medium hover:border-primary/40 hover:-translate-y-1;
+    @apply active:scale-[0.98] active:translate-y-0 active:shadow-soft;
     will-change: transform, box-shadow;
-  }
-
-  /* Card Hover - Alternative subtle effect */
-  .card-hover {
-    @apply transition-all duration-200 cursor-pointer;
-    @apply hover:shadow-md hover:border-primary/20;
-    @apply focus-visible:ring-2 focus-visible:ring-primary/20;
   }
 
   /* Animations */
   .animate-fade-in {
-    animation: fadeIn 0.2s ease-out;
+    animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   .animate-slide-up {
-    animation: slideUp 0.2s ease-out;
+    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
   @keyframes slideUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .animate-scale-in {
-    animation: scaleIn 0.15s ease-out;
-  }
-  @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
-  /* Shimmer Loading */
-  .shimmer {
-    background: linear-gradient(90deg, hsl(0 0% 90%) 0%, hsl(0 0% 97%) 50%, hsl(0 0% 90%) 100%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-  }
-  @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-  }
-
-  /* Scrollbar */
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: hsl(var(--border)) transparent;
-  }
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: hsl(var(--border));
-    border-radius: 3px;
-  }
-
-  /* Reduced motion */
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      transition-duration: 0.01ms !important;
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 }
 
 /* ============================================
-   CSS VARIABLES - DESIGN TOKENS
+   CSS VARIABLES - PREMIUM DESIGN TOKENS
    ============================================ */
 :root {
-  /* Background */
-  --background: 210 20% 98%;
-  --foreground: 210 15% 15%;
+  /* Surface & Background */
+  --background: 220 33% 98%;
+  --foreground: 220 40% 10%;
 
   /* Card & Surface */
   --card: 0 0% 100%;
-  --card-foreground: 210 15% 15%;
+  --card-foreground: 220 40% 10%;
   --popover: 0 0% 100%;
-  --popover-foreground: 210 15% 15%;
+  --popover-foreground: 220 40% 10%;
 
-  /* Sidebar - Dark Blue */
-  --sidebar: 222 47% 11%;
-  --sidebar-foreground: 215 20% 75%;
-  --sidebar-border: 217 33% 15%;
+  /* Sidebar - Modern Deep Navy */
+  --sidebar: 224 71% 4%;
+  --sidebar-foreground: 220 20% 80%;
+  --sidebar-border: 224 71% 8%;
 
-  /* Header */
-  --header: 0 0% 100% / 0.85;
-  --header-foreground: 222 47% 11%;
-  --header-border: 214 32% 91%;
+  /* Header - Clean Base */
+  --header: 0 0% 100%;
+  --header-foreground: 224 71% 4%;
+  --header-border: 220 15% 92%;
 
-  /* Primary - Corporate Blue */
-  --primary: 210 100% 45%;
+  /* Primary - High Contrast Indigo */
+  --primary: 235 85% 60%;
   --primary-foreground: 0 0% 100%;
 
-  /* Secondary */
-  --secondary: 210 15% 92%;
-  --secondary-foreground: 210 100% 40%;
+  /* Secondary - Soft Blue */
+  --secondary: 220 25% 94%;
+  --secondary-foreground: 235 85% 45%;
 
-  /* Accent - Teal */
-  --accent: 180 60% 45%;
+  /* Accent */
+  --accent: 235 85% 60%;
   --accent-foreground: 0 0% 100%;
 
   /* Muted */
-  --muted: 210 15% 94%;
-  --muted-foreground: 210 12% 40%;
+  --muted: 220 15% 94%;
+  --muted-foreground: 220 10% 45%;
 
   /* Destructive */
-  --destructive: 0 80% 55%;
+  --destructive: 350 85% 55%;
   --destructive-foreground: 0 0% 100%;
 
   /* Border & Input */
-  --border: 210 15% 88%;
-  --input: 0 0% 100%;
-  --ring: 210 100% 45%;
+  --border: 220 15% 90%;
+  --input: 220 15% 90%;
+  --ring: 235 85% 60%;
 
   /* Semantic Colors */
-  --success: 142 70% 40%;
+  --success: 155 85% 40%;
   --success-foreground: 0 0% 100%;
-  --warning: 38 90% 50%;
+  --warning: 35 95% 55%;
   --warning-foreground: 0 0% 100%;
-  --info: 199 85% 48%;
+  --info: 210 95% 55%;
   --info-foreground: 0 0% 100%;
 
-  /* Chart Colors */
-  --chart-1: 210 100% 45%;
-  --chart-2: 180 60% 45%;
-  --chart-3: 142 70% 40%;
-  --chart-4: 199 85% 48%;
-  --chart-5: 260 60% 50%;
-
   /* Radius */
-  --radius: 0.75rem;
+  --radius: 1rem;
 }
 
 @layer base {
@@ -189,7 +160,11 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Fira Sans', system-ui, -apple-system, sans-serif;
+    font-family:
+      "Fira Sans",
+      system-ui,
+      -apple-system,
+      sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -220,7 +195,12 @@
     background-color: hsl(var(--primary) / 0.2);
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold tracking-tight;
   }
 }

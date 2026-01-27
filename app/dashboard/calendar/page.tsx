@@ -7,6 +7,14 @@ import { PageHeader } from '@/components/common/page-header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { EventForm } from '@/components/forms/event-form'
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns'
 import { tr } from 'date-fns/locale'
@@ -23,6 +31,7 @@ export default function CalendarPage() {
   const initialDate = useMemo(() => new Date('2000-01-01T00:00:00Z'), [])
   const [currentDate, setCurrentDate] = useState(initialDate)
   const [today, setToday] = useState(initialDate)
+  const [isEventFormOpen, setIsEventFormOpen] = useState(false)
 
   useEffect(() => {
     const now = new Date()
@@ -63,7 +72,11 @@ export default function CalendarPage() {
         description="Etkinlikleri ve görevleri takvim üzerinde görüntüleyin"
         icon={CalendarIcon}
         actions={
-          <Button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
+          <Button
+            onClick={() => setIsEventFormOpen(true)}
+            className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+            data-testid="create-event-button"
+          >
             <Plus className="mr-2 h-4 w-4" />
             Yeni Etkinlik
           </Button>
@@ -195,6 +208,19 @@ export default function CalendarPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Event Creation Dialog */}
+      <Dialog open={isEventFormOpen} onOpenChange={setIsEventFormOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Yeni Etkinlik Oluştur</DialogTitle>
+            <DialogDescription>
+              Takvim için yeni etkinlik veya toplantı oluşturun
+            </DialogDescription>
+          </DialogHeader>
+          <EventForm onSuccess={() => setIsEventFormOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

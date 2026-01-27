@@ -6,6 +6,13 @@ import { useUsersList } from '@/hooks/queries/use-users'
 import { PageHeader } from '@/components/common/page-header'
 import { DataTable } from '@/components/common/data-table'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -42,6 +49,7 @@ export default function UsersPage() {
   const [search, setSearch] = useState('')
   const [role, setRole] = useState<string>('')
   const [status, setStatus] = useState<string>('')
+  const [isFormOpen, setIsFormOpen] = useState(false)
 
   const { data, isLoading } = useUsersList({
     page,
@@ -174,7 +182,10 @@ export default function UsersPage() {
         description="Sistem kullanıcılarını görüntüleyin ve yönetin"
         icon={Users}
         actions={
-          <Button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
+          <Button
+            className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+            onClick={() => setIsFormOpen(true)}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Yeni Kullanıcı
           </Button>
@@ -226,6 +237,21 @@ export default function UsersPage() {
         pageIndex={page}
         onPageChange={setPage}
       />
+
+      {/* New User Dialog */}
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Yeni Kullanıcı</DialogTitle>
+            <DialogDescription>
+              Yeni bir kullanıcı oluşturun. Tüm gerekli alanları doldurun.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-8 text-center text-muted-foreground">
+            Form bileşeni yükleniyor...
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -27,6 +27,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import { Tables } from '@/types/database.types'
+import { formatDateForInput } from '@/lib/utils'
 
 interface NeedyFormProps {
   initialData?: Tables<'needy_persons'>
@@ -190,7 +191,7 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
                   <FormItem>
                     <FormLabel>Doğum Tarihi</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} value={field.value || ''} />
+                      <Input type="date" {...field} value={formatDateForInput(field.value)} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

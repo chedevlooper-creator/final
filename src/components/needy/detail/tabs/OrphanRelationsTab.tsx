@@ -22,6 +22,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -258,6 +259,9 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Yetim Bağla</DialogTitle>
+            <DialogDescription>
+              Bu kişinin bir yetim ile olan ilişki türünü belirleyin ve bağlayın.
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">

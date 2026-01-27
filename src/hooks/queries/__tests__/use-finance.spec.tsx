@@ -208,7 +208,7 @@ describe('use-finance', () => {
 
             expect(methodCalls['insert']?.[0][0]).toMatchObject({
                 ...input,
-                transaction_number: expect.stringMatching(/GEL-\d{8}-\d{4}/)
+                transaction_number: expect.stringMatching(/GEL-\d{8}-[0-9A-F]{8}/i)
             })
         })
     })

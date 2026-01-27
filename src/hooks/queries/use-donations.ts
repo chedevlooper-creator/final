@@ -36,7 +36,6 @@ export function useDonationsList(filters?: DonationFilters) {
           donor_name,
           donor_phone,
           donor_email,
-          category:categories(id, name),
           created_at
         `, { count: 'exact' })
         .order('created_at', { ascending: false })
@@ -99,7 +98,6 @@ export function useDonationDetail(id: string) {
         .from('donations')
         .select(`
           *,
-          category:categories(*),
           aid_distribution:aids(id, aid_date, status)
         `)
         .eq('id', id)

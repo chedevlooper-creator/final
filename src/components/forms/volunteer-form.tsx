@@ -22,6 +22,8 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
+import { useCreateVolunteer } from '@/hooks/queries/use-volunteers'
+import { Loader2 } from 'lucide-react'
 
 const AVAILABILITY_OPTIONS = [
     { value: 'weekdays', label: 'Hafta İçi' },
@@ -50,6 +52,8 @@ interface VolunteerFormProps {
 }
 
 export function VolunteerForm({ defaultValues, onSuccess }: VolunteerFormProps) {
+    const createVolunteer = useCreateVolunteer()
+
     const form = useForm<VolunteerFormValues>({
         resolver: zodResolver(volunteerFormSchema),
         defaultValues: {
@@ -64,8 +68,20 @@ export function VolunteerForm({ defaultValues, onSuccess }: VolunteerFormProps) 
 
     const onSubmit = async (data: VolunteerFormValues) => {
         try {
-            console.log('Form data:', data)
+            await createVolunteer.mutateAsync({
+                first_name: data.first_name,
+                last_name: data.last_name,
+                phone: data.phone,
+                email: data.email || null,
+                profession: data.profession || null,
+                availability: data.availability || null,
+                skills: data.skills ? data.skills.split(',').map(s => s.trim()) : null,
+                address: data.address || null,
+                notes: data.notes || null,
+                status: 'active',
+            })
             toast.success('Gönüllü kaydı oluşturuldu')
+            form.reset()
             onSuccess?.()
         } catch (error) {
             toast.error('Kayıt oluşturulurken hata oluştu')
@@ -209,7 +225,10 @@ export function VolunteerForm({ defaultValues, onSuccess }: VolunteerFormProps) 
                 />
 
                 <div className="flex justify-end gap-2 pt-4">
-                    <Button type="submit">Kaydet</Button>
+                    <Button type="submit" disabled={createVolunteer.isPending}>
+                        {createVolunteer.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                        Kaydet
+                    </Button>
                 </div>
             </form>
         </Form>

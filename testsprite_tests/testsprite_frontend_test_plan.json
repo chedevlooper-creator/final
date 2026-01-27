@@ -1,0 +1,614 @@
+[
+  {
+    "id": "TC001",
+    "title": "User Login with Valid Credentials",
+    "description": "Verify that users can log in successfully using valid credentials and appropriate role-based access is enforced.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page"
+      },
+      {
+        "type": "action",
+        "description": "Enter valid username and password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user is authenticated and redirected to the dashboard with modules accessible according to their roles"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Login Failure with Invalid Credentials",
+    "description": "Verify that login fails with invalid username or password and appropriate error message is shown.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page"
+      },
+      {
+        "type": "action",
+        "description": "Enter invalid username and/or password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify login is rejected and error message about invalid credentials is displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Dashboard Home Displays Correct Statistics",
+    "description": "Verify the dashboard home page loads correctly and displays accurate key statistics and overview cards.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a user with dashboard access"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to dashboard home page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify dashboard shows correct summary data for needy individuals, donations, finance, volunteers, and recent activities"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Needy Management - Add New Needy Person",
+    "description": "Verify that a new needy person can be added successfully with validated input fields and relevant details, including bank accounts and documents.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in and navigate to needy management module"
+      },
+      {
+        "type": "action",
+        "description": "Open 'Add Needy' modal/form"
+      },
+      {
+        "type": "action",
+        "description": "Enter valid details including personal info, bank accounts, and upload necessary documents and photos"
+      },
+      {
+        "type": "action",
+        "description": "Submit the form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new needy person appears in the list with correct data and details view"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Needy Management - Input Validation on Add/Edit",
+    "description": "Verify that form validations prevent submission of invalid or incomplete data for needy records.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to add/edit needy form"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to submit the form leaving required fields empty or entering invalid data formats"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify appropriate validation errors are shown and submission is blocked"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Needy Management - Update Existing Needy Record",
+    "description": "Verify that existing needy records can be modified and saved successfully with updated information.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to needy management and select an existing needy record"
+      },
+      {
+        "type": "action",
+        "description": "Edit fields such as contact info, bank accounts, or uploaded documents"
+      },
+      {
+        "type": "action",
+        "description": "Save changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify changes are persisted and reflected in the details view and listing"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Donations Management - Create Cash Donation",
+    "description": "Verify that cash donations can be added with all necessary donor details, and receipts are generated.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to donations module and select cash donations"
+      },
+      {
+        "type": "action",
+        "description": "Open new cash donation form"
+      },
+      {
+        "type": "action",
+        "description": "Fill in valid donor details and donation amount"
+      },
+      {
+        "type": "action",
+        "description": "Submit the donation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the donation record is created and receipt is generated/available"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Donations Management - Sacrifice Donation Workflow",
+    "description": "Verify that sacrifice donations can be properly entered, tracked, and detailed records are accessible.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to sacrifice donation section"
+      },
+      {
+        "type": "action",
+        "description": "Create a new sacrifice donation record with valid data"
+      },
+      {
+        "type": "action",
+        "description": "Submit the record"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify donation is saved and details can be viewed properly"
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Finance Management - Add Bank Account and Transactions",
+    "description": "Verify that users can create bank accounts and record transactions accurately with validations.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to finance module and select bank accounts"
+      },
+      {
+        "type": "action",
+        "description": "Add a new bank account with required fields"
+      },
+      {
+        "type": "action",
+        "description": "Create a new transaction linked to the bank account"
+      },
+      {
+        "type": "action",
+        "description": "Submit the transaction form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify bank account and transaction are listed with accurate details"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Finance Management - Generate Financial Reports",
+    "description": "Verify the finance reports module generates accurate reports and allows exporting to Excel and PDF.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to finance reports page"
+      },
+      {
+        "type": "action",
+        "description": "Select report parameters (date ranges, accounts, transaction types)"
+      },
+      {
+        "type": "action",
+        "description": "Run the report"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify report data is accurate and consistent with entered transactions"
+      },
+      {
+        "type": "action",
+        "description": "Export the report in Excel and PDF formats"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify exports are generated correctly with expected content"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Event Management - Create and View Events with Calendar Integration",
+    "description": "Verify users can create events successfully and the events appear correctly on the integrated calendar.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to event management module"
+      },
+      {
+        "type": "action",
+        "description": "Open create event form and enter valid event details"
+      },
+      {
+        "type": "action",
+        "description": "Submit the event form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the event is listed and appears in the calendar view on scheduled dates"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Volunteer Management - Register Volunteer and Assign Mission",
+    "description": "Verify that volunteers can be registered successfully and assigned to missions with all information saved.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to volunteers module"
+      },
+      {
+        "type": "action",
+        "description": "Open volunteer registration form and complete all required info"
+      },
+      {
+        "type": "action",
+        "description": "Submit the form to create the volunteer record"
+      },
+      {
+        "type": "action",
+        "description": "Assign the volunteer to a mission"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify volunteer is listed and mission assignment is reflected in details"
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Application Management - Aid Application Workflow",
+    "description": "Verify application creation, status updates, and monitoring workflows function correctly.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to applications management module"
+      },
+      {
+        "type": "action",
+        "description": "Create a new aid application with required data"
+      },
+      {
+        "type": "action",
+        "description": "Submit the application"
+      },
+      {
+        "type": "action",
+        "description": "Update the application status through various workflow steps"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the status changes are saved and visible in application tracking"
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Orphans Management - Add Orphan and Track Sponsorship",
+    "description": "Verify orphan records can be created and sponsorship status tracked accurately.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to orphans management module"
+      },
+      {
+        "type": "action",
+        "description": "Add a new orphan record with necessary details"
+      },
+      {
+        "type": "action",
+        "description": "Assign sponsorship details to the orphan"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify orphan and sponsorship information is saved and displayed correctly"
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Aid Distribution - Add Cash and Service Aids",
+    "description": "Verify that cash and service aids can be recorded and tracked with all relevant data.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to aids management module"
+      },
+      {
+        "type": "action",
+        "description": "Create a new cash aid record with required fields"
+      },
+      {
+        "type": "action",
+        "description": "Create a new service aid record"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify both cash and service aids are saved and listed correctly"
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "Purchase Management - Create Purchase Order and Manage Merchants",
+    "description": "Verify purchase orders can be created, linked to merchants, and modifications are saved properly.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to purchase management module"
+      },
+      {
+        "type": "action",
+        "description": "Add new merchant details"
+      },
+      {
+        "type": "action",
+        "description": "Create purchase order linked with the merchant"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify purchase order appears properly with merchant info and can be edited"
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Messaging System - Send Bulk SMS Message",
+    "description": "Verify that bulk messaging can be composed and sent to selected recipients successfully.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to bulk messaging page"
+      },
+      {
+        "type": "action",
+        "description": "Compose a valid SMS message"
+      },
+      {
+        "type": "action",
+        "description": "Select target recipients from available lists"
+      },
+      {
+        "type": "action",
+        "description": "Send the bulk message"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify message is sent and delivery status is updated"
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Reports Module - Generate and Export Operations Reports",
+    "description": "Verify reports generate accurate operational data and exports function as expected.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to reporting module"
+      },
+      {
+        "type": "action",
+        "description": "Select operational report with filters"
+      },
+      {
+        "type": "action",
+        "description": "Generate the report"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify report data accuracy and completeness"
+      },
+      {
+        "type": "action",
+        "description": "Export report to Excel and PDF"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify exports match generated report data"
+      }
+    ]
+  },
+  {
+    "id": "TC019",
+    "title": "User Settings - Manage User Accounts and Role Definitions",
+    "description": "Verify administrators can create/edit user accounts, assign roles, and restrict access appropriately.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as an administrator"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to user settings management page"
+      },
+      {
+        "type": "action",
+        "description": "Add a new user and assign a specific role"
+      },
+      {
+        "type": "action",
+        "description": "Edit existing user roles and permissions"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify user has access only to permitted modules and actions as per role"
+      }
+    ]
+  },
+  {
+    "id": "TC020",
+    "title": "Role-Based Access Control Enforcement",
+    "description": "Verify that users cannot access modules or perform actions outside their role permissions.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a user with limited permissions"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to access restricted modules or perform unauthorized actions"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify access is denied and proper error or redirection occurs"
+      }
+    ]
+  },
+  {
+    "id": "TC021",
+    "title": "Audit Logs - Capture and Review Critical User Actions",
+    "description": "Verify that critical operations generate audit logs with accurate and complete information.",
+    "category": "security",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Perform critical operations such as user role changes, donations entry, or finance transactions"
+      },
+      {
+        "type": "action",
+        "description": "Access audit logs from the system"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify audit entries include user ID, timestamp, operation type, and affected data"
+      }
+    ]
+  },
+  {
+    "id": "TC022",
+    "title": "Form Accessibility - Keyboard Navigation and Screen Reader Support",
+    "description": "Verify that forms and tables support proper keyboard navigation and are accessible to screen readers.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to various data entry forms and tables"
+      },
+      {
+        "type": "action",
+        "description": "Navigate entirely using keyboard (tab, shift+tab, enter, arrow keys)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify focus order is logical and all elements are accessible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify form elements have appropriate labels and ARIA attributes for screen readers"
+      }
+    ]
+  },
+  {
+    "id": "TC023",
+    "title": "Performance - Verify Response Times Under Load",
+    "description": "Ensure the system maintains acceptable response times under concurrent user loads up to 500 users.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Simulate 500 concurrent users accessing critical pages like dashboard, needy management, donations, and finance"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify response times remain under 2 seconds for all critical interactions"
+      }
+    ]
+  },
+  {
+    "id": "TC024",
+    "title": "Data Validation Using Zod Schemas",
+    "description": "Verify all form inputs and data entries are validated using Zod schemas to reject invalid data submissions.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Enter invalid or malformed data in forms like needy management, donations, finance, and volunteers"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify client-side validation prevents invalid data submission and shows descriptive error messages"
+      }
+    ]
+  }
+]

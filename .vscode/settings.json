@@ -14,5 +14,7 @@
   },
   "files.associations": {
     "*.css": "tailwindcss"
-  }
+  },
+  "blackbox.mcpMarketplace.enabled": false,
+  "blackbox.mcp.mode": "off"
 }

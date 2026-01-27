@@ -78,7 +78,7 @@ export default function NeedyListPage() {
   const router = useRouter()
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState('')
-  const [status, setStatus] = useState<string>('')
+  const [status, setStatus] = useState<string>('all')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
@@ -107,7 +107,7 @@ export default function NeedyListPage() {
   const { data, isLoading } = useNeedyList({
     page,
     search: nameFilter || search || undefined,
-    status: status || undefined,
+    status: status === 'all' ? undefined : status,
   })
 
   const deleteMutation = useDeleteNeedy()
@@ -129,12 +129,12 @@ export default function NeedyListPage() {
     setNameFilter('')
     setIdentityFilter('')
     setFileNumberFilter('')
-    setStatus('')
+    setStatus('all')
   }, [])
 
   // Has active filters
   const hasActiveFilters = Boolean(
-    idFilter || nameFilter || identityFilter || fileNumberFilter || status
+    idFilter || nameFilter || identityFilter || fileNumberFilter || (status && status !== 'all')
   )
 
   const columns: ColumnDef<NeedyPerson>[] = [
@@ -314,6 +314,7 @@ export default function NeedyListPage() {
               onClick={() => {
                 window.location.hash = '#!/crea/relief/needy/add'
               }}
+              data-testid="needy-add-button"
             >
               <Plus className="h-4 w-4 mr-1" />
               Yeni Ekle
@@ -332,6 +333,7 @@ export default function NeedyListPage() {
                 value={nameFilter}
                 onChange={(e) => setNameFilter(e.target.value)}
                 className="pl-9 h-9 bg-muted/50 focus:bg-background"
+                data-testid="needy-search-input"
               />
             </div>
 
@@ -344,6 +346,7 @@ export default function NeedyListPage() {
                 'transition-all duration-200',
                 isFilterOpen && 'bg-primary text-primary-foreground hover:bg-primary/90'
               )}
+              data-testid="needy-filter-toggle"
             >
               <Filter className="h-4 w-4 mr-1" />
               Filtrele
@@ -356,6 +359,7 @@ export default function NeedyListPage() {
                 variant="ghost"
                 onClick={clearFilters}
                 className="text-muted-foreground hover:text-foreground"
+                data-testid="needy-clear-filters"
               >
                 <X className="h-4 w-4 mr-1" />
                 Temizle
@@ -396,19 +400,21 @@ export default function NeedyListPage() {
                   value={fileNumberFilter}
                   onChange={(e) => setFileNumberFilter(e.target.value)}
                   className="w-32 h-9"
+                  data-testid="needy-filter-file-number"
                 />
                 <Input
                   placeholder="Kimlik No"
                   value={identityFilter}
                   onChange={(e) => setIdentityFilter(e.target.value)}
                   className="w-36 h-9"
+                  data-testid="needy-filter-identity"
                 />
                 <Select value={status} onValueChange={setStatus}>
-                  <SelectTrigger className="w-32 h-9">
+                  <SelectTrigger className="w-32 h-9" data-testid="needy-filter-status">
                     <SelectValue placeholder="Durum" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Tümü</SelectItem>
+                    <SelectItem value="all">Tümü</SelectItem>
                     <SelectItem value="active">Aktif</SelectItem>
                     <SelectItem value="inactive">Pasif</SelectItem>
                     <SelectItem value="pending">Taslak</SelectItem>

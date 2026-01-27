@@ -22,6 +22,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -282,6 +283,9 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
             <DialogTitle>
               {editingAccount ? 'Banka Hesabı Düzenle' : 'Yeni Banka Hesabı Ekle'}
             </DialogTitle>
+            <DialogDescription>
+              {editingAccount ? 'Banka hesabı bilgilerini buradan güncelleyebilirsiniz.' : 'Yeni banka hesabı bilgilerini buradan ekleyebilirsiniz.'}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="grid grid-cols-2 gap-4 py-4">

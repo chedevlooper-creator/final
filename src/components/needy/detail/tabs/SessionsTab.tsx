@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Plus, Eye, Pencil, Trash2, Calendar } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import { InterviewSession, SESSION_TYPE_OPTIONS, SESSION_STATUS_OPTIONS, SessionType, SessionStatus } from '@/types/linked-records.types'
@@ -107,7 +107,12 @@ export function SessionsTab({ needyPersonId, onClose }: SessionsTabProps) {
 
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Seans Planla</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Seans Planla</DialogTitle>
+            <DialogDescription>
+              Bu kişi için yeni bir danışmanlık seansı planlayın.
+            </DialogDescription>
+          </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div><Label>Tarih/Saat *</Label><Input type="datetime-local" value={formData.scheduled_date} onChange={(e) => setFormData({ ...formData, scheduled_date: e.target.value })} /></div>

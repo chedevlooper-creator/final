@@ -90,8 +90,9 @@ export function useCreateUser() {
 
   return useMutation({
     mutationFn: async (values: UserProfileData) => {
+      // Insert into profiles table (users is a view)
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .insert(values)
         .select()
         .single()
@@ -111,8 +112,9 @@ export function useUpdateUser() {
 
   return useMutation({
     mutationFn: async ({ id, values }: { id: string; values: Partial<UserProfileData> }) => {
+      // Update profiles table (users is a view)
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .update(values)
         .eq('id', id)
         .select()

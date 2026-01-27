@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Gift, MoreHorizontal, Eye, Pencil, X } from 'lucide-react'
+import { Gift, MoreHorizontal, Eye, Pencil, X, Plus } from 'lucide-react'
 import { ColumnDef } from '@tanstack/react-table'
 import {
   DropdownMenu,
@@ -22,7 +22,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { PAYMENT_METHODS, CURRENCIES } from '@/lib/validations/donation'
+import { DonationForm } from '@/components/forms/donation-form'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 
@@ -51,6 +59,7 @@ type Donation = {
 export default function SacrificeDonationsPage() {
   const [page, setPage] = useState(0)
   const [paymentStatus, setPaymentStatus] = useState<string>('')
+  const [isFormOpen, setIsFormOpen] = useState(false)
 
   const { data, isLoading } = useDonationsList({
     page,
@@ -194,6 +203,15 @@ export default function SacrificeDonationsPage() {
           title="Kurban Bağışları"
           description="Kurban bağışlarını görüntüleyin ve yönetin"
           icon={Gift}
+          actions={
+            <Button
+              className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+              onClick={() => setIsFormOpen(true)}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Yeni Bağış
+            </Button>
+          }
         />
 
         {/* Filter Bar */}
@@ -263,6 +281,19 @@ export default function SacrificeDonationsPage() {
             </p>
           </div>
         )}
+
+        {/* Add Donation Dialog */}
+        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Yeni Kurban Bağışı</DialogTitle>
+              <DialogDescription>
+                Yeni bir kurban bağış kaydı oluşturun.
+              </DialogDescription>
+            </DialogHeader>
+            <DonationForm onSuccess={() => setIsFormOpen(false)} defaultDonationType="sacrifice" />
+          </DialogContent>
+        </Dialog>
       </div>
     </PageTransition>
   )

@@ -22,6 +22,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -120,7 +121,12 @@ export function SponsorsTab({ needyPersonId, onClose }: SponsorsTabProps) {
 
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Sponsor Bağla</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Sponsor Bağla</DialogTitle>
+            <DialogDescription>
+              Bu kişiye sponsor bağlamak için mevcut bir sponsor seçin veya yeni sponsor ekleyin.
+            </DialogDescription>
+          </DialogHeader>
           <div className="py-4 text-center text-muted-foreground">
             <p>Sponsor seçimi için arama yapın veya yeni sponsor ekleyin.</p>
           </div>

@@ -27,14 +27,16 @@ import { Loader2 } from 'lucide-react'
 
 interface DonationFormProps {
   onSuccess?: () => void
+  defaultDonationType?: string
 }
 
-export function DonationForm({ onSuccess }: DonationFormProps) {
+export function DonationForm({ onSuccess, defaultDonationType }: DonationFormProps) {
   const createMutation = useCreateDonation()
 
   const form = useForm<DonationFormValues>({
     resolver: zodResolver(donationSchema),
     defaultValues: {
+      donation_type: defaultDonationType || 'cash',
       currency: 'TRY',
       amount: 0,
     },
@@ -65,7 +67,7 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
               <FormItem>
                 <FormLabel>Bağışçı Adı</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ad Soyad" {...field} value={field.value || ''} />
+                  <Input placeholder="Ad Soyad" {...field} value={field.value || ''} data-testid="donation-donor-name" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -80,7 +82,7 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
               <FormItem>
                 <FormLabel>Telefon</FormLabel>
                 <FormControl>
-                  <Input placeholder="0500 000 00 00" {...field} value={field.value || ''} />
+                  <Input placeholder="0500 000 00 00" {...field} value={field.value || ''} data-testid="donation-donor-phone" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -96,7 +98,7 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
             <FormItem>
               <FormLabel>E-posta</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="ornek@email.com" {...field} value={field.value || ''} />
+                <Input type="email" placeholder="ornek@email.com" {...field} value={field.value || ''} data-testid="donation-donor-email" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -113,7 +115,7 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
                 <FormLabel>Bağış Türü *</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger data-testid="donation-type-select">
                       <SelectValue placeholder="Tür seçin" />
                     </SelectTrigger>
                   </FormControl>
@@ -139,7 +141,7 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
                 <FormLabel>Ödeme Yöntemi</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value || ''}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger data-testid="donation-payment-method-select">
                       <SelectValue placeholder="Yöntem seçin" />
                     </SelectTrigger>
                   </FormControl>
@@ -173,6 +175,7 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
                     placeholder="0.00"
                     {...field}
                     onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                    data-testid="donation-amount-input"
                   />
                 </FormControl>
                 <FormMessage />
@@ -189,7 +192,7 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
                 <FormLabel>Para Birimi</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger data-testid="donation-currency-select">
                       <SelectValue placeholder="Seçin" />
                     </SelectTrigger>
                   </FormControl>
@@ -219,6 +222,7 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
                   placeholder="Bağış hakkında detaylı bilgi..."
                   {...field}
                   value={field.value || ''}
+                    data-testid="donation-description"
                 />
               </FormControl>
               <FormMessage />
@@ -238,6 +242,7 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
                   placeholder="Ek notlar..."
                   {...field}
                   value={field.value || ''}
+                    data-testid="donation-notes"
                 />
               </FormControl>
               <FormMessage />
@@ -253,6 +258,7 @@ export function DonationForm({ onSuccess }: DonationFormProps) {
             type="submit"
             disabled={isLoading}
             className="bg-gradient-primary hover:opacity-90"
+            data-testid="donation-save-button"
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Bağış Kaydet

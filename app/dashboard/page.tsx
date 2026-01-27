@@ -26,6 +26,7 @@ import { useRouter } from 'next/navigation'
 import { useNeedyList } from '@/hooks/queries/use-needy'
 import { useApplicationsList } from '@/hooks/queries/use-applications'
 import { useDonationStats } from '@/hooks/queries/use-donations'
+import { useVolunteersList } from '@/hooks/queries/use-volunteers'
 import {
   useDashboardStats,
   useMonthlyDonationTrend,
@@ -48,7 +49,7 @@ function PageTransition({ children }: { children: React.ReactNode }) {
 // Stats grid with stagger animation
 function StatsGrid({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {React.Children.map(children, (child, index) => (
         <div
           key={index}
@@ -91,6 +92,7 @@ export default function DashboardPage() {
   const { data: needyData } = useNeedyList({ limit: 5 })
   const { data: applicationsData } = useApplicationsList({ limit: 5 })
   const { data: donationStats } = useDonationStats()
+  const { data: volunteersData } = useVolunteersList({ limit: 5 })
 
   // Dashboard charts data
   const { isLoading: isStatsLoading } = useDashboardStats()
@@ -159,7 +161,15 @@ export default function DashboardPage() {
       iconBg: 'bg-destructive/10',
       description: 'Tüm zamanlar',
     },
-  ], [needyData?.count, applicationsData?.data, donationStats, isStatsLoading])
+  ],
+    [
+      needyData?.count,
+      applicationsData?.data,
+      donationStats,
+      volunteersData?.count,
+      isStatsLoading
+    ]
+  )
 
   // Memoize filtered applications to prevent recalculation on every render
   const recentApplications = useMemo(() => {

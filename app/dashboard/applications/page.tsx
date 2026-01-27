@@ -233,7 +233,7 @@ export default function ApplicationsListPage() {
           actions={
             <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90">
+                <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90" data-testid="application-add-button">
                   <Plus className="mr-2 h-4 w-4" />
                   Yeni Başvuru
                 </Button>

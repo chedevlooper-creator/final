@@ -13,6 +13,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -149,6 +150,9 @@ export function PhotosTab({ needyPersonId, onClose }: PhotosTabProps) {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Fotoğraf Yükle</DialogTitle>
+            <DialogDescription>
+              Kişinin fotoğrafını yükleyin ve fotoğraf türünü belirleyin.
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
