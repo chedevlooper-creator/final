@@ -93,6 +93,7 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
                         'w-full justify-between',
                         !field.value && 'text-muted-foreground'
                       )}
+                      data-testid="application-needy-select"
                     >
                       {field.value
                         ? needyData?.data?.find((person) => person.id === field.value)
@@ -109,6 +110,7 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
                       placeholder="Ad veya TC ile ara..."
                       value={searchValue}
                       onValueChange={setSearchValue}
+                      data-testid="application-needy-search"
                     />
                     <CommandList>
                       <CommandEmpty>Kayıt bulunamadı.</CommandEmpty>
@@ -121,6 +123,7 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
                               form.setValue('needy_person_id', person.id)
                               setOpen(false)
                             }}
+                            data-testid="application-needy-option"
                           >
                             <Check
                               className={cn(
@@ -154,7 +157,7 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
                 <FormLabel>Başvuru Türü *</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger data-testid="application-type-select">
                       <SelectValue placeholder="Tür seçin" />
                     </SelectTrigger>
                   </FormControl>
@@ -180,7 +183,7 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
                 <FormLabel>Öncelik</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger data-testid="application-priority-select">
                       <SelectValue placeholder="Öncelik seçin" />
                     </SelectTrigger>
                   </FormControl>
@@ -213,6 +216,7 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
                   {...field}
                   value={field.value || ''}
                   onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : null)}
+                    data-testid="application-requested-amount"
                 />
               </FormControl>
               <FormMessage />
@@ -232,6 +236,7 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
                   placeholder="Başvuru hakkında detaylı bilgi..."
                   {...field}
                   value={field.value || ''}
+                    data-testid="application-description"
                 />
               </FormControl>
               <FormMessage />
@@ -251,6 +256,7 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
                   placeholder="Ek notlar..."
                   {...field}
                   value={field.value || ''}
+                    data-testid="application-notes"
                 />
               </FormControl>
               <FormMessage />
@@ -266,6 +272,7 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
             type="submit"
             disabled={isLoading}
             className="bg-gradient-primary hover:opacity-90"
+            data-testid="application-save-button"
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Başvuru Oluştur

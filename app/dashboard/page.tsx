@@ -15,7 +15,6 @@ import {
   TrendingUp,
   Calendar,
   ArrowUpRight,
-  ArrowDownRight,
   MoreHorizontal,
   AlertCircle,
 } from 'lucide-react'
@@ -27,6 +26,7 @@ import { useRouter } from 'next/navigation'
 import { useNeedyList } from '@/hooks/queries/use-needy'
 import { useApplicationsList } from '@/hooks/queries/use-applications'
 import { useDonationStats } from '@/hooks/queries/use-donations'
+import { useVolunteersList } from '@/hooks/queries/use-volunteers'
 import {
   useDashboardStats,
   useMonthlyDonationTrend,
@@ -39,22 +39,18 @@ import { cn } from '@/lib/utils'
 
 // Page transition wrapper component
 function PageTransition({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="animate-fade-in animate-slide-up" style={{ animationDuration: '0.3s' }}>
-      {children}
-    </div>
-  )
+  return <div className="animate-fade-in">{children}</div>
 }
 
 // Stats grid with stagger animation
 function StatsGrid({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid gap-4 grid-cols-6">
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {React.Children.map(children, (child, index) => (
         <div
           key={index}
-          className="animate-fade-in animate-slide-up"
-          style={{ animationDelay: `${index * 50}ms`, animationDuration: '0.3s' }}
+          className="animate-fade-in"
+          style={{ animationDelay: `${index * 30}ms` }}
         >
           {child}
         </div>
@@ -68,24 +64,34 @@ function StaggerCard({ children, className, delay = 0 }: { children: React.React
   return (
     <Card
       className={cn(
-        'shadow-soft hover:shadow-medium transition-all duration-300 animate-fade-in',
+        'shadow-soft hover:shadow-medium hover:border-primary/20',
+        'transition-colors duration-150',
         className
       )}
-      style={{ animationDelay: `${delay}ms`, animationDuration: '0.3s' }}
+      style={{ animationDelay: `${delay}ms` }}
     >
       {children}
     </Card>
   )
 }
 
+// Error display component
+const ErrorDisplay = ({ message }: { message: string }) => (
+  <div className="flex flex-col items-center justify-center py-8 text-center">
+    <AlertCircle className="h-10 w-10 text-warning mb-2" />
+    <p className="text-sm text-muted-foreground">{message}</p>
+  </div>
+)
+
 export default function DashboardPage() {
   const router = useRouter()
   const { data: needyData } = useNeedyList({ limit: 5 })
   const { data: applicationsData } = useApplicationsList({ limit: 5 })
   const { data: donationStats } = useDonationStats()
+  const { data: volunteersData } = useVolunteersList({ limit: 5 })
 
   // Dashboard charts data
-  const { data: dashboardStats, isLoading: isStatsLoading, error: statsError } = useDashboardStats()
+  const { isLoading: isStatsLoading } = useDashboardStats()
   const { data: monthlyTrend, isLoading: isTrendLoading, error: trendError } = useMonthlyDonationTrend(6)
   const { data: applicationTypes, isLoading: isTypesLoading } = useApplicationTypeDistribution()
   const { data: cityDistribution, isLoading: isCityLoading } = useCityDistribution()
@@ -151,7 +157,15 @@ export default function DashboardPage() {
       iconBg: 'bg-destructive/10',
       description: 'Tüm zamanlar',
     },
-  ], [needyData?.count, applicationsData?.data, donationStats, isStatsLoading])
+  ],
+    [
+      needyData?.count,
+      applicationsData?.data,
+      donationStats,
+      volunteersData?.count,
+      isStatsLoading
+    ]
+  )
 
   // Memoize filtered applications to prevent recalculation on every render
   const recentApplications = useMemo(() => {
@@ -172,14 +186,6 @@ export default function DashboardPage() {
   const handleApplicationClick = (appId: string) => {
     router.push(`/dashboard/applications/${appId}`)
   }
-
-  // Error display component
-  const ErrorDisplay = ({ message }: { message: string }) => (
-    <div className="flex flex-col items-center justify-center py-8 text-center">
-      <AlertCircle className="h-10 w-10 text-warning mb-2" />
-      <p className="text-sm text-muted-foreground">{message}</p>
-    </div>
-  )
 
   return (
     <PageTransition>
@@ -215,7 +221,7 @@ export default function DashboardPage() {
         </StatsGrid>
 
         {/* Main Content Grid */}
-        <div className="grid gap-6 grid-cols-2">
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
           {/* Recent Applications */}
           <StaggerCard delay={300}>
             <CardHeader className="flex flex-row items-center justify-between pb-3">
@@ -282,7 +288,7 @@ export default function DashboardPage() {
               <CardTitle className="text-lg font-semibold">Hızlı İşlemler</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-3 grid-cols-2">
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
                 <Link href="/dashboard/needy" className="group">
                   <Button
                     variant="outline"
@@ -357,7 +363,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Charts Section */}
-        <div className="grid gap-6 grid-cols-2">
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
           {/* Monthly Donation Trend */}
           <StaggerCard delay={400}>
             <CardHeader className="flex flex-row items-center justify-between pb-3">
@@ -384,7 +390,7 @@ export default function DashboardPage() {
                   labelKey="label"
                   valueKey="value"
                   height={250}
-                  color="hsl(174, 73%, 42%)"
+                  color="hsl(var(--primary))"
                   showArea={true}
                   formatValue={(v) => `₺${v.toLocaleString('tr-TR')}`}
                 />
@@ -524,7 +530,7 @@ export default function DashboardPage() {
                   labelKey="label"
                   valueKey="value"
                   height={250}
-                  color="hsl(174, 73%, 42%)"
+                  color="hsl(var(--primary))"
                   horizontal={true}
                 />
               ) : (

@@ -55,14 +55,13 @@ if (typeof window === 'undefined') {
  * Usage:
  * ```typescript
  * import { env } from '@/lib/env'
- * 
+ *
  * const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL
  * ```
  */
 export const env = {
   // Supabase configuration (required)
   NEXT_PUBLIC_SUPABASE_URL: process.env['NEXT_PUBLIC_SUPABASE_URL'] || '',
-
   NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'] || '',
 
   // Service role key (server-side only) - MUST be set in production
@@ -93,6 +92,26 @@ export const env = {
   // Feature flags
   ENABLE_ANALYTICS: process.env['ENABLE_ANALYTICS'] === 'true',
   ENABLE_ERROR_TRACKING: process.env['ENABLE_ERROR_TRACKING'] === 'true',
+} as const
+
+/**
+ * Server-only environment variables
+ * These are NEVER exposed to the client
+ *
+ * Usage (server components only):
+ * ```typescript
+ * import { serverEnv } from '@/lib/env'
+ *
+ * const serviceKey = serverEnv.SUPABASE_SERVICE_ROLE_KEY
+ * ```
+ */
+export const serverEnv = {
+  // Service role key - ONLY accessible on server-side
+  SUPABASE_SERVICE_ROLE_KEY: process.env['SUPABASE_SERVICE_ROLE_KEY'] || '',
+
+  // Other server-only secrets can be added here
+  DATABASE_URL: process.env['DATABASE_URL'],
+  API_SECRET_KEY: process.env['API_SECRET_KEY'],
 } as const
 
 /**

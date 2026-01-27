@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { CURRENCIES as COMMON_CURRENCIES, PAYMENT_METHODS as COMMON_PAYMENT_METHODS } from '@/types/common'
 
+// Super refined schema with conditional validation
 export const donationSchema = z.object({
   donor_name: z.string().nullable().optional(),
   donor_phone: z.string().nullable().optional(),

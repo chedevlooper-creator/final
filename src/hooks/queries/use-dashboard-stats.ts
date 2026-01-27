@@ -39,33 +39,12 @@ export function useDashboardStats() {
   return useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async (): Promise<DashboardStats> => {
-      // Try using the optimized RPC function first
-      const { data: rpcData, error: rpcError } = await supabase
-        .rpc('get_dashboard_summary')
-
-      if (!rpcError && rpcData && rpcData.length > 0) {
-        const stats = rpcData[0]
-        return {
-          totalNeedy: stats.active_needy || 0,
-          activeNeedy: stats.active_needy || 0,
-          pendingApplications: stats.pending_applications || 0,
-          todayDonations: stats.today_donations || 0,
-          monthlyDonations: stats.this_month_donations || 0,
-          yearlyDonations: stats.total_donations || 0,
-          totalDonationCount: 0, // Would need another query
-          completedAids: stats.total_aids || 0,
-          activeVolunteers: stats.active_volunteers || 0,
-          pendingOrphans: 0,
-          totalAids: stats.total_aids || 0,
-        }
-      }
-
-      // Fallback to parallel queries if RPC doesn't exist
       const now = new Date()
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate())
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
       const startOfYear = new Date(now.getFullYear(), 0, 1)
 
+      // Using parallel direct queries as primary for better reliability and no 404s
       const [
         needyCountResult,
         activeNeedyResult,
@@ -77,36 +56,27 @@ export function useDashboardStats() {
         completedAidsResult,
         volunteersResult,
       ] = await Promise.all([
-        // Total needy persons
         supabase.from('needy_persons').select('*', { count: 'exact', head: true }),
-        // Active needy persons
         supabase.from('needy_persons').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-        // Pending applications
         supabase.from('applications').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-        // Today's donations (amount sum) - use created_at which exists in schema
         supabase.from('donations').select('amount').gte('created_at', startOfDay.toISOString()).eq('payment_status', 'completed'),
-        // Monthly donations (amount sum)
         supabase.from('donations').select('amount').gte('created_at', startOfMonth.toISOString()).eq('payment_status', 'completed'),
-        // Yearly donations (amount sum)
         supabase.from('donations').select('amount').gte('created_at', startOfYear.toISOString()).eq('payment_status', 'completed'),
-        // Total donation count
         supabase.from('donations').select('*', { count: 'exact', head: true }).eq('payment_status', 'completed'),
-        // Completed aids this month
         supabase.from('aids').select('*', { count: 'exact', head: true }).eq('status', 'distributed').gte('aid_date', startOfMonth.toISOString()),
-        // Active volunteers
         supabase.from('volunteers').select('*', { count: 'exact', head: true }).eq('status', 'active'),
       ])
 
-      const sumAmounts = (data: { amount: number }[] | null) => 
+      const sumAmounts = (data: { amount: number }[] | null) =>
         data?.reduce((sum, item) => sum + (item.amount || 0), 0) || 0
 
       return {
         totalNeedy: needyCountResult.count || 0,
         activeNeedy: activeNeedyResult.count || 0,
         pendingApplications: pendingApplicationsResult.count || 0,
-        todayDonations: sumAmounts(todayDonationsResult.data),
-        monthlyDonations: sumAmounts(monthlyDonationsResult.data),
-        yearlyDonations: sumAmounts(yearlyDonationsResult.data),
+        todayDonations: sumAmounts(todayDonationsResult.data as { amount: number }[]),
+        monthlyDonations: sumAmounts(monthlyDonationsResult.data as { amount: number }[]),
+        yearlyDonations: sumAmounts(yearlyDonationsResult.data as { amount: number }[]),
         totalDonationCount: totalDonationsResult.count || 0,
         completedAids: completedAidsResult.count || 0,
         activeVolunteers: volunteersResult.count || 0,
@@ -134,18 +104,7 @@ export function useMonthlyDonationTrend(months: number = 6) {
       const now = new Date()
       const startDate = new Date(now.getFullYear(), now.getMonth() - months + 1, 1)
 
-      // Single query with date truncation
-      const { data, error } = await supabase
-        .rpc('get_monthly_donation_trend', {
-          p_start_date: startDate.toISOString(),
-          p_end_date: now.toISOString()
-        })
-
-      if (!error && data) {
-        return data
-      }
-
-      // Fallback: Manual aggregation
+      // Using direct query as primary to avoid 404 console errors
       const { data: donations } = await supabase
         .from('donations')
         .select('created_at, amount')
@@ -165,7 +124,7 @@ export function useMonthlyDonationTrend(months: number = 6) {
       for (let i = months - 1; i >= 0; i--) {
         const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1)
         const monthKey = monthDate.toISOString().slice(0, 7)
-        
+
         results.push({
           month: monthKey,
           label: monthNames[monthDate.getMonth()] || '',
@@ -190,7 +149,7 @@ export function useApplicationTypeDistribution() {
     queryKey: ['dashboard-application-types'],
     queryFn: async (): Promise<CategoryDistribution[]> => {
       // Use aggregation in database for better performance
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('applications')
         .select('application_type')
         .not('application_type', 'is', null)
@@ -333,15 +292,39 @@ export function useRecentActivities(limit: number = 10) {
   return useQuery({
     queryKey: ['dashboard-recent-activities', limit],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .rpc('get_recent_activities', { p_limit: limit })
+      // Using table queries instead of RPC to avoid 404s
+      const [donations, aids] = await Promise.all([
+        supabase
+          .from('donations')
+          .select('id, donor_name, amount, created_at')
+          .eq('payment_status', 'completed')
+          .order('created_at', { ascending: false })
+          .limit(limit),
+        supabase
+          .from('aids')
+          .select('id, aid_type, created_at, needy_person:needy_persons(first_name, last_name)')
+          .order('created_at', { ascending: false })
+          .limit(limit)
+      ])
 
-      if (!error && data) {
-        return data
-      }
+      const activities = [
+        ...(donations.data?.map((d: { id: string; donor_name: string; amount: number; created_at: string }) => ({
+          id: d.id,
+          type: 'donation',
+          description: `Bağış: ${d.donor_name} - ${d.amount} TL`,
+          created_at: d.created_at
+        })) || []),
+        ...(aids.data?.map((a: { id: string; aid_type: string | null; created_at: string; needy_person: { first_name: string; last_name: string } | null }) => ({
+          id: a.id,
+          type: 'aid',
+          description: `Yardım: ${a.aid_type} - ${a.needy_person?.first_name} ${a.needy_person?.last_name}`,
+          created_at: a.created_at
+        })) || [])
+      ]
 
-      // Fallback
-      return []
+      return activities.sort((a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      ).slice(0, limit)
     },
     staleTime: 1 * 60 * 1000, // 1 minute - more frequent updates
     refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes

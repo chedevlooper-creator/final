@@ -136,13 +136,13 @@ export default function BulkMessagesPage() {
                 rows={8}
                 maxLength={messageType === 'sms' ? 160 : 1000}
               />
-              <p className="text-xs text-slate-500 text-right">
+              <p className="text-xs text-muted-foreground text-right">
                 {message.length} / {messageType === 'sms' ? 160 : 1000} karakter
               </p>
             </div>
 
             <Button 
-              className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600"
+              className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
               onClick={handleSend}
               disabled={sendBulkSMS.isPending || sendBulkEmail.isPending || !message}
             >
@@ -158,12 +158,12 @@ export default function BulkMessagesPage() {
             <CardTitle>Bilgiler</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 border border-blue-200">
-              <Users className="h-5 w-5 text-blue-500 mt-0.5" />
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-info/10 border border-info/20">
+              <Users className="h-5 w-5 text-info mt-0.5" />
               <div>
-                <p className="font-medium text-sm text-blue-900">Alıcı Sayısı</p>
-                <p className="text-2xl font-bold text-blue-600">{recipientsData?.count || 0}</p>
-                <p className="text-xs text-blue-700 mt-1">Tahmini alıcı sayısı</p>
+                <p className="font-medium text-sm text-info">Alıcı Sayısı</p>
+                <p className="text-2xl font-bold text-info">{recipientsData?.count || 0}</p>
+                <p className="text-xs text-info/80 mt-1">Tahmini alıcı sayısı</p>
               </div>
             </div>
 
@@ -171,7 +171,7 @@ export default function BulkMessagesPage() {
               <FileText className="h-5 w-5 text-emerald-500 mt-0.5" />
               <div>
                 <p className="font-medium text-sm text-emerald-900">Mesaj Uzunluğu</p>
-                <p className="text-2xl font-bold text-emerald-600">
+                <p className="text-2xl font-bold text-success">
                   {messageType === 'sms' ? Math.ceil(message.length / 160) : 1}
                 </p>
                 <p className="text-xs text-emerald-700 mt-1">
@@ -181,7 +181,7 @@ export default function BulkMessagesPage() {
             </div>
 
             <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-muted-foreground">
                 <strong>Not:</strong> Toplu mesaj gönderimi öncesi mesaj içeriğini kontrol edin.
                 SMS gönderimi için kredi gereklidir.
               </p>

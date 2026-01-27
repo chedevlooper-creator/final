@@ -8,6 +8,14 @@ import { DataTable } from '@/components/common/data-table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { VolunteerForm } from '@/components/forms/volunteer-form'
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -41,6 +49,7 @@ export default function VolunteersPage() {
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<string>('')
+  const [isFormOpen, setIsFormOpen] = useState(false)
 
   const { data, isLoading } = useVolunteersList({
     page,
@@ -50,9 +59,9 @@ export default function VolunteersPage() {
 
   const getStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
-      active: 'bg-green-100 text-green-700',
-      inactive: 'bg-slate-100 text-slate-700',
-      pending: 'bg-yellow-100 text-yellow-700',
+      active: 'bg-success/10 text-success',
+      inactive: 'bg-muted text-muted-foreground',
+      pending: 'bg-warning/10 text-warning',
     }
     const statusLabels: Record<string, string> = {
       active: 'Aktif',
@@ -77,13 +86,13 @@ export default function VolunteersPage() {
           </p>
           <div className="flex gap-2 mt-1">
             {row.original.phone && (
-              <span className="text-xs text-slate-500 flex items-center gap-1">
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
                 <Phone className="h-3 w-3" />
                 {row.original.phone}
               </span>
             )}
             {row.original.email && (
-              <span className="text-xs text-slate-500 flex items-center gap-1">
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
                 <Mail className="h-3 w-3" />
                 {row.original.email}
               </span>
@@ -123,12 +132,12 @@ export default function VolunteersPage() {
           const date = row.original.created_at ? new Date(row.original.created_at) : null
           const isValidDate = date && !isNaN(date.getTime())
           return (
-            <span className="text-sm text-slate-500">
+            <span className="text-sm text-muted-foreground">
               {isValidDate ? format(date!, 'dd MMM yyyy', { locale: tr }) : '-'}
             </span>
           )
         } catch (e) {
-          return <span className="text-sm text-slate-500">-</span>
+          return <span className="text-sm text-muted-foreground">-</span>
         }
       },
     },
@@ -163,7 +172,7 @@ export default function VolunteersPage() {
         description="Gönüllüleri görüntüleyin ve yönetin"
         icon={UserCheck}
         actions={
-          <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600">
+          <Button onClick={() => setIsFormOpen(true)} className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
             <Plus className="mr-2 h-4 w-4" />
             Yeni Gönüllü
           </Button>
@@ -173,7 +182,7 @@ export default function VolunteersPage() {
       {/* Filtreler */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Gönüllü ara..."
             value={search}
@@ -203,6 +212,19 @@ export default function VolunteersPage() {
         pageIndex={page}
         onPageChange={setPage}
       />
+
+      {/* Gönüllü Ekleme Modal */}
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Yeni Gönüllü Ekle</DialogTitle>
+            <DialogDescription>
+              Yeni gönüllü kaydı oluşturun
+            </DialogDescription>
+          </DialogHeader>
+          <VolunteerForm onSuccess={() => setIsFormOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

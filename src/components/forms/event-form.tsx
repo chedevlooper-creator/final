@@ -22,23 +22,24 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
+import { useCreateEvent } from '@/hooks/queries/use-calendar'
+import { formatDateForInput } from '@/lib/utils'
 
 const EVENT_TYPES = [
-    { value: 'charity', label: 'Yardım Etkinliği' },
-    { value: 'education', label: 'Eğitim' },
     { value: 'meeting', label: 'Toplantı' },
-    { value: 'campaign', label: 'Kampanya' },
+    { value: 'event', label: 'Etkinlik' },
+    { value: 'reminder', label: 'Hatırlatıcı' },
+    { value: 'other', label: 'Diğer' },
 ]
 
 const eventFormSchema = z.object({
     title: z.string().min(3, 'Başlık en az 3 karakter olmalı'),
-    event_type: z.string().min(1, 'Tür seçiniz'),
+    event_type: z.enum(['meeting', 'event', 'reminder', 'other']),
     description: z.string().optional(),
     location: z.string().optional(),
-    address: z.string().optional(),
     start_date: z.string().min(1, 'Başlangıç tarihi seçiniz'),
     end_date: z.string().optional(),
-    capacity: z.number().optional(),
 })
 
 type EventFormValues = z.infer<typeof eventFormSchema>
@@ -49,11 +50,13 @@ interface EventFormProps {
 }
 
 export function EventForm({ defaultValues, onSuccess }: EventFormProps) {
+    const createMutation = useCreateEvent()
+
     const form = useForm<EventFormValues>({
         resolver: zodResolver(eventFormSchema),
         defaultValues: {
             title: '',
-            event_type: 'charity',
+            event_type: 'event',
             start_date: '',
             ...defaultValues,
         },
@@ -61,10 +64,19 @@ export function EventForm({ defaultValues, onSuccess }: EventFormProps) {
 
     const onSubmit = async (data: EventFormValues) => {
         try {
-            console.log('Form data:', data)
+            await createMutation.mutateAsync({
+                title: data.title,
+                description: data.description,
+                event_type: data.event_type,
+                location: data.location,
+                start_date: new Date(data.start_date).toISOString(),
+                end_date: data.end_date ? new Date(data.end_date).toISOString() : null,
+                status: 'planned',
+            })
             toast.success('Etkinlik oluşturuldu')
+            form.reset()
             onSuccess?.()
-        } catch (error) {
+        } catch (_error) {
             toast.error('Etkinlik oluşturulurken hata oluştu')
         }
     }
@@ -77,9 +89,9 @@ export function EventForm({ defaultValues, onSuccess }: EventFormProps) {
                     name="title"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Başlık *</FormLabel>
+                            <FormLabel htmlFor="event_title">Başlık *</FormLabel>
                             <FormControl>
-                                <Input {...field} placeholder="Etkinlik başlığı" />
+                                <Input id="event_title" {...field} placeholder="Etkinlik başlığı" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -91,10 +103,10 @@ export function EventForm({ defaultValues, onSuccess }: EventFormProps) {
                     name="event_type"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Tür *</FormLabel>
+                            <FormLabel htmlFor="event_type">Tür *</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
-                                    <SelectTrigger>
+                                    <SelectTrigger id="event_type">
                                         <SelectValue />
                                     </SelectTrigger>
                                 </FormControl>
@@ -109,28 +121,15 @@ export function EventForm({ defaultValues, onSuccess }: EventFormProps) {
                     )}
                 />
 
-                <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Açıklama</FormLabel>
-                            <FormControl>
-                                <Textarea {...field} value={field.value || ''} placeholder="Etkinlik açıklaması" rows={3} />
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
-
                 <div className="grid gap-4 md:grid-cols-2">
                     <FormField
                         control={form.control}
                         name="start_date"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Başlangıç *</FormLabel>
+                                <FormLabel htmlFor="event_start_date">Başlangıç Tarihi *</FormLabel>
                                 <FormControl>
-                                    <Input type="datetime-local" {...field} />
+                                    <Input id="event_start_date" type="date" {...field} value={formatDateForInput(field.value)} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -141,43 +140,11 @@ export function EventForm({ defaultValues, onSuccess }: EventFormProps) {
                         name="end_date"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Bitiş</FormLabel>
+                                <FormLabel htmlFor="event_end_date">Bitiş Tarihi</FormLabel>
                                 <FormControl>
-                                    <Input type="datetime-local" {...field} value={field.value || ''} />
+                                    <Input id="event_end_date" type="date" {...field} value={formatDateForInput(field.value)} />
                                 </FormControl>
-                            </FormItem>
-                        )}
-                    />
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                    <FormField
-                        control={form.control}
-                        name="location"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Mekan</FormLabel>
-                                <FormControl>
-                                    <Input {...field} value={field.value || ''} placeholder="Mekan adı" />
-                                </FormControl>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="capacity"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Kapasite</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type="number"
-                                        {...field}
-                                        value={field.value || ''}
-                                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
-                                        placeholder="100"
-                                    />
-                                </FormControl>
+                                <FormMessage />
                             </FormItem>
                         )}
                     />
@@ -185,19 +152,46 @@ export function EventForm({ defaultValues, onSuccess }: EventFormProps) {
 
                 <FormField
                     control={form.control}
-                    name="address"
+                    name="location"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Adres</FormLabel>
+                            <FormLabel htmlFor="event_location">Mekan</FormLabel>
                             <FormControl>
-                                <Textarea {...field} value={field.value || ''} placeholder="Tam adres" rows={2} />
+                                <Input id="event_location" {...field} value={field.value || ''} placeholder="Mekan adı" />
                             </FormControl>
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
 
-                <div className="flex justify-end gap-2 pt-4">
-                    <Button type="submit">Kaydet</Button>
+                <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel htmlFor="event_description">Açıklama</FormLabel>
+                            <FormControl>
+                                <Textarea
+                                    id="event_description"
+                                    {...field}
+                                    value={field.value || ''}
+                                    placeholder="Etkinlik açıklaması"
+                                    rows={3}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <div className="flex justify-end gap-2 pt-4 border-t">
+                    <Button type="button" variant="outline" onClick={onSuccess}>
+                        İptal
+                    </Button>
+                    <Button type="submit" disabled={createMutation.isPending}>
+                        {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Kaydet
+                    </Button>
                 </div>
             </form>
         </Form>

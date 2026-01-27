@@ -1,0 +1,233 @@
+{
+  "meta": {
+    "project": "Yardım Yönetim Paneli",
+    "date": "2026-01-21",
+    "prepared_by": "Software Development Manager"
+  },
+  "product_overview": "Yardım Yönetim Paneli is a comprehensive web application designed for NGOs to efficiently manage needy individuals, donations, volunteers, applications, and financial processes on a unified platform. It enhances operational efficiency, data accuracy, and transparency through secure role-based access and detailed reporting.",
+  "core_goals": [
+    "Centralize management of needy individuals, donations, applications, finance, and volunteers within a single dashboard.",
+    "Accelerate data entry and reduce user errors through validated forms and streamlined workflows.",
+    "Increase process visibility via reporting, status tracking, and audit logs.",
+    "Ensure secure access using role-based access control (RBAC) and maintain audit trails for all critical operations.",
+    "Support scalability to at least 500 concurrent users and maintain response times under 2 seconds on critical screens."
+  ],
+  "key_features": [
+    "User authentication and authorization with Supabase, including role-based access control.",
+    "Dashboard home displays key statistics and overview cards for quick insights.",
+    "Needy management module with full CRUD, detailed views including bank accounts, photos, and documents.",
+    "Donation management supporting cash and sacrifice donations with tracking and detailed records.",
+    "Finance management including bank and cash account management, transaction tracking, and reporting.",
+    "Event management system with event creation and calendar integration.",
+    "Volunteer registry with mission assignments and detailed profile management.",
+    "Application management for aid process workflow with status tracking.",
+    "Orphan management and sponsorship tracking features.",
+    "Aid distribution modules covering cash, service, transfer, logistics, and cashdesk aids.",
+    "Purchase management for orders and merchant tracking.",
+    "Messaging and notification system supporting SMS and bulk messaging.",
+    "Reporting module with analytics and export to Excel/PDF.",
+    "User settings and management including definitions and account configuration.",
+    "Reusable UI components built with Radix UI and styled with Tailwind CSS for consistency and accessibility."
+  ],
+  "user_flow_summary": [
+    "User logs in via the authentication system with role-based permissions governing access.",
+    "From the dashboard home, user selects a module to manage needy individuals, donations, volunteers, etc.",
+    "In needy management, user can add, edit, view detailed records including tabs for bank accounts and document uploads.",
+    "Donation workflows allow creation and tracking of different donation types with donor details and receipt generation.",
+    "Finance users manage bank and cash accounts, record transactions, and generate financial reports.",
+    "Volunteers can be registered, assigned to missions, and monitored through the volunteer management module.",
+    "Aid applications are created, their progression monitored, and status updates managed through the applications module.",
+    "Notifications and bulk messages can be sent to stakeholders via the messaging system.",
+    "Reports are generated and exported for operational and financial analysis.",
+    "Users manage their account settings and system configurations including role definitions and user permissions."
+  ],
+  "validation_criteria": [
+    "At least 95% successful processing rate in core business workflows such as needy registration, donations, applications, finance, and volunteer management.",
+    "Active usage in at least five primary modules including needy management, donations, applications, finance, and volunteers.",
+    "Monthly report generation time is reduced by at least 50% compared to the previous system.",
+    "System response time under 2 seconds for critical user interactions and pages.",
+    "Proper implementation of role-based access control with no unauthorized access to restricted modules.",
+    "Audit logs capturing key user actions with traceability for security and compliance purposes.",
+    "Successful integration with Supabase services for authentication, database, and storage.",
+    "Accurate and validated data entry with form validation using Zod schemas.",
+    "Accessibility compliance including keyboard navigation support on forms and tables.",
+    "Scalability tested to support at least 500 concurrent users without degradation."
+  ],
+  "code_summary": {
+    "tech_stack": [
+      "TypeScript",
+      "Next.js 16",
+      "React 19",
+      "Supabase (PostgreSQL)",
+      "Tailwind CSS",
+      "Radix UI",
+      "React Hook Form",
+      "TanStack Query",
+      "Zod"
+    ],
+    "features": [
+      {
+        "name": "Authentication System",
+        "description": "User authentication and authorization with Supabase, role-based access control",
+        "files": [
+          "app/(auth)/login/page.tsx",
+          "src/hooks/use-auth.ts",
+          "src/lib/rbac.tsx",
+          "src/lib/supabase/client.ts",
+          "src/lib/supabase/server.ts"
+        ]
+      },
+      {
+        "name": "Dashboard Home",
+        "description": "Main dashboard with statistics and overview cards",
+        "files": [
+          "app/dashboard/page.tsx",
+          "src/hooks/queries/use-dashboard-stats.ts"
+        ]
+      },
+      {
+        "name": "Needy Management",
+        "description": "CRUD operations for needy people management with detailed view including tabs for bank accounts, photos, documents, etc.",
+        "files": [
+          "app/dashboard/needy/page.tsx",
+          "app/dashboard/needy/[id]/page.tsx",
+          "src/components/needy/AddNeedyModal.tsx",
+          "src/components/needy/detail/",
+          "src/hooks/queries/use-needy.ts",
+          "src/lib/validations/needy.ts"
+        ]
+      },
+      {
+        "name": "Donations Management",
+        "description": "Cash and sacrifice donations tracking and management",
+        "files": [
+          "app/dashboard/donations/page.tsx",
+          "app/dashboard/donations/cash/page.tsx",
+          "app/dashboard/donations/sacrifice/page.tsx",
+          "app/dashboard/donations/[id]/page.tsx",
+          "src/components/forms/donation-form.tsx",
+          "src/hooks/queries/use-donations.ts"
+        ]
+      },
+      {
+        "name": "Finance Management",
+        "description": "Bank and cash account management with transaction tracking",
+        "files": [
+          "app/dashboard/finance/page.tsx",
+          "app/dashboard/finance/bank/page.tsx",
+          "app/dashboard/finance/cash/page.tsx",
+          "app/dashboard/finance/reports/page.tsx",
+          "src/components/forms/cash-transaction-form.tsx",
+          "src/hooks/queries/use-finance.ts",
+          "src/lib/validations/finance.ts"
+        ]
+      },
+      {
+        "name": "Events Management",
+        "description": "Event creation and management with calendar integration",
+        "files": [
+          "app/dashboard/events/page.tsx",
+          "app/dashboard/events/[id]/page.tsx",
+          "app/dashboard/calendar/page.tsx",
+          "src/components/forms/event-form.tsx",
+          "src/hooks/queries/use-events.ts",
+          "src/hooks/queries/use-calendar.ts"
+        ]
+      },
+      {
+        "name": "Volunteers Management",
+        "description": "Volunteer registry and mission assignments",
+        "files": [
+          "app/dashboard/volunteers/page.tsx",
+          "app/dashboard/volunteers/[id]/page.tsx",
+          "app/dashboard/volunteers/missions/page.tsx",
+          "src/components/forms/volunteer-form.tsx",
+          "src/hooks/queries/use-volunteers.ts"
+        ]
+      },
+      {
+        "name": "Applications Management",
+        "description": "Aid application processing and workflow",
+        "files": [
+          "app/dashboard/applications/page.tsx",
+          "app/dashboard/applications/[id]/page.tsx",
+          "src/components/forms/application-form.tsx",
+          "src/hooks/queries/use-applications.ts"
+        ]
+      },
+      {
+        "name": "Orphans Management",
+        "description": "Orphan registry and sponsorship tracking",
+        "files": [
+          "app/dashboard/orphans/page.tsx",
+          "app/dashboard/orphans/[id]/page.tsx",
+          "src/components/forms/orphan-form.tsx",
+          "src/hooks/queries/use-orphans.ts"
+        ]
+      },
+      {
+        "name": "Aids Management",
+        "description": "Cash, service, transfer, logistics, and cashdesk aid distribution",
+        "files": [
+          "app/dashboard/aids/page.tsx",
+          "app/dashboard/aids/cash/page.tsx",
+          "app/dashboard/aids/service/page.tsx",
+          "app/dashboard/aids/transfer/page.tsx",
+          "app/dashboard/aids/logistics/page.tsx",
+          "app/dashboard/aids/cashdesk/page.tsx",
+          "src/hooks/queries/use-aids.ts"
+        ]
+      },
+      {
+        "name": "Purchase Management",
+        "description": "Purchase orders and merchant management",
+        "files": [
+          "app/dashboard/purchase/page.tsx",
+          "app/dashboard/purchase/[id]/page.tsx",
+          "app/dashboard/purchase/merchants/page.tsx",
+          "src/components/forms/purchase-form.tsx",
+          "src/hooks/queries/use-purchase.ts"
+        ]
+      },
+      {
+        "name": "Messages & Notifications",
+        "description": "SMS and bulk messaging system",
+        "files": [
+          "app/dashboard/messages/sms/page.tsx",
+          "app/dashboard/messages/bulk/page.tsx",
+          "src/components/layout/notification-dropdown.tsx",
+          "src/hooks/use-notifications.ts",
+          "src/hooks/queries/use-messages.ts"
+        ]
+      },
+      {
+        "name": "Reports",
+        "description": "Reporting and analytics module",
+        "files": [
+          "app/dashboard/reports/page.tsx",
+          "src/hooks/queries/use-reports.ts"
+        ]
+      },
+      {
+        "name": "User Settings",
+        "description": "User management and settings configuration",
+        "files": [
+          "app/dashboard/settings/users/page.tsx",
+          "app/dashboard/settings/users/[id]/page.tsx",
+          "app/dashboard/settings/definitions/page.tsx",
+          "app/dashboard/account/page.tsx",
+          "src/hooks/queries/use-users.ts"
+        ]
+      },
+      {
+        "name": "UI Components",
+        "description": "Reusable UI components based on Radix UI and Tailwind CSS",
+        "files": [
+          "src/components/ui/",
+          "src/components/common/",
+          "src/components/layout/"
+        ]
+      }
+    ]
+  }
+}

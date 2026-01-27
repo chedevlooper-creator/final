@@ -722,6 +722,7 @@ export interface VolunteerInsert {
   last_name?: string
   phone?: string | null
   email?: string | null
+  profession?: string | null
   address?: string | null
   city?: string | null
   birth_date?: string | null

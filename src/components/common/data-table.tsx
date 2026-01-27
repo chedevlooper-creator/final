@@ -46,7 +46,7 @@ function DataTableInner<TData, TValue>({
   isLoading,
   pageCount,
   pageIndex = 0,
-  pageSize = 20,
+  pageSize: _pageSize,
   onPageChange,
   onRowClick,
 }: DataTableProps<TData, TValue>) {
@@ -90,7 +90,7 @@ function DataTableInner<TData, TValue>({
     <div className="space-y-4">
       {searchKey && (
         <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
           <Input
             placeholder={searchPlaceholder}
             value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ''}
@@ -98,11 +98,13 @@ function DataTableInner<TData, TValue>({
               table.getColumn(searchKey)?.setFilterValue(event.target.value)
             }
             className="pl-9"
+            aria-label={searchPlaceholder}
+            role="searchbox"
           />
         </div>
       )}
 
-      <div className="rounded-lg border bg-white overflow-hidden">
+      <div className="rounded-lg border bg-white overflow-hidden" role="region" aria-label="Veri tablosu">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -128,6 +130,15 @@ function DataTableInner<TData, TValue>({
                   data-state={row.getIsSelected() && 'selected'}
                   className={onRowClick ? "cursor-pointer hover:bg-muted/50" : "hover:bg-muted/50"}
                   onClick={() => onRowClick?.(row.original)}
+                  onKeyDown={(e) => {
+                    if (onRowClick && (e.key === 'Enter' || e.key === ' ')) {
+                      e.preventDefault()
+                      onRowClick(row.original)
+                    }
+                  }}
+                  tabIndex={onRowClick ? 0 : undefined}
+                  role={onRowClick ? "button" : undefined}
+                  aria-label={onRowClick ? `Satır ${row.index + 1} detayını görüntüle` : undefined}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -148,8 +159,8 @@ function DataTableInner<TData, TValue>({
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
+      <nav className="flex items-center justify-between" aria-label="Sayfalama">
+        <p className="text-sm text-muted-foreground" aria-live="polite">
           Toplam {data.length} kayıt
         </p>
         <div className="flex items-center gap-2">
@@ -158,11 +169,12 @@ function DataTableInner<TData, TValue>({
             size="sm"
             onClick={() => onPageChange?.(pageIndex - 1)}
             disabled={pageIndex === 0}
+            aria-label="Önceki sayfa"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             Önceki
           </Button>
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm text-muted-foreground" aria-current="page">
             Sayfa {pageIndex + 1} / {pageCount || 1}
           </span>
           <Button
@@ -170,12 +182,13 @@ function DataTableInner<TData, TValue>({
             size="sm"
             onClick={() => onPageChange?.(pageIndex + 1)}
             disabled={pageIndex >= (pageCount || 1) - 1}
+            aria-label="Sonraki sayfa"
           >
             Sonraki
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
-      </div>
+      </nav>
     </div>
   )
 }

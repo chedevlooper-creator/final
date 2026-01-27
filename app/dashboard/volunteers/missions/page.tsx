@@ -54,10 +54,10 @@ export default function MissionsPage() {
 
   const getStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
-      assigned: 'bg-blue-100 text-blue-700',
-      in_progress: 'bg-yellow-100 text-yellow-700',
-      completed: 'bg-green-100 text-green-700',
-      cancelled: 'bg-red-100 text-red-700',
+      assigned: 'bg-info/10 text-info',
+      in_progress: 'bg-warning/10 text-warning',
+      completed: 'bg-success/10 text-success',
+      cancelled: 'bg-destructive/10 text-destructive',
     }
     const statusLabels: Record<string, string> = {
       assigned: 'Atandı',
@@ -77,7 +77,7 @@ export default function MissionsPage() {
       accessorKey: 'mission_number',
       header: 'Görev No',
       cell: ({ row }) => (
-        <span className="font-mono text-sm text-slate-600">
+        <span className="font-mono text-sm text-muted-foreground">
           {row.original.mission_number || '-'}
         </span>
       ),
@@ -89,7 +89,7 @@ export default function MissionsPage() {
         <div>
           <p className="font-medium">{row.original.title}</p>
           {row.original.location && (
-            <p className="text-xs text-slate-500">{row.original.location}</p>
+            <p className="text-xs text-muted-foreground">{row.original.location}</p>
           )}
         </div>
       ),
@@ -103,7 +103,7 @@ export default function MissionsPage() {
             {row.original.volunteer?.first_name} {row.original.volunteer?.last_name}
           </p>
           {row.original.volunteer?.phone && (
-            <p className="text-xs text-slate-500">{row.original.volunteer.phone}</p>
+            <p className="text-xs text-muted-foreground">{row.original.volunteer.phone}</p>
           )}
         </div>
       ),
@@ -112,7 +112,7 @@ export default function MissionsPage() {
       accessorKey: 'mission_date',
       header: 'Görev Tarihi',
       cell: ({ row }) => (
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-muted-foreground">
           {format(new Date(row.original.mission_date), 'dd MMM yyyy', { locale: tr })}
         </span>
       ),
@@ -141,7 +141,7 @@ export default function MissionsPage() {
               Düzenle
             </DropdownMenuItem>
             {row.original.status !== 'completed' && (
-              <DropdownMenuItem className="text-green-600">
+              <DropdownMenuItem className="text-success">
                 <CheckCircle className="mr-2 h-4 w-4" />
                 Tamamlandı İşaretle
               </DropdownMenuItem>
@@ -159,7 +159,7 @@ export default function MissionsPage() {
         description="Gönüllü görevlendirmelerini görüntüleyin ve yönetin"
         icon={Calendar}
         actions={
-          <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600">
+          <Button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
             <Plus className="mr-2 h-4 w-4" />
             Yeni Görevlendirme
           </Button>

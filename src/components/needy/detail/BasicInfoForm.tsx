@@ -30,6 +30,7 @@ import { GENDERS, MARITAL_STATUSES, RELIGIONS, EDUCATION_STATUSES, EDUCATION_LEV
 import { DISEASES, INCOME_SOURCES } from './MultiSelectSection'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
+import { formatDateForInput } from '@/lib/utils'
 
 interface BasicInfoFormProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -578,7 +579,7 @@ export function BasicInfoForm({
               <FormItem>
                 <FormLabel className="text-xs font-medium">Geçerlilik Tarihi</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} value={field.value || ''} className="h-9" />
+                  <Input type="date" {...field} value={formatDateForInput(field.value)} className="h-9" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -646,7 +647,7 @@ export function BasicInfoForm({
               <FormItem>
                 <FormLabel className="text-xs font-medium">Pasaport Bitiş</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} value={field.value || ''} className="h-9" />
+                  <Input type="date" {...field} value={formatDateForInput(field.value)} className="h-9" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -688,7 +689,7 @@ export function BasicInfoForm({
               <FormItem>
                 <FormLabel className="text-xs font-medium">Vize Bitiş</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} value={field.value || ''} className="h-9" />
+                  <Input type="date" {...field} value={formatDateForInput(field.value)} className="h-9" />
                 </FormControl>
                 <FormMessage />
               </FormItem>

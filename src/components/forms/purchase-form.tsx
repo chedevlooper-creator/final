@@ -71,7 +71,7 @@ export function PurchaseForm({ defaultValues, onSuccess }: PurchaseFormProps) {
             console.log('Form data:', data)
             toast.success('Satın alma talebi oluşturuldu')
             onSuccess?.()
-        } catch (error) {
+        } catch (_error) {
             toast.error('Talep oluşturulurken hata oluştu')
         }
     }

@@ -1,76 +1,25 @@
 'use client'
 
-import { useEffect, useState, useLayoutEffect } from 'react'
-import { usePathname, useSearchParams } from 'next/navigation'
-
-/**
- * Top progress bar for page transitions
- * Shows a loading bar at the top of the page during navigation
- */
+import { useEffect, useState } from 'react'
 
 export function ProgressBar() {
-  const [isLoading, setIsLoading] = useState(false)
   const [progress, setProgress] = useState(0)
-  const [mounted, setMounted] = useState(false)
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-
-  // Prevent SSR hydration mismatch
-  useLayoutEffect(() => {
-    const timeout = setTimeout(() => {
-      setMounted(true)
-    }, 0)
-
-    return () => clearTimeout(timeout)
-  }, [])
 
   useEffect(() => {
-    if (!mounted) return
-
-    let timer: NodeJS.Timeout
-    let progressTimer: NodeJS.Timeout
-
-    const startLoading = () => {
-      setIsLoading(true)
-      setProgress(0)
-
-      // Simulate progress
-      progressTimer = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 90) return prev
-          return prev + Math.random() * 10
-        })
-      }, 100)
+    const updateProgress = () => {
+      const { scrollTop, scrollHeight, clientHeight } = document.documentElement
+      const scrolled = (scrollTop / (scrollHeight - clientHeight)) * 100
+      setProgress(scrolled)
     }
 
-    const stopLoading = () => {
-      clearInterval(progressTimer)
-      setProgress(100)
-
-      timer = setTimeout(() => {
-        setIsLoading(false)
-        setProgress(0)
-      }, 200)
-    }
-
-    // Start loading on route change
-    startLoading()
-
-    // Stop loading when route change is complete
-    stopLoading()
-
-    return () => {
-      clearInterval(progressTimer)
-      clearTimeout(timer)
-    }
-  }, [pathname, searchParams, mounted])
-
-  if (!mounted || !isLoading) return null
+    window.addEventListener('scroll', updateProgress)
+    return () => window.removeEventListener('scroll', updateProgress)
+  }, [])
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[9999] h-1 bg-muted">
+    <div className="fixed top-0 left-0 right-0 h-1 bg-muted z-50">
       <div
-        className="h-full bg-gradient-to-r from-primary to-info transition-all duration-150 ease-out"
+        className="h-full bg-primary transition-all duration-150"
         style={{ width: `${progress}%` }}
       />
     </div>

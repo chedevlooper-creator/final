@@ -64,9 +64,9 @@ const mockLogistics = [
 ]
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-    pending: { label: 'Hazırlanıyor', color: 'bg-yellow-100 text-yellow-700' },
-    in_transit: { label: 'Yolda', color: 'bg-blue-100 text-blue-700' },
-    delivered: { label: 'Teslim Edildi', color: 'bg-green-100 text-green-700' },
+    pending: { label: 'Hazırlanıyor', color: 'bg-warning/10 text-warning' },
+    in_transit: { label: 'Yolda', color: 'bg-info/10 text-info' },
+    delivered: { label: 'Teslim Edildi', color: 'bg-success/10 text-success' },
 }
 
 export default function LogisticsPage() {
@@ -86,7 +86,7 @@ export default function LogisticsPage() {
                 description="Gıda, giyim ve diğer ayni yardım teslimatları"
                 icon={Package}
                 actions={
-                    <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500">
+                    <Button className="bg-gradient-to-r from-primary to-primary/80">
                         <Plus className="mr-2 h-4 w-4" />
                         Yeni Ayni Yardım
                     </Button>
@@ -97,7 +97,7 @@ export default function LogisticsPage() {
             <div className="grid gap-4 md:grid-cols-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Toplam Teslimat</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Toplam Teslimat</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold">{mockLogistics.length}</p>
@@ -105,30 +105,30 @@ export default function LogisticsPage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Teslim Edildi</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Teslim Edildi</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold text-green-600">
+                        <p className="text-2xl font-bold text-success">
                             {mockLogistics.filter((l) => l.status === 'delivered').length}
                         </p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Yolda</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Yolda</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold text-blue-600">
+                        <p className="text-2xl font-bold text-info">
                             {mockLogistics.filter((l) => l.status === 'in_transit').length}
                         </p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Hazırlanıyor</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Hazırlanıyor</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold text-yellow-600">
+                        <p className="text-2xl font-bold text-warning">
                             {mockLogistics.filter((l) => l.status === 'pending').length}
                         </p>
                     </CardContent>
@@ -138,7 +138,7 @@ export default function LogisticsPage() {
             {/* Filters */}
             <div className="flex gap-4">
                 <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         placeholder="Kişi adı ile ara..."
                         value={search}
@@ -178,7 +178,7 @@ export default function LogisticsPage() {
                         <TableBody>
                             {filteredItems.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={8} className="text-center py-8 text-slate-500">
+                                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                                         Kayıt bulunamadı
                                     </TableCell>
                                 </TableRow>
@@ -195,7 +195,7 @@ export default function LogisticsPage() {
                                             <TableCell className="font-mono text-sm">{item.aid_number}</TableCell>
                                             <TableCell className="font-medium">{item.needy_person.name}</TableCell>
                                             <TableCell>
-                                                <div className="flex items-center gap-1 text-sm text-slate-500">
+                                                <div className="flex items-center gap-1 text-sm text-muted-foreground">
                                                     <MapPin className="h-3 w-3" />
                                                     {item.needy_person.address}
                                                 </div>
@@ -212,7 +212,7 @@ export default function LogisticsPage() {
                                             <TableCell>
                                                 <Badge className={statusConfig.color}>{statusConfig.label}</Badge>
                                             </TableCell>
-                                            <TableCell className="text-sm text-slate-500">
+                                            <TableCell className="text-sm text-muted-foreground">
                                                 {item.delivery_date
                                                     ? format(new Date(item.delivery_date), 'dd.MM.yyyy', { locale: tr })
                                                     : '-'}

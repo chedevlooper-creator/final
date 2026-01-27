@@ -6,6 +6,13 @@ import { useUsersList } from '@/hooks/queries/use-users'
 import { PageHeader } from '@/components/common/page-header'
 import { DataTable } from '@/components/common/data-table'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -42,6 +49,7 @@ export default function UsersPage() {
   const [search, setSearch] = useState('')
   const [role, setRole] = useState<string>('')
   const [status, setStatus] = useState<string>('')
+  const [isFormOpen, setIsFormOpen] = useState(false)
 
   const { data, isLoading } = useUsersList({
     page,
@@ -52,10 +60,10 @@ export default function UsersPage() {
 
   const getRoleBadge = (role: string) => {
     const roleColors: Record<string, string> = {
-      admin: 'bg-red-100 text-red-700',
+      admin: 'bg-destructive/10 text-destructive',
       manager: 'bg-purple-100 text-purple-700',
-      user: 'bg-blue-100 text-blue-700',
-      viewer: 'bg-slate-100 text-slate-700',
+      user: 'bg-info/10 text-info',
+      viewer: 'bg-muted text-muted-foreground',
     }
     const roleLabels: Record<string, string> = {
       admin: 'Yönetici',
@@ -73,9 +81,9 @@ export default function UsersPage() {
 
   const getStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
-      active: 'bg-green-100 text-green-700',
-      inactive: 'bg-slate-100 text-slate-700',
-      suspended: 'bg-red-100 text-red-700',
+      active: 'bg-success/10 text-success',
+      inactive: 'bg-muted text-muted-foreground',
+      suspended: 'bg-destructive/10 text-destructive',
     }
     const statusLabels: Record<string, string> = {
       active: 'Aktif',
@@ -99,12 +107,12 @@ export default function UsersPage() {
             {row.original.full_name || 'İsimsiz Kullanıcı'}
           </p>
           <div className="flex gap-2 mt-1">
-            <span className="text-xs text-slate-500 flex items-center gap-1">
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
               <Mail className="h-3 w-3" />
               {row.original.email}
             </span>
             {row.original.phone && (
-              <span className="text-xs text-slate-500 flex items-center gap-1">
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
                 <Phone className="h-3 w-3" />
                 {row.original.phone}
               </span>
@@ -127,7 +135,7 @@ export default function UsersPage() {
       accessorKey: 'last_login',
       header: 'Son Giriş',
       cell: ({ row }) => (
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-muted-foreground">
           {row.original.last_login
             ? format(new Date(row.original.last_login), 'dd MMM yyyy HH:mm', { locale: tr })
             : 'Hiç giriş yapmadı'}
@@ -138,7 +146,7 @@ export default function UsersPage() {
       accessorKey: 'created_at',
       header: 'Kayıt Tarihi',
       cell: ({ row }) => (
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-muted-foreground">
           {format(new Date(row.original.created_at), 'dd MMM yyyy', { locale: tr })}
         </span>
       ),
@@ -174,7 +182,10 @@ export default function UsersPage() {
         description="Sistem kullanıcılarını görüntüleyin ve yönetin"
         icon={Users}
         actions={
-          <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600">
+          <Button
+            className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+            onClick={() => setIsFormOpen(true)}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Yeni Kullanıcı
           </Button>
@@ -184,7 +195,7 @@ export default function UsersPage() {
       {/* Filtreler */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Kullanıcı ara..."
             value={search}
@@ -226,6 +237,21 @@ export default function UsersPage() {
         pageIndex={page}
         onPageChange={setPage}
       />
+
+      {/* New User Dialog */}
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Yeni Kullanıcı</DialogTitle>
+            <DialogDescription>
+              Yeni bir kullanıcı oluşturun. Tüm gerekli alanları doldurun.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-8 text-center text-muted-foreground">
+            Form bileşeni yükleniyor...
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

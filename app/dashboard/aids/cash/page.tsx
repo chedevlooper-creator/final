@@ -94,7 +94,7 @@ export default function CashAidsPage() {
                 description="Nakdi yardım kayıtları ve takibi"
                 icon={Banknote}
                 actions={
-                    <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500">
+                    <Button className="bg-gradient-to-r from-primary to-primary/80">
                         <Plus className="mr-2 h-4 w-4" />
                         Yeni Nakdi Yardım
                     </Button>
@@ -105,7 +105,7 @@ export default function CashAidsPage() {
             <div className="grid gap-4 md:grid-cols-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Toplam Kayıt</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Toplam Kayıt</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold">{mockCashAids.length}</p>
@@ -113,7 +113,7 @@ export default function CashAidsPage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Toplam Tutar</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Toplam Tutar</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold">₺{totalAmount.toLocaleString('tr-TR')}</p>
@@ -121,18 +121,18 @@ export default function CashAidsPage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Teslim Edilen</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Teslim Edilen</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold text-green-600">{deliveredCount}</p>
+                        <p className="text-2xl font-bold text-success">{deliveredCount}</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Bekleyen</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Bekleyen</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold text-yellow-600">
+                        <p className="text-2xl font-bold text-warning">
                             {mockCashAids.filter((a) => a.status === 'pending').length}
                         </p>
                     </CardContent>
@@ -142,7 +142,7 @@ export default function CashAidsPage() {
             {/* Filters */}
             <div className="flex gap-4">
                 <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         placeholder="Kişi adı ile ara..."
                         value={search}
@@ -181,7 +181,7 @@ export default function CashAidsPage() {
                         <TableBody>
                             {filteredAids.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={8} className="text-center py-8 text-slate-500">
+                                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                                         Kayıt bulunamadı
                                     </TableCell>
                                 </TableRow>
@@ -197,7 +197,7 @@ export default function CashAidsPage() {
                                         <TableCell>
                                             <div>
                                                 <p className="font-medium">{aid.needy_person.name}</p>
-                                                <p className="text-xs text-slate-500">{aid.needy_person.phone}</p>
+                                                <p className="text-xs text-muted-foreground">{aid.needy_person.phone}</p>
                                             </div>
                                         </TableCell>
                                         <TableCell>
@@ -207,16 +207,16 @@ export default function CashAidsPage() {
                                             ₺{aid.amount.toLocaleString('tr-TR')}
                                         </TableCell>
                                         <TableCell>
-                                            <Badge className={aid.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}>
+                                            <Badge className={aid.status === 'delivered' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}>
                                                 {aid.status === 'delivered' ? 'Teslim Edildi' : 'Beklemede'}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="text-sm text-slate-500">
+                                        <TableCell className="text-sm text-muted-foreground">
                                             {aid.delivery_date
                                                 ? format(new Date(aid.delivery_date), 'dd.MM.yyyy', { locale: tr })
                                                 : '-'}
                                         </TableCell>
-                                        <TableCell className="text-sm text-slate-500">
+                                        <TableCell className="text-sm text-muted-foreground">
                                             {aid.next_date || '-'}
                                         </TableCell>
                                     </TableRow>

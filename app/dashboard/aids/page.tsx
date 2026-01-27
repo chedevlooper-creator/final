@@ -61,12 +61,6 @@ export default function AidsListPage() {
   })
 
   const getDeliveryStatusBadge = (status: string) => {
-    const statusColors: Record<string, string> = {
-      pending: 'bg-yellow-100 text-yellow-700',
-      delivered: 'bg-green-100 text-green-700',
-      returned: 'bg-red-100 text-red-700',
-      cancelled: 'bg-slate-100 text-slate-700',
-    }
     const statusLabels: Record<string, string> = {
       pending: 'Bekliyor',
       delivered: 'Teslim Edildi',
@@ -74,7 +68,7 @@ export default function AidsListPage() {
       cancelled: 'İptal',
     }
     return (
-      <Badge className={statusColors[status] || 'bg-slate-100'}>
+      <Badge status={status}>
         {statusLabels[status] || status}
       </Badge>
     )
@@ -96,7 +90,7 @@ export default function AidsListPage() {
             {row.original.needy_person?.first_name} {row.original.needy_person?.last_name}
           </p>
           {row.original.needy_person?.phone && (
-            <p className="text-xs text-slate-500">{row.original.needy_person.phone}</p>
+            <p className="text-xs text-muted-foreground">{row.original.needy_person.phone}</p>
           )}
         </div>
       ),
@@ -115,12 +109,12 @@ export default function AidsListPage() {
       cell: ({ row }) => (
         <div>
           {row.original.amount && (
-            <span className="font-bold text-emerald-600">
+            <span className="font-bold text-success">
               {formatAmount(row.original.amount, row.original.currency)}
             </span>
           )}
           {row.original.quantity && (
-            <span className="text-sm text-slate-600 ml-2">
+            <span className="text-sm text-muted-foreground ml-2">
               {row.original.quantity} {row.original.unit || 'adet'}
             </span>
           )}
@@ -134,12 +128,12 @@ export default function AidsListPage() {
         try {
           const date = row.original.aid_date ? new Date(row.original.aid_date) : null
           return (
-            <span className="text-sm text-slate-500">
+            <span className="text-sm text-muted-foreground">
               {date && !isNaN(date.getTime()) ? format(date, 'dd MMM yyyy', { locale: tr }) : '-'}
             </span>
           )
         } catch (e) {
-          return <span className="text-sm text-slate-500">-</span>
+          return <span className="text-sm text-muted-foreground">-</span>
         }
       },
     },

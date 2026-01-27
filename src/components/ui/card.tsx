@@ -2,32 +2,16 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-// Card variants for different styles
-const cardVariants = {
-  default: "rounded-xl border bg-card text-card-foreground shadow-soft",
-  elevated: "rounded-xl border bg-card text-card-foreground shadow-medium",
-  flat: "rounded-xl border bg-card text-card-foreground shadow-none",
-  interactive: "rounded-xl border bg-card text-card-foreground shadow-soft card-interactive cursor-pointer focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-none focus-visible:ring-offset-2",
-  glass: "rounded-xl border bg-card/80 text-card-foreground shadow-soft backdrop-blur-sm",
-  gradient: "rounded-xl border-0 bg-gradient-surface text-card-foreground shadow-medium",
-}
-
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & {
-    variant?: keyof typeof cardVariants
-    interactive?: boolean
-  }
->(({ className, variant = "default", interactive, ...props }, ref) => (
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      cardVariants[variant],
-      "transition-all duration-200",
+      "rounded-xl border bg-card text-card-foreground shadow-soft",
       className
     )}
-    tabIndex={interactive || variant === "interactive" ? 0 : undefined}
-    role={interactive || variant === "interactive" ? "button" : undefined}
     {...props}
   />
 ))

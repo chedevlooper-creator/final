@@ -79,9 +79,9 @@ const CATEGORY_OPTIONS = [
 ]
 
 const STATUS_OPTIONS = [
-    { value: 'active', label: 'Aktif', color: 'bg-green-100 text-green-700' },
-    { value: 'inactive', label: 'Pasif', color: 'bg-slate-100 text-slate-700' },
-    { value: 'blocked', label: 'Bloke', color: 'bg-red-100 text-red-700' },
+    { value: 'active', label: 'Aktif', color: 'bg-success/10 text-success' },
+    { value: 'inactive', label: 'Pasif', color: 'bg-muted text-muted-foreground' },
+    { value: 'blocked', label: 'Bloke', color: 'bg-destructive/10 text-destructive' },
 ]
 
 export default function MerchantDetailPage() {
@@ -130,10 +130,10 @@ export default function MerchantDetailPage() {
                             <h1 className="text-2xl font-bold">{merchant.company_name}</h1>
                             <Badge className={statusConfig?.color}>{statusConfig?.label}</Badge>
                         </div>
-                        <p className="text-sm text-slate-500">#{merchant.merchant_code}</p>
+                        <p className="text-sm text-muted-foreground">#{merchant.merchant_code}</p>
                     </div>
                 </div>
-                <Button onClick={handleSave} disabled={isSaving} className="bg-gradient-to-r from-emerald-500 to-cyan-500">
+                <Button onClick={handleSave} disabled={isSaving} className="bg-gradient-to-r from-primary to-primary/80">
                     <Save className="mr-2 h-4 w-4" />
                     {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
                 </Button>
@@ -145,14 +145,14 @@ export default function MerchantDetailPage() {
                     <CardContent className="pt-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-slate-500">Bakiye</p>
-                                <p className={`text-2xl font-bold ${merchant.balance >= 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                <p className="text-sm text-muted-foreground">Bakiye</p>
+                                <p className={`text-2xl font-bold ${merchant.balance >= 0 ? 'text-destructive' : 'text-success'}`}>
                                     ₺{Math.abs(merchant.balance).toLocaleString('tr-TR')}
                                 </p>
-                                <p className="text-xs text-slate-400">{merchant.balance >= 0 ? 'Borç' : 'Alacak'}</p>
+                                <p className="text-xs text-muted-foreground">{merchant.balance >= 0 ? 'Borç' : 'Alacak'}</p>
                             </div>
-                            <div className="p-3 bg-blue-100 rounded-lg">
-                                <CreditCard className="h-6 w-6 text-blue-600" />
+                            <div className="p-3 bg-info/10 rounded-lg">
+                                <CreditCard className="h-6 w-6 text-info" />
                             </div>
                         </div>
                     </CardContent>
@@ -161,11 +161,11 @@ export default function MerchantDetailPage() {
                     <CardContent className="pt-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-slate-500">Toplam Alım</p>
+                                <p className="text-sm text-muted-foreground">Toplam Alım</p>
                                 <p className="text-2xl font-bold">₺{merchant.total_purchases.toLocaleString('tr-TR')}</p>
                             </div>
-                            <div className="p-3 bg-green-100 rounded-lg">
-                                <TrendingUp className="h-6 w-6 text-green-600" />
+                            <div className="p-3 bg-success/10 rounded-lg">
+                                <TrendingUp className="h-6 w-6 text-success" />
                             </div>
                         </div>
                     </CardContent>
@@ -174,7 +174,7 @@ export default function MerchantDetailPage() {
                     <CardContent className="pt-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-slate-500">İşlem Sayısı</p>
+                                <p className="text-sm text-muted-foreground">İşlem Sayısı</p>
                                 <p className="text-2xl font-bold">{merchant.transactions.length}</p>
                             </div>
                             <div className="p-3 bg-purple-100 rounded-lg">
@@ -270,7 +270,7 @@ export default function MerchantDetailPage() {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>{t.description}</TableCell>
-                                            <TableCell className={`text-right font-medium ${t.amount >= 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                            <TableCell className={`text-right font-medium ${t.amount >= 0 ? 'text-destructive' : 'text-success'}`}>
                                                 {t.amount >= 0 ? '+' : ''}₺{Math.abs(t.amount).toLocaleString('tr-TR')}
                                             </TableCell>
                                         </TableRow>

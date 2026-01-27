@@ -94,10 +94,10 @@ export default function CashDeskPage() {
                 actions={
                     <div className="flex gap-2">
                         <Button variant="outline">
-                            <ArrowDownLeft className="mr-2 h-4 w-4 text-green-600" />
+                            <ArrowDownLeft className="mr-2 h-4 w-4 text-success" />
                             Tahsilat
                         </Button>
-                        <Button className="bg-gradient-to-r from-emerald-500 to-cyan-500">
+                        <Button className="bg-gradient-to-r from-primary to-primary/80">
                             <ArrowUpRight className="mr-2 h-4 w-4" />
                             Ödeme
                         </Button>
@@ -109,27 +109,27 @@ export default function CashDeskPage() {
             <div className="grid gap-4 md:grid-cols-3">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Günlük Tahsilat</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Günlük Tahsilat</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold text-green-600">
+                        <p className="text-2xl font-bold text-success">
                             ₺{totalIn.toLocaleString('tr-TR')}
                         </p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Günlük Ödeme</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Günlük Ödeme</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold text-red-600">
+                        <p className="text-2xl font-bold text-destructive">
                             ₺{totalOut.toLocaleString('tr-TR')}
                         </p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Kasa Bakiyesi</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Kasa Bakiyesi</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold">
@@ -142,7 +142,7 @@ export default function CashDeskPage() {
             {/* Filters */}
             <div className="flex gap-4">
                 <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         placeholder="Ad ile ara..."
                         value={search}
@@ -180,7 +180,7 @@ export default function CashDeskPage() {
                         <TableBody>
                             {filteredTransactions.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center py-8 text-slate-500">
+                                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                                         İşlem bulunamadı
                                     </TableCell>
                                 </TableRow>
@@ -196,20 +196,20 @@ export default function CashDeskPage() {
                                             {transaction.transaction_number}
                                         </TableCell>
                                         <TableCell>
-                                            <Badge className={transaction.type === 'in' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
+                                            <Badge className={transaction.type === 'in' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}>
                                                 {transaction.type === 'in' ? 'Tahsilat' : 'Ödeme'}
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
                                             <div>
                                                 <p className="font-medium">{transaction.recipient_name}</p>
-                                                <p className="text-xs text-slate-500">{transaction.description}</p>
+                                                <p className="text-xs text-muted-foreground">{transaction.description}</p>
                                             </div>
                                         </TableCell>
-                                        <TableCell className={`font-medium ${transaction.type === 'in' ? 'text-green-600' : 'text-red-600'}`}>
+                                        <TableCell className={`font-medium ${transaction.type === 'in' ? 'text-success' : 'text-destructive'}`}>
                                             {transaction.type === 'in' ? '+' : '-'}₺{transaction.amount.toLocaleString('tr-TR')}
                                         </TableCell>
-                                        <TableCell className="text-sm text-slate-500">
+                                        <TableCell className="text-sm text-muted-foreground">
                                             {format(new Date(transaction.created_at), 'dd.MM.yyyy HH:mm', { locale: tr })}
                                         </TableCell>
                                         <TableCell className="text-sm">{transaction.created_by}</TableCell>

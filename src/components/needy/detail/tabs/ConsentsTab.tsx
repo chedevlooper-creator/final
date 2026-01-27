@@ -4,11 +4,10 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { Plus, Eye, Upload, CheckCircle2, XCircle, FileCheck } from 'lucide-react'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Eye, Upload, CheckCircle2, XCircle, FileCheck } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import { Consent, CONSENT_TYPE_OPTIONS, SIGNATURE_TYPE_OPTIONS, ConsentType, SignatureType } from '@/types/linked-records.types'
 import { format } from 'date-fns'
@@ -16,13 +15,13 @@ import { tr } from 'date-fns/locale'
 
 interface ConsentsTabProps {
   needyPersonId: string
-  onClose: () => void
+  onClose?: () => void
 }
 
-export function ConsentsTab({ needyPersonId, onClose }: ConsentsTabProps) {
+export function ConsentsTab(_props: ConsentsTabProps) {
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [consents, setConsents] = useState<Consent[]>([])
+  const [consents, _setConsents] = useState<Consent[]>([])
   const [formData, setFormData] = useState({
     consent_type: '' as ConsentType | '',
     consent_name: '',
@@ -111,7 +110,12 @@ export function ConsentsTab({ needyPersonId, onClose }: ConsentsTabProps) {
 
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Rıza Beyanı Ekle</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Rıza Beyanı Ekle</DialogTitle>
+            <DialogDescription>
+              Kişinin rıza beyanı bilgilerini girin ve ilgili belgeleri yükleyin.
+            </DialogDescription>
+          </DialogHeader>
           <div className="space-y-4 py-4">
             <div><Label>Rıza Türü *</Label>
               <Select value={formData.consent_type} onValueChange={(v) => setFormData({ ...formData, consent_type: v as ConsentType })}>

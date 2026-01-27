@@ -1,345 +1,316 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+# CLAUDE.md - AI Development Context
 
 ## Project Overview
 
-**Yardım Yönetim Paneli** (Charity Management Panel) is a comprehensive web application for NGOs and charitable organizations to manage aid operations. Built with Next.js 16, TypeScript, Supabase, and Tailwind CSS.
+**Yardım Yönetim Paneli** (Aid Management Panel) is a comprehensive web application for Turkish NGOs and charitable organizations to manage aid operations, donations, volunteers, and beneficiaries.
 
-**Key Technologies:** Next.js 16 App Router, Supabase (PostgreSQL + Auth), TanStack Query, Zustand, React Hook Form + Zod, shadcn/ui components
+- **Type:** Dashboard/Management Web Application
+- **Language:** TypeScript (strict mode)
+- **Framework:** Next.js 16.1.3 with App Router
+- **Database:** Supabase (PostgreSQL) with Row Level Security
+- **UI Library:** Radix UI primitives (shadcn/ui) with Tailwind CSS
+- **State Management:** TanStack Query (server), Zustand (client)
+- **Deployment:** Vercel
 
-**Required Runtime:** Node.js 24.x (specified in package.json engines)
+## Technology Stack
 
----
+### Frontend
+- Next.js 16.1.3 (App Router, Turbopack, Server Components)
+- React 18
+- TypeScript 5.0
+- Tailwind CSS 3.4
+- Radix UI + shadcn/ui components
+- Framer Motion (animations)
+- Recharts (data visualization)
 
-## Development Commands
+### Backend & Database
+- Supabase (PostgreSQL, Auth, Storage)
+- Next.js API Routes
+- Row Level Security (RLS) on all tables
 
-```bash
-# Core development
-npm run dev              # Start dev server on localhost:3000
-npm run build            # Production build
-npm run start            # Start production server
+### State & Data Fetching
+- TanStack Query (server state, caching)
+- Zustand (client state)
+- React Hook Form (form state)
+- Zod (validation)
 
-# Code quality
-npm run lint             # ESLint
-npx tsc --noEmit         # Type check (important - do this before committing)
-npm run test             # Run Vitest tests
-npm run test:ui          # Test UI
-npm run test:coverage    # Coverage report
+### Monitoring & Analytics
+- Sentry (error tracking)
+- PostHog (product analytics)
+- Vercel Analytics
 
-# Analysis
-npm run analyze          # Bundle size analysis (requires ANALYZE=true)
-```
-
----
-
-## Architecture
-
-### App Router Structure
+## Project Structure
 
 ```
 src/
-├── app/                  # Next.js App Router
-│   ├── (auth)/          # Auth route group (no layout pollution)
-│   │   └── login/       # Authentication pages
-│   ├── api/             # Route Handlers (RESTful API)
-│   │   ├── cron/       # Scheduled jobs
-│   │   ├── docs/       # OpenAPI spec at /api/docs
-│   │   ├── finance/    # Finance endpoints
-│   │   └── mernis/     # TC Kimlik verification
-│   ├── dashboard/       # Protected area (middleware-enforced)
-│   │   └── [module]/   # Feature modules (aids, donations, needy, etc.)
-│   └── layout.tsx       # Root layout with providers
-├── proxy.ts             # Next.js middleware (auth redirects, non-standard location)
-└── ...
+├── app/                          # Next.js App Router
+│   ├── (auth)/                  # Authentication pages (login, register)
+│   ├── api/                     # API routes
+│   ├── dashboard/               # Main dashboard modules
+│   │   ├── account/            # User account management
+│   │   ├── aids/               # Aid distribution management
+│   │   ├── applications/       # Aid application tracking
+│   │   ├── calendar/           # Event calendar
+│   │   ├── donations/          # Donation management (with charity-boxes/)
+│   │   ├── events/             # Event management
+│   │   ├── finance/            # Financial module
+│   │   ├── messages/           # Messaging system
+│   │   ├── needy/              # Beneficiary management
+│   │   ├── orphans/            # Orphan/student tracking
+│   │   ├── purchase/           # Purchase management
+│   │   ├── reports/            # Reporting & analytics
+│   │   ├── settings/           # System settings
+│   │   └── volunteers/         # Volunteer management
+│   └── test/                   # Test pages
+│
+├── components/                   # React components
+│   ├── charts/                  # Recharts-based visualizations
+│   ├── common/                  # Shared components (EmptyState, Loading)
+│   ├── forms/                   # Form components (CharityBoxForm, etc.)
+│   ├── layout/                  # Layout components (Header, Sidebar)
+│   ├── navigation/              # Navigation components
+│   ├── needy/                   # Beneficiary-specific components
+│   ├── notification/            # Notification components
+│   ├── performance/             # Performance monitoring
+│   ├── ui/                      # UI primitives (shadcn/ui - 26 components)
+│   └── upload/                  # File upload components
+│
+├── hooks/                        # Custom React hooks
+│   ├── queries/                 # TanStack Query hooks
+│   ├── use-auth.ts             # Authentication state
+│   ├── use-notifications.ts    # Notification management
+│   └── use-toast.ts            # Toast notifications
+│
+├── lib/                          # Utilities & services
+│   ├── supabase/                # Supabase client config
+│   ├── validations/             # Zod validation schemas
+│   ├── analytics.ts            # PostHog integration
+│   ├── api-docs.ts             # OpenAPI spec
+│   ├── audit.ts                # Audit logging
+│   ├── bulk.ts                 # Bulk operations
+│   ├── email.ts                # Email templates
+│   ├── errors.ts               # Error handling
+│   ├── rbac.tsx                # Role-based access control
+│   ├── security.ts             # Security utilities
+│   └── utils.ts                # General utilities
+│
+├── stores/                       # Zustand state stores
+├── types/                        # TypeScript definitions
+│   └── database.types.ts       # Supabase generated types
+└── middleware.ts                 # Next.js middleware (auth)
+
+supabase/
+└── migrations/                   # Database migrations (23 files)
 ```
 
-### State Management Strategy
+## Core Modules
 
-| State Type | Tool | Use Case |
-|------------|------|----------|
-| Server State | TanStack Query | Database data, API responses (10min cache) |
-| Client State | Zustand | UI state, form state, preferences |
-| Form State | React Hook Form + Zod | Form validation |
-| Auth State | Supabase + Context | User session, permissions |
+### 1. İhtiyaç Sahipleri (Beneficiaries)
+- Personal information management
+- MERNIS integration for Turkish identity verification
+- Family and income tracking
+- Status workflow (pending, approved, rejected, etc.)
 
-### Component Patterns
+### 2. Bağış Yönetimi (Donations)
+- Cash and in-kind donation tracking
+- Donor management
+- Campaign management
+- Payment status tracking
 
-- **Compound Components**: DataTable with Header, Body, Pagination sub-components
-- **Render Props**: `IfPermission` component for RBAC
-- **Container/Presenter**: Data fetching in container, UI in presenter
-- **Custom Hooks**: `/src/hooks/queries/` for TanStack Query abstractions
+### 3. Kumbara Sistemi (Charity Boxes) - Recently Added
+- Box location management
+- Collection tracking
+- QR code support
+- Collection records with totals
 
----
+### 4. Gönüllü Sistemi (Volunteers)
+- Volunteer registration
+- Skill matching
+- Task assignment
+- Hours tracking
 
-## Security & RBAC
+### 5. Yetim Takibi (Orphan/Student Tracking)
+- Student information
+- Education status
+- Sponsor matching
+- Guardian information
 
-### Roles (4 levels)
-- `admin` - Full access, user management, settings
-- `moderator` - CRUD + approval, reports
-- `user` - Create/edit own records
-- `viewer` - Read-only
-
-### Permission Check Pattern
-
-```typescript
-// Using the RBAC helper
-import { IfPermission } from '@/lib/rbac'
-
-<IfPermission role={user.role} resource="needy_persons" action="delete">
-  <DeleteButton />
-</IfPermission>
-
-// Or use the hook
-import { usePermissions } from '@/lib/rbac'
-const { canDelete, needyPersons: { canUpdate } } = usePermissions(user.role)
-```
-
-### Important Security Constraints
-
-- **Service Role Key**: NEVER use on client-side; only in API routes or server components
-- **RLS**: All database tables have Row Level Security enabled
-- **MERNIS**: Turkish identity verification via `/api/mernis/verify`
-- **Audit Logging**: All CREATE/UPDATE/DELETE operations are logged via `lib/audit.ts`
-
----
-
-## Data Layer
-
-### Supabase Clients (3 types)
-
-```typescript
-// Client-side - use in browser components
-import { createClient } from '@/lib/supabase/client'
-
-// Server-side - use in Server Components / Route Handlers
-import { createClient } from '@/lib/supabase/server'
-
-// Middleware - for auth checks
-import { createClient } from '@/lib/supabase/middleware'
-```
-
-### Query Hooks Pattern
-
-```typescript
-// Custom hooks in src/hooks/queries/
-import { useNeedyList, useNeedyDetail } from '@/hooks/queries'
-
-// List query with filters/pagination
-const { data, isLoading, error } = useNeedyList({
-  page: 1,
-  limit: 20,
-  filters: { city_id: 34 }
-})
-
-// Detail query
-const { data: person } = useNeedyDetail(id)
-```
-
----
-
-## File Naming Conventions
-
-```
-# Components - kebab-case
-my-component.tsx           ✅
-MyComponent.tsx            ❌
-
-# Hooks - camelCase
-useAuth.ts                 ✅
-use-auth.ts                ❌
-
-# Folders for multi-file components
-components/my-feature/
-  index.tsx                # Main export
-  my-feature-card.tsx      # Sub-components
-  my-feature.types.ts      # Types
-```
-
----
-
-## Import Order
-
-```typescript
-// 1. External libraries
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-
-// 2. Internal absolute imports (@/)
-import { Button } from '@/components/ui/button'
-import { useAuth } from '@/hooks/use-auth'
-
-// 3. Relative imports
-import { SubComponent } from './sub-component'
-```
-
----
-
-## Database & Migrations
-
-- Migrations in `supabase/migrations/` (16 files)
-- All tables use UUID primary keys
-- Standard audit columns: `created_at`, `updated_at`, `created_by`, `updated_by`
-- Lookup tables: countries, cities, districts, neighborhoods, categories
-
----
-
-## API Routes
-
-- RESTful design with pagination
-- Error responses: `{ error: string, code: string }`
-- Rate limiting: 100 req/15min in production
-- OpenAPI spec: `GET /api/docs`
-
----
-
-## Module-Specific Notes
-
-### Needy Persons (`/dashboard/needy`)
-- Core entity with 27 component files
-- Bulk import/export via `lib/bulk.ts`
-- Excel/PDF export capabilities
-
-### Finance (`/dashboard/finance`)
-- Multi-currency support (TRY, USD, EUR, GBP)
+### 6. Finans (Finance)
+- Income/expense tracking
+- Budget management
+- Financial reports
 - Bank account management
-- Income/expense tracking with categories
 
-### Applications (`/dashboard/applications`)
-- Approval workflow (pending → approved/rejected)
-- Status transitions tracked in audit log
+### 7. Başvurular (Applications)
+- Online application forms
+- Approval workflows
+- Status tracking
+- Document management
 
----
+## Database Architecture
 
-## Testing
+### Key Tables
+- `needy_persons` - Beneficiary information
+- `aid_applications` - Aid application tracking
+- `donations` - Donation records
+- `orphans` - Student/orphan tracking
+- `charity_boxes` - Charity box locations
+- `charity_box_collections` - Collection records
+- `profiles` - User profiles with roles
+- `notifications` - User notifications
+- `meetings` - Meeting scheduling
 
+### Geographic Hierarchy
+- `countries` → `cities` → `districts` → `neighborhoods`
+
+### Security
+- Row Level Security (RLS) enabled on all tables
+- UUID-based primary keys
+- Audit columns (`created_at`, `updated_at`, `created_by`, `updated_by`)
+- Soft delete support (`deleted_at`)
+
+## User Roles & Permissions
+
+| Role | Permissions |
+|------|-------------|
+| **Admin** | Full system access, user management, system settings |
+| **Moderator** | CRUD operations, reporting, application approval |
+| **User** | Create and edit own records |
+| **Viewer** | Read-only access |
+
+Role-based access control is implemented in `src/lib/rbac.tsx`
+
+## Design System
+
+### Color Scheme (Corporate Professional Blue)
+```css
+--primary: #1e40af (blue-800)
+--primary-foreground: #ffffff
+--secondary: #f1f5f9 (slate-100)
+--accent: #3b82f6 (blue-500)
+--muted: #64748b (slate-500)
+--destructive: #ef4444 (red-500)
+```
+
+### UI Components
+- 26 shadcn/ui primitives (Button, Card, Dialog, Form, etc.)
+- Custom loading skeletons
+- Empty state components
+- Toast notifications (Sonner)
+
+## Development Workflow
+
+### Available Scripts
 ```bash
-npm run test              # Run tests
-npm run test:coverage     # Coverage report
+npm run dev              # Start development server
+npm run build            # Production build
+npm run start            # Production server
+npm run lint             # ESLint check
+npm run test             # Unit tests (Vitest)
+npm run test:ui          # Test UI
+npm run test:coverage    # Test coverage report
+npm run analyze          # Bundle analyzer
 ```
 
-Tests use Vitest with Testing Library. Test files should be co-located or in `src/__tests__/`.
+### Testing
+- Framework: Vitest
+- Testing Library: React Testing Library
+- Coverage reports available
 
----
+## TanStack Query Configuration
 
-## Common Patterns
+Default query options (configured in `src/hooks/queries/index.ts`):
+- `staleTime`: 10 minutes (600,000ms)
+- `gcTime`: 30 minutes (1,800,000ms)
+- `refetchOnWindowFocus`: false
+- `retry`: 2 attempts
 
-### Generic Table with Search/Filter
+## Important Patterns
 
+### Creating a New Query Hook
 ```typescript
-import { DataTable } from '@/components/common/data-table'
-import { useDataTable } from '@/hooks/use-data-table'
+// src/hooks/queries/use-example.ts
+import { useQuery } from '@tanstack/react-query'
+import { supabase } from '@/lib/supabase/client'
 
-function MyList() {
-  const { data, isLoading, filters, setFilters } = useNeedyList()
-  return (
-    <DataTable>
-      <DataTable.Header>
-        <DataTable.Search value={filters.search} onChange={setFilters} />
-      </DataTable.Header>
-      <DataTable.Body columns={columns} data={data} />
-      <DataTable.Pagination />
-    </DataTable>
-  )
-}
-```
-
-### Form with Validation
-
-```typescript
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { mySchema } from '@/lib/validations/my-schema'
-
-function MyForm() {
-  const form = useForm({
-    resolver: zodResolver(mySchema),
-    defaultValues: { ... }
+export function useExample(id: string) {
+  return useQuery({
+    queryKey: ['example', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('example_table')
+        .select('*')
+        .eq('id', id)
+        .single()
+      if (error) throw error
+      return data
+    },
   })
-  // ...
 }
+
+// Don't forget to export in src/hooks/queries/index.ts
 ```
 
----
+### Creating a New Form Component
+1. Create Zod schema in `src/lib/validations/`
+2. Create form component using `@/components/ui/form` (shadcn/ui + React Hook Form)
+3. Use `use-toast` for success/error notifications
+4. Call appropriate mutation/query hooks
 
-## Environment Variables
+### Database Migrations
+- Place new migrations in `supabase/migrations/`
+- Use naming convention: `YYYYMMDDHHmmss_description.sql`
+- Run via Supabase CLI or dashboard
+- Regenerate types: `supabase gen types typescript --local > src/types/database.types.ts`
 
-Required in `.env.local`:
-```bash
-NEXT_PUBLIC_SUPABASE_URL=xxx
-NEXT_PUBLIC_SUPABASE_ANON_KEY=xxx
-SUPABASE_SERVICE_ROLE_KEY=xxx  # Server-only, never commit
-```
+## Security Considerations
 
-Optional:
-```bash
-NEXT_PUBLIC_SENTRY_DSN=xxx
-NEXT_PUBLIC_POSTHOG_KEY=xxx
-MERNIS_SERVICE_URL=xxx
-CRON_SECRET=xxx
-```
-
----
+- All API routes check authentication
+- RLS policies enforced at database level
+- Input validation via Zod schemas
+- Audit logging for sensitive operations
+- CORS configured for allowed origins
+- MERNIS integration for Turkish identity verification
 
 ## Deployment
 
-- Platform: Vercel
-- CI/CD: GitHub Actions (lint, test, build, security scan)
-- Auto-deploy on push to `main` branch
-- Environment variables configured in Vercel dashboard
-- **Output Mode**: `standalone` (configured in next.config.ts for Docker/container support)
+- **Platform:** Vercel
+- **Region:** iad1
+- **Automatic deployments** on push to `main`
+- **Cron jobs** configured in `vercel.json`
+- **Environment variables** managed via Vercel dashboard
 
----
+## Recent Updates
 
-## Key Documentation
+### Charity Box System (2026-01-26)
+- Added `charity_boxes` table migration
+- Created `CharityBoxForm` component
+- Added `use-charity-boxes` query hook
+- Created charity-boxes dashboard module
 
-- `docs/ARCHITECTURE.md` - Detailed architecture diagrams
-- `docs/API.md` - Full API documentation
-- `docs/DATABASE.md` - Database schema
-- `docs/SECURITY.md` - Security policies and RBAC matrix
-- `docs/SETUP.md` - Development environment setup
-- `docs/PRODUCTION_CHECKLIST.md` - Production deployment checklist
+### Design System Update
+- Transitioned from teal/nature theme to corporate blue
+- Improved color contrast and accessibility
+- Updated across all components
 
----
+## Key Files to Reference
 
-## Production Deployment
+| File | Purpose |
+|------|---------|
+| `src/lib/supabase/client.ts` | Supabase client initialization |
+| `src/lib/rbac.tsx` | Role-based access control helpers |
+| `src/hooks/queries/index.ts` | TanStack Query configuration |
+| `src/middleware.ts` | Next.js middleware for auth |
+| `src/types/database.types.ts` | Database type definitions |
+| `vercel.json` | Vercel deployment config |
 
-### Prerequisites
-1. Supabase project with all migrations applied
-2. Environment variables configured (see `.env.example`)
-3. GitHub secrets set for CI/CD
-4. Vercel project connected
+## Notes for AI Assistants
 
-### Pre-Commit Validation
-```bash
-# Run all checks before committing
-npx tsc --noEmit    # Type check
-npm run lint        # ESLint
-npm run test        # Run tests
-```
-
-### Deployment Steps
-```bash
-# 1. Build locally to verify
-npm run build
-
-# 2. Test production build
-npm start
-
-# 3. Deploy (via Vercel CLI or GitHub Actions)
-vercel --prod
-# or push to main branch for auto-deploy
-```
-
-### Known Issues
-- **xlsx package v0.18.5**: Has known security vulnerabilities (Prototype Pollution, ReDoS)
-  - Mitigation: Used only server-side for Excel export
-  - Override added in package.json
-  - Consider replacing with `exceljs` for future releases
-
-### Post-Deployment
-1. Verify all API endpoints
-2. Test authentication flow
-3. Check Sentry error reporting
-4. Validate PostHog analytics
-5. Run through `docs/PRODUCTION_CHECKLIST.md`
+1. **Type Safety:** Always use TypeScript with strict mode. Use generated types from `database.types.ts`
+2. **Component Library:** Prefer shadcn/ui components. Build on top of existing primitives
+3. **State Management:** Use TanStack Query for server state, Zustand for client state
+4. **Forms:** Use React Hook Form + Zod validation pattern
+5. **Database Changes:** Always create migrations, never modify schema directly
+6. **UI Patterns:** Follow existing component patterns for consistency
+7. **Internationalization:** UI is in Turkish. Keep user-facing text in Turkish
+8. **Error Handling:** Use toast notifications for user feedback, Sentry for error tracking

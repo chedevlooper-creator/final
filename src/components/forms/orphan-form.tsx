@@ -22,6 +22,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
+import { formatDateForInput } from '@/lib/utils'
 
 const ORPHAN_TYPES = [
     { value: 'ihh_orphan', label: 'İHH Yetimi' },
@@ -170,7 +171,7 @@ export function OrphanForm({ defaultValues, onSuccess }: OrphanFormProps) {
                             <FormItem>
                                 <FormLabel>Doğum Tarihi</FormLabel>
                                 <FormControl>
-                                    <Input type="date" {...field} value={field.value || ''} />
+                                    <Input type="date" {...field} value={formatDateForInput(field.value)} />
                                 </FormControl>
                             </FormItem>
                         )}

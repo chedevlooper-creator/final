@@ -64,9 +64,9 @@ const AVAILABILITY_OPTIONS = [
 ]
 
 const STATUS_OPTIONS = [
-    { value: 'active', label: 'Aktif', color: 'bg-green-100 text-green-700' },
-    { value: 'inactive', label: 'Pasif', color: 'bg-slate-100 text-slate-700' },
-    { value: 'pending', label: 'Beklemede', color: 'bg-yellow-100 text-yellow-700' },
+    { value: 'active', label: 'Aktif', color: 'bg-success/10 text-success' },
+    { value: 'inactive', label: 'Pasif', color: 'bg-muted text-muted-foreground' },
+    { value: 'pending', label: 'Beklemede', color: 'bg-warning/10 text-warning' },
 ]
 
 export default function VolunteerDetailPage() {
@@ -115,10 +115,10 @@ export default function VolunteerDetailPage() {
                             <h1 className="text-2xl font-bold">{volunteer.first_name} {volunteer.last_name}</h1>
                             <Badge className={statusConfig?.color}>{statusConfig?.label}</Badge>
                         </div>
-                        <p className="text-sm text-slate-500">#{volunteer.volunteer_number}</p>
+                        <p className="text-sm text-muted-foreground">#{volunteer.volunteer_number}</p>
                     </div>
                 </div>
-                <Button onClick={handleSave} disabled={isSaving} className="bg-gradient-to-r from-emerald-500 to-cyan-500">
+                <Button onClick={handleSave} disabled={isSaving} className="bg-gradient-to-r from-primary to-primary/80">
                     <Save className="mr-2 h-4 w-4" />
                     {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
                 </Button>
@@ -129,11 +129,11 @@ export default function VolunteerDetailPage() {
                 <Card>
                     <CardContent className="pt-6">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-blue-100 rounded-lg">
-                                <Briefcase className="h-6 w-6 text-blue-600" />
+                            <div className="p-3 bg-info/10 rounded-lg">
+                                <Briefcase className="h-6 w-6 text-info" />
                             </div>
                             <div>
-                                <p className="text-sm text-slate-500">Toplam Görev</p>
+                                <p className="text-sm text-muted-foreground">Toplam Görev</p>
                                 <p className="text-2xl font-bold">{volunteer.total_missions}</p>
                             </div>
                         </div>
@@ -142,11 +142,11 @@ export default function VolunteerDetailPage() {
                 <Card>
                     <CardContent className="pt-6">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-green-100 rounded-lg">
-                                <Calendar className="h-6 w-6 text-green-600" />
+                            <div className="p-3 bg-success/10 rounded-lg">
+                                <Calendar className="h-6 w-6 text-success" />
                             </div>
                             <div>
-                                <p className="text-sm text-slate-500">Toplam Saat</p>
+                                <p className="text-sm text-muted-foreground">Toplam Saat</p>
                                 <p className="text-2xl font-bold">{volunteer.total_hours}</p>
                             </div>
                         </div>
@@ -159,7 +159,7 @@ export default function VolunteerDetailPage() {
                                 <Award className="h-6 w-6 text-purple-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-slate-500">Üyelik</p>
+                                <p className="text-sm text-muted-foreground">Üyelik</p>
                                 <p className="text-lg font-medium">{format(new Date(volunteer.join_date), 'MMM yyyy', { locale: tr })}</p>
                             </div>
                         </div>

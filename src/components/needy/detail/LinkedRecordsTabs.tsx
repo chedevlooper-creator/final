@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
   CreditCard,
   FileText,
@@ -19,9 +19,6 @@ import {
   FileCheck,
   Wallet,
   X,
-  Plus,
-  Search,
-  Filter,
 } from 'lucide-react'
 import { LINKED_RECORD_TABS, LinkedRecordTabType, CardSummary } from '@/types/linked-records.types'
 
@@ -61,7 +58,6 @@ interface LinkedRecordsTabsProps {
 }
 
 export function LinkedRecordsTabs({ needyPersonId, cardSummary }: LinkedRecordsTabsProps) {
-  const router = useRouter()
   const pathname = usePathname()
   const [activeTab, setActiveTab] = useState<LinkedRecordTabType | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -205,7 +201,12 @@ export function LinkedRecordsTabs({ needyPersonId, cardSummary }: LinkedRecordsT
         <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <div className="flex items-center justify-between">
-              <DialogTitle>{getActiveTabTitle()}</DialogTitle>
+              <div>
+                <DialogTitle>{getActiveTabTitle()}</DialogTitle>
+                <DialogDescription className="sr-only">
+                  İlgili kayıtların detaylarını görüntüleyin ve yönetin
+                </DialogDescription>
+              </div>
               <Button variant="ghost" size="icon" onClick={handleCloseModal}>
                 <X className="h-4 w-4" />
               </Button>

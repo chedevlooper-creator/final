@@ -2,15 +2,18 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-const Input = React.forwardRef<
-  HTMLInputElement,
-  React.ComponentProps<"input"> & {
-    error?: boolean
-  }
->(({ className, type, error, ...props }, ref) => {
+export interface InputProps extends React.ComponentProps<"input"> {
+  error?: boolean
+  /** ID of element describing the input for accessibility */
+  "aria-describedby"?: string
+}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, error, "aria-invalid": ariaInvalid, ...props }, ref) => {
     return (
       <input
         type={type}
+        aria-invalid={ariaInvalid ?? error}
         className={cn(
           "flex h-10 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm shadow-soft transition-all duration-200",
           "placeholder:text-muted-foreground",

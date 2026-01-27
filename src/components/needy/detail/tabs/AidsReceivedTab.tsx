@@ -14,9 +14,9 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog'
-import { Plus, Eye, Gift, Truck, Trash2 } from 'lucide-react'
+import { Eye, Gift, Truck, Trash2 } from 'lucide-react'
 import { TabLayout } from './TabLayout'
-import { AidReceived, AID_TYPE_OPTIONS, DELIVERY_STATUS_OPTIONS, CURRENCY_OPTIONS, AidType, DeliveryStatus } from '@/types/linked-records.types'
+import { AID_TYPE_OPTIONS, DELIVERY_STATUS_OPTIONS, CURRENCY_OPTIONS, AidType } from '@/types/linked-records.types'
 import { useLinkedRecords, useCreateLinkedRecord, useDeleteLinkedRecord, NeedyAidReceived } from '@/hooks/queries/use-linked-records'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
@@ -24,10 +24,10 @@ import { tr } from 'date-fns/locale'
 
 interface AidsReceivedTabProps {
   needyPersonId: string
-  onClose: () => void
+  onClose?: () => void
 }
 
-export function AidsReceivedTab({ needyPersonId, onClose }: AidsReceivedTabProps) {
+export function AidsReceivedTab({ needyPersonId }: AidsReceivedTabProps) {
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   
@@ -68,7 +68,7 @@ export function AidsReceivedTab({ needyPersonId, onClose }: AidsReceivedTabProps
       })
       toast.success('Yardım kaydı eklendi')
       setIsAddModalOpen(false)
-    } catch (error) {
+    } catch (_error) {
       toast.error('Kayıt başarısız oldu')
     }
   }
@@ -78,7 +78,7 @@ export function AidsReceivedTab({ needyPersonId, onClose }: AidsReceivedTabProps
       try {
         await deleteMutation.mutateAsync({ id, needyPersonId })
         toast.success('Kayıt silindi')
-      } catch (error) {
+      } catch (_error) {
         toast.error('Silme işlemi başarısız oldu')
       }
     }

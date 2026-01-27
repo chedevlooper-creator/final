@@ -7,8 +7,8 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { Plus, Eye, Pencil, Trash2, MessageSquare } from 'lucide-react'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Eye, Pencil, Trash2 } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import { Interview, INTERVIEW_TYPE_OPTIONS, INTERVIEW_OUTCOME_OPTIONS, INTERVIEW_STATUS_OPTIONS, InterviewType, InterviewOutcome } from '@/types/linked-records.types'
 import { format } from 'date-fns'
@@ -16,13 +16,13 @@ import { tr } from 'date-fns/locale'
 
 interface InterviewsTabProps {
   needyPersonId: string
-  onClose: () => void
+  onClose?: () => void
 }
 
-export function InterviewsTab({ needyPersonId, onClose }: InterviewsTabProps) {
+export function InterviewsTab(_props: InterviewsTabProps) {
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [interviews, setInterviews] = useState<Interview[]>([])
+  const [interviews, _setInterviews] = useState<Interview[]>([])
   const [formData, setFormData] = useState({
     interview_date: '',
     interview_type: '' as InterviewType | '',
@@ -104,7 +104,12 @@ export function InterviewsTab({ needyPersonId, onClose }: InterviewsTabProps) {
 
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Görüşme Ekle</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Görüşme Ekle</DialogTitle>
+            <DialogDescription>
+              Bu kişi ile yapılan görüşme kaydını ve sonuçlarını girin.
+            </DialogDescription>
+          </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div><Label>Tarih/Saat *</Label><Input type="datetime-local" value={formData.interview_date} onChange={(e) => setFormData({ ...formData, interview_date: e.target.value })} /></div>

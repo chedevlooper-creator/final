@@ -22,6 +22,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -46,10 +47,10 @@ import { toast } from 'sonner'
 
 interface BankAccountsTabProps {
   needyPersonId: string
-  onClose: () => void
+  onClose?: () => void
 }
 
-export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps) {
+export function BankAccountsTab({ needyPersonId }: BankAccountsTabProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -173,7 +174,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
         toast.success('Banka hesabı eklendi')
       }
       setIsAddModalOpen(false)
-    } catch (error) {
+    } catch (_error) {
       toast.error('Kayıt sırasında hata oluştu')
     }
   }
@@ -183,7 +184,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
       try {
         await deleteMutation.mutateAsync({ id, needyPersonId })
         toast.success('Banka hesabı silindi')
-      } catch (error) {
+      } catch (_error) {
         toast.error('Silme işlemi başarısız')
       }
     }
@@ -230,7 +231,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
                   </TableCell>
                 </TableRow>
               ) : (
-                accounts.map((account, index) => (
+                accounts.map((account) => (
                   <TableRow key={account.id}>
                     <TableCell>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -253,7 +254,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => handleEdit(account as any)}
+                          onClick={() => handleEdit(account)}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
@@ -282,6 +283,9 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
             <DialogTitle>
               {editingAccount ? 'Banka Hesabı Düzenle' : 'Yeni Banka Hesabı Ekle'}
             </DialogTitle>
+            <DialogDescription>
+              {editingAccount ? 'Banka hesabı bilgilerini buradan güncelleyebilirsiniz.' : 'Yeni banka hesabı bilgilerini buradan ekleyebilirsiniz.'}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="grid grid-cols-2 gap-4 py-4">

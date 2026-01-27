@@ -2,15 +2,6 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -22,31 +13,31 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Plus, Eye, Pencil, Trash2, ExternalLink } from 'lucide-react'
+import { Trash2, ExternalLink } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import { 
   Sponsor, 
   SPONSOR_TYPE_OPTIONS, 
   SPONSORSHIP_TYPE_OPTIONS,
   SPONSOR_STATUS_OPTIONS,
-  CURRENCY_OPTIONS,
   StatusFilter 
 } from '@/types/linked-records.types'
 
 interface SponsorsTabProps {
   needyPersonId: string
-  onClose: () => void
+  onClose?: () => void
 }
 
-export function SponsorsTab({ needyPersonId, onClose }: SponsorsTabProps) {
+export function SponsorsTab(_props: SponsorsTabProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [sponsors, setSponsors] = useState<Sponsor[]>([])
+  const [sponsors, _setSponsors] = useState<Sponsor[]>([])
 
   const columns = [
     { key: 'sponsor_name', label: 'Sponsor Adı' },
@@ -120,7 +111,12 @@ export function SponsorsTab({ needyPersonId, onClose }: SponsorsTabProps) {
 
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Sponsor Bağla</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Sponsor Bağla</DialogTitle>
+            <DialogDescription>
+              Bu kişiye sponsor bağlamak için mevcut bir sponsor seçin veya yeni sponsor ekleyin.
+            </DialogDescription>
+          </DialogHeader>
           <div className="py-4 text-center text-muted-foreground">
             <p>Sponsor seçimi için arama yapın veya yeni sponsor ekleyin.</p>
           </div>

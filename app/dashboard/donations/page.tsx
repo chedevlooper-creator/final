@@ -34,7 +34,6 @@ import { DONATION_TYPES, PAYMENT_METHODS, CURRENCIES } from '@/lib/validations/d
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { DonationForm } from '@/components/forms/donation-form'
-import { cn } from '@/lib/utils'
 
 // Page transition wrapper
 function PageTransition({ children }: { children: React.ReactNode }) {
@@ -56,7 +55,6 @@ type Donation = {
   payment_method: string | null
   payment_status: string
   created_at: string
-  category?: { id: string; name: string } | null
 }
 
 export default function DonationsListPage() {
@@ -223,7 +221,7 @@ export default function DonationsListPage() {
           actions={
             <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90">
+                <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90" data-testid="donation-add-button">
                   <Plus className="mr-2 h-4 w-4" />
                   Yeni Bağış
                 </Button>

@@ -14,6 +14,18 @@ export { useApplicationsList, useApplicationDetail, useCreateApplication, useUpd
 // Donations
 export { useDonationsList, useDonationDetail, useCreateDonation, useUpdateDonation, useDonationStats } from './use-donations'
 
+// Charity Boxes
+export {
+  useCharityBoxesList,
+  useCharityBoxDetail,
+  useCreateCharityBox,
+  useUpdateCharityBox,
+  useDeleteCharityBox,
+  useCharityBoxCollections,
+  useCreateCharityBoxCollection,
+  useCharityBoxStats,
+} from './use-charity-boxes'
+
 // Aids
 export { useAidsList, useAidDetail, useCreateAid, useUpdateAid } from './use-aids'
 

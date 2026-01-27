@@ -6,6 +6,13 @@ import { PageHeader } from '@/components/common/page-header'
 import { DataTable } from '@/components/common/data-table'
 import { Button } from '@/components/ui/button'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -25,7 +32,7 @@ import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { useBankTransactions, useDeleteFinanceTransaction, FinanceTransaction } from '@/hooks/queries/use-finance'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
+import { CashTransactionForm } from '@/components/forms/cash-transaction-form'
 
 // Page transition wrapper
 function PageTransition({ children }: { children: React.ReactNode }) {
@@ -39,6 +46,7 @@ function PageTransition({ children }: { children: React.ReactNode }) {
 export default function FinanceBankPage() {
   const [page, setPage] = useState(0)
   const [transactionType, setTransactionType] = useState<string>('')
+  const [isFormOpen, setIsFormOpen] = useState(false)
 
   const { data, isLoading } = useBankTransactions({
     type: transactionType as 'income' | 'expense' | undefined,
@@ -179,7 +187,10 @@ export default function FinanceBankPage() {
           description="Banka işlemlerini görüntüleyin ve yönetin"
           icon={CreditCard}
           actions={
-            <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90">
+            <Button
+              className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
+              onClick={() => setIsFormOpen(true)}
+            >
               <Plus className="mr-2 h-4 w-4" />
               Yeni İşlem
             </Button>
@@ -254,6 +265,19 @@ export default function FinanceBankPage() {
           </div>
         )}
       </div>
+
+      {/* New Transaction Dialog */}
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Yeni Banka İşlemi</DialogTitle>
+            <DialogDescription>
+              Yeni bir banka işlemi oluşturun. Tüm gerekli alanları doldurun.
+            </DialogDescription>
+          </DialogHeader>
+          <CashTransactionForm accountType="bank" onSuccess={() => setIsFormOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </PageTransition>
   )
 }

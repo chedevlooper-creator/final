@@ -22,11 +22,12 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Plus, Eye, Pencil, Trash2, ExternalLink } from 'lucide-react'
+import { Trash2, ExternalLink } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import { OrphanRelation, ORPHAN_RELATION_TYPE_OPTIONS, OrphanRelationType, StatusFilter } from '@/types/linked-records.types'
 import Link from 'next/link'
@@ -34,7 +35,7 @@ import { toast } from 'sonner'
 
 interface OrphanRelationsTabProps {
   needyPersonId: string
-  onClose: () => void
+  onClose?: () => void
 }
 
 interface Orphan {
@@ -43,7 +44,7 @@ interface Orphan {
   last_name: string
 }
 
-export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTabProps) {
+export function OrphanRelationsTab({ needyPersonId }: OrphanRelationsTabProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -258,6 +259,9 @@ export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTa
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Yetim Bağla</DialogTitle>
+            <DialogDescription>
+              Bu kişinin bir yetim ile olan ilişki türünü belirleyin ve bağlayın.
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">

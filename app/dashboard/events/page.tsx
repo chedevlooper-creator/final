@@ -7,6 +7,13 @@ import { PageHeader } from '@/components/common/page-header'
 import { DataTable } from '@/components/common/data-table'
 import { Button } from '@/components/ui/button'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -24,7 +31,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
-import { cn } from '@/lib/utils'
+import { EventForm } from '@/components/forms/event-form'
 
 // Page transition wrapper
 function PageTransition({ children }: { children: React.ReactNode }) {
@@ -51,6 +58,7 @@ export default function EventsPage() {
   const [page, setPage] = useState(0)
   const [eventType, setEventType] = useState<string>('')
   const [status, setStatus] = useState<string>('')
+  const [isFormOpen, setIsFormOpen] = useState(false)
 
   const { data, isLoading } = useEventsList({
     page,
@@ -205,7 +213,10 @@ export default function EventsPage() {
           description="Etkinlikleri görüntüleyin ve yönetin"
           icon={Calendar}
           actions={
-            <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90">
+            <Button
+              className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
+              onClick={() => setIsFormOpen(true)}
+            >
               <Plus className="mr-2 h-4 w-4" />
               Yeni Etkinlik
             </Button>
@@ -296,6 +307,19 @@ export default function EventsPage() {
           </div>
         )}
       </div>
+
+      {/* New Event Dialog */}
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Yeni Etkinlik</DialogTitle>
+            <DialogDescription>
+              Yeni bir etkinlik oluşturun. Tüm gerekli alanları doldurun.
+            </DialogDescription>
+          </DialogHeader>
+          <EventForm onSuccess={() => setIsFormOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </PageTransition>
   )
 }
