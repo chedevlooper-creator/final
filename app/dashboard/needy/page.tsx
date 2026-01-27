@@ -41,7 +41,7 @@ function PageTransition({ children }: { children: React.ReactNode }) {
 // Lazy loading large libraries for performance
 const exportToExcelLazy = async (data: any[]) => {
   const { exportNeedyPersonsToExcel } = await import('@/lib/export/excel')
-  exportNeedyPersonsToExcel(data)
+  await exportNeedyPersonsToExcel(data)
 }
 
 // Lazy loading modal - reduces initial bundle size

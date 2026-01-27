@@ -61,17 +61,17 @@ export function CategoryChart({ data }: CategoryChartProps) {
           data={data}
           cx="50%"
           cy="50%"
-          labelLine={false}
-          label={({ category, percent }: { category: string; percent: number }) => `${category}: ${(percent * 100).toFixed(0)}%`}
           outerRadius={80}
           fill="hsl(var(--chart-1))"
           dataKey="amount"
+          label
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
           ))}
         </Pie>
         <Tooltip formatter={(value?: number) => value !== undefined ? `${value.toLocaleString('tr-TR')} TL` : ''} />
+        <Legend />
       </PieChart>
     </ResponsiveContainer>
   )
