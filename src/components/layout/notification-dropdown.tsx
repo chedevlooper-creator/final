@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -13,7 +12,6 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { 
   Bell, 
-  Check, 
   CheckCheck, 
   Info, 
   CheckCircle, 

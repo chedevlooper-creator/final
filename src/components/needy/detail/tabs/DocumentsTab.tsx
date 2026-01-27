@@ -27,9 +27,9 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog'
-import { Plus, Eye, Download, Trash2, FileText, Upload, CheckCircle2 } from 'lucide-react'
+import { Eye, Download, Trash2, FileText, Upload, CheckCircle2 } from 'lucide-react'
 import { TabLayout } from './TabLayout'
-import { Document, DOCUMENT_TYPE_OPTIONS, DocumentType, StatusFilter } from '@/types/linked-records.types'
+import { DOCUMENT_TYPE_OPTIONS, DocumentType } from '@/types/linked-records.types'
 import { useLinkedRecords, useCreateLinkedRecord, useDeleteLinkedRecord } from '@/hooks/queries/use-linked-records'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
@@ -37,15 +37,15 @@ import { tr } from 'date-fns/locale'
 
 interface DocumentsTabProps {
   needyPersonId: string
-  onClose: () => void
+  onClose?: () => void
 }
 
-export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
+export function DocumentsTab({ needyPersonId }: DocumentsTabProps) {
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   
-  const { data: documents = [], isLoading } = useLinkedRecords<any>('needy_documents', needyPersonId)
-  const createMutation = useCreateLinkedRecord<any>('needy_documents')
+  const { data: documents = [], isLoading } = useLinkedRecords<Record<string, unknown>>('needy_documents', needyPersonId)
+  const createMutation = useCreateLinkedRecord<Record<string, unknown>>('needy_documents')
   const deleteMutation = useDeleteLinkedRecord('needy_documents')
 
   const [formData, setFormData] = useState({
@@ -88,7 +88,7 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
       })
       toast.success('Döküman eklendi')
       setIsAddModalOpen(false)
-    } catch (error) {
+    } catch (_error) {
       toast.error('Döküman yüklenemedi')
     }
   }
@@ -98,13 +98,13 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
       try {
         await deleteMutation.mutateAsync({ id, needyPersonId })
         toast.success('Döküman silindi')
-      } catch (error) {
+      } catch (_error) {
         toast.error('Silme işlemi başarısız oldu')
       }
     }
   }
 
-  const filteredDocs = documents.filter((doc: any) => 
+  const filteredDocs = documents.filter((doc: Record<string, unknown>) => 
     !searchValue || 
     doc.document_name?.toLowerCase().includes(searchValue.toLowerCase()) ||
     doc.document_number?.includes(searchValue)
@@ -145,7 +145,7 @@ export function DocumentsTab({ needyPersonId, onClose }: DocumentsTabProps) {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredDocs.map((doc: any) => (
+                filteredDocs.map((doc: Record<string, unknown>) => (
                   <TableRow key={doc.id}>
                     <TableCell>
                       <Button variant="ghost" size="icon" className="h-8 w-8">

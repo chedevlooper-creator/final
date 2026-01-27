@@ -7,22 +7,22 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { Plus, Eye, Pencil, Trash2, CreditCard } from 'lucide-react'
+import { Pencil, Trash2, CreditCard } from 'lucide-react'
 import { TabLayout } from './TabLayout'
-import { SocialCard, SOCIAL_CARD_TYPE_OPTIONS, SOCIAL_CARD_STATUS_OPTIONS, SocialCardType, SocialCardStatus, StatusFilter } from '@/types/linked-records.types'
+import { SocialCard, SOCIAL_CARD_TYPE_OPTIONS, SOCIAL_CARD_STATUS_OPTIONS, SocialCardType, StatusFilter } from '@/types/linked-records.types'
 import { format, isBefore } from 'date-fns'
 import { tr } from 'date-fns/locale'
 
 interface SocialCardsTabProps {
   needyPersonId: string
-  onClose: () => void
+  onClose?: () => void
 }
 
-export function SocialCardsTab({ needyPersonId, onClose }: SocialCardsTabProps) {
+export function SocialCardsTab(_props: SocialCardsTabProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [cards, setCards] = useState<SocialCard[]>([])
+  const [cards, _setCards] = useState<SocialCard[]>([])
   const [formData, setFormData] = useState({
     card_type: '' as SocialCardType | '',
     card_name: '',
