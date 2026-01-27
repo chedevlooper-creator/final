@@ -83,7 +83,7 @@ export function VolunteerForm({ defaultValues, onSuccess }: VolunteerFormProps) 
             toast.success('Gönüllü kaydı oluşturuldu')
             form.reset()
             onSuccess?.()
-        } catch (error) {
+        } catch (_error) {
             toast.error('Kayıt oluşturulurken hata oluştu')
         }
     }

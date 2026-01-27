@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Plus, Eye, ExternalLink, Check, X } from 'lucide-react'
+import { ExternalLink, Check, X } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import Link from 'next/link'
 import { format } from 'date-fns'
@@ -58,11 +58,10 @@ const mockApplicationsData: Record<string, Application[]> = {
 
 interface ApplicationsTabProps {
   needyPersonId: string
-  onClose: () => void
+  onClose?: () => void
 }
 
-export function ApplicationsTab({ needyPersonId, onClose }: ApplicationsTabProps) {
-  const [searchValue, setSearchValue] = useState('')
+export function ApplicationsTab({ needyPersonId }: ApplicationsTabProps) {
   const [applications, setApplications] = useState<Application[]>([])
 
   // Load data

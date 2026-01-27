@@ -18,18 +18,18 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Plus, Trash2, Upload, Camera, Image as ImageIcon, Star, StarOff, X } from 'lucide-react'
+import { Trash2, Upload, Camera, Image as ImageIcon, Star, StarOff, X } from 'lucide-react'
 import { Photo, PHOTO_TYPE_OPTIONS, PhotoType } from '@/types/linked-records.types'
 
 interface PhotosTabProps {
   needyPersonId: string
-  onClose: () => void
+  onClose?: () => void
 }
 
-export function PhotosTab({ needyPersonId, onClose }: PhotosTabProps) {
+export function PhotosTab(_props: PhotosTabProps) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null)
-  const [photos, setPhotos] = useState<Photo[]>([])
+  const [photos, _setPhotos] = useState<Photo[]>([])
   
   const [formData, setFormData] = useState({
     photo_type: 'general' as PhotoType,
