@@ -91,10 +91,13 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // Refresh session to ensure it's valid
+  // Check session using getSession() instead of getUser() for middleware
+  // getSession() is more reliable in edge environments and doesn't auto-refresh
   const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  const user = session?.user
 
   const pathname = request.nextUrl.pathname
 
