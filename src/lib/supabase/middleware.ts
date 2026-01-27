@@ -26,6 +26,14 @@ const SECURITY_HEADERS = {
   'X-XSS-Protection': '1; mode=block',
   'Cross-Origin-Opener-Policy': 'same-origin',
   'Cross-Origin-Resource-Policy': 'same-origin',
+  'Content-Security-Policy': [
+    "default-src 'self'",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com data:",
+    "img-src 'self' data: https: blob:",
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+    "connect-src 'self' https://*.supabase.co https://*.vercel.app",
+  ].join('; '),
 } as const
 
 /**
@@ -62,6 +70,27 @@ function isPublicPath(pathname: string): boolean {
  * 4. Adds security headers to all responses
  */
 export async function updateSession(request: NextRequest) {
+  const pathname = request.nextUrl.pathname
+
+  // Skip auth check for static assets and public paths BEFORE creating Supabase client
+  // This prevents unnecessary auth calls for routes like manifest.webmanifest
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/static') ||
+    pathname.startsWith('/images') ||
+    pathname.includes('.') ||
+    isPublicPath(pathname)
+  ) {
+    const response = NextResponse.next({
+      request,
+    })
+    // Add security headers to public responses
+    Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+      response.headers.set(key, value)
+    })
+    return response
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -98,23 +127,6 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getSession()
 
   const user = session?.user
-
-  const pathname = request.nextUrl.pathname
-
-  // Skip auth check for static assets and public paths
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/static') ||
-    pathname.startsWith('/images') ||
-    pathname.includes('.') ||
-    isPublicPath(pathname)
-  ) {
-    // Add security headers to public responses too
-    Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
-      supabaseResponse.headers.set(key, value)
-    })
-    return supabaseResponse
-  }
 
   // Redirect unauthenticated users to login
   if (!user) {
