@@ -142,7 +142,10 @@ export function Header() {
                   {profile?.name || user?.email?.split('@')[0]}
                 </span>
                 <span className="text-xs text-muted-foreground leading-tight capitalize">
-                  {profile?.role || 'user'}
+                  {profile?.role === 'admin' ? 'Yönetici' :
+                    profile?.role === 'moderator' ? 'Moderatör' :
+                      profile?.role === 'user' ? 'Kullanıcı' :
+                        profile?.role === 'viewer' ? 'İzleyici' : 'Kullanıcı'}
                 </span>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />

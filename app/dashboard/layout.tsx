@@ -3,7 +3,9 @@
 import { useUIStore } from '@/stores/ui-store'
 import { cn } from '@/lib/utils'
 import { memo } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { useAuth } from '@/hooks/use-auth'
 
 // Import components directly to avoid dynamic import issues with Zustand
 import { Sidebar } from '@/components/layout/sidebar'
@@ -17,6 +19,23 @@ function DashboardLayoutClient({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+  const { user, loading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login')
+    }
+  }, [user, loading, router])
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    )
+  }
+
   // Use a selector function that returns a stable value
   const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed)
 
