@@ -27,7 +27,7 @@ import { Loader2 } from 'lucide-react'
 
 interface DonationFormProps {
   onSuccess?: () => void
-  defaultDonationType?: string
+  defaultDonationType?: DonationFormValues['donation_type']
 }
 
 export function DonationForm({ onSuccess, defaultDonationType }: DonationFormProps) {
@@ -36,7 +36,7 @@ export function DonationForm({ onSuccess, defaultDonationType }: DonationFormPro
   const form = useForm<DonationFormValues>({
     resolver: zodResolver(donationSchema),
     defaultValues: {
-      donation_type: defaultDonationType || 'cash',
+      donation_type: defaultDonationType ?? 'cash',
       currency: 'TRY',
       amount: 0,
     },

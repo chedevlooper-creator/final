@@ -23,7 +23,7 @@ const isProduction = process.env['NODE_ENV'] === 'production'
 const isBuildPhase = process.env['NEXT_PHASE'] === 'phase-production-build'
 
 /**
- * Export environment variables
+ * Public environment variables (safe for client-side access)
  *
  * Usage:
  * ```typescript
@@ -33,15 +33,11 @@ const isBuildPhase = process.env['NEXT_PHASE'] === 'phase-production-build'
  * ```
  */
 export const env = {
-  // Supabase configuration
+  // Supabase configuration (public)
   NEXT_PUBLIC_SUPABASE_URL: process.env['NEXT_PUBLIC_SUPABASE_URL'] || '',
-
   NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'] || '',
 
-  // Service role key (server-side only) - MUST be set in production
-  SUPABASE_SERVICE_ROLE_KEY: process.env['SUPABASE_SERVICE_ROLE_KEY'] || '',
-
-  // Sentry configuration (optional)
+  // Sentry configuration (optional, public)
   NEXT_PUBLIC_SENTRY_DSN: process.env['NEXT_PUBLIC_SENTRY_DSN'],
 
   // Application URL (for CORS and other configurations)
@@ -55,9 +51,30 @@ export const env = {
 } as const
 
 /**
+ * Server-only environment variables
+ * These are NEVER exposed to the client
+ *
+ * Usage (server components only):
+ * ```typescript
+ * import { serverEnv } from '@/lib/env'
+ *
+ * const serviceKey = serverEnv.SUPABASE_SERVICE_ROLE_KEY
+ * ```
+ */
+export const serverEnv = {
+  // Service role key - ONLY accessible on server-side
+  SUPABASE_SERVICE_ROLE_KEY: process.env['SUPABASE_SERVICE_ROLE_KEY'] || '',
+
+  // Other server-only secrets can be added here
+  DATABASE_URL: process.env['DATABASE_URL'],
+  API_SECRET_KEY: process.env['API_SECRET_KEY'],
+} as const
+
+/**
  * Type-safe environment variables
  */
 export type Env = typeof env
+export type ServerEnv = typeof serverEnv
 
 /**
  * Validates that required environment variables are present
@@ -97,4 +114,15 @@ export function validateEnv(): { valid: boolean; missing: string[] } {
  */
 export function hasSupabaseCredentials(): boolean {
   return !!(env.NEXT_PUBLIC_SUPABASE_URL && env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+}
+
+/**
+ * Get service role key (server-side only)
+ * Throws on client-side access attempt
+ */
+export function getServiceRoleKey(): string {
+  if (!isServer) {
+    throw new Error('Service role key can only be accessed on server-side')
+  }
+  return serverEnv.SUPABASE_SERVICE_ROLE_KEY
 }

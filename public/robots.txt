@@ -1,0 +1,33 @@
+# robots.txt - Search Engine Crawlers Configuration
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and sensitive routes
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /_next/
+Disallow: /static/
+
+# Disallow authenticated routes
+Disallow: /profile/
+Disallow: /settings/
+
+# Sitemap location
+Sitemap: https://yardimyonetim.com/sitemap.xml
+
+# Crawl delay (optional, prevents server overload)
+Crawl-delay: 1
+
+# Popular crawlers with specific rules
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Disallow image indexing (optional)
+# User-agent: Googlebot-Image
+# Disallow: /

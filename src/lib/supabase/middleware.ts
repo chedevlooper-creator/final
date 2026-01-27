@@ -13,6 +13,53 @@ function isBuildTime(): boolean {
   return !env.NEXT_PUBLIC_SUPABASE_URL || !env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 }
 
+/**
+ * Security headers to add to all responses
+ */
+const SECURITY_HEADERS = {
+  'X-DNS-Prefetch-Control': 'force-off',
+  'X-Frame-Options': 'SAMEORIGIN',
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  'X-XSS-Protection': '1; mode=block',
+  'Cross-Origin-Opener-Policy': 'same-origin',
+  'Cross-Origin-Resource-Policy': 'same-origin',
+} as const
+
+/**
+ * Paths that don't require authentication
+ */
+const PUBLIC_PATHS = [
+  '/login',
+  '/auth',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/api/health',
+  '/api/auth',
+  '/_next',
+  '/favicon.ico',
+  '/public',
+]
+
+/**
+ * Check if a path is public (doesn't require authentication)
+ */
+function isPublicPath(pathname: string): boolean {
+  return PUBLIC_PATHS.some((path) => pathname.startsWith(path))
+}
+
+/**
+ * Update session and handle authentication
+ *
+ * This middleware:
+ * 1. Refreshes the Supabase session
+ * 2. Redirects unauthenticated users from protected routes
+ * 3. Redirects authenticated users from auth pages
+ * 4. Adds security headers to all responses
+ */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -43,27 +90,101 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
+  // Refresh session to ensure it's valid
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Korumalı sayfalar için auth kontrolü
+  const pathname = request.nextUrl.pathname
+
+  // Skip auth check for static assets and public paths
   if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth')
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/static') ||
+    pathname.startsWith('/images') ||
+    pathname.includes('.') ||
+    isPublicPath(pathname)
   ) {
+    // Add security headers to public responses too
+    Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+      supabaseResponse.headers.set(key, value)
+    })
+    return supabaseResponse
+  }
+
+  // Redirect unauthenticated users to login
+  if (!user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    return NextResponse.redirect(url)
+    // Preserve the original URL for redirect after login
+    url.searchParams.set('redirect', pathname)
+    const response = NextResponse.redirect(url)
+
+    // Add security headers to redirect response
+    Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+      response.headers.set(key, value)
+    })
+
+    return response
   }
 
-  // Login sayfasına gelen authenticated kullanıcıları ana sayfaya yönlendir
-  if (user && request.nextUrl.pathname.startsWith('/login')) {
+  // Redirect authenticated users away from login/auth pages
+  if (user && (pathname.startsWith('/login') || pathname.startsWith('/auth'))) {
     const url = request.nextUrl.clone()
-    url.pathname = '/'
-    return NextResponse.redirect(url)
+    url.pathname = '/dashboard'
+    const response = NextResponse.redirect(url)
+
+    Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+      response.headers.set(key, value)
+    })
+
+    return response
   }
+
+  // Add security headers to authenticated responses
+  Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+    supabaseResponse.headers.set(key, value)
+  })
 
   return supabaseResponse
+}
+
+/**
+ * Rate limiting store for API routes (in-memory)
+ * Note: For production, use Redis or Upstash for distributed rate limiting
+ */
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>()
+
+/**
+ * Check rate limit for API routes
+ */
+export function checkRateLimit(identifier: string, limit = 100, windowMs = 900000): boolean {
+  const now = Date.now()
+  const entry = rateLimitStore.get(identifier)
+
+  if (!entry || now > entry.resetTime) {
+    rateLimitStore.set(identifier, { count: 1, resetTime: now + windowMs })
+    return true
+  }
+
+  if (entry.count >= limit) {
+    return false
+  }
+
+  entry.count++
+  return true
+}
+
+/**
+ * Clean up expired rate limit entries (run every 5 minutes)
+ */
+if (typeof window === 'undefined') {
+  setInterval(() => {
+    const now = Date.now()
+    for (const [key, value] of rateLimitStore.entries()) {
+      if (now > value.resetTime) {
+        rateLimitStore.delete(key)
+      }
+    }
+  }, 5 * 60 * 1000)
 }

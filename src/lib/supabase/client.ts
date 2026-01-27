@@ -1,5 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr'
-import { env } from '@/lib/env'
+import { env, getServiceRoleKey } from '@/lib/env'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
 // Singleton pattern for browser client
@@ -20,6 +20,7 @@ function isBuildTime(): boolean {
 /**
  * Optimized browser client with singleton pattern
  * Prevents multiple instances and improves performance
+ * SECURITY: Only uses public anon key, never service role key
  */
 export function createClient() {
   if (browserClient) {
@@ -51,24 +52,46 @@ export function createClient() {
 }
 
 /**
- * Check if service role key is available for admin operations
+ * Check if service role key is available for admin operations (server-side only)
  */
 function hasServiceRoleKey(): boolean {
-  return !!env.SUPABASE_SERVICE_ROLE_KEY
+  if (typeof window !== 'undefined') {
+    // Never allow service role key access on client-side
+    return false
+  }
+  try {
+    return !!getServiceRoleKey()
+  } catch {
+    return false
+  }
 }
 
 /**
  * Create admin client for privileged operations
- * Use only in server-side contexts!
+ * SECURITY: This will throw an error if called from client-side
+ *
+ * IMPORTANT: Only use in:
+ * - Server Components
+ * - API Routes (Route Handlers)
+ * - Server Actions
+ * - Middleware
+ *
+ * NEVER use in:
+ * - Client Components
+ * - Browser console
  */
 export function createAdminClient() {
+  // Security check: prevent client-side usage
   if (typeof window !== 'undefined') {
-    throw new Error('Admin client should only be used on server side')
+    throw new Error(
+      'SECURITY: Admin client can only be used on server-side. ' +
+      'This attempt has been logged for security review.'
+    )
   }
 
   // Use placeholder values during build/SSG
   const url = isBuildTime() ? BUILD_PLACEHOLDER_URL : env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = hasServiceRoleKey() ? env.SUPABASE_SERVICE_ROLE_KEY : BUILD_PLACEHOLDER_KEY
+  const serviceKey = hasServiceRoleKey() ? getServiceRoleKey() : BUILD_PLACEHOLDER_KEY
 
   return createSupabaseClient(
     url,
