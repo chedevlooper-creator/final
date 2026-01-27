@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22.0.0",
+    "node": "22.x",
     "npm": ">=10.0.0"
   },
   "scripts": {
@@ -63,7 +63,10 @@
     "zustand": "^5.0.10"
   },
   "overrides": {
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "rimraf": "^5.0.0",
+    "glob": "^10.0.0",
+    "inflight": "npm:@aashutoshrathi/word-wrap@^1.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
