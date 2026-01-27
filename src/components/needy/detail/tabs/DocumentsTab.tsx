@@ -104,11 +104,13 @@ export function DocumentsTab({ needyPersonId }: DocumentsTabProps) {
     }
   }
 
-  const filteredDocs = documents.filter((doc: Record<string, unknown>) => 
-    !searchValue || 
-    doc.document_name?.toLowerCase().includes(searchValue.toLowerCase()) ||
-    doc.document_number?.includes(searchValue)
-  )
+  const filteredDocs = documents.filter((doc: Record<string, unknown>) => {
+    const docName = doc['document_name'] as string | undefined
+    const docNumber = doc['document_number'] as string | undefined
+    return !searchValue || 
+      docName?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      docNumber?.includes(searchValue)
+  })
 
   return (
     <>
@@ -146,7 +148,7 @@ export function DocumentsTab({ needyPersonId }: DocumentsTabProps) {
                 </TableRow>
               ) : (
                 filteredDocs.map((doc: Record<string, unknown>) => (
-                  <TableRow key={doc.id}>
+                  <TableRow key={doc['id'] as string}>
                     <TableCell>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <Eye className="h-4 w-4" />
@@ -155,21 +157,21 @@ export function DocumentsTab({ needyPersonId }: DocumentsTabProps) {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <FileText className="h-4 w-4 text-muted-foreground" />
-                        {DOCUMENT_TYPE_OPTIONS.find(t => t.value === doc.document_type)?.label}
+                        {DOCUMENT_TYPE_OPTIONS.find(t => t.value === doc['document_type'])?.label}
                       </div>
                     </TableCell>
-                    <TableCell>{doc.document_name}</TableCell>
-                    <TableCell>{doc.document_number}</TableCell>
+                    <TableCell>{doc['document_name'] as string}</TableCell>
+                    <TableCell>{doc['document_number'] as string}</TableCell>
                     <TableCell>
-                      {doc.issue_date && format(new Date(doc.issue_date), 'dd.MM.yyyy', { locale: tr })}
+                      {doc['issue_date'] ? format(new Date(doc['issue_date'] as string), 'dd.MM.yyyy', { locale: tr }) : null}
                     </TableCell>
                     <TableCell>
-                      {doc.expiry_date && format(new Date(doc.expiry_date), 'dd.MM.yyyy', { locale: tr })}
+                      {doc['expiry_date'] ? format(new Date(doc['expiry_date'] as string), 'dd.MM.yyyy', { locale: tr }) : null}
                     </TableCell>
                     <TableCell>
-                      {doc.is_verified && (
+                      {doc['is_verified'] ? (
                         <CheckCircle2 className="h-4 w-4 text-success" />
-                      )}
+                      ) : null}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
@@ -180,7 +182,7 @@ export function DocumentsTab({ needyPersonId }: DocumentsTabProps) {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 text-destructive"
-                          onClick={() => handleDelete(doc.id)}
+                          onClick={() => handleDelete(doc['id'] as string)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
