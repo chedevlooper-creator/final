@@ -76,7 +76,7 @@ export function EventForm({ defaultValues, onSuccess }: EventFormProps) {
             toast.success('Etkinlik oluşturuldu')
             form.reset()
             onSuccess?.()
-        } catch (error) {
+        } catch (_error) {
             toast.error('Etkinlik oluşturulurken hata oluştu')
         }
     }

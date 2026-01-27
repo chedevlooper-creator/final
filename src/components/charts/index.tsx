@@ -1,15 +1,6 @@
 'use client'
 
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieLabelRenderProps } from 'recharts'
-
-// CSS değişkenlerinden renk değerlerini al
-const getCSSColor = (varName: string): string => {
-  if (typeof window === 'undefined') return '#10b981' // SSR fallback
-  const root = document.documentElement
-  const hsl = getComputedStyle(root).getPropertyValue(varName).trim()
-  if (!hsl) return '#10b981'
-  return `hsl(${hsl})`
-}
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 // Chart renkleri - CSS değişkenlerini kullanır
 const CHART_COLORS = [
@@ -22,15 +13,6 @@ const CHART_COLORS = [
   'hsl(var(--chart-7))',
   'hsl(var(--chart-8))',
 ]
-
-interface PieLabelProps {
-  category: string
-  percent: number
-}
-
-const CustomPieLabel = ({ category, percent }: PieLabelProps) => {
-  return `${category}: ${(percent * 100).toFixed(0)}%`
-}
 
 interface DonationChartProps {
   data: Array<{ date: string; amount: number }>
@@ -80,7 +62,7 @@ export function CategoryChart({ data }: CategoryChartProps) {
           cx="50%"
           cy="50%"
           labelLine={false}
-          label={({ category, percent }: any) => `${category}: ${(percent * 100).toFixed(0)}%`}
+          label={({ category, percent }: { category: string; percent: number }) => `${category}: ${(percent * 100).toFixed(0)}%`}
           outerRadius={80}
           fill="hsl(var(--chart-1))"
           dataKey="amount"

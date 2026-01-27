@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "github.com/antvis/mcp-server-chart": {
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "@antv/mcp-server-chart"]
-    }
-  }
-}

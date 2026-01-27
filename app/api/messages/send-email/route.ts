@@ -10,6 +10,64 @@ import { NextRequest, NextResponse } from 'next/server'
 import { withAuth } from '@/lib/permission-middleware'
 import { getEmailProvider, type EmailOptions } from '@/lib/messaging/email.provider'
 
+/**
+ * HTML içeriğini sanitize eder - XSS koruması
+ * Sadece güvenli HTML etiketlerine izin verir
+ */
+function sanitizeHtml(html: string): string {
+  // Güvenli HTML etiketleri ve özellikleri
+  const allowedTags = [
+    'p', 'br', 'strong', 'b', 'em', 'i', 'u',
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'ul', 'ol', 'li',
+    'a', 'img',
+    'table', 'thead', 'tbody', 'tr', 'td', 'th',
+    'div', 'span'
+  ]
+
+  const allowedAttributes = {
+    'a': ['href', 'title', 'target'],
+    'img': ['src', 'alt', 'width', 'height'],
+    '*': ['class', 'style'] // Sınırlı style kullanımı
+  }
+
+  // Script ve olay handler'larını temizle
+  let sanitized = html
+
+  // <script> etiketlerini kaldır
+  sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+
+  // Olay handler'larını kaldır (onclick, onerror, vb.)
+  sanitized = sanitized.replace(/\s+on\w+\s*=\s*["'][^"']*["']/gi, '')
+  sanitized = sanitized.replace(/\s+on\w+\s*=\s*[^\s>]+/gi, '')
+
+  // javascript: protokolünü kaldır
+  sanitized = sanitized.replace(/href\s*=\s*["']javascript:[^"']*["']/gi, 'href="#"')
+  sanitized = sanitized.replace(/href\s*=\s*javascript:[^\s>]*/gi, 'href="#"')
+
+  // Data URL'leri kaldır (XSS riski)
+  sanitized = sanitized.replace(/src\s*=\s*["']data:[^"']*["']/gi, 'src=""')
+  sanitized = sanitized.replace(/src\s*=\s*data:[^\s>]*/gi, 'src=""')
+
+  // VML ve SVG XSS koruması
+  sanitized = sanitized.replace(/<vml:[^>]*>.*?<\/vml:[^>]*>/gi, '')
+  sanitized = sanitized.replace(/<svg[^>]*>.*?<\/svg>/gi, '')
+
+  // İfade ve eval içeriklerini temizle
+  sanitized = sanitized.replace(/&#[xX][0-9a-fA-F]+;?/g, '') // Hex entities
+  sanitized = sanitized.replace(/&#\d+;?/g, '') // Decimal entities
+
+  return sanitized
+}
+
+/**
+ * E-posta adresini validate eder
+ */
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email)
+}
+
 export async function POST(request: NextRequest) {
   try {
     // RBAC: Email gönderme için create permission gerekli
@@ -27,9 +85,26 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { recipients, subject, message, html, messageType, from, replyTo } = body
 
+    // Recipients validation
     if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
       return NextResponse.json(
         { error: 'Recipients are required', code: 'MISSING_RECIPIENTS' },
+        { status: 400 }
+      )
+    }
+
+    // Her bir e-posta adresini validate et
+    const validRecipients = recipients.filter((email: string) => {
+      if (typeof email !== 'string' || !isValidEmail(email)) {
+        console.warn(`Invalid email address skipped: ${email}`)
+        return false
+      }
+      return true
+    })
+
+    if (validRecipients.length === 0) {
+      return NextResponse.json(
+        { error: 'No valid email addresses provided', code: 'INVALID_RECIPIENTS' },
         { status: 400 }
       )
     }
@@ -41,9 +116,31 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Subject uzunluk limiti
+    if (subject.length > 500) {
+      return NextResponse.json(
+        { error: 'Subject too long (max 500 characters)', code: 'SUBJECT_TOO_LONG' },
+        { status: 400 }
+      )
+    }
+
     if (!message && !html) {
       return NextResponse.json(
         { error: 'Message content is required', code: 'MISSING_CONTENT' },
+        { status: 400 }
+      )
+    }
+
+    // HTML varsa sanitize et
+    let safeHtml = html
+    if (html && typeof html === 'string') {
+      safeHtml = sanitizeHtml(html)
+    }
+
+    // Message uzunluk limiti
+    if (message && message.length > 100000) {
+      return NextResponse.json(
+        { error: 'Message too long (max 100KB)', code: 'MESSAGE_TOO_LONG' },
         { status: 400 }
       )
     }
@@ -52,10 +149,10 @@ export async function POST(request: NextRequest) {
     const { data: emailData, error: insertError } = await supabase
       .from('email_messages')
       .insert(
-        recipients.map((email: string) => ({
+        validRecipients.map((email: string) => ({
           email,
           subject,
-          message: message || html,
+          message: message || safeHtml,
           message_type: messageType || 'bulk',
           status: 'pending',
           sent_at: new Date().toISOString(),
@@ -71,12 +168,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Send email via configured provider
+    // Send email via configured provider (sanitize edilmiş HTML ile)
     const emailProvider = getEmailProvider()
-    const emailOptions: EmailOptions[] = recipients.map((email: string) => ({
+    const emailOptions: EmailOptions[] = validRecipients.map((email: string) => ({
       to: email,
       subject,
-      html,
+      html: safeHtml,
       text: message,
       from,
       replyTo,
@@ -119,8 +216,8 @@ export async function POST(request: NextRequest) {
       failed: failCount,
       message: `Email processing completed: ${successCount} sent, ${failCount} failed`,
     })
-  } catch (error) {
-    console.error('Email send error:', error)
+  } catch (_error) {
+    console.error('Email send error:', _error)
     return NextResponse.json(
       { error: 'Internal server error', code: 'INTERNAL_ERROR' },
       { status: 500 }

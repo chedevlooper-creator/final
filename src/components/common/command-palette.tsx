@@ -17,19 +17,15 @@ import { menuItems } from '@/lib/menu-config'
 import {
   Search,
   ArrowRight,
-  Plus,
   Settings,
   User,
   LogOut,
-  Moon,
-  Sun,
   FileText,
   Users,
   DollarSign,
   Calendar,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
-import { cn } from '@/lib/utils'
 
 // Quick actions for the command palette
 const quickActions = [

@@ -46,7 +46,7 @@ function DataTableInner<TData, TValue>({
   isLoading,
   pageCount,
   pageIndex = 0,
-  pageSize = 20,
+  pageSize: _pageSize,
   onPageChange,
   onRowClick,
 }: DataTableProps<TData, TValue>) {
