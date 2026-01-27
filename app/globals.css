@@ -33,62 +33,33 @@
     );
   }
 
-  /* Glass Effect - Enhanced */
+  /* Glass Effect - Optimized */
   .glass {
-    background: hsl(0 0% 100% / 0.7);
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background: hsl(0 0% 100% / 0.8);
     border: 1px solid hsl(0 0% 100% / 0.4);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
   }
 
-  /* Shadows - Layered & Natural */
+  /* Shadows - Simplified for Performance */
   .shadow-soft {
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.02),
-      0 4px 12px rgba(0, 0, 0, 0.02),
-      0 12px 24px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
   .shadow-medium {
-    box-shadow:
-      0 2px 4px rgba(0, 0, 0, 0.03),
-      0 8px 24px rgba(0, 0, 0, 0.04),
-      0 16px 48px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 
-  /* Card Interactive - Smoother & More Feedback */
+  /* Card Interactive - Optimized */
   .card-interactive {
-    @apply transition-all duration-300 cursor-pointer border;
-    @apply hover:shadow-medium hover:border-primary/40 hover:-translate-y-1;
-    @apply active:scale-[0.98] active:translate-y-0 active:shadow-soft;
-    will-change: transform, box-shadow;
+    @apply transition-colors duration-200 cursor-pointer border;
+    @apply hover:border-primary/40;
   }
 
-  /* Animations */
+  /* Essential Animation Only */
   .animate-fade-in {
-    animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeIn 0.2s ease-out;
   }
   @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  .animate-slide-up {
-    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 }
 

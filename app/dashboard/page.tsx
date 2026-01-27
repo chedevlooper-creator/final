@@ -39,11 +39,7 @@ import { cn } from '@/lib/utils'
 
 // Page transition wrapper component
 function PageTransition({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="animate-fade-in animate-slide-up" style={{ animationDuration: '0.3s' }}>
-      {children}
-    </div>
-  )
+  return <div className="animate-fade-in">{children}</div>
 }
 
 // Stats grid with stagger animation
@@ -53,8 +49,8 @@ function StatsGrid({ children }: { children: React.ReactNode }) {
       {React.Children.map(children, (child, index) => (
         <div
           key={index}
-          className="animate-fade-in animate-slide-up"
-          style={{ animationDelay: `${index * 50}ms`, animationDuration: '0.3s' }}
+          className="animate-fade-in"
+          style={{ animationDelay: `${index * 30}ms` }}
         >
           {child}
         </div>
@@ -69,10 +65,10 @@ function StaggerCard({ children, className, delay = 0 }: { children: React.React
     <Card
       className={cn(
         'shadow-soft hover:shadow-medium hover:border-primary/20',
-        'transition-all duration-200 animate-fade-in',
+        'transition-colors duration-150',
         className
       )}
-      style={{ animationDelay: `${delay}ms`, animationDuration: '0.3s' }}
+      style={{ animationDelay: `${delay}ms` }}
     >
       {children}
     </Card>
