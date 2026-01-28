@@ -141,8 +141,13 @@ export function useAuth() {
       }
 
       toast.success('Giriş başarılı!')
-      // Force a full reload to ensure cookies are synchronized with the server middleware
-      window.location.href = '/dashboard'
+      
+      // Wait for session to be established before navigation
+      // This ensures cookies are set and auth state is ready
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
+      // Use router navigation to maintain auth state
+      router.push('/dashboard')
       return data
     } catch (error) {
       const message = ErrorHandler.handle(error, {
@@ -211,7 +216,12 @@ export function useAuth() {
       }
 
       toast.success('Çıkış yapıldı')
-      window.location.href = '/login'
+      
+      // Wait for session to be cleared
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
+      // Use router navigation
+      router.push('/login')
     } catch (error) {
       const message = ErrorHandler.handle(error, { action: 'signOut' })
       toast.error(message)
