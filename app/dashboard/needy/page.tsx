@@ -426,6 +426,7 @@ export default function NeedyListPage() {
           isLoading={isLoading}
           pageCount={Math.ceil((data?.count || 0) / 20)}
           pageIndex={page}
+          totalCount={data?.count}
           onPageChange={setPage}
           onRowClick={(row) => router.push(`/dashboard/needy/${row.id}`)}
         />

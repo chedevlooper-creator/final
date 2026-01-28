@@ -1,7 +1,6 @@
-import { LucideIcon } from 'lucide-react'
+import { LucideIcon, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { memo } from 'react'
-import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
 
 interface StatCardProps {
   title: string
@@ -53,7 +52,12 @@ export const StatCard = memo(function StatCard({
               </div>
             )}
           </div>
-          <div className="text-2xl font-bold text-foreground">{value}</div>
+          <div 
+            className="text-2xl font-bold text-foreground truncate max-w-[160px]" 
+            title={typeof value === 'string' || typeof value === 'number' ? String(value) : undefined}
+          >
+            {value}
+          </div>
           {description && (
             <p className="text-xs text-muted-foreground">{description}</p>
           )}

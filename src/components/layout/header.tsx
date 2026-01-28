@@ -80,7 +80,7 @@ export function Header() {
             placeholder="Ara... (⌘K)"
             className={cn(
               'w-64 pl-9 bg-muted/50 border-border transition-all duration-200',
-              'focus:w-80 focus:bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary/50'
+              'focus:bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary'
             )}
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setSearchFocused(false)}

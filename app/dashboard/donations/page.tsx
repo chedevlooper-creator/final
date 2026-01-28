@@ -309,6 +309,7 @@ export default function DonationsListPage() {
           isLoading={isLoading}
           pageCount={Math.ceil((data?.count || 0) / 20)}
           pageIndex={page}
+          totalCount={data?.count}
           onPageChange={setPage}
         />
 

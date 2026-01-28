@@ -35,7 +35,22 @@ export function Sidebar() {
   const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed)
   const toggleSidebar = useUIStore((state) => state.toggleSidebar)
   const [mounted, setMounted] = useState(false)
-  const [openGroups, setOpenGroups] = useState<string[]>(['Başlangıç', 'Yardım Yönetimi'])
+  
+  // Initialize state from localStorage using lazy initialization
+  const [openGroups, setOpenGroups] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      const savedGroups = localStorage.getItem('sidebar_open_groups')
+      if (savedGroups) {
+        try {
+          return JSON.parse(savedGroups)
+        } catch {
+          // Fallback to defaults if parse fails
+          return ['Başlangıç', 'Yardım Yönetimi']
+        }
+      }
+    }
+    return ['Başlangıç', 'Yardım Yönetimi']
+  })
 
   // Client-side hydration
   useEffect(() => {
@@ -46,12 +61,20 @@ export function Sidebar() {
     return () => clearTimeout(timeout)
   }, [])
 
+  // Save open groups to localStorage when they change
+  useEffect(() => {
+    if (typeof window !== 'undefined' && mounted) {
+      localStorage.setItem('sidebar_open_groups', JSON.stringify(openGroups))
+    }
+  }, [openGroups, mounted])
+
   const toggleGroup = (title: string) => {
-    setOpenGroups((prev) =>
-      prev.includes(title)
+    setOpenGroups((prev) => {
+      const newGroups = prev.includes(title)
         ? prev.filter((t) => t !== title)
         : [...prev, title]
-    )
+      return newGroups
+    })
   }
 
   if (!mounted) {

@@ -162,7 +162,13 @@ export default function FinancePage() {
                 </div>
               ))
             ) : (
-              <p className="text-center text-muted-foreground py-4">İşlem bulunamadı</p>
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <div className="p-3 rounded-full bg-muted/30 mb-3">
+                  <ArrowUpRight className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <p className="text-sm font-medium text-foreground">Henüz işlem yok</p>
+                <p className="text-xs text-muted-foreground mt-1">Kasa ve banka işlemleri burada görünecek</p>
+              </div>
             )}
           </div>
         </CardContent>

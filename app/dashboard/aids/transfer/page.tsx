@@ -31,6 +31,7 @@ import {
     Clock,
     CheckCircle,
     XCircle,
+    Send,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
@@ -183,8 +184,14 @@ export default function BankTransferPage() {
                         <TableBody>
                             {filteredTransfers.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center py-8 text-slate-500">
-                                        Ödeme emri bulunamadı
+                                    <TableCell colSpan={7} className="text-center py-12">
+                                        <div className="flex flex-col items-center justify-center">
+                                            <div className="p-3 rounded-full bg-muted/30 mb-3">
+                                                <Send className="h-6 w-6 text-muted-foreground" />
+                                            </div>
+                                            <p className="text-sm font-medium text-foreground">Ödeme emri bulunamadı</p>
+                                            <p className="text-xs text-muted-foreground mt-1">Arama kriterlerini değiştirmeyi deneyin</p>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ) : (

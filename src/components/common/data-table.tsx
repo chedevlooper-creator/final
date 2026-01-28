@@ -34,6 +34,7 @@ interface DataTableProps<TData, TValue> {
   pageCount?: number
   pageIndex?: number
   pageSize?: number
+  totalCount?: number
   onPageChange?: (page: number) => void
   onRowClick?: (data: TData) => void
 }
@@ -46,6 +47,7 @@ function DataTableInner<TData, TValue>({
   isLoading,
   pageCount,
   pageIndex = 0,
+  totalCount,
   onPageChange,
   onRowClick,
 }: DataTableProps<TData, TValue>) {
@@ -149,7 +151,15 @@ function DataTableInner<TData, TValue>({
       {/* Pagination */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Toplam {data.length} kayıt
+          {totalCount !== undefined ? (
+            <>
+              <span className="font-medium text-foreground">{data.length}</span> kayıt gösteriliyor
+              {' / '}
+              <span className="font-medium text-foreground">{totalCount}</span> toplam
+            </>
+          ) : (
+            <>Toplam <span className="font-medium text-foreground">{data.length}</span> kayıt</>
+          )}
         </p>
         <div className="flex items-center gap-2">
           <Button

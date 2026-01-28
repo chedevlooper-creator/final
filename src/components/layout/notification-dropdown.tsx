@@ -102,8 +102,9 @@ function NotificationItem({ notification, onRead, onDelete }: NotificationItemPr
           onDelete(notification.id)
         }}
         className="p-1 rounded hover:bg-muted opacity-0 group-hover:opacity-100 transition-opacity"
+        aria-label="Bildirimi sil"
       >
-        <Trash2 className="h-3 w-3 text-muted-foreground" />
+        <Trash2 className="h-3 w-3 text-muted-foreground" aria-hidden="true" />
       </button>
     </div>
   )
@@ -146,8 +147,8 @@ export function NotificationDropdown() {
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
+        <Button variant="ghost" size="icon" className="relative" aria-label="Bildirimler">
+          <Bell className="h-5 w-5" aria-hidden="true" />
           {hasUnread && (
             <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-danger/70 opacity-75" />
