@@ -12,8 +12,9 @@ import { usePermissions } from '@/lib/rbac'
 /**
  * Delay in milliseconds to allow cookies to be set after auth operations
  * This ensures the session is properly established before navigation
+ * 500ms allows sufficient time for cookies to sync in most network conditions
  */
-const AUTH_COOKIE_SYNC_DELAY = 100
+const AUTH_COOKIE_SYNC_DELAY = 500
 
 interface UserProfile {
   id: string
@@ -103,21 +104,32 @@ export function useAuth() {
 
       if (session?.user) {
         // Refetch profile on auth state change
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
+        try {
+          const { data: profileData, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
 
-        if (profileData) {
-          setProfile({
-            id: profileData.id,
-            email: profileData.email || session.user.email || '',
-            role: profileData.role || 'viewer',
-            name: profileData.name,
-            avatar_url: profileData.avatar_url
-          })
-        } else {
+          if (error) {
+            // PGRST116 = "No rows found" - expected for new users without profiles
+            if (error.code !== 'PGRST116') {
+              console.error('Profile fetch error:', error)
+            }
+            setProfile(null)
+          } else if (profileData) {
+            setProfile({
+              id: profileData.id,
+              email: profileData.email || session.user.email || '',
+              role: profileData.role || 'viewer',
+              name: profileData.name,
+              avatar_url: profileData.avatar_url
+            })
+          } else {
+            setProfile(null)
+          }
+        } catch (error) {
+          console.error('Unexpected error fetching profile:', error)
           setProfile(null)
         }
       } else {
@@ -154,6 +166,11 @@ export function useAuth() {
       
       // Use router navigation to maintain auth state
       router.push('/dashboard')
+      
+      // Force refresh to ensure middleware re-evaluates the session
+      // This is necessary because the session cookies need to be read by the server
+      router.refresh()
+      
       return data
     } catch (error) {
       const message = ErrorHandler.handle(error, {
