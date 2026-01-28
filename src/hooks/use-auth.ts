@@ -63,7 +63,7 @@ export function useAuth() {
 
         // Fetch user profile from profiles table
         if (user) {
-          const { data: profileData } = await supabase
+          const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', user.id)
@@ -77,6 +77,41 @@ export function useAuth() {
               name: profileData['name'],
               avatar_url: profileData['avatar_url']
             })
+          } else if (profileError?.code === 'PGRST116') {
+            // Profile doesn't exist - create it from user metadata
+            const userName = user.user_metadata?.['name'] || ''
+            const userRole = user.user_metadata?.['role'] || 'viewer'
+
+            const { data: newProfile, error: createError } = await supabase
+              .from('profiles')
+              .upsert({
+                id: user.id,
+                email: user.email || '',
+                name: userName,
+                role: userRole,
+                updated_at: new Date().toISOString()
+              }, { onConflict: 'id' })
+              .select()
+              .single()
+
+            if (newProfile && !createError) {
+              setProfile({
+                id: newProfile.id,
+                email: newProfile.email || user.email || '',
+                role: newProfile.role || 'viewer',
+                name: newProfile.name,
+                avatar_url: newProfile.avatar_url
+              })
+            } else {
+              // Fallback: Use user metadata as profile
+              setProfile({
+                id: user.id,
+                email: user.email || '',
+                role: userRole as UserRole,
+                name: userName,
+                avatar_url: undefined
+              })
+            }
           }
         }
       } catch (error) {
@@ -97,7 +132,7 @@ export function useAuth() {
 
       if (session?.user) {
         // Refetch profile on auth state change
-        const { data: profileData } = await supabase
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
@@ -111,6 +146,41 @@ export function useAuth() {
             name: profileData.name,
             avatar_url: profileData.avatar_url
           })
+        } else if (profileError?.code === 'PGRST116') {
+          // Profile doesn't exist - create it
+          const userName = session.user.user_metadata?.['name'] || ''
+          const userRole = session.user.user_metadata?.['role'] || 'viewer'
+
+          const { data: newProfile } = await supabase
+            .from('profiles')
+            .upsert({
+              id: session.user.id,
+              email: session.user.email || '',
+              name: userName,
+              role: userRole,
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'id' })
+            .select()
+            .single()
+
+          if (newProfile) {
+            setProfile({
+              id: newProfile.id,
+              email: newProfile.email || session.user.email || '',
+              role: newProfile.role || 'viewer',
+              name: newProfile.name,
+              avatar_url: newProfile.avatar_url
+            })
+          } else {
+            // Fallback
+            setProfile({
+              id: session.user.id,
+              email: session.user.email || '',
+              role: userRole as UserRole,
+              name: userName,
+              avatar_url: undefined
+            })
+          }
         } else {
           setProfile(null)
         }

@@ -20,7 +20,7 @@ import { NotificationDropdown } from '@/components/layout/notification-dropdown'
 import { useEffect, useState } from 'react'
 
 export function Header() {
-  const { user, profile, signOut } = useAuth()
+  const { user, profile, signOut, role } = useAuth()
   const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed)
   const [mounted, setMounted] = useState(false)
   const [searchFocused, setSearchFocused] = useState(false)
@@ -29,9 +29,33 @@ export function Header() {
     setMounted(true)
   }, [])
 
-  const initials = user?.email
-    ? user.email.slice(0, 2).toUpperCase()
-    : 'U'
+  // İsimden veya email'den initials oluştur
+  const getInitials = () => {
+    if (profile?.name) {
+      const parts = profile.name.trim().split(' ')
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+      }
+      return profile.name.slice(0, 2).toUpperCase()
+    }
+    if (user?.email) {
+      return user.email.slice(0, 2).toUpperCase()
+    }
+    return 'U'
+  }
+
+  const initials = getInitials()
+
+  // Rol badge'i için Türkçe karşılık
+  const getRoleLabel = (userRole: string) => {
+    const roleLabels: Record<string, string> = {
+      admin: 'Yönetici',
+      moderator: 'Moderatör',
+      user: 'Kullanıcı',
+      viewer: 'İzleyici',
+    }
+    return roleLabels[userRole] || userRole
+  }
 
   if (!mounted) {
     return (
@@ -95,10 +119,10 @@ export function Header() {
               </Avatar>
               <div className="hidden md:flex flex-col items-start mr-1">
                 <span className="text-sm font-bold leading-tight">
-                  {profile?.name || user?.email?.split('@')[0]}
+                  {profile?.name || user?.email?.split('@')[0] || 'Kullanıcı'}
                 </span>
-                <span className="text-xs text-muted-foreground leading-tight capitalize">
-                  {profile?.role || 'user'}
+                <span className="text-xs text-muted-foreground leading-tight">
+                  {getRoleLabel(role)}
                 </span>
               </div>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -108,11 +132,14 @@ export function Header() {
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-bold">
-                  {profile?.name || user?.email?.split('@')[0]}
+                  {profile?.name || user?.email?.split('@')[0] || 'Kullanıcı'}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {user?.email}
+                  {user?.email || 'Email bulunamadı'}
                 </p>
+                <span className="text-xs text-primary font-medium">
+                  {getRoleLabel(role)}
+                </span>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
