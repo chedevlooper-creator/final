@@ -37,9 +37,13 @@ function DashboardLayoutClient({
     )
   }
 
-  // If not loading but no user, don't render (redirect is happening)
+  // If not loading but no user, show loading (redirect is happening)
   if (!user) {
-    return null
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    )
   }
 
   // Use a selector function that returns a stable value
