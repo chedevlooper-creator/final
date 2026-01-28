@@ -183,3 +183,6 @@ run-migrations.sh
 # ===================
 .claude/
 skills/
+
+# Sentry Config File
+.env.sentry-build-plugin
