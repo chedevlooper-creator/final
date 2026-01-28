@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Heart, Loader2, Eye, EyeOff, Mail, Lock } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -15,48 +14,35 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const [currentYear, setCurrentYear] = useState<number | null>(null)
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const { signIn } = useAuth()
 
-  useEffect(() => {
-    setCurrentYear(new Date().getFullYear())
-  }, [])
-
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {}
-
-    // Email validation
     if (!email) {
       newErrors.email = 'E-posta adresi gerekli'
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = 'Geçerli bir e-posta adresi girin'
     }
-
-    // Password validation
     if (!password) {
       newErrors.password = 'Şifre gerekli'
     } else if (password.length < 6) {
       newErrors.password = 'Şifre en az 6 karakter olmalı'
     }
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!validateForm()) {
       toast.error('Lütfen formu kontrol edin')
       return
     }
-
     setIsLoading(true)
-
     try {
       await signIn(email, password)
-    } catch (error: unknown) {
+    } catch (error) {
       console.error(error)
     } finally {
       setIsLoading(false)
@@ -64,36 +50,33 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background-subtle to-primary/10 px-4">
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      {/* Subtle Background Pattern */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-50">
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/3 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-accent/3 rounded-full blur-3xl" />
       </div>
 
-      <Card className="w-full max-w-md relative z-10 shadow-large border-border/50 bg-card">
-        <CardHeader className="text-center space-y-4 pb-6">
+      <div className="w-full max-w-md relative">
+        {/* Card */}
+        <div className="card-bento p-8">
           {/* Logo */}
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/25 transition-transform hover:scale-105 duration-300">
-            <Heart className="h-8 w-8 text-primary-foreground" />
-          </div>
-
-          {/* Title */}
-          <div className="space-y-2">
-            <CardTitle className="text-2xl font-bold text-foreground">
+          <div className="text-center mb-8">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-b from-primary to-primary-dark shadow-lg mb-4">
+              <Heart className="h-8 w-8 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
               Yardım Yönetim Paneli
-            </CardTitle>
-            <CardDescription className="text-muted-foreground">
+            </h1>
+            <p className="text-muted-foreground mt-2 text-sm">
               Panel erişimi için hesabınıza giriş yapın
-            </CardDescription>
+            </p>
           </div>
-        </CardHeader>
 
-        <CardContent className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             {/* Email Field */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-foreground">
+              <Label htmlFor="email" className="text-sm font-semibold">
                 E-posta
               </Label>
               <div className="relative">
@@ -110,15 +93,14 @@ export default function LoginPage() {
                   required
                   autoComplete="email"
                   aria-invalid={!!errors.email}
-                  aria-describedby={errors.email ? 'email-error' : undefined}
                   className={cn(
-                    "pl-10 bg-background border-input transition-all duration-200",
-                    errors.email && "border-danger focus:border-danger focus:ring-danger/20"
+                    "pl-10",
+                    errors.email && "border-danger focus:border-danger"
                   )}
                 />
               </div>
               {errors.email && (
-                <p id="email-error" className="text-xs text-danger animate-fade-in">
+                <p className="text-xs text-danger font-medium">
                   {errors.email}
                 </p>
               )}
@@ -126,7 +108,7 @@ export default function LoginPage() {
 
             {/* Password Field */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-foreground">
+              <Label htmlFor="password" className="text-sm font-semibold">
                 Şifre
               </Label>
               <div className="relative">
@@ -143,10 +125,9 @@ export default function LoginPage() {
                   required
                   autoComplete="current-password"
                   aria-invalid={!!errors.password}
-                  aria-describedby={errors.password ? 'password-error' : undefined}
                   className={cn(
-                    "pl-10 pr-10 bg-background border-input transition-all duration-200",
-                    errors.password && "border-danger focus:border-danger focus:ring-danger/20"
+                    "pl-10 pr-10",
+                    errors.password && "border-danger focus:border-danger"
                   )}
                 />
                 <button
@@ -163,7 +144,7 @@ export default function LoginPage() {
                 </button>
               </div>
               {errors.password && (
-                <p id="password-error" className="text-xs text-danger animate-fade-in">
+                <p className="text-xs text-danger font-medium">
                   {errors.password}
                 </p>
               )}
@@ -173,7 +154,7 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-medium shadow-primary transition-all duration-200 hover:shadow-lg hover:shadow-primary/30"
+              className="w-full btn-primary"
             >
               {isLoading ? (
                 <>
@@ -187,24 +168,22 @@ export default function LoginPage() {
           </form>
 
           {/* Footer */}
-          <div className="pt-4 border-t border-border">
-            <p className="text-center text-sm text-muted-foreground">
+          <div className="mt-6 pt-6 border-t border-border text-center">
+            <p className="text-sm text-muted-foreground">
               Hesabınız yok mu?{' '}
               <button
                 type="button"
-                className="text-primary hover:text-primary/80 font-medium transition-colors underline-offset-4 hover:underline"
+                className="text-primary font-semibold hover:underline underline-offset-4 transition-colors"
               >
                 Sistem yöneticisi ile iletişime geçin
               </button>
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Version / Footer */}
-      <div className="absolute bottom-4 left-0 right-0 text-center">
-        <p className="text-xs text-muted-foreground/60">
-          Yardım Yönetim Paneli © {currentYear ?? ''}
+        {/* Version */}
+        <p className="text-center text-xs text-muted-foreground mt-6">
+          Yardım Yönetim Paneli © {new Date().getFullYear()}
         </p>
       </div>
     </div>

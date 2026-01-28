@@ -37,7 +37,7 @@ export function NotificationContainer({
   const filteredNotifications = notifications.filter(n => n.position === position)
 
   return (
-    <div className={`fixed z-50 flex flex-col gap-2 max-w-md w-full ${positionClasses[position]} ${className}`}>
+    <div className={`fixed z-[65] flex flex-col gap-2 max-w-md w-full ${positionClasses[position]} ${className}`}>
       <AnimatePresence mode="popLayout">
         {filteredNotifications.map((notification) => (
           <NotificationItem

@@ -29,7 +29,7 @@ export default function NeedyListLoading() {
       </Card>
 
       {/* Table Skeleton */}
-      <div className="rounded-lg border bg-white overflow-hidden">
+      <div className="rounded-lg border bg-card overflow-hidden shadow-soft">
         {/* Table Header */}
         <div className="border-b bg-muted p-4">
           <div className="flex gap-4">

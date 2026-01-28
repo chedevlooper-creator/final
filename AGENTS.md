@@ -54,6 +54,70 @@
 
 ---
 
+## 🎨 UI/UX Design System v2.0
+
+Proje, **UI UX Pro Max** skill kullanılarak tamamen yeniden tasarlanmıştır.
+
+### Design System
+
+| Özellik | Değer |
+|---------|-------|
+| **Stil** | Soft UI Evolution + Bento Grids |
+| **Font** | Nunito (rounded, friendly) |
+| **Primary** | `#0891B2` (Compassion Cyan) |
+| **Accent** | `#F97316` (Action Orange) |
+| **Background** | `#F0F9FF` (Soft Blue) |
+| **Card** | `#FFFFFF` (White) |
+| **Border Radius** | 12-16px |
+| **Shadows** | Soft multi-layer |
+
+### UI UX Pro Max Skill
+
+Proje, AI destekli tasarım önerileri sunan UI UX Pro Max skill entegrasyonuna sahiptir.
+
+### Kullanım
+
+```bash
+# Stil ara
+./.agents/skills/ui-ux-pro-max/uiux style glassmorphism
+
+# Renk paleti ara
+./.agents/skills/ui-ux-pro-max/uiux color healthcare
+
+# Font kombinasyonu ara
+./.agents/skills/ui-ux-pro-max/uiux font modern
+
+# Ürün tipine göre öneriler
+./.agents/skills/ui-ux-pro-max/uiux product saas
+
+# Tam design system oluştur
+./.agents/skills/ui-ux-pro-max/uiux design-system "fintech"
+
+# Python script doğrudan kullanım
+python3 .agents/skills/ui-ux-pro-max/scripts/search.py "saas" --domain color -n 3
+```
+
+### Özellikler
+
+- **67 UI Stili** - Glassmorphism, Neumorphism, Brutalism, Bento Grid, vb.
+- **96 Renk Paleti** - Endüstriye özel paletler (SaaS, Healthcare, Fintech)
+- **57 Font Kombinasyonu** - Google Fonts entegrasyonu
+- **BM25 + Regex Arama** - Akıllı öneri sistemi
+
+### Domain'ler
+
+| Domain | Açıklama |
+|--------|----------|
+| `product` | Ürün tipi önerileri |
+| `style` | UI stilleri + AI prompt'ları |
+| `color` | Renk paletleri |
+| `typography` | Font kombinasyonları |
+| `landing` | Landing page pattern'leri |
+| `chart` | Grafik tipleri |
+| `ux` | UX best practices |
+
+---
+
 ## 📁 Klasör Yapısı
 
 ```

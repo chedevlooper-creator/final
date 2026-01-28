@@ -29,7 +29,7 @@ export function DetailHeader({
   onDeleteRequest
 }: DetailHeaderProps) {
   return (
-    <div className="sticky top-0 z-10 bg-background border-b">
+    <div className="sticky top-0 z-20 bg-card border-b border-border/80 shadow-soft">
       <div className="flex items-center justify-between px-6 py-3">
         {/* Sol Taraf - Aksiyon Butonları */}
         <div className="flex items-center gap-2">

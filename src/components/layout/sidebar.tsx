@@ -6,14 +6,12 @@ import { cn } from '@/lib/utils'
 import { menuItems } from '@/lib/menu-config'
 import {
   ChevronLeft,
-  ChevronRight,
   ChevronDown,
   Heart,
   Home,
   Settings,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useUIStore } from '@/stores/ui-store'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useState, useEffect } from 'react'
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
@@ -27,11 +25,10 @@ import {
   TooltipContent,
   TooltipProvider,
 } from '@/components/ui/tooltip'
+import { useUIStore } from '@/stores/ui-store'
 
 export function Sidebar() {
   const pathname = usePathname()
-
-  // Zustand store selectors
   const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed)
   const toggleSidebar = useUIStore((state) => state.toggleSidebar)
   const [mounted, setMounted] = useState(false)
@@ -44,7 +41,6 @@ export function Sidebar() {
         try {
           return JSON.parse(savedGroups)
         } catch {
-          // Fallback to defaults if parse fails
           return ['Başlangıç', 'Yardım Yönetimi']
         }
       }
@@ -52,16 +48,10 @@ export function Sidebar() {
     return ['Başlangıç', 'Yardım Yönetimi']
   })
 
-  // Client-side hydration
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setMounted(true)
-    }, 0)
-
-    return () => clearTimeout(timeout)
+    setMounted(true)
   }, [])
 
-  // Save open groups to localStorage when they change
   useEffect(() => {
     if (typeof window !== 'undefined' && mounted) {
       localStorage.setItem('sidebar_open_groups', JSON.stringify(openGroups))
@@ -79,13 +69,13 @@ export function Sidebar() {
 
   if (!mounted) {
     return (
-      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card shadow-soft" aria-label="Ana navigasyon">
-        <div className="flex h-16 items-center justify-between border-b border-border px-4">
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary text-white shadow-primary">
-              <Heart className="h-5 w-5" />
+      <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-card shadow-card border-r border-border">
+        <div className="flex h-16 items-center px-4 border-b border-border">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary shadow-md">
+              <Heart className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-lg font-bold text-foreground">Yardım Paneli</h1>
+            <span className="text-lg font-bold text-foreground">Yardım Paneli</span>
           </div>
         </div>
       </aside>
@@ -96,73 +86,61 @@ export function Sidebar() {
     <TooltipProvider delayDuration={200}>
       <aside
         className={cn(
-          'fixed left-0 top-0 z-40 h-screen border-r border-border bg-card/95 backdrop-blur-sm transition-all duration-300 ease-out shadow-soft',
-          sidebarCollapsed ? 'w-16' : 'w-64'
+          'fixed left-0 top-0 z-40 h-screen bg-card shadow-card border-r border-border transition-all duration-300 ease-out',
+          sidebarCollapsed ? 'w-20' : 'w-64'
         )}
-        aria-label="Ana navigasyon"
       >
         {/* Header */}
-        <div className="flex h-16 items-center justify-between border-b border-border bg-transparent px-3">
+        <div className="flex h-16 items-center justify-between px-4 border-b border-border">
           {!sidebarCollapsed ? (
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity animate-slide-in-right"
-            >
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary text-white shadow-primary hover:shadow-lg transition-all duration-200">
-                <Heart className="h-5 w-5" />
+            <Link href="/dashboard" className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary shadow-md transition-transform hover:scale-105">
+                <Heart className="h-5 w-5 text-white" />
               </div>
-              <h1 className="text-lg font-bold text-foreground">
+              <span className="text-lg font-bold text-foreground">
                 Yardım Paneli
-              </h1>
+              </span>
             </Link>
           ) : (
             <Tooltip>
               <TooltipPrimitive.Trigger asChild>
                 <Link
                   href="/dashboard"
-                  className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary text-white shadow-primary hover:shadow-lg transition-all duration-200"
-                  aria-label="Yardım Paneli - Ana sayfaya dön"
+                  className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-primary shadow-md"
                 >
-                  <Home className="h-5 w-5" />
+                  <Home className="h-5 w-5 text-white" />
                 </Link>
               </TooltipPrimitive.Trigger>
-              <TooltipContent side="right" align="center">
-                Yardım Paneli - Ana sayfa
+              <TooltipContent side="right">
+                Ana Sayfa
               </TooltipContent>
             </Tooltip>
           )}
 
-          {/* Toggle Button */}
-          <Tooltip>
-            <TooltipPrimitive.Trigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleSidebar}
-                className={cn(
-                  'text-muted-foreground hover:text-foreground hover:bg-muted transition-all duration-200',
-                  sidebarCollapsed && 'mx-auto'
-                )}
-                aria-label={sidebarCollapsed ? 'Sidebar\'ı genişlet' : 'Sidebar\'ı daralt'}
-              >
-                {sidebarCollapsed ? (
-                  <ChevronRight className="h-4 w-4 transition-transform duration-200" />
-                ) : (
-                  <ChevronLeft className="h-4 w-4 transition-transform duration-200" />
-                )}
-              </Button>
-            </TooltipPrimitive.Trigger>
-            <TooltipContent side="right" align="center">
-              {sidebarCollapsed ? 'Sidebar\'ı genişlet' : 'Sidebar\'ı daralt'}
-            </TooltipContent>
-          </Tooltip>
+          {!sidebarCollapsed && (
+            <Tooltip>
+              <TooltipPrimitive.Trigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleSidebar}
+                  className="h-9 w-9 rounded-lg"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              </TooltipPrimitive.Trigger>
+              <TooltipContent side="right">
+                Daralt
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
 
         {/* Menu */}
-        <ScrollArea className="h-[calc(100vh-8rem)] scrollbar-thin">
-          <nav className="space-y-1 p-2" role="navigation" aria-label="Ana menü">
+        <ScrollArea className="h-[calc(100vh-8rem)] scrollbar-soft">
+          <nav className="p-3 space-y-1">
             {sidebarCollapsed ? (
-              // Collapsed mode - flat list with tooltips
+              // Collapsed mode
               <div className="space-y-1">
                 {menuItems.flatMap((group) => group.items).map((item) => {
                   const isActive = pathname === item.href
@@ -171,87 +149,72 @@ export function Sidebar() {
                       <TooltipPrimitive.Trigger asChild>
                         <Link
                           href={item.href}
-                          prefetch={true}
                           className={cn(
-                            'group flex items-center justify-center rounded-xl p-2.5 transition-all duration-200 outline-none focus-visible focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 focus:ring-offset-card',
-                            'hover:bg-muted cursor-pointer mx-auto w-10 h-10',
+                            'flex items-center justify-center rounded-lg p-2.5 transition-all duration-200',
+                            'hover:bg-muted',
                             isActive
                               ? 'bg-primary/10 text-primary'
                               : 'text-muted-foreground hover:text-foreground',
+                            'w-12 h-12 mx-auto'
                           )}
-                          aria-current={isActive ? 'page' : undefined}
                         >
-                          <item.icon className={cn(
-                            'shrink-0 transition-all duration-200',
-                            isActive ? 'h-5 w-5 text-primary' : 'h-5 w-5'
-                          )} />
+                          <item.icon className="h-5 w-5" />
                           {isActive && (
-                            <div className="absolute right-2 top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-primary" />
+                            <span className="absolute right-2 h-2 w-2 rounded-full bg-primary" />
                           )}
                         </Link>
                       </TooltipPrimitive.Trigger>
-                      <TooltipContent side="right" align="center">
-                        <span>{item.title}</span>
+                      <TooltipContent side="right">
+                        {item.title}
                       </TooltipContent>
                     </Tooltip>
                   )
                 })}
               </div>
             ) : (
-              // Expanded mode - grouped collapsible menu
-              menuItems.map((group, groupIndex) => (
+              // Expanded mode
+              menuItems.map((group) => (
                 <Collapsible
                   key={group.title}
                   open={openGroups.includes(group.title)}
                   onOpenChange={() => toggleGroup(group.title)}
                 >
                   <CollapsibleTrigger asChild>
-                    <button
-                      className={cn(
-                        'group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 outline-none focus-visible focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 focus:ring-offset-card',
-                        'text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer',
-                      )}
-                      style={{ animationDelay: `${groupIndex * 50}ms` }}
-                      aria-expanded={openGroups.includes(group.title)}
-                      aria-controls={`menu-${group.title.toLowerCase().replace(/\s+/g, '-')}`}
-                    >
-                      <div className="flex items-center justify-center rounded-lg bg-muted group-hover:bg-primary/10 p-2 transition-all duration-200 w-8 h-8">
-                        <group.icon className="shrink-0 h-4 w-4" />
+                    <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-muted-foreground hover:bg-muted transition-colors">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
+                        <group.icon className="h-4 w-4" />
                       </div>
                       <span className="flex-1 text-left">{group.title}</span>
                       <ChevronDown
                         className={cn(
-                          'h-4 w-4 shrink-0 transition-transform duration-200 text-muted-foreground',
+                          'h-4 w-4 transition-transform duration-200',
                           openGroups.includes(group.title) && 'rotate-180'
                         )}
                       />
                     </button>
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="space-y-0.5 pl-2" id={`menu-${group.title.toLowerCase().replace(/\s+/g, '-')}`}>
-                    {group.items.map((item, itemIndex) => {
+                  <CollapsibleContent className="space-y-0.5 pl-2">
+                    {group.items.map((item) => {
                       const isActive = pathname === item.href
                       return (
                         <Link
                           key={item.href}
                           href={item.href}
-                          prefetch={true}
                           className={cn(
-                            'group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all duration-200 outline-none focus-visible focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 focus:ring-offset-card',
-                            'hover:bg-muted cursor-pointer',
+                            'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-200',
+                            'hover:bg-muted',
                             isActive
-                              ? 'bg-primary/10 text-primary font-medium'
-                              : 'text-muted-foreground hover:text-foreground',
+                              ? 'bg-primary/10 text-primary font-semibold'
+                              : 'text-muted-foreground hover:text-foreground'
                           )}
-                          style={{ animationDelay: `${(groupIndex * 50) + (itemIndex * 25)}ms` }}
-                          aria-current={isActive ? 'page' : undefined}
                         >
                           <item.icon className={cn(
-                            'shrink-0 transition-all duration-200',
-                            isActive ? 'h-4 w-4 text-primary' : 'h-4 w-4 text-muted-foreground group-hover:text-foreground'
+                            'h-4 w-4',
+                            isActive ? 'text-primary' : ''
                           )} />
                           <span>{item.title}</span>
                           {isActive && (
-                            <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
+                            <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
                           )}
                         </Link>
                       )
@@ -264,38 +227,27 @@ export function Sidebar() {
         </ScrollArea>
 
         {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 border-t border-border bg-transparent p-2">
+        <div className="absolute bottom-0 left-0 right-0 border-t border-border bg-muted/50 p-3">
           {sidebarCollapsed ? (
             <Tooltip>
               <TooltipPrimitive.Trigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="mx-auto h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl"
-                  aria-label="Ayarlar"
-                  asChild
-                >
+                <Button variant="ghost" size="icon" className="mx-auto w-12 h-12 rounded-lg" asChild>
                   <Link href="/dashboard/settings/definitions">
                     <Settings className="h-5 w-5" />
                   </Link>
                 </Button>
               </TooltipPrimitive.Trigger>
-              <TooltipContent side="right" align="center">
+              <TooltipContent side="right">
                 Ayarlar
               </TooltipContent>
             </Tooltip>
           ) : (
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl px-3 py-2.5"
-              aria-label="Ayarlar"
-              asChild
-            >
+            <Button variant="ghost" className="w-full justify-start gap-3 rounded-lg" asChild>
               <Link href="/dashboard/settings/definitions">
-                <div className="flex items-center justify-center rounded-lg bg-muted p-2 w-8 h-8">
+                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
                   <Settings className="h-4 w-4" />
                 </div>
-                <span className="text-sm font-medium">Ayarlar</span>
+                <span className="font-semibold">Ayarlar</span>
               </Link>
             </Button>
           )}

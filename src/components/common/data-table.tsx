@@ -103,7 +103,7 @@ function DataTableInner<TData, TValue>({
         </div>
       )}
 
-      <div className="rounded-lg border bg-white overflow-hidden">
+      <div className="rounded-lg border bg-card overflow-hidden shadow-soft">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

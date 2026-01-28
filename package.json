@@ -15,7 +15,12 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "analyze": "ANALYZE=true next build"
+    "analyze": "ANALYZE=true next build",
+    "uiux": "./.agents/skills/ui-ux-pro-max/uiux",
+    "uiux:style": "./.agents/skills/ui-ux-pro-max/uiux style",
+    "uiux:color": "./.agents/skills/ui-ux-pro-max/uiux color",
+    "uiux:font": "./.agents/skills/ui-ux-pro-max/uiux font",
+    "uiux:design": "./.agents/skills/ui-ux-pro-max/uiux design-system"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
