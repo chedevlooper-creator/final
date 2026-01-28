@@ -72,6 +72,11 @@ next-env.d.ts
 .sentryclirc
 
 # ===================
+# VS Code MCP (contains secrets)
+# ===================
+.vscode/mcp.json
+
+# ===================
 # Supabase
 # ===================
 supabase/.temp/
