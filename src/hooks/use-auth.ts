@@ -112,7 +112,7 @@ export function useAuth() {
             .single()
 
           if (error) {
-            // PGRST116 = "No rows found" - expected for new users without profiles
+            // PGRST116 = Row not found when using .single() - expected for new users without profiles
             if (error.code !== 'PGRST116') {
               console.error('Profile fetch error:', error)
             }
@@ -245,6 +245,9 @@ export function useAuth() {
       
       // Use router navigation
       router.push('/login')
+      
+      // Force refresh to ensure middleware re-evaluates the cleared session
+      router.refresh()
     } catch (error) {
       const message = ErrorHandler.handle(error, { action: 'signOut' })
       toast.error(message)
