@@ -39,8 +39,13 @@ export async function GET(request: NextRequest) {
     const supabase = await createServerSupabaseClient()
     const { searchParams } = new URL(request.url)
 
-    const page = Number.parseInt(searchParams.get('page') || '0')
-    const limit = Number.parseInt(searchParams.get('limit') || '20')
+    const pageParam = Number.parseInt(searchParams.get('page') || '0', 10)
+    const limitParam = Number.parseInt(searchParams.get('limit') || '20', 10)
+    
+    // Validate pagination parameters
+    const page = Number.isNaN(pageParam) || pageParam < 0 ? 0 : pageParam
+    const limit = Number.isNaN(limitParam) || limitParam < 1 ? 20 : Math.min(limitParam, 100)
+    
     const search = searchParams.get('search')
     const cityId = searchParams.get('city_id')
     const districtId = searchParams.get('district_id')
@@ -150,9 +155,26 @@ export async function POST(request: NextRequest) {
     const supabase = await createServerSupabaseClient()
     const user = authResult.user!
 
-    // Prepare data with created_by
+    // Prepare data with allowed fields only (prevent mass assignment)
     const newData = {
-      ...body,
+      first_name: body.first_name,
+      last_name: body.last_name,
+      phone: body.phone || null,
+      email: body.email || null,
+      tc_no: body.tc_no || null,
+      date_of_birth: body.date_of_birth || null,
+      gender: body.gender || null,
+      marital_status: body.marital_status || null,
+      country_id: body.country_id || null,
+      city_id: body.city_id || null,
+      district_id: body.district_id || null,
+      neighborhood_id: body.neighborhood_id || null,
+      address: body.address || null,
+      occupation: body.occupation || null,
+      monthly_income: body.monthly_income || null,
+      family_size: body.family_size || null,
+      housing_type: body.housing_type || null,
+      notes: body.notes || null,
       created_by: user.id,
       updated_by: user.id,
       status: body.status || 'active',

@@ -521,7 +521,7 @@ export function BasicInfoForm({
               <FormItem>
                 <FormLabel className="text-xs font-medium">Ailedeki Kişi Sayısı</FormLabel>
                 <Select 
-                  onValueChange={(v) => field.onChange(parseInt(v))} 
+                  onValueChange={(v) => field.onChange(parseInt(v, 10))} 
                   value={field.value?.toString() || ''}
                 >
                   <FormControl>
@@ -1018,7 +1018,7 @@ export function BasicInfoForm({
                     max={100}
                     {...field} 
                     value={field.value || ''} 
-                    onChange={e => field.onChange(parseInt(e.target.value) || 0)}
+                    onChange={e => field.onChange(parseInt(e.target.value, 10) || 0)}
                     placeholder="0"
                     className="h-9"
                   />

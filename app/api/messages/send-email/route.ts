@@ -184,6 +184,16 @@ export async function POST(request: NextRequest) {
     // Update status based on provider results
     for (let i = 0; i < emailData.length; i++) {
       const result = emailResults[i]
+      
+      // Skip if result is undefined (array length mismatch)
+      if (!result) {
+        await supabase
+          .from('email_messages')
+          .update({ status: 'failed', error_message: 'Provider result missing' })
+          .eq('id', emailData[i].id)
+        continue
+      }
+      
       const updateData: {
         status: string
         provider_message_id?: string

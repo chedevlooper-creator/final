@@ -66,12 +66,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get user profile with role information
-    const { data: profile } = await supabase
+    // Get user profile with role information (may be null for new users)
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('role, name, avatar_url')
       .eq('id', data.user.id)
-      .single()
+      .maybeSingle()
+    
+    // Log profile fetch error but don't fail login
+    if (profileError) {
+      console.warn('Profile fetch warning:', profileError.message)
+    }
 
     // Return user data with profile
     return NextResponse.json({

@@ -28,8 +28,12 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const status = searchParams.get('status');
     const upcoming = searchParams.get('upcoming');
-    const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = parseInt(searchParams.get('limit') || '10', 10);
+    const pageParam = parseInt(searchParams.get('page') || '1', 10);
+    const limitParam = parseInt(searchParams.get('limit') || '10', 10);
+    
+    // Validate pagination parameters
+    const page = Number.isNaN(pageParam) || pageParam < 1 ? 1 : pageParam;
+    const limit = Number.isNaN(limitParam) || limitParam < 1 ? 10 : Math.min(limitParam, 100);
     
     let query = supabase
       .from('meetings')

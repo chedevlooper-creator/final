@@ -65,8 +65,13 @@ export async function GET(request: NextRequest) {
     const supabase = await createServerSupabaseClient()
     const { searchParams } = new URL(request.url)
 
-    const page = parseInt(searchParams.get('page') || '0')
-    const limit = parseInt(searchParams.get('limit') || '20')
+    const pageParam = Number.parseInt(searchParams.get('page') || '0', 10)
+    const limitParam = Number.parseInt(searchParams.get('limit') || '20', 10)
+    
+    // Validate pagination parameters
+    const page = Number.isNaN(pageParam) || pageParam < 0 ? 0 : pageParam
+    const limit = Number.isNaN(limitParam) || limitParam < 1 ? 20 : Math.min(limitParam, 100)
+    
     const search = searchParams.get('search') || ''
 
     let query = supabase
