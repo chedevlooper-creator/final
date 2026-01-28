@@ -59,8 +59,9 @@ export function EventForm({ defaultValues, onSuccess }: EventFormProps) {
         },
     })
 
-    const onSubmit = async (data: EventFormValues) => {
+    const onSubmit = async (_data: EventFormValues) => {
         try {
+            // TODO: API call with _data
             toast.success('Etkinlik oluşturuldu')
             onSuccess?.()
         } catch {

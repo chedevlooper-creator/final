@@ -1,11 +1,14 @@
 /**
  * Needy Persons API
  * GET/POST /api/needy
+ *
+ * Multi-tenant: Tüm sorgular organization_id ile filtrelenir
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/permission-middleware'
+import { withOrgAuth, createOrgErrorResponse } from '@/lib/organization-middleware'
 
 /**
  * GET /api/needy - Get list of needy persons with pagination and filters
@@ -26,7 +29,16 @@ import { withAuth } from '@/lib/permission-middleware'
  */
 export async function GET(request: NextRequest) {
   try {
-    // RBAC: Needy persons listesinde read yetkisi gerekli
+    // Multi-tenant auth: Organizasyon context'i ile birlikte auth kontrolü
+    const orgAuthResult = await withOrgAuth(request, {
+      requiredPermission: 'data:read',
+    })
+
+    if (!orgAuthResult.success) {
+      return createOrgErrorResponse(orgAuthResult.error, orgAuthResult.status)
+    }
+
+    // Legacy RBAC kontrolü (opsiyonel, kaldırılabilir)
     const authResult = await withAuth(request, {
       requiredPermission: 'read',
       resource: 'needy_persons',
@@ -38,6 +50,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createServerSupabaseClient()
     const { searchParams } = new URL(request.url)
+    const organizationId = orgAuthResult.user.organization.id
 
     const page = Number.parseInt(searchParams.get('page') || '0')
     const limit = Number.parseInt(searchParams.get('limit') || '20')
@@ -46,10 +59,11 @@ export async function GET(request: NextRequest) {
     const districtId = searchParams.get('district_id')
     const status = searchParams.get('status')
 
-    // Build query
+    // Build query with organization filter
     let query = supabase
       .from('needy_persons')
       .select('*', { count: 'exact' })
+      .eq('organization_id', organizationId) // Multi-tenant filter
       .order('created_at', { ascending: false })
 
     // Apply filters
@@ -90,6 +104,7 @@ export async function GET(request: NextRequest) {
         limit,
         count: count || 0,
         totalPages,
+        organization_id: organizationId, // Include org context in response
       },
     })
   } catch (error) {
@@ -123,7 +138,16 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    // RBAC: Needy persons create için create yetkisi gerekli
+    // Multi-tenant auth: Organizasyon context'i ile birlikte auth kontrolü
+    const orgAuthResult = await withOrgAuth(request, {
+      requiredPermission: 'data:create',
+    })
+
+    if (!orgAuthResult.success) {
+      return createOrgErrorResponse(orgAuthResult.error, orgAuthResult.status)
+    }
+
+    // Legacy RBAC kontrolü (opsiyonel, kaldırılabilir)
     const authResult = await withAuth(request, {
       requiredPermission: 'create',
       resource: 'needy_persons',
@@ -149,10 +173,12 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createServerSupabaseClient()
     const user = authResult.user!
+    const organizationId = orgAuthResult.user.organization.id
 
-    // Prepare data with created_by
+    // Prepare data with organization_id and created_by
     const newData = {
       ...body,
+      organization_id: organizationId, // Multi-tenant: Her kayıt organizasyona bağlı
       created_by: user.id,
       updated_by: user.id,
       status: body.status || 'active',
