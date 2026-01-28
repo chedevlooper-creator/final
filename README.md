@@ -9,6 +9,24 @@
 
 ---
 
+## 💡 Neler Yapabilirsiniz?
+
+Bu sistem ile:
+
+- ✅ **İhtiyaç sahiplerini** kaydedin, takip edin, belgelerini yükleyin
+- ✅ **Bağış alın** (nakit, ayni, zekat, kurban) ve otomatik kaydedin
+- ✅ **Başvuruları** online alın, değerlendirin, onaylayın
+- ✅ **Gönüllüleri** yönetin, görev atayın, performans takibi yapın
+- ✅ **Yetim/öğrenci** kayıtları oluşturun, sponsor eşleştirin
+- ✅ **Finans yönetimi** yapın, gelir-gider takibi, bütçe planlama
+- ✅ **Etkinlik planlayın**, takvim yönetin, hatırlatma ayarlayın
+- ✅ **Detaylı raporlar** oluşturun, Excel/PDF export yapın
+- ✅ **Güvenli çalışın** - RBAC, audit log, MERNIS doğrulama
+
+**👉 Daha fazla bilgi için:** [Neler Yapabilirsiniz? (Detaylı Rehber)](docs/NELER_YAPILABILIR.md)
+
+---
+
 ## 📋 Proje Hakkında
 
 Yardım Yönetim Paneli, sivil toplum kuruluşlarının yardım operasyonlarını dijital ortamda yönetmelerini sağlayan kapsamlı bir web uygulamasıdır. İhtiyaç sahiplerinin takibinden bağış yönetimine, gönüllü koordinasyonundan finansal raporlamaya kadar tüm süreçleri tek bir platformda birleştirir.
@@ -164,6 +182,16 @@ Uygulama `http://localhost:3000` adresinde çalışacaktır.
 ---
 
 ## 📚 Dokümantasyon
+
+### 🚀 Başlangıç Rehberleri
+
+| Doküman | Açıklama | Süre |
+|---------|----------|------|
+| [🚀 Hızlı Başlangıç](docs/HIZLI_BASLANGIC_REHBERI.md) | 5 dakikada sistemi çalıştırın | 5-10 dk |
+| [📊 Sistem Özeti](docs/SISTEM_OZETI.md) | Tek sayfada tüm sistem | 5 dk |
+| [💡 Neler Yapabilirsiniz?](docs/NELER_YAPILABILIR.md) | Kapsamlı özellik ve kullanım rehberi | 30 dk |
+
+### 📖 Teknik Dokümantasyon
 
 | Doküman | Açıklama |
 |---------|----------|
