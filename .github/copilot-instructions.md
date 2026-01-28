@@ -90,3 +90,42 @@ throw new AppError('Not found', { type: ErrorType.NOT_FOUND, severity: ErrorSeve
 - Test files in [src/__tests__/](src/__tests__/) mirroring src structure
 - Use Vitest + React Testing Library
 - Setup in [vitest.setup.ts](vitest.setup.ts)
+
+## ⛔ KRİTİK GIT KURALLARI - ASLA İHLAL ETME
+
+### YASAK KOMUTLAR (Değişiklik varken ASLA kullanma):
+```bash
+# ❌ YASAK - Yerel değişiklikleri siler
+git reset --hard origin/main
+git reset --hard HEAD
+git clean -fd
+git checkout -- .
+```
+
+### CONFLICT DURUMUNDA:
+```bash
+# ✅ DOĞRU - Önce yedekle
+git stash                          # Değişiklikleri yedekle
+git branch backup-$(date +%s)      # Yedek branch oluştur
+
+# ✅ DOĞRU - Manuel çöz
+# Conflict'leri editörde manuel düzelt, asla reset atma
+
+# ✅ KURTARMA - Hata yaptıysan
+git reflog                         # Kayıp commit'i bul
+git reset --hard <commit-hash>     # Geri al
+```
+
+### PUSH ÖNCE KONTROL:
+```bash
+# ✅ DOĞRU SIRA
+git stash                          # 1. Değişiklikleri yedekle (varsa)
+git pull origin main --rebase      # 2. Remote'u çek
+git stash pop                      # 3. Değişiklikleri geri al
+# Conflict varsa manuel çöz
+git add . && git commit            # 4. Commit
+git push                           # 5. Push
+```
+
+### ALTIN KURAL:
+> **Kullanıcının yerel değişikliklerini ASLA silme. Şüphe varsa önce `git stash` veya yedek branch oluştur.**
