@@ -43,6 +43,7 @@ export default [
       }],
       '@typescript-eslint/no-explicit-any': 'warn',
       'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/set-state-in-effect': 'off',
       'react/no-unescaped-entities': 'off',
       'react/react-in-jsx-scope': 'off',
       'no-constant-binary-expression': 'warn'

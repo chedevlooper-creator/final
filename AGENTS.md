@@ -54,22 +54,22 @@
 
 ---
 
-## 🎨 UI/UX Design System v2.0
+## 🎨 UI/UX Design System v2.0 - Kurumsal Tema
 
-Proje, **UI UX Pro Max** skill kullanılarak tamamen yeniden tasarlanmıştır.
+Proje, **UI UX Pro Max** skill kullanılarak tamamen yeniden tasarlanmıştır. Kurumsal ve ciddi bir tema uygulanmıştır.
 
 ### Design System
 
 | Özellik | Değer |
 |---------|-------|
-| **Stil** | Soft UI Evolution + Bento Grids |
-| **Font** | Nunito (rounded, friendly) |
-| **Primary** | `#0891B2` (Compassion Cyan) |
-| **Accent** | `#F97316` (Action Orange) |
-| **Background** | `#F0F9FF` (Soft Blue) |
-| **Card** | `#FFFFFF` (White) |
-| **Border Radius** | 12-16px |
-| **Shadows** | Soft multi-layer |
+| **Stil** | Kurumsal & Ciddi - Soft UI |
+| **Font** | Inter (professional, clean) |
+| **Primary** | `#1e3a8a` (Kurumsal Lacivert) |
+| **Accent** | `#b45309` (Prestij Altın/Gold) |
+| **Background** | `#f1f5f9` (Açık Gri) |
+| **Card** | `#FFFFFF` (Beyaz) |
+| **Border Radius** | 6-10px (daha sade) |
+| **Shadows** | Minimal & Kurumsal |
 
 ### UI UX Pro Max Skill
 

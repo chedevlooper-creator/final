@@ -23,7 +23,7 @@ export const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 export interface UploadOptions {
   bucket?: string
   folder?: string
-  onProgress?: (progress: number) => void
+  _onProgress?: (progress: number) => void
 }
 
 export interface UploadResult {
@@ -94,7 +94,7 @@ export function useStorageUpload(): UseStorageUploadReturn {
    */
   const uploadFile = useCallback(
     async (file: File, needyPersonId: string, options: UploadOptions = {}): Promise<UploadResult | null> => {
-      const { bucket = 'needy-documents', onProgress } = options
+      const { bucket = 'needy-documents', _onProgress } = options
 
       setError(null)
       setProgress(0)

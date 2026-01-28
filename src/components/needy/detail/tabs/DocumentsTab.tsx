@@ -120,6 +120,7 @@ export function DocumentsTab({ needyPersonId }: DocumentsTabProps) {
   ]
 
   // Dosya seçme işleyicisi
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -133,17 +134,20 @@ export function DocumentsTab({ needyPersonId }: DocumentsTabProps) {
     setSelectedFile(file)
     
     // Otomatik belge adı önerisi
-    if (!formData.document_name) {
-      const fileNameWithoutExt = file.name.split('.').slice(0, -1).join('.')
-      setFormData(prev => ({ ...prev, document_name: fileNameWithoutExt }))
-    }
+    setFormData(prev => {
+      if (!prev.document_name) {
+        const fileNameWithoutExt = file.name.split('.').slice(0, -1).join('.')
+        return { ...prev, document_name: fileNameWithoutExt }
+      }
+      return prev
+    })
 
     // Görsel için önizleme oluştur
     if (file.type.startsWith('image/')) {
       const url = URL.createObjectURL(file)
       setPreviewUrl(url)
     }
-  }, [formData.document_name])
+  }, [])
 
   // Dosya seçme diyalogunu aç
   const handleSelectFileClick = useCallback(() => {
