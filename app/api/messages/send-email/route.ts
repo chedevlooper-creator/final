@@ -181,6 +181,11 @@ export async function POST(request: NextRequest) {
 
     const emailResults = await emailProvider.sendBulkEmail(emailOptions)
 
+    // Log array length mismatch for debugging
+    if (emailResults.length !== emailData.length) {
+      console.warn(`Email results length mismatch: expected ${emailData.length}, got ${emailResults.length}`)
+    }
+
     // Update status based on provider results
     for (let i = 0; i < emailData.length; i++) {
       const result = emailResults[i]
