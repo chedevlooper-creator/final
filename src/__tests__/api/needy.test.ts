@@ -30,6 +30,38 @@ vi.mock('@/lib/permission-middleware', () => ({
   })),
 }))
 
+// Mock withOrgAuth for multi-tenant
+vi.mock('@/lib/organization-middleware', () => ({
+  withOrgAuth: vi.fn(() => Promise.resolve({
+    success: true,
+    user: {
+      id: 'user-1',
+      email: 'test@example.com',
+      organization: {
+        id: 'org-1',
+        name: 'Test Org',
+        slug: 'test-org',
+        plan_tier: 'professional',
+        role: 'admin',
+        settings: {
+          currency: 'TRY',
+          language: 'tr',
+          timezone: 'Europe/Istanbul',
+          date_format: 'DD.MM.YYYY',
+          max_users: 10,
+          features: {
+            sms_enabled: true,
+            email_enabled: true,
+            mernis_enabled: true,
+            reports_enabled: true
+          }
+        }
+      }
+    }
+  })),
+  createOrgErrorResponse: vi.fn((error, status) => new Response(JSON.stringify({ error }), { status })),
+}))
+
 describe('POST /api/needy', () => {
   it('should create a new needy person', async () => {
     const request = new NextRequest('http://localhost/api/needy', {

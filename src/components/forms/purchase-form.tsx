@@ -66,8 +66,9 @@ export function PurchaseForm({ defaultValues, onSuccess }: PurchaseFormProps) {
         name: 'items',
     })
 
-    const onSubmit = async (data: PurchaseFormValues) => {
+    const onSubmit = async (_data: PurchaseFormValues) => {
         try {
+            // TODO: API call with _data
             toast.success('Satın alma talebi oluşturuldu')
             onSuccess?.()
         } catch {
