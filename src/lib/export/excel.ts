@@ -3,36 +3,11 @@
  *
  * Excel dosyası export işlemleri için utility fonksiyonlar
  *
- * SECURITY NOTE: xlsx package has known vulnerabilities (Prototype Pollution & ReDoS).
- * However, it's only used for exporting trusted internal data (not parsing user uploads).
- * Risk is minimal as we control all input data. Monitor for updates: https://github.com/SheetJS/sheetjs
- *
- * MITIGATIONS IN PLACE:
- * 1. Only used for EXPORT (write) operations, never for parsing user uploads
- * 2. All data comes from trusted internal database queries
- * 3. Input validation added to prevent prototype pollution patterns
- * 4. Consider migrating to 'exceljs' in future release for enhanced security
+ * Uses ExcelJS - a secure and actively maintained Excel library
+ * https://github.com/exceljs/exceljs
  */
 
-import * as XLSX from 'xlsx'
-
-/**
- * Sanitize data to prevent prototype pollution patterns
- * Removes __proto__, constructor, and prototype keys from objects
- */
-function sanitizeData<T extends Record<string, unknown>>(data: T[]): T[] {
-  const dangerousKeys = ['__proto__', 'constructor', 'prototype']
-
-  return data.map(item => {
-    const sanitized = { ...item }
-    dangerousKeys.forEach(key => {
-      if (key in sanitized) {
-        delete (sanitized as Record<string, unknown>)[key]
-      }
-    })
-    return sanitized as T
-  })
-}
+import ExcelJS from 'exceljs'
 
 export interface ExcelExportOptions {
   filename: string
@@ -52,88 +27,202 @@ export interface ExcelColumn<T = unknown> {
 /**
  * Basit veriyi Excel'e export eder
  */
-export function exportToExcel<T extends Record<string, unknown>>(
+export async function exportToExcel<T extends Record<string, unknown>>(
   data: T[],
   options: ExcelExportOptions
-): void {
-  // Sanitize data to prevent prototype pollution
-  const sanitizedData = sanitizeData(data)
+): Promise<ArrayBuffer> {
+  const workbook = new ExcelJS.Workbook()
 
-  const workbook = XLSX.utils.book_new()
-  const worksheet = XLSX.utils.json_to_sheet(sanitizedData)
-  
-  // Sheet ismi
-  const sheetName = options.sheetName || 'Sheet1'
-  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName)
-  
   // Metadata
-  if (options.author || options.title || options.subject) {
-    const props: Partial<{ Author: string; Title: string; Subject: string }> = {}
-    if (options.author) props.Author = options.author
-    if (options.title) props.Title = options.title
-    if (options.subject) props.Subject = options.subject
-    workbook.Props = props
+  workbook.creator = options.author || 'Yardım Yönetim Paneli'
+  workbook.created = new Date()
+  if (options.title) {
+    workbook.title = options.title
   }
-  
-  // Export
-  XLSX.writeFile(workbook, `${options.filename}.xlsx`)
+  if (options.subject) {
+    workbook.subject = options.subject
+  }
+
+  const sheetName = options.sheetName || 'Sheet1'
+  const worksheet = workbook.addWorksheet(sheetName)
+
+  // Get columns from first row
+  if (data.length > 0) {
+    const keys = Object.keys(data[0])
+    worksheet.columns = keys.map(key => ({
+      header: key,
+      key: key,
+      width: 15
+    }))
+
+    // Add rows
+    data.forEach(row => {
+      worksheet.addRow(row)
+    })
+
+    // Style header row
+    const headerRow = worksheet.getRow(1)
+    headerRow.font = { bold: true }
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFE0E0E0' }
+    }
+  }
+
+  // Generate buffer
+  const buffer = await workbook.xlsx.writeBuffer()
+  return buffer
+}
+
+/**
+ * Browser'da Excel dosyası indir
+ */
+export async function downloadExcel<T extends Record<string, unknown>>(
+  data: T[],
+  options: ExcelExportOptions
+): Promise<void> {
+  const buffer = await exportToExcel(data, options)
+
+  // Create blob and download
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = options.filename + '.xlsx'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
 }
 
 /**
  * Column mapping ile Excel export
  */
-export function exportToExcelWithColumns<T extends Record<string, unknown>>(
+export async function exportToExcelWithColumns<T extends Record<string, unknown>>(
   data: T[],
   columns: ExcelColumn<unknown>[],
   options: ExcelExportOptions
-): void {
-  // Transform data
-  const transformedData = data.map((row) => {
-    const transformed: Record<string, unknown> = {}
-    columns.forEach((col) => {
+): Promise<void> {
+  const workbook = new ExcelJS.Workbook()
+
+  // Metadata
+  workbook.creator = options.author || 'Yardım Yönetim Paneli'
+  workbook.created = new Date()
+  if (options.title) {
+    workbook.title = options.title
+  }
+
+  const sheetName = options.sheetName || 'Sheet1'
+  const worksheet = workbook.addWorksheet(sheetName)
+
+  // Set columns
+  worksheet.columns = columns.map(col => ({
+    header: col.header,
+    key: col.key,
+    width: col.width || 15
+  }))
+
+  // Add rows with formatting
+  data.forEach(row => {
+    const formattedRow: Record<string, unknown> = {}
+    columns.forEach(col => {
       const value = row[col.key]
-      transformed[col.header] = col.format ? col.format(value) : value
+      formattedRow[col.key] = col.format ? col.format(value) : value
     })
-    return transformed
+    worksheet.addRow(formattedRow)
   })
-  
-  exportToExcel(transformedData, options)
+
+  // Style header row
+  const headerRow = worksheet.getRow(1)
+  headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } }
+  headerRow.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FF4F81BD' }
+  }
+
+  // Generate buffer and download
+  const buffer = await workbook.xlsx.writeBuffer()
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = options.filename + '.xlsx'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
 }
 
 /**
  * Multiple sheets export
  */
-export function exportToExcelMultipleSheets(
+export async function exportToExcelMultipleSheets(
   sheets: Array<{
     name: string
     data: Record<string, unknown>[]
   }>,
   options: ExcelExportOptions
-): void {
-  const workbook = XLSX.utils.book_new()
+): Promise<void> {
+  const workbook = new ExcelJS.Workbook()
 
-  sheets.forEach((sheet) => {
-    // Sanitize data to prevent prototype pollution
-    const sanitizedData = sanitizeData(sheet.data)
-    const worksheet = XLSX.utils.json_to_sheet(sanitizedData)
-    XLSX.utils.book_append_sheet(workbook, worksheet, sheet.name)
-  })
-  
   // Metadata
-  if (options.author || options.title) {
-    workbook.Props = {
-      Author: options.author || 'Yardım Yönetim Paneli',
-      Title: options.title || options.filename,
-    }
+  workbook.creator = options.author || 'Yardım Yönetim Paneli'
+  workbook.created = new Date()
+  if (options.title) {
+    workbook.title = options.title
   }
-  
-  XLSX.writeFile(workbook, `${options.filename}.xlsx`)
+
+  sheets.forEach(sheet => {
+    const worksheet = workbook.addWorksheet(sheet.name)
+
+    if (sheet.data.length > 0) {
+      const keys = Object.keys(sheet.data[0])
+      worksheet.columns = keys.map(key => ({
+        header: key,
+        key: key,
+        width: 15
+      }))
+
+      sheet.data.forEach(row => {
+        worksheet.addRow(row)
+      })
+
+      // Style header row
+      const headerRow = worksheet.getRow(1)
+      headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } }
+      headerRow.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF4F81BD' }
+      }
+    }
+  })
+
+  // Generate buffer and download
+  const buffer = await workbook.xlsx.writeBuffer()
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = options.filename + '.xlsx'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
 }
 
 /**
  * İhtiyaç sahipleri için özel export
  */
-export function exportNeedyPersonsToExcel(data: Record<string, unknown>[]): void {
+export async function exportNeedyPersonsToExcel(data: Record<string, unknown>[]): Promise<void> {
   const columns: ExcelColumn[] = [
     { header: 'Dosya No', key: 'file_number', width: 15 },
     { header: 'Ad', key: 'first_name', width: 20 },
@@ -146,19 +235,20 @@ export function exportNeedyPersonsToExcel(data: Record<string, unknown>[]): void
       header: 'Aylık Gelir',
       key: 'monthly_income',
       width: 15,
-      format: (val) => (val ? `${val} TL` : '-'),
+      format: (val) => (val ? val + ' TL' : '-'),
     },
     {
       header: 'Kira',
       key: 'rent_amount',
       width: 15,
-      format: (val) => (val ? `${val} TL` : '-'),
+      format: (val) => (val ? val + ' TL' : '-'),
     },
     { header: 'Notlar', key: 'notes', width: 30 },
   ]
-  
-  exportToExcelWithColumns(data, columns, {
-    filename: `ihtiyac-sahipleri-${new Date().toISOString().split('T')[0]}`,
+
+  const today = new Date().toISOString().split('T')[0]
+  await exportToExcelWithColumns(data, columns, {
+    filename: 'ihtiyac-sahipleri-' + today,
     sheetName: 'İhtiyaç Sahipleri',
     author: 'Yardım Yönetim Paneli',
     title: 'İhtiyaç Sahipleri Listesi',
@@ -168,7 +258,7 @@ export function exportNeedyPersonsToExcel(data: Record<string, unknown>[]): void
 /**
  * Bağışlar için özel export
  */
-export function exportDonationsToExcel(data: Record<string, unknown>[]): void {
+export async function exportDonationsToExcel(data: Record<string, unknown>[]): Promise<void> {
   const columns: ExcelColumn[] = [
     { header: 'Bağış No', key: 'donation_number', width: 15 },
     { header: 'Bağışçı Adı', key: 'donor_name', width: 25 },
@@ -177,7 +267,7 @@ export function exportDonationsToExcel(data: Record<string, unknown>[]): void {
       header: 'Tutar',
       key: 'amount',
       width: 15,
-      format: (val) => `${val} TL`,
+      format: (val) => val + ' TL',
     },
     { header: 'Para Birimi', key: 'currency', width: 10 },
     { header: 'Ödeme Yöntemi', key: 'payment_method', width: 15 },
@@ -189,9 +279,10 @@ export function exportDonationsToExcel(data: Record<string, unknown>[]): void {
       format: (val: unknown) => new Date(val as string | number | Date).toLocaleString('tr-TR'),
     },
   ]
-  
-  exportToExcelWithColumns(data, columns, {
-    filename: `bagislar-${new Date().toISOString().split('T')[0]}`,
+
+  const today = new Date().toISOString().split('T')[0]
+  await exportToExcelWithColumns(data, columns, {
+    filename: 'bagislar-' + today,
     sheetName: 'Bağışlar',
     author: 'Yardım Yönetim Paneli',
     title: 'Bağış Listesi',
@@ -201,19 +292,20 @@ export function exportDonationsToExcel(data: Record<string, unknown>[]): void {
 /**
  * Rapor için multiple sheets export
  */
-export function exportReportToExcel(data: {
+export async function exportReportToExcel(data: {
   donations: Record<string, unknown>[]
   aids: Record<string, unknown>[]
   needyPersons: Record<string, unknown>[]
-}): void {
-  exportToExcelMultipleSheets(
+}): Promise<void> {
+  const today = new Date().toISOString().split('T')[0]
+  await exportToExcelMultipleSheets(
     [
       { name: 'Bağışlar', data: data.donations },
       { name: 'Yardım İşlemleri', data: data.aids },
       { name: 'İhtiyaç Sahipleri', data: data.needyPersons },
     ],
     {
-      filename: `rapor-${new Date().toISOString().split('T')[0]}`,
+      filename: 'rapor-' + today,
       author: 'Yardım Yönetim Paneli',
       title: 'Genel Rapor',
     }
