@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Plus, Trash2, Upload, Camera, Image as ImageIcon, Star, StarOff, X } from 'lucide-react'
+import { Trash2, Upload, Camera, Image as ImageIcon, Star, StarOff, X } from 'lucide-react'
 import { Photo, PHOTO_TYPE_OPTIONS, PhotoType } from '@/types/linked-records.types'
 
 interface PhotosTabProps {
@@ -25,10 +25,10 @@ interface PhotosTabProps {
   onClose: () => void
 }
 
-export function PhotosTab({ needyPersonId, onClose }: PhotosTabProps) {
+export function PhotosTab({ needyPersonId: _needyPersonId, onClose: _onClose }: PhotosTabProps) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null)
-  const [photos, setPhotos] = useState<Photo[]>([])
+  const [photos] = useState<Photo[]>([])
   
   const [formData, setFormData] = useState({
     photo_type: 'general' as PhotoType,
@@ -41,18 +41,15 @@ export function PhotosTab({ needyPersonId, onClose }: PhotosTabProps) {
   }
 
   const handleSave = async () => {
-    console.log('Saving:', formData)
     setIsAddModalOpen(false)
   }
 
   const handleDelete = async (id: string) => {
     if (confirm('Bu fotoğrafı silmek istediğinizden emin misiniz?')) {
-      console.log('Deleting:', id)
     }
   }
 
   const handleSetPrimary = async (id: string) => {
-    console.log('Setting primary:', id)
   }
 
   return (

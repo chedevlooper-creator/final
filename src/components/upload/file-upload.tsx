@@ -9,13 +9,11 @@
 import React, { 
   useState, 
   useCallback, 
-  useRef, 
-  useEffect,
+  useRef,
   useMemo
 } from 'react';
 import { 
   Upload, 
-  X, 
   File, 
   Image as ImageIcon, 
   FileText, 
@@ -30,22 +28,15 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
-  uploadFile, 
   uploadMultipleFiles,
   getFileInfo,
   isImageFile,
-  isVideoFile,
-  isPdfFile,
-  isDocumentFile,
   formatFileSize,
-  validateFileSize,
   validateFileType,
-  UploadProgress,
-  type ProgressCallback
+  UploadProgress
 } from '@/lib/upload';
 import { 
   Buckets, 
-  UploadOptions, 
   FilePreview, 
   UploadStatistics,
   ValidationError
@@ -234,7 +225,7 @@ export interface FileUploadProps {
   // Callbacks
   onUploadStart?: (files: File[]) => void;
   onUploadProgress?: (progress: UploadProgress) => void;
-  onUploadComplete?: (results: any[]) => void;
+  onUploadComplete?: (results: unknown[]) => void;
   onUploadError?: (error: Error) => void;
   onFileSelect?: (files: File[]) => void;
   onFileRemove?: (fileId: string) => void;
@@ -266,9 +257,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   onFileRemove,
   label = 'Dosya Yükle',
   description = 'Dosyaları sürükleyip bırakın veya seçmek için tıklayın',
-  acceptLabel = 'Yükle',
-  rejectLabel = 'İptal',
-  dragActiveLabel = 'Dosyaları bırakın'
+  dragActiveLabel = 'Dosyaları bırakın',
+  // acceptLabel and rejectLabel are part of the API but not currently used
+  ..._unusedLabels
 }) => {
   const [previews, setPreviews] = useState<FilePreview[]>([]);
   const [isDragging, setIsDragging] = useState(false);

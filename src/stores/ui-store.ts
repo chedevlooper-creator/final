@@ -20,7 +20,7 @@ const defaultState = {
   modalData: null,
 }
 
-export const useUIStore = create<UIState>((set, get) => ({
+export const useUIStore = create<UIState>((set, _get) => ({
   ...defaultState,
   toggleSidebar: () => {
     set((state) => {

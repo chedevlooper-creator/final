@@ -216,7 +216,7 @@ describe('RBAC System', () => {
     })
 
     it('should handle invalid resource gracefully', () => {
-      expect(hasResourcePermission('admin', 'invalid_resource' as any, 'read')).toBe(false)
+      expect(hasResourcePermission('admin', 'invalid_resource' as never, 'read')).toBe(false)
     })
 
     it('should handle invalid action gracefully', () => {

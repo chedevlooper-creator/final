@@ -32,7 +32,7 @@ interface SummaryItem {
   color?: string
 }
 
-export function CardSummaryTab({ needyPersonId, onClose, cardSummary }: CardSummaryTabProps) {
+export function CardSummaryTab({ needyPersonId, cardSummary }: CardSummaryTabProps) {
   // Mock data for demo - gerçek uygulamada cardSummary'den gelecek
   const summary = cardSummary || {
     needy_person_id: needyPersonId,

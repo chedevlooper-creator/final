@@ -135,13 +135,13 @@ export function useMonthlyDonationTrend(months: number = 6) {
       const startDate = new Date(now.getFullYear(), now.getMonth() - months + 1, 1)
 
       // Single query with date truncation
-      const { data, error } = await supabase
+      const { data, error: _error } = await supabase
         .rpc('get_monthly_donation_trend', {
           p_start_date: startDate.toISOString(),
           p_end_date: now.toISOString()
         })
 
-      if (!error && data) {
+      if (!_error && data) {
         return data
       }
 
@@ -190,7 +190,7 @@ export function useApplicationTypeDistribution() {
     queryKey: ['dashboard-application-types'],
     queryFn: async (): Promise<CategoryDistribution[]> => {
       // Use aggregation in database for better performance
-      const { data, error } = await supabase
+      const { data, error: _error } = await supabase
         .from('applications')
         .select('application_type')
         .not('application_type', 'is', null)

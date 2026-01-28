@@ -49,7 +49,7 @@ interface BankAccountsTabProps {
   onClose: () => void
 }
 
-export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps) {
+export function BankAccountsTab({ needyPersonId }: BankAccountsTabProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -173,7 +173,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
         toast.success('Banka hesabı eklendi')
       }
       setIsAddModalOpen(false)
-    } catch (error) {
+    } catch {
       toast.error('Kayıt sırasında hata oluştu')
     }
   }
@@ -183,7 +183,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
       try {
         await deleteMutation.mutateAsync({ id, needyPersonId })
         toast.success('Banka hesabı silindi')
-      } catch (error) {
+      } catch {
         toast.error('Silme işlemi başarısız')
       }
     }
@@ -230,7 +230,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
                   </TableCell>
                 </TableRow>
               ) : (
-                accounts.map((account, index) => (
+                accounts.map((account) => (
                   <TableRow key={account.id}>
                     <TableCell>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -253,7 +253,7 @@ export function BankAccountsTab({ needyPersonId, onClose }: BankAccountsTabProps
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => handleEdit(account as any)}
+                          onClick={() => handleEdit(account)}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>

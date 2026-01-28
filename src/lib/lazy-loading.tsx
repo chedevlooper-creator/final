@@ -19,6 +19,7 @@ export function LoadingFallback({ message = 'Yükleniyor...' }: { message?: stri
 }
 
 // Wrapper for lazy loading with error boundary
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createLazyComponent<T extends ComponentType<any>>(
   importFn: () => Promise<{ default: T }>,
   fallbackMessage?: string

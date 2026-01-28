@@ -59,7 +59,7 @@ export enum BulkOperationPriority {
 }
 
 // Toplu işlem seçenekleri
-export interface BulkOperationOptions<T = any> {
+export interface BulkOperationOptions<T = unknown> {
   items: T[];
   operation: BulkOperationType;
   onProgress?: (progress: BulkOperationProgress) => void;
@@ -70,7 +70,7 @@ export interface BulkOperationOptions<T = any> {
   continueOnError?: boolean;
   maxConcurrent?: number;
   priority?: BulkOperationPriority;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // İşlem ilerleme durumu
@@ -85,7 +85,7 @@ export interface BulkOperationProgress {
 }
 
 // İşlem sonucu
-export interface BulkOperationResult<T = any> {
+export interface BulkOperationResult<T = unknown> {
   success: boolean;
   status: BulkOperationStatus;
   totalItems: number;
@@ -197,7 +197,7 @@ export class BulkOperation<T = unknown> {
   /**
    * İşlemi çalıştır
    */
-  async execute(operationFn: (item: T, signal: AbortSignal) => Promise<any>): Promise<BulkOperationResult<T>> {
+  async execute(operationFn: (item: T, signal: AbortSignal) => Promise<unknown>): Promise<BulkOperationResult<T>> {
     if (this.status !== BulkOperationStatus.PENDING) {
       throw new BulkOperationError(`İşlem zaten çalışıyor veya tamamlandı. Durum: ${this.status}`);
     }
@@ -389,7 +389,7 @@ export const bulk = {
    */
   create: async <T>(
     items: T[],
-    createFn: (item: T) => Promise<any>,
+    createFn: (item: T) => Promise<unknown>,
     options?: Partial<BulkOperationOptions<T>>
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({
@@ -406,7 +406,7 @@ export const bulk = {
    */
   update: async <T>(
     items: T[],
-    updateFn: (item: T) => Promise<any>,
+    updateFn: (item: T) => Promise<unknown>,
     options?: Partial<BulkOperationOptions<T>>
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({
@@ -423,7 +423,7 @@ export const bulk = {
    */
   delete: async <T>(
     items: T[],
-    deleteFn: (item: T) => Promise<any>,
+    deleteFn: (item: T) => Promise<unknown>,
     options?: Partial<BulkOperationOptions<T>>
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({
@@ -440,7 +440,7 @@ export const bulk = {
    */
   approve: async <T>(
     items: T[],
-    approveFn: (item: T) => Promise<any>,
+    approveFn: (item: T) => Promise<unknown>,
     options?: Partial<BulkOperationOptions<T>>
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({
@@ -457,7 +457,7 @@ export const bulk = {
    */
   reject: async <T>(
     items: T[],
-    rejectFn: (item: T) => Promise<any>,
+    rejectFn: (item: T) => Promise<unknown>,
     options?: Partial<BulkOperationOptions<T>>
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({
@@ -474,7 +474,7 @@ export const bulk = {
    */
   export: async <T>(
     items: T[],
-    exportFn: (item: T) => Promise<any>,
+    exportFn: (item: T) => Promise<unknown>,
     options?: Partial<BulkOperationOptions<T>>
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({
@@ -491,7 +491,7 @@ export const bulk = {
    */
   import: async <T>(
     items: T[],
-    importFn: (item: T) => Promise<any>,
+    importFn: (item: T) => Promise<unknown>,
     options?: Partial<BulkOperationOptions<T>>
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({
@@ -508,7 +508,7 @@ export const bulk = {
    */
   custom: async <T>(
     items: T[],
-    customFn: (item: T) => Promise<any>,
+    customFn: (item: T) => Promise<unknown>,
     options?: Partial<BulkOperationOptions<T>>
   ): Promise<BulkOperationResult<T>> => {
     const operation = new BulkOperation<T>({

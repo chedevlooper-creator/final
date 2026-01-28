@@ -11,8 +11,7 @@
 'use client'
 
 import React from 'react'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Button } from '@/components/ui/button'
+
 
 // Re-export shadcn/ui skeleton components for convenience
 export {

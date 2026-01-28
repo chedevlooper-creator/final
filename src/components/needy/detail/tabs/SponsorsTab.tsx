@@ -2,15 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+
 import {
   Table,
   TableBody,
@@ -26,14 +18,14 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Plus, Eye, Pencil, Trash2, ExternalLink } from 'lucide-react'
+import { Trash2, ExternalLink } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import { 
   Sponsor, 
   SPONSOR_TYPE_OPTIONS, 
   SPONSORSHIP_TYPE_OPTIONS,
   SPONSOR_STATUS_OPTIONS,
-  CURRENCY_OPTIONS,
+
   StatusFilter 
 } from '@/types/linked-records.types'
 
@@ -42,11 +34,11 @@ interface SponsorsTabProps {
   onClose: () => void
 }
 
-export function SponsorsTab({ needyPersonId, onClose }: SponsorsTabProps) {
+export function SponsorsTab({ needyPersonId: _needyPersonId, onClose: _onClose }: SponsorsTabProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [sponsors, setSponsors] = useState<Sponsor[]>([])
+  const [sponsors] = useState<Sponsor[]>([])
 
   const columns = [
     { key: 'sponsor_name', label: 'Sponsor Adı' },

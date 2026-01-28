@@ -68,10 +68,9 @@ export function PurchaseForm({ defaultValues, onSuccess }: PurchaseFormProps) {
 
     const onSubmit = async (data: PurchaseFormValues) => {
         try {
-            console.log('Form data:', data)
             toast.success('Satın alma talebi oluşturuldu')
             onSuccess?.()
-        } catch (error) {
+        } catch {
             toast.error('Talep oluşturulurken hata oluştu')
         }
     }

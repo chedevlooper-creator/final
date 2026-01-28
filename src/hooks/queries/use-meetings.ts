@@ -864,7 +864,7 @@ export function useSubmitVote() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data: VoteResponse) => {
+    onSuccess: (_data: VoteResponse) => {
       queryClient.invalidateQueries({ queryKey: ['meetings', 'votes'] });
     },
   });

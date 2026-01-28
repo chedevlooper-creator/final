@@ -27,9 +27,9 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Trash2 } from 'lucide-react'
 import { TabLayout } from './TabLayout'
-import { Dependent, DEPENDENT_RELATION_TYPE_OPTIONS, DependentRelationType, StatusFilter } from '@/types/linked-records.types'
+import { DEPENDENT_RELATION_TYPE_OPTIONS, DependentRelationType, StatusFilter } from '@/types/linked-records.types'
 import { useLinkedRecords, useCreateLinkedRecord, useUpdateLinkedRecord, useDeleteLinkedRecord, NeedyDependent } from '@/hooks/queries/use-linked-records'
 import { toast } from 'sonner'
 
@@ -38,7 +38,7 @@ interface DependentsTabProps {
   onClose: () => void
 }
 
-export function DependentsTab({ needyPersonId, onClose }: DependentsTabProps) {
+export function DependentsTab({ needyPersonId }: DependentsTabProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -110,7 +110,7 @@ export function DependentsTab({ needyPersonId, onClose }: DependentsTabProps) {
         toast.success('Bağımlı kişi eklendi')
       }
       setIsAddModalOpen(false)
-    } catch (error) {
+    } catch {
       toast.error('İşlem sırasında bir hata oluştu')
     }
   }
@@ -120,7 +120,7 @@ export function DependentsTab({ needyPersonId, onClose }: DependentsTabProps) {
       try {
         await deleteMutation.mutateAsync({ id, needyPersonId })
         toast.success('Kayıt silindi')
-      } catch (error) {
+      } catch {
         toast.error('Silme işlemi başarısız oldu')
       }
     }

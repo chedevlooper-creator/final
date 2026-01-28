@@ -19,8 +19,8 @@ export interface AuditLog {
   action: string;
   entity_type: string;
   entity_id?: string;
-  old_values?: Record<string, any>;
-  new_values?: Record<string, any>;
+  old_values?: Record<string, unknown>;
+  new_values?: Record<string, unknown>;
   ip_address?: string;
   user_agent?: string;
   level: LogLevelType;
@@ -153,8 +153,8 @@ export interface LoggingOptions {
 }
 
 export interface AuditChanges {
-  old?: Record<string, any>;
-  new?: Record<string, any>;
+  old?: Record<string, unknown>;
+  new?: Record<string, unknown>;
   fields?: string[];
 }
 
@@ -202,7 +202,7 @@ export interface EventContext {
   requestId?: string;
   ipAddress?: string;
   userAgent?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Search

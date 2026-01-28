@@ -3,17 +3,6 @@
  * OpenAPI/Swagger specification generator
   */
 
-// Type definition for the decorator parameter
-interface RouteSpec {
-  summary: string
-  description?: string
-  tags?: string[]
-  parameters?: any[]
-  requestBody?: any
-  responses?: any
-  security?: any[]
-}
-
 export interface OpenAPISpec {
   openapi: string
   info: {
@@ -33,11 +22,11 @@ export interface OpenAPISpec {
     url: string
     description: string
   }>
-  paths: Record<string, any>
+  paths: Record<string, unknown>
   components: {
-    schemas: Record<string, any>
-    responses: Record<string, any>
-    parameters: Record<string, any>
+    schemas: Record<string, unknown>
+    responses: Record<string, unknown>
+    parameters: Record<string, unknown>
   }
   tags: Array<{
     name: string
@@ -281,20 +270,20 @@ export function DocumentRoute(config: {
   summary: string
   description?: string
   tags?: string[]
-  parameters?: any[]
-  requestBody?: any
-  responses?: any
-  security?: any[]
+  parameters?: unknown[]
+  requestBody?: unknown
+  responses?: unknown
+  security?: unknown[]
 }) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (target: object, propertyKey: string, descriptor: PropertyDescriptor) {
     // Store metadata for documentation generation
-    const classConstructor = target.constructor
+    const classConstructor = target.constructor as unknown as Record<string, unknown>
    
     // Get existing metadata or create new
-    const existingDocs: any = (classConstructor as any).__api_docs_metadata__ || {}
+    const existingDocs = (classConstructor['__api_docs_metadata__'] as Record<string, unknown> | undefined) ?? {}
     if (typeof existingDocs === 'object' && existingDocs !== null) {
       existingDocs[propertyKey] = config;
-      (classConstructor as any).__api_docs_metadata__ = existingDocs
+      (classConstructor as Record<string, unknown>)['__api_docs_metadata__'] = existingDocs
     }
     
     return descriptor
@@ -303,7 +292,7 @@ export function DocumentRoute(config: {
 
 /**
  */
-export function generateOpenAPISpec(routes: Record<string, any>): OpenAPISpec {
+export function generateOpenAPISpec(routes: Record<string, unknown>): OpenAPISpec {
   const spec = { ...apiDocsConfig }
   
   // Process routes and build paths

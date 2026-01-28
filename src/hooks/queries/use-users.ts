@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
-import { User, UserRole } from '@/types/common'
+import { UserRole } from '@/types/common'
 
 // User profile data for creating/updating
 export interface UserProfileData {

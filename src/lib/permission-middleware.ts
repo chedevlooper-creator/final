@@ -78,7 +78,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
       name: profile?.['name'] || user.user_metadata?.['name'],
       avatar_url: profile?.['avatar_url'] || user.user_metadata?.['avatar_url']
     }
-  } catch (error) {
+  } catch (_error) {
     // Auth error logged securely without exposing sensitive data
     return null
   }
@@ -192,7 +192,7 @@ export async function withAuth(
       success: true,
       user
     }
-  } catch (error) {
+  } catch (_error) {
     // Auth middleware error logged securely without exposing sensitive data
     return {
       success: false,

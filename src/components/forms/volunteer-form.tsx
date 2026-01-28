@@ -64,10 +64,9 @@ export function VolunteerForm({ defaultValues, onSuccess }: VolunteerFormProps) 
 
     const onSubmit = async (data: VolunteerFormValues) => {
         try {
-            console.log('Form data:', data)
             toast.success('Gönüllü kaydı oluşturuldu')
             onSuccess?.()
-        } catch (error) {
+        } catch {
             toast.error('Kayıt oluşturulurken hata oluştu')
         }
     }

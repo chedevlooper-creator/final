@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "github.com/executeautomation/mcp-playwright": {
-      "command": "npx",
-      "args": ["-y", "@executeautomation/playwright-mcp-server"]
-    }
-  }
-}

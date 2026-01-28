@@ -24,8 +24,8 @@ class AuditLogger {
     action: string,
     entityType: string,
     entityId?: string,
-    oldValues?: Record<string, any>,
-    newValues?: Record<string, any>,
+    oldValues?: Record<string, unknown>,
+    newValues?: Record<string, unknown>,
     options?: LogOptions
   ): Promise<void> {
     try {
@@ -55,8 +55,8 @@ class AuditLogger {
     action: string,
     entityType: string,
     entityId?: string,
-    oldValues?: Record<string, any>,
-    newValues?: Record<string, any>
+    oldValues?: Record<string, unknown>,
+    newValues?: Record<string, unknown>
   ): Promise<void> {
     return this.log(action, entityType, entityId, oldValues, newValues, { level: 'INFO' });
   }
@@ -65,8 +65,8 @@ class AuditLogger {
     action: string,
     entityType: string,
     entityId?: string,
-    oldValues?: Record<string, any>,
-    newValues?: Record<string, any>
+    oldValues?: Record<string, unknown>,
+    newValues?: Record<string, unknown>
   ): Promise<void> {
     return this.log(action, entityType, entityId, oldValues, newValues, { level: 'WARNING' });
   }
@@ -75,8 +75,8 @@ class AuditLogger {
     action: string,
     entityType: string,
     entityId?: string,
-    oldValues?: Record<string, any>,
-    newValues?: Record<string, any>
+    oldValues?: Record<string, unknown>,
+    newValues?: Record<string, unknown>
   ): Promise<void> {
     return this.log(action, entityType, entityId, oldValues, newValues, { level: 'ERROR' });
   }
@@ -85,8 +85,8 @@ class AuditLogger {
     action: string,
     entityType: string,
     entityId?: string,
-    oldValues?: Record<string, any>,
-    newValues?: Record<string, any>
+    oldValues?: Record<string, unknown>,
+    newValues?: Record<string, unknown>
   ): Promise<void> {
     return this.log(action, entityType, entityId, oldValues, newValues, { level: 'CRITICAL' });
   }

@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useState } from 'react'
+import { ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Plus, Search, Filter, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { Plus, Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { StatusFilter, STATUS_FILTER_OPTIONS } from '@/types/linked-records.types'
 
 interface TabLayoutProps {
@@ -59,7 +59,7 @@ interface TabLayoutProps {
 }
 
 export function TabLayout({
-  title,
+  title: _title,
   children,
   columns = [],
   data = [],

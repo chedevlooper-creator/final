@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { POST } from '@app/api/donations/route'
+import { POST } from '../../../app/api/donations/route'
 import { NextRequest } from 'next/server'
 
 // Mock Supabase client

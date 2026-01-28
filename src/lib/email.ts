@@ -104,7 +104,7 @@ export interface EmailOptions {
   bcc?: string | string[];
   subject?: string;
   template?: EmailTemplate;
-  templateData?: Record<string, any>;
+  templateData?: Record<string, unknown>;
   text?: string;
   html?: string;
   attachments?: EmailAttachment[];
@@ -131,6 +131,9 @@ export interface EmailResult {
   error?: string;
   provider?: EmailProvider;
   timestamp: Date;
+  subject?: string;
+  text?: string;
+  html?: string;
 }
 
 // Email istatistikleri arayüzü
@@ -268,7 +271,7 @@ export class EmailSender {
   /**
    * Template'i işle
    */
-  private processTemplate(template: EmailTemplate, data: Record<string, any>): EmailTemplateContent {
+  private processTemplate(template: EmailTemplate, data: Record<string, unknown>): EmailTemplateContent {
     const templates = this.getTemplates();
     const templateContent = templates[template];
 
@@ -285,9 +288,9 @@ export class EmailSender {
       const value = data[key] || '';
       const placeholder = `{{${key}}}`;
       
-      subject = subject.replace(new RegExp(placeholder, 'g'), value);
-      text = text.replace(new RegExp(placeholder, 'g'), value);
-      html = html.replace(new RegExp(placeholder, 'g'), value);
+      subject = subject.replace(new RegExp(placeholder, 'g'), String(value));
+      text = text.replace(new RegExp(placeholder, 'g'), String(value));
+      html = html.replace(new RegExp(placeholder, 'g'), String(value));
     }
 
     return { subject, text, html, variables: templateContent.variables };
@@ -510,7 +513,10 @@ export class EmailSender {
         success: true,
         messageId,
         provider: this.config.provider,
-        timestamp: new Date()
+        timestamp: new Date(),
+        subject,
+        text,
+        html
       };
 
     } catch (error: unknown) {

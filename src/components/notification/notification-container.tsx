@@ -7,7 +7,7 @@
 'use client'
 
 import React from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { useNotifications } from '@/lib/notification.context'
 import { NotificationItem } from './notification-item'
 import { NotificationPosition } from '@/lib/notification'

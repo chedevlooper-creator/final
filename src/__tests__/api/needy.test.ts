@@ -2,8 +2,8 @@
  * Tests for /api/needy endpoint
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { POST } from '@app/api/needy/route'
+import { describe, it, expect, vi } from 'vitest'
+import { POST } from '../../../app/api/needy/route'
 import { NextRequest } from 'next/server'
 
 // Mock Supabase client

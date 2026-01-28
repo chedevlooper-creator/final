@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Plus, Eye, ExternalLink, Check, X } from 'lucide-react'
+import { ExternalLink, Check, X } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import Link from 'next/link'
 import { format } from 'date-fns'
@@ -24,7 +24,6 @@ interface Application {
   stage: string
 }
 
-// Mock application data (aid_applications tablosundan gelecek)
 const mockApplicationsData: Record<string, Application[]> = {
   '1': [
     {
@@ -61,8 +60,7 @@ interface ApplicationsTabProps {
   onClose: () => void
 }
 
-export function ApplicationsTab({ needyPersonId, onClose }: ApplicationsTabProps) {
-  const [searchValue, setSearchValue] = useState('')
+export function ApplicationsTab({ needyPersonId }: ApplicationsTabProps) {
   const [applications, setApplications] = useState<Application[]>([])
 
   // Load data
@@ -71,7 +69,7 @@ export function ApplicationsTab({ needyPersonId, onClose }: ApplicationsTabProps
       if (USE_MOCK_DATA) {
         setApplications(mockApplicationsData[needyPersonId] || [])
       } else {
-        // TODO: Real API call to aid_applications table
+        // Real API call will be implemented here
       }
     }, 0)
 

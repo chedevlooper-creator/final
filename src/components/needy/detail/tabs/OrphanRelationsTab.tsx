@@ -26,7 +26,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Plus, Eye, Pencil, Trash2, ExternalLink } from 'lucide-react'
+import { Trash2, ExternalLink } from 'lucide-react'
 import { TabLayout } from './TabLayout'
 import { OrphanRelation, ORPHAN_RELATION_TYPE_OPTIONS, OrphanRelationType, StatusFilter } from '@/types/linked-records.types'
 import Link from 'next/link'
@@ -43,7 +43,7 @@ interface Orphan {
   last_name: string
 }
 
-export function OrphanRelationsTab({ needyPersonId, onClose }: OrphanRelationsTabProps) {
+export function OrphanRelationsTab({ needyPersonId }: OrphanRelationsTabProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
   const [searchValue, setSearchValue] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)

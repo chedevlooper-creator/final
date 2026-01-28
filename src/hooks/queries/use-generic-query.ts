@@ -109,8 +109,6 @@ export function createQueryHook<T>(
   defaultQueryFn: (options: QueryOptions) => Promise<T>
 ) {
   return (queryOptions: QueryOptions = {}) => {
-    const { limit, offset, page, search, status, sortBy, sortOrder } = queryOptions
-    
     // Create a stable key from options
     const optionsKey = JSON.stringify(queryOptions)
     

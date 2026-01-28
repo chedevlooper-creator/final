@@ -200,7 +200,7 @@ export function useUpdateDonation() {
         )
       }
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (_, _variables) => {
       // Invalidate list query
       queryClient.invalidateQueries({ 
         queryKey: ['donations', 'list'] 

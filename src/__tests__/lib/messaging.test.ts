@@ -2,7 +2,7 @@
  * Tests for messaging providers
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import {
   TwilioProvider,
   NetGSMProvider,

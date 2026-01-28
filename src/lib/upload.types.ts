@@ -247,5 +247,5 @@ export interface UploadMetadata {
   category?: string;
   tags?: string[];
   description?: string;
-  customData?: Record<string, any>;
+  customData?: Record<string, unknown>;
 }

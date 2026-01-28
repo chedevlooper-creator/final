@@ -52,7 +52,7 @@ export interface Document {
   needy_person_id: string
   document_type: DocumentType
   document_name: string
-  file_path: string
+  file_path: string | null
   file_size: number | null
   mime_type: string | null
   issue_date: string | null
@@ -66,6 +66,10 @@ export interface Document {
   updated_at: string
   created_by: string | null
   notes: string | null
+  // Storage entegrasyonu için yeni alanlar
+  storage_path?: string | null
+  file_url?: string | null
+  file_name?: string | null
 }
 
 export type DocumentType = 
@@ -78,6 +82,7 @@ export type DocumentType =
   | 'vukuatli_nufus'
   | 'tapu_sened'
   | 'kira_sozlesmesi'
+  | 'riza_beyani'
   | 'diger'
 
 export const DOCUMENT_TYPE_OPTIONS: { value: DocumentType; label: string }[] = [
@@ -90,6 +95,7 @@ export const DOCUMENT_TYPE_OPTIONS: { value: DocumentType; label: string }[] = [
   { value: 'vukuatli_nufus', label: 'Vukuatlı Nüfus Kayıt Örneği' },
   { value: 'tapu_sened', label: 'Tapu/Senet' },
   { value: 'kira_sozlesmesi', label: 'Kira Sözleşmesi' },
+  { value: 'riza_beyani', label: 'Rıza Beyanı/Aydınlatma Metni' },
   { value: 'diger', label: 'Diğer' },
 ]
 

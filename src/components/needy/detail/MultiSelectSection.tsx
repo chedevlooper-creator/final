@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+'use client'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { FormSection } from './FormSection'

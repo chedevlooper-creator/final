@@ -9,7 +9,7 @@ vi.mock('@/lib/supabase/server', () => ({
   createServerSupabaseClient: vi.fn(),
 }))
 
-import { POST } from '@app/api/auth/login/route'
+import { POST } from '../../../app/api/auth/login/route'
 import { NextRequest } from 'next/server'
 
 describe('POST /api/auth/login', () => {
@@ -23,7 +23,7 @@ describe('POST /api/auth/login', () => {
       body: JSON.stringify({ password: 'test123' }),
     })
 
-    const response = await POST(request as any)
+    const response = await POST(request)
     const data = await response.json()
 
     expect(response.status).toBe(400)
@@ -37,7 +37,7 @@ describe('POST /api/auth/login', () => {
       body: JSON.stringify({ email: 'test@example.com' }),
     })
 
-    const response = await POST(request as any)
+    const response = await POST(request)
     const data = await response.json()
 
     expect(response.status).toBe(400)
@@ -54,7 +54,7 @@ describe('POST /api/auth/login', () => {
       }),
     })
 
-    const response = await POST(request as any)
+    const response = await POST(request)
     const data = await response.json()
 
     expect(response.status).toBe(400)
@@ -71,7 +71,7 @@ describe('POST /api/auth/login', () => {
       }),
     })
 
-    const response = await POST(request as any)
+    const response = await POST(request)
     const data = await response.json()
 
     expect(response.status).toBe(400)
@@ -88,7 +88,7 @@ describe('POST /api/auth/login', () => {
       }),
     })
 
-    const response = await POST(request as any)
+    const response = await POST(request)
     const data = await response.json()
 
     expect(response.status).toBe(400)

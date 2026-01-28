@@ -252,7 +252,7 @@ export function useAuth() {
 
   // Check if user can perform action on resource
   const canPerform = (resource: string, action: string) => {
-    const resourcePerms = permissions[resource as keyof typeof permissions] as any
+    const resourcePerms = permissions[resource as keyof typeof permissions] as Record<string, boolean> | undefined
     return resourcePerms?.[action] || false
   }
 

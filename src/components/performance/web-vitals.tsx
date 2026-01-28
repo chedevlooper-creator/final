@@ -3,6 +3,29 @@
 import { useReportWebVitals } from 'next/web-vitals'
 import { useEffect, useState } from 'react'
 
+// Extend Window interface for Google Analytics and Sentry
+declare global {
+  interface Window {
+    gtag?: (command: string, action: string, params?: Record<string, unknown>) => void
+    Sentry?: {
+      addBreadcrumb: (breadcrumb: {
+        category: string
+        message: string
+        level: 'info' | 'warning' | 'error'
+      }) => void
+    }
+  }
+  
+  // Extend Performance interface for Chrome memory API
+  interface Performance {
+    memory?: {
+      usedJSHeapSize: number
+      totalJSHeapSize: number
+      jsHeapSizeLimit: number
+    }
+  }
+}
+
 export function WebVitals() {
   useReportWebVitals((metric) => {
     // Only log in development
@@ -11,8 +34,8 @@ export function WebVitals() {
     }
     
     // Analytics servisine gönder
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      ;(window as any).gtag('event', metric.name, {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', metric.name, {
         value: Math.round(
           metric.name === 'CLS' ? metric.value * 1000 : metric.value
         ),
@@ -22,8 +45,8 @@ export function WebVitals() {
     }
     
     // Sentry'ye gönder
-    if (typeof window !== 'undefined' && (window as any).Sentry) {
-      ;(window as any).Sentry.addBreadcrumb({
+    if (typeof window !== 'undefined' && window.Sentry) {
+      window.Sentry.addBreadcrumb({
         category: 'web-vitals',
         message: `${metric.name}: ${metric.value}`,
         level: 'info',
@@ -72,12 +95,14 @@ export function PerformanceMonitor() {
 
     // Memory usage izleme
     if ('memory' in performance && process.env.NODE_ENV === 'development') {
-      const mem = (performance as any).memory
-      console.log('[Memory Usage]', {
-        usedJSHeapSize: Math.round(mem.usedJSHeapSize / 1048576) + ' MB',
-        totalJSHeapSize: Math.round(mem.totalJSHeapSize / 1048576) + ' MB',
-        jsHeapSizeLimit: Math.round(mem.jsHeapSizeLimit / 1048576) + ' MB',
-      })
+      const mem = performance.memory
+      if (mem) {
+        console.log('[Memory Usage]', {
+          usedJSHeapSize: Math.round(mem.usedJSHeapSize / 1048576) + ' MB',
+          totalJSHeapSize: Math.round(mem.totalJSHeapSize / 1048576) + ' MB',
+          jsHeapSizeLimit: Math.round(mem.jsHeapSizeLimit / 1048576) + ' MB',
+        })
+      }
     }
   }, [mounted])
 

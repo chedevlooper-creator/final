@@ -4,6 +4,24 @@
  * Web Vitals ve custom metrics tracking
  */
 
+// Extend Window interface for Google Analytics
+declare global {
+  interface Window {
+    gtag?: (command: string, action: string, params?: Record<string, unknown>) => void
+  }
+  
+  // Layout Instability API - LayoutShift type
+  interface LayoutShift extends PerformanceEntry {
+    value: number
+    hadRecentInput: boolean
+    sources: Array<{
+      node?: Node
+      previousRect: DOMRectReadOnly
+      currentRect: DOMRectReadOnly
+    }>
+  }
+}
+
 export interface PerformanceMetric {
   name: string
   value: number
@@ -54,8 +72,8 @@ export function reportMetric(metric: PerformanceMetric) {
   // Send to analytics in production
   if (process.env.NODE_ENV === 'production') {
     // Send to your analytics service (Vercel, Google Analytics, etc.)
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', metric.name, {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', metric.name, {
         value: metric.value,
         event_label: metric.rating,
         custom_map: { metric_rating: metric.rating },
@@ -98,7 +116,7 @@ export function measureWebVitals() {
     try {
       const observer = new PerformanceObserver((list) => {
         const entries = list.getEntries()
-        const lastEntry = entries[entries.length - 1] as any
+        const lastEntry = entries[entries.length - 1] as PerformanceEntry
         if (lastEntry) {
           const value = lastEntry.startTime
           reportMetric({
@@ -120,7 +138,7 @@ export function measureWebVitals() {
   if ('PerformanceObserver' in window) {
     try {
       const observer = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries() as any[]) {
+        for (const entry of list.getEntries() as PerformanceEventTiming[]) {
           if (entry.processingStart && entry.startTime) {
             const value = entry.processingStart - entry.startTime
             reportMetric({
@@ -144,7 +162,7 @@ export function measureWebVitals() {
     try {
       let clsValue = 0
       const observer = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries() as any[]) {
+        for (const entry of list.getEntries() as LayoutShift[]) {
           if (!entry.hadRecentInput) {
             clsValue += entry.value
             reportMetric({
@@ -165,7 +183,7 @@ export function measureWebVitals() {
   
   // TTFB - Time to First Byte
   if (performance.getEntriesByType) {
-    const navigationEntries = performance.getEntriesByType('navigation') as any[]
+    const navigationEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[]
     if (navigationEntries.length > 0) {
       const ttfb = navigationEntries[0].responseStart - navigationEntries[0].requestStart
       reportMetric({
@@ -185,7 +203,7 @@ export function measureWebVitals() {
 export function trackPageLoad(pageName: string) {
   if (typeof window === 'undefined') return
   
-  const timing = performance.getEntriesByType('navigation')[0] as any
+  const timing = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
   
   if (!timing) return
   
@@ -293,7 +311,7 @@ export function getPerformanceSummary(): {
     return { navigation: '', resource: 0, timing: {} }
   }
   
-  const navigation = performance.getEntriesByType('navigation')[0] as any
+  const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
   const resources = performance.getEntriesByType('resource')
   
   return {
@@ -313,7 +331,7 @@ export function getPerformanceSummary(): {
 export function getResourceTiming() {
   if (typeof window === 'undefined') return []
   
-  const resources = performance.getEntriesByType('resource') as any[]
+  const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[]
   
   return resources.map((r) => ({
     name: r.name,
