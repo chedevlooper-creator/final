@@ -13,6 +13,11 @@ Sentry.init({
   
   // beforeSend - Sensitive data filtering
   beforeSend(event: any, hint: any) {
+    // Filter out Sentry example page errors
+    if (event.request?.url?.includes('/sentry-example-page')) {
+      return null
+    }
+    
     // Filter out sensitive data
     if (event.request) {
       // Remove passwords from request data
@@ -73,6 +78,8 @@ Sentry.init({
     // Browser extensions
     'chrome-extension://',
     'moz-extension://',
+    // Sentry example/test errors
+    'SentryExampleFrontendError',
   ],
   
   // Deny URLs

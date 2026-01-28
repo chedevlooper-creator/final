@@ -12,6 +12,16 @@ Sentry.init({
   
   // beforeSend - Server-side filtering
   beforeSend(event: any, hint: any) {
+    // Filter out Sentry example API errors
+    if (event.request?.url?.includes('/api/sentry-example-api')) {
+      return null
+    }
+    
+    // Filter out SentryExampleAPIError
+    if (event.exception?.values?.[0]?.type === 'SentryExampleAPIError') {
+      return null
+    }
+    
     // Filter sensitive headers
     if (event.request?.headers) {
       delete event.request.headers.authorization
@@ -36,6 +46,11 @@ Sentry.init({
     
     // Skip health checks
     if (url.includes('/health') || url.includes('/ping') || url.includes('/ready')) {
+      return 0
+    }
+    
+    // Skip Sentry example API
+    if (url.includes('/api/sentry-example-api')) {
       return 0
     }
     
