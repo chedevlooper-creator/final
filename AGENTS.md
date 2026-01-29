@@ -177,7 +177,7 @@ const form = useForm<EntityFormValues>({
 
 ### Supabase Client Selection
 - **Client components:** `import { createClient } from '@/lib/supabase/client'`
-- **Server components:** `import { createClient } from '@/lib/supabase/server'`
+- **Server components:** `import { createServerSupabaseClient } from '@/lib/supabase/server'`
 - **Admin operations:** Use service role key (server-side only)
 
 ### RBAC (Role-Based Access Control)
