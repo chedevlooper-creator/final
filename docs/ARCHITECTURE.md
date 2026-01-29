@@ -399,7 +399,7 @@ CREATE POLICY "tenant_isolation" ON needy_persons
 ```typescript
 // app/api/needy/route.ts
 import { withOrgAuth } from '@/lib/organization-middleware'
-import { createClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export async function GET(request: Request) {
   // 1. Authentication & Authorization
@@ -411,7 +411,7 @@ export async function GET(request: Request) {
   const page = parseInt(searchParams.get('page') || '1')
   
   // 3. Database query
-  const supabase = createClient()
+  const supabase = await createServerSupabaseClient()
   const { data, error, count } = await supabase
     .from('needy_persons')
     .select('*', { count: 'exact' })
