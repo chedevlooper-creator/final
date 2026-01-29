@@ -24,6 +24,8 @@ import { Input } from '@/components/ui/input'
 import { useState, memo } from 'react'
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useIsMobile } from '@/hooks/use-media-query'
+import { MobileTableRow } from '@/components/common/mobile-table-row'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -53,6 +55,7 @@ function DataTableInner<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const isMobile = useIsMobile()
 
   const table = useReactTable({
     data,
@@ -90,7 +93,7 @@ function DataTableInner<TData, TValue>({
   return (
     <div className="space-y-4">
       {searchKey && (
-        <div className="relative max-w-sm">
+        <div className="relative w-full md:max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder={searchPlaceholder}
@@ -103,84 +106,99 @@ function DataTableInner<TData, TValue>({
         </div>
       )}
 
-      <div className="rounded-lg border bg-card overflow-hidden shadow-soft">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="bg-muted hover:bg-muted">
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="font-semibold text-foreground">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                  className={onRowClick ? "cursor-pointer hover:bg-muted/50" : "hover:bg-muted/50"}
-                  onClick={() => onRowClick?.(row.original)}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+      {isMobile ? (
+        <div className="space-y-3">
+          {data.map((row, index) => {
+            const rowData = row as Record<string, unknown>
+            return (
+              <MobileTableRow
+                key={rowData['id'] as string | number || index}
+                data={row}
+                columns={columns}
+                onClick={() => onRowClick?.(row)}
+              />
+            )
+          })}
+        </div>
+      ) : (
+        <div className="rounded-lg border bg-card overflow-hidden shadow-soft">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className="bg-muted hover:bg-muted">
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id} className="font-semibold text-foreground">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                  Kayıt bulunamadı.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && 'selected'}
+                    className={onRowClick ? "cursor-pointer hover:bg-muted/50" : "hover:bg-muted/50"}
+                    onClick={() => onRowClick?.(row.original)}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+                    Kayıt bulunamadı.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
       {/* Pagination */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">{data.length}</span>
           {totalCount !== undefined ? (
             <>
-              <span className="font-medium text-foreground">{data.length}</span> kayıt gösteriliyor
-              {' / '}
-              <span className="font-medium text-foreground">{totalCount}</span> toplam
+              <span className="hidden sm:inline"> kayıt gösteriliyor / </span>
+              <span className="hidden sm:inline font-medium text-foreground">{totalCount}</span>
+              <span className="hidden sm:inline"> toplam</span>
             </>
           ) : (
-            <>Toplam <span className="font-medium text-foreground">{data.length}</span> kayıt</>
+            <span className="hidden sm:inline"> kayıt</span>
           )}
         </p>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            size="sm"
+            size="icon-sm"
             onClick={() => onPageChange?.(pageIndex - 1)}
             disabled={pageIndex === 0}
           >
             <ChevronLeft className="h-4 w-4" />
-            Önceki
           </Button>
           <span className="text-sm text-muted-foreground">
-            Sayfa {pageIndex + 1} / {pageCount || 1}
+            {pageIndex + 1} / {pageCount || 1}
           </span>
           <Button
             variant="outline"
-            size="sm"
+            size="icon-sm"
             onClick={() => onPageChange?.(pageIndex + 1)}
             disabled={pageIndex >= (pageCount || 1) - 1}
           >
-            Sonraki
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>

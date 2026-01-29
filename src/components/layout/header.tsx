@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Search, LogOut, User, Sparkles, ChevronDown } from 'lucide-react'
+import { Search, LogOut, User, Sparkles, ChevronDown, Menu } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { useUIStore } from '@/stores/ui-store'
 import {
@@ -22,6 +22,7 @@ import { useEffect, useState } from 'react'
 export function Header() {
   const { user, profile, signOut } = useAuth()
   const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed)
+  const { setMobileMenuOpen } = useUIStore()
   const [mounted, setMounted] = useState(false)
   const [searchFocused, setSearchFocused] = useState(false)
 
@@ -49,13 +50,27 @@ export function Header() {
 
   return (
     <header
-      className="fixed top-0 z-30 flex h-16 items-center justify-between bg-card shadow-card border-b border-border px-4 transition-all duration-300"
-      style={{ left: sidebarCollapsed ? '5rem' : '16rem', right: 0 }}
+      className={cn(
+        "fixed top-0 z-30 flex h-16 items-center justify-between bg-card shadow-card border-b border-border px-4 transition-all duration-300",
+        "left-0 right-0 md:left-auto md:right-auto",
+        !sidebarCollapsed && "md:left-[16rem]",
+        sidebarCollapsed && "md:left-[5rem]"
+      )}
     >
       {/* Left Section */}
-      <div className="flex items-center gap-4">
-        {/* Search */}
-        <div className="relative">
+      <div className="flex items-center gap-2 md:gap-4">
+        {/* Hamburger Menu - Mobile Only */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden h-9 w-9 rounded-lg"
+          onClick={() => setMobileMenuOpen(true)}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+
+        {/* Search - Desktop Only */}
+        <div className="relative hidden md:block">
           <Search className={cn(
             'absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors pointer-events-none',
             searchFocused ? 'text-primary' : 'text-muted-foreground'
@@ -72,14 +87,14 @@ export function Header() {
 
       {/* Right Section */}
       <div className="flex items-center gap-2">
-        {/* Quick Actions */}
-        <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+        {/* Quick Actions - Desktop Only */}
+        <Button variant="ghost" size="sm" className="hidden md:flex gap-2 text-muted-foreground hover:text-foreground">
           <Sparkles className="h-4 w-4" />
-          <span className="hidden sm:inline">İpuçları</span>
+          <span>İpuçları</span>
         </Button>
 
         {/* Divider */}
-        <div className="h-6 w-px bg-border" />
+        <div className="h-6 w-px bg-border hidden md:block" />
 
         {/* Notifications */}
         <NotificationDropdown />

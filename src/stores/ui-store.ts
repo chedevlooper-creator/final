@@ -10,6 +10,8 @@ interface UIState {
   setSidebarOpen: (open: boolean) => void
   openModal: (modalId: string, data?: Record<string, unknown>) => void
   closeModal: () => void
+  mobileMenuOpen: boolean
+  setMobileMenuOpen: (open: boolean) => void
 }
 
 // Default initial state (same for server and client to avoid hydration mismatch)
@@ -18,6 +20,7 @@ const defaultState = {
   sidebarOpen: true,
   activeModal: null,
   modalData: null,
+  mobileMenuOpen: false,
 }
 
 export const useUIStore = create<UIState>((set, _get) => ({
@@ -50,6 +53,7 @@ export const useUIStore = create<UIState>((set, _get) => ({
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
   openModal: (modalId, data) => set({ activeModal: modalId, modalData: data || null }),
   closeModal: () => set({ activeModal: null, modalData: null }),
+  setMobileMenuOpen: (open) => set({ mobileMenuOpen: open }),
 }))
 
 // Hydrate from localStorage on client side (called once)
