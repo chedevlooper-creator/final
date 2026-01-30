@@ -112,19 +112,19 @@ export default function ItemsPage() {
                 </thead>
                 <tbody>
                   {filteredItems?.map((item) => (
-                    <tr key={item.id} className="border-b hover:bg-muted/50">
+                    <tr key={item.item_id} className="border-b hover:bg-muted/50">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
                             <Package className="h-5 w-5 text-muted-foreground" />
                           </div>
                           <div>
-                            <p className="font-medium">{item.name}</p>
+                            <p className="font-medium">{item.item_name}</p>
                             <p className="text-xs text-muted-foreground">{item.sku}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm">{item.category_name}</td>
+                      <td className="px-4 py-3 text-sm">{item.category_name || '-'}</td>
                       <td className="px-4 py-3 text-right">
                         <span className="font-medium">{formatNumber(item.total_available || 0)}</span>
                         <span className="text-sm text-muted-foreground ml-1">{item.unit}</span>
@@ -136,7 +136,7 @@ export default function ItemsPage() {
                       </td>
                       <td className="px-4 py-3 text-right">
                         <Button variant="ghost" size="sm" asChild>
-                          <Link href={`/dashboard/inventory/items/${item.id}`}>
+                          <Link href={`/dashboard/inventory/items/${item.item_id}`}>
                             <ArrowUpRight className="h-4 w-4" />
                           </Link>
                         </Button>

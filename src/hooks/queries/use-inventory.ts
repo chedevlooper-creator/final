@@ -165,7 +165,16 @@ export function useInventorySummary(filters?: {
       const { data, error } = await query
       
       if (error) throw error
-      return data as (InventoryItem & { total_quantity: number; stock_status: string })[]
+      return data as (InventoryItem & { 
+        item_id: string
+        item_name: string
+        category_name: string | null
+        total_quantity: number
+        total_reserved: number
+        total_available: number
+        warehouse_count: number
+        stock_status: string 
+      })[]
     },
     staleTime: 5 * 60 * 1000,
   })
@@ -354,7 +363,11 @@ export function useExpiringLots(days: number = 30) {
         .order('expiry_date')
       
       if (error) throw error
-      return data as (InventoryLot & { days_until_expiry: number })[]
+      return data as (InventoryLot & { 
+        days_until_expiry: number
+        item_name: string
+        warehouse_name: string 
+      })[]
     },
   })
 }
@@ -498,7 +511,7 @@ export function useInventoryDashboardStats() {
       ])
       
       const totalItems = summary?.length || 0
-      const totalValue = summary?.reduce((sum, item) => sum + ((item as any).total_available || 0), 0) || 0
+      const totalValue = summary?.reduce((sum: number, item: { total_available?: number }) => sum + (item.total_available || 0), 0) || 0
       
       return {
         totalItems,

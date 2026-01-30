@@ -15,8 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
-import { useRouteById } from '@/hooks/queries/use-donation-boxes'
-import { useVolunteers } from '@/hooks/queries/use-volunteers'
+import { useRouteById, useVolunteers } from '@/hooks/queries/use-donation-boxes'
 import { useCreateCollectionRoute, useUpdateCollectionRoute } from '@/hooks/mutations/use-donation-box-mutations'
 import { collectionRouteSchema, type CollectionRouteFormValues } from '@/lib/validations/donation-boxes'
 
@@ -162,7 +161,7 @@ export function RouteDialog({ open, onOpenChange, routeId }: RouteDialogProps) {
                 <SelectValue placeholder="Toplayıcı seçin" />
               </SelectTrigger>
               <SelectContent>
-                {volunteers?.map((v) => (
+                {volunteers?.map((v: { id: string; first_name: string; last_name: string }) => (
                   <SelectItem key={v.id} value={v.id}>
                     {v.first_name} {v.last_name}
                   </SelectItem>
@@ -178,7 +177,7 @@ export function RouteDialog({ open, onOpenChange, routeId }: RouteDialogProps) {
                 <SelectValue placeholder="Yedek seçin (opsiyonel)" />
               </SelectTrigger>
               <SelectContent>
-                {volunteers?.map((v) => (
+                {volunteers?.map((v: { id: string; first_name: string; last_name: string }) => (
                   <SelectItem key={v.id} value={v.id}>
                     {v.first_name} {v.last_name}
                   </SelectItem>

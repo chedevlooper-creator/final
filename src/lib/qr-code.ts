@@ -37,7 +37,6 @@ export async function generateQRCodeDataURL(
 ): Promise<string> {
   const {
     width = DEFAULT_SIZE,
-    height = DEFAULT_SIZE,
     margin = 2,
     color = { dark: '#000000', light: '#FFFFFF' }
   } = options
@@ -45,10 +44,8 @@ export async function generateQRCodeDataURL(
   try {
     const dataUrl = await QRCode.toDataURL(content, {
       width,
-      height,
       margin,
       color,
-      type: 'image/png',
       errorCorrectionLevel: 'H', // Yüksek hata düzeltme (hasarlı okunabilir)
     })
     
@@ -68,7 +65,6 @@ export async function generateQRCodeBuffer(
 ): Promise<Buffer> {
   const {
     width = DEFAULT_SIZE,
-    height = DEFAULT_SIZE,
     margin = 2,
     color = { dark: '#000000', light: '#FFFFFF' }
   } = options
@@ -76,10 +72,8 @@ export async function generateQRCodeBuffer(
   try {
     const buffer = await QRCode.toBuffer(content, {
       width,
-      height,
       margin,
       color,
-      type: 'png',
       errorCorrectionLevel: 'H',
     })
     

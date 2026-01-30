@@ -119,8 +119,8 @@ export default function InventoryPage() {
 
       {/* Quick Navigation */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="hover:bg-muted/50 transition-colors cursor-pointer" asChild>
-          <Link href="/dashboard/inventory/warehouses">
+        <Link href="/dashboard/inventory/warehouses">
+          <Card className="hover:bg-muted/50 transition-colors cursor-pointer h-full">
             <CardHeader>
               <Warehouse className="h-8 w-8 text-blue-500 mb-2" />
               <CardTitle className="text-lg">Depolar</CardTitle>
@@ -128,11 +128,11 @@ export default function InventoryPage() {
             <CardContent>
               <p className="text-sm text-muted-foreground">Depo yönetimi ve konumlar</p>
             </CardContent>
-          </Link>
-        </Card>
+          </Card>
+        </Link>
 
-        <Card className="hover:bg-muted/50 transition-colors cursor-pointer" asChild>
-          <Link href="/dashboard/inventory/items">
+        <Link href="/dashboard/inventory/items">
+          <Card className="hover:bg-muted/50 transition-colors cursor-pointer h-full">
             <CardHeader>
               <Package className="h-8 w-8 text-green-500 mb-2" />
               <CardTitle className="text-lg">Ürünler</CardTitle>
@@ -140,11 +140,11 @@ export default function InventoryPage() {
             <CardContent>
               <p className="text-sm text-muted-foreground">Envanter kalemleri</p>
             </CardContent>
-          </Link>
-        </Card>
+          </Card>
+        </Link>
 
-        <Card className="hover:bg-muted/50 transition-colors cursor-pointer" asChild>
-          <Link href="/dashboard/inventory/transactions">
+        <Link href="/dashboard/inventory/transactions">
+          <Card className="hover:bg-muted/50 transition-colors cursor-pointer h-full">
             <CardHeader>
               <ArrowRight className="h-8 w-8 text-purple-500 mb-2" />
               <CardTitle className="text-lg">Hareketler</CardTitle>
@@ -152,11 +152,11 @@ export default function InventoryPage() {
             <CardContent>
               <p className="text-sm text-muted-foreground">Giriş/Çıkış kayıtları</p>
             </CardContent>
-          </Link>
-        </Card>
+          </Card>
+        </Link>
 
-        <Card className="hover:bg-muted/50 transition-colors cursor-pointer" asChild>
-          <Link href="/dashboard/inventory/alerts">
+        <Link href="/dashboard/inventory/alerts">
+          <Card className="hover:bg-muted/50 transition-colors cursor-pointer h-full relative">
             <CardHeader>
               <AlertTriangle className="h-8 w-8 text-red-500 mb-2" />
               <CardTitle className="text-lg">Uyarılar</CardTitle>
@@ -169,8 +169,8 @@ export default function InventoryPage() {
             <CardContent>
               <p className="text-sm text-muted-foreground">Stok uyarıları</p>
             </CardContent>
-          </Link>
-        </Card>
+          </Card>
+        </Link>
       </div>
 
       {/* Main Content Tabs */}

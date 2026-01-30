@@ -125,14 +125,14 @@ export default function AlertsPage() {
                             {alert.warehouse && (
                               <span>Depo: {alert.warehouse.name}</span>
                             )}
-                            {alert.current_value !== undefined && (
+                            {alert.current_value != null && (
                               <span>
-                                Mevcut: {formatNumber(alert.current_value)} {alert.item?.unit}
+                                Mevcut: {formatNumber(alert.current_value ?? 0)} {alert.item?.unit}
                               </span>
                             )}
-                            {alert.threshold_value !== undefined && (
+                            {alert.threshold_value != null && (
                               <span>
-                                Eşik: {formatNumber(alert.threshold_value)} {alert.item?.unit}
+                                Eşik: {formatNumber(alert.threshold_value ?? 0)} {alert.item?.unit}
                               </span>
                             )}
                           </div>

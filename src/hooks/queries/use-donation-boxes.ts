@@ -404,3 +404,26 @@ export function useDonationBoxDashboardStats() {
     },
   })
 }
+
+// ============================================
+// GÖNÜLLÜ SORGULARI (Basitleştirilmiş)
+// ============================================
+
+export function useVolunteers() {
+  const supabase = createClient()
+  
+  return useQuery({
+    queryKey: ['volunteers-simple'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('volunteers')
+        .select('id, first_name, last_name, phone, status')
+        .eq('status', 'active')
+        .order('first_name')
+      
+      if (error) throw error
+      return data || []
+    },
+    staleTime: 5 * 60 * 1000,
+  })
+}

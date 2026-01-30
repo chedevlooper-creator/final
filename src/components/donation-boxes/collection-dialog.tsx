@@ -106,7 +106,7 @@ export function CollectionDialog({ open, onOpenChange }: CollectionDialogProps) 
                 <SelectValue placeholder="Toplayıcı seçin" />
               </SelectTrigger>
               <SelectContent>
-                {volunteers?.map((v) => (
+                {volunteers?.map((v: { id: string; first_name: string; last_name: string }) => (
                   <SelectItem key={v.id} value={v.id}>
                     {v.first_name} {v.last_name}
                   </SelectItem>
