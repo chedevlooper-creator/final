@@ -2,7 +2,7 @@
 
 import { useUIStore } from '@/stores/ui-store'
 import { cn } from '@/lib/utils'
-import { memo } from 'react'
+import { memo, useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 
 import { Sidebar } from '@/components/layout/sidebar'
@@ -18,8 +18,16 @@ function DashboardLayoutClient({
 }) {
   const pathname = usePathname()
   const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const isDetailPage = pathname?.includes('/needy/') && pathname !== '/dashboard/needy'
+
+  // Default to expanded for SSR to match sidebar's default
+  const isCollapsed = mounted ? sidebarCollapsed : false
 
   return (
     <div className="min-h-screen bg-background" suppressHydrationWarning>
@@ -32,8 +40,8 @@ function DashboardLayoutClient({
         className={cn(
           'min-h-screen transition-all duration-300 ease-out',
           !isDetailPage && 'pt-16',
-          'pl-0 md:pl-20',
-          !sidebarCollapsed && 'md:pl-72',
+          'pl-0 md:pl-64',
+          isCollapsed && 'md:pl-20',
           'pb-16 md:pb-0'
         )}
       >

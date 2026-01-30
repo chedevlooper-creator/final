@@ -15,6 +15,10 @@ import {
   UserCheck,
   Banknote,
   Gift,
+  Package,
+  Warehouse,
+  Box,
+  MapPin,
   LucideIcon,
 } from 'lucide-react'
 
@@ -50,6 +54,7 @@ export const menuItems: MenuGroup[] = [
       { title: 'Banka Ödeme Emirleri', href: '/dashboard/aids/transfer', icon: CreditCard },
       { title: 'Nakdi Yardım İşlemleri', href: '/dashboard/aids/cash', icon: DollarSign },
       { title: 'Ayni Yardım İşlemleri', href: '/dashboard/aids/logistics', icon: Gift },
+      { title: 'Stok / Depo', href: '/dashboard/inventory', icon: Package },
       { title: 'Hizmet Sevk', href: '/dashboard/aids/service', icon: UserCheck },
       { title: 'Raporlar', href: '/dashboard/reports', icon: BarChart3 },
     ]
@@ -61,6 +66,8 @@ export const menuItems: MenuGroup[] = [
       { title: 'Tüm Bağışlar', href: '/dashboard/donations', icon: DollarSign },
       { title: 'Nakit Bağışlar', href: '/dashboard/donations/cash', icon: Banknote },
       { title: 'Kurban', href: '/dashboard/donations/sacrifice', icon: Gift },
+      { title: 'Kumbaralar', href: '/dashboard/donations/boxes', icon: Box },
+      { title: 'Toplama Rotaları', href: '/dashboard/donations/routes', icon: MapPin },
     ]
   },
   {

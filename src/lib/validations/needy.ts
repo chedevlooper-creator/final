@@ -63,6 +63,9 @@ export const needyFormSchema = z.object({
   // Kişisel Bilgiler
   gender: z.enum(['male', 'female']).nullable().optional(),
   date_of_birth: z.string().nullable().optional(),
+  birth_place: z.string().nullable().optional(),
+  father_name: z.string().nullable().optional(),
+  mother_name: z.string().nullable().optional(),
   phone: z.string().nullable().optional(),
   email: z.string().email({ message: 'Geçersiz e-posta adresi' }).nullable().optional(),
   address: z.string().nullable().optional(),

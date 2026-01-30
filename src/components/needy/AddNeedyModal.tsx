@@ -29,7 +29,8 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Save, X, Loader2 } from 'lucide-react'
+import { Save, X, Loader2, Camera } from 'lucide-react'
+import { IdScanner, ScannedIdData } from '@/components/forms/id-scanner'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
@@ -82,6 +83,19 @@ interface AddNeedyModalProps {
 export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [scannerOpen, setScannerOpen] = useState(false)
+
+  const handleScanComplete = (data: ScannedIdData) => {
+    if (data.firstName) form.setValue('first_name', data.firstName)
+    if (data.lastName) form.setValue('last_name', data.lastName)
+    if (data.identityNumber) form.setValue('identity_number', data.identityNumber)
+    if (data.dateOfBirth) {
+      const date = new Date(data.dateOfBirth)
+      const formatted = date.toISOString().split('T')[0]
+      form.setValue('date_of_birth', formatted)
+    }
+    setScannerOpen(false)
+  }
 
   const form = useForm<AddNeedyFormValues>({
     resolver: zodResolver(addNeedySchema),
@@ -176,6 +190,15 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
             Yeni İhtiyaç Sahibi Ekle
           </DialogTitle>
           <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setScannerOpen(true)}
+              className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+            >
+              <Camera className="h-4 w-4 mr-2" />
+              Kamera ile Tara
+            </Button>
             <Button
               onClick={form.handleSubmit(onSubmit)}
               disabled={!isFormValid || isLoading}
@@ -411,6 +434,13 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
             />
           </form>
         </Form>
+
+        {/* ID Scanner Modal */}
+        <IdScanner
+          open={scannerOpen}
+          onOpenChange={setScannerOpen}
+          onScanComplete={handleScanComplete}
+        />
       </DialogContent>
     </Dialog>
   )

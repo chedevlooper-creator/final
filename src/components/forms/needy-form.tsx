@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { needyPersonSchema, NeedyPersonFormValues } from '@/lib/validations/needy'
@@ -25,8 +26,9 @@ import {
 } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
+import { Loader2, ScanLine } from 'lucide-react'
 import { Tables } from '@/types/database.types'
+import { IdScanner, ScannedIdData } from './id-scanner'
 
 interface NeedyFormProps {
   initialData?: Tables<'needy_persons'>
@@ -52,6 +54,7 @@ const INCOME_SOURCES = [
 ]
 
 export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
+  const [scannerOpen, setScannerOpen] = useState(false)
   const createMutation = useCreateNeedy()
   const updateMutation = useUpdateNeedy()
   const isEditing = !!initialData
@@ -59,6 +62,40 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
   const { data: countries } = useCountries() as { data: Array<{ id: string; name: string; code: string | null }> | undefined }
   const { data: categories } = useCategories('needy') as { data: Array<{ id: string; name: string; type: string | null }> | undefined }
   const { data: partners } = usePartners() as { data: Array<{ id: string; name: string; type: string | null }> | undefined }
+
+  // Taranan kimlik bilgilerini forma doldur
+  const handleScanComplete = (data: ScannedIdData) => {
+    if (data.firstName) {
+      form.setValue('first_name', data.firstName)
+    }
+    if (data.lastName) {
+      form.setValue('last_name', data.lastName)
+    }
+    if (data.identityNumber) {
+      form.setValue('identity_number', data.identityNumber)
+      form.setValue('identity_type', 'tc')
+    }
+    if (data.passportNumber) {
+      form.setValue('passport_number', data.passportNumber)
+      form.setValue('identity_type', 'passport')
+    }
+    if (data.dateOfBirth) {
+      form.setValue('date_of_birth', data.dateOfBirth)
+    }
+    if (data.gender) {
+      form.setValue('gender', data.gender)
+    }
+    if (data.fatherName) {
+      form.setValue('father_name', data.fatherName)
+    }
+    if (data.motherName) {
+      form.setValue('mother_name', data.motherName)
+    }
+    if (data.birthPlace) {
+      form.setValue('birth_place', data.birthPlace)
+    }
+    toast.success('Kimlik bilgileri forma aktarıldı')
+  }
 
   const form = useForm<NeedyPersonFormValues>({
     resolver: zodResolver(needyPersonSchema),
@@ -275,12 +312,26 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
 
           {/* Kimlik Bilgileri */}
           <TabsContent value="identity" className="space-y-4 mt-4">
+            {/* Kamera ile Tara Butonu */}
+            <div className="flex justify-end mb-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setScannerOpen(true)}
+                className="gap-2"
+              >
+                <ScanLine className="h-4 w-4" />
+                Kamera ile Tara
+              </Button>
+            </div>
+            
             <div className="grid gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="identity_type"
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel>Kimlik Türü</FormLabel>
                     <FormLabel>Kimlik Türü</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || ''}>
                       <FormControl>
@@ -576,6 +627,13 @@ export function NeedyForm({ initialData, onSuccess }: NeedyFormProps) {
           </Button>
         </div>
       </form>
+
+      {/* Kimlik Tarama Dialog */}
+      <IdScanner
+        open={scannerOpen}
+        onOpenChange={setScannerOpen}
+        onScanComplete={handleScanComplete}
+      />
     </Form>
   )
 }

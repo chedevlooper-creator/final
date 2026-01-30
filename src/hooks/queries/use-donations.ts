@@ -226,15 +226,26 @@ export function useDonationStats() {
       today.setHours(0, 0, 0, 0)
       const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1)
 
-      // Single query with aggregation - much faster!
-      const { data, error } = await supabase
-        .rpc('calculate_donation_stats', {
-          p_start_date: thisMonth.toISOString(),
-          p_end_date: today.toISOString()
-        })
+      try {
+        // Single query with aggregation - attempt to use RPC
+        const { data, error } = await supabase
+          .rpc('calculate_donation_stats', {
+            p_start_date: thisMonth.toISOString(),
+            p_end_date: today.toISOString()
+          })
 
-      if (error) {
-        // Fallback to manual calculation if RPC doesn't exist
+        if (error) throw error
+        
+        return data || {
+          today: 0,
+          thisMonth: 0,
+          allTime: 0,
+          count: 0,
+        }
+      } catch (err) {
+        // Fallback to manual calculation if RPC doesn't exist or fails
+        console.warn('RPC calculate_donation_stats failed, using fallback:', err)
+        
         const [todayResult, monthResult, totalResult] = await Promise.all([
           supabase
             .from('donations')
@@ -262,13 +273,6 @@ export function useDonationStats() {
           allTime: allTimeTotal,
           count: totalResult.data?.length || 0,
         }
-      }
-
-      return data || {
-        today: 0,
-        thisMonth: 0,
-        allTime: 0,
-        count: 0,
       }
     },
     // Cache stats for 2 minutes

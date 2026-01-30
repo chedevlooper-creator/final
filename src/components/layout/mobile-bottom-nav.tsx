@@ -5,12 +5,21 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { mobileNavItems } from '@/lib/config/mobile-nav-config'
 
+import { useState, useEffect } from 'react'
+
 export function MobileBottomNav() {
   const pathname = usePathname()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-card/95 backdrop-blur-sm border-t border-border">
-      <div className="flex items-center justify-around h-16 safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-card/95 backdrop-blur-lg border-t border-border safe-area-bottom">
+      <div className="flex items-center justify-around h-16">
         {mobileNavItems.map((item) => {
           const isActive = pathname === item.href || pathname?.startsWith(item.href)
           

@@ -69,13 +69,13 @@ export function Sidebar() {
 
   if (!mounted) {
     return (
-      <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-card shadow-card border-r border-border hidden md:flex">
-        <div className="flex h-16 items-center px-4 border-b border-border">
+      <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-card shadow-card border-r border-border hidden md:flex flex-col">
+        <div className="flex h-16 items-center px-6 border-b border-border shrink-0">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary shadow-md">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary shadow-md shadow-primary/20">
               <Heart className="h-5 w-5 text-white" />
             </div>
-            <span className="text-lg font-bold text-foreground">Yardım Paneli</span>
+            <span className="text-lg font-bold tracking-tight text-foreground whitespace-nowrap">Yardım Paneli</span>
           </div>
         </div>
       </aside>
@@ -86,53 +86,46 @@ export function Sidebar() {
     <TooltipProvider delayDuration={200}>
       <aside
         className={cn(
-          'fixed left-0 top-0 z-40 h-screen bg-card shadow-card border-r border-border transition-all duration-300 ease-out hidden md:flex',
+          'fixed left-0 top-0 z-40 h-screen bg-card border-r border-border transition-all duration-300 ease-in-out hidden md:flex flex-col',
           sidebarCollapsed ? 'w-20' : 'w-64'
         )}
       >
-        {/* Header */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-border">
+        {/* Sidebar Header */}
+        <div className={cn(
+          "flex h-16 items-center border-b border-border bg-card transition-all duration-300 shrink-0",
+          sidebarCollapsed ? "justify-center px-2" : "justify-between px-6"
+        )}>
           {!sidebarCollapsed ? (
-            <Link href="/dashboard" className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary shadow-md transition-transform hover:scale-105">
-                <Heart className="h-5 w-5 text-white" />
+            <Link href="/dashboard" className="flex items-center gap-3 active:scale-95 transition-transform min-w-0 overflow-hidden">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white shadow-md shadow-primary/20 shrink-0">
+                <Heart className="h-5 w-5" />
               </div>
-              <span className="text-lg font-bold text-foreground">
+              <span className="text-lg font-bold tracking-tight text-foreground whitespace-nowrap overflow-hidden text-ellipsis">
                 Yardım Paneli
               </span>
             </Link>
           ) : (
             <Tooltip>
               <TooltipPrimitive.Trigger asChild>
-                <Link
-                  href="/dashboard"
-                  className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-primary shadow-md"
+                <div 
+                  onClick={toggleSidebar}
+                  className="cursor-pointer flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-md shadow-primary/20 active:scale-95 transition-transform"
                 >
-                  <Home className="h-5 w-5 text-white" />
-                </Link>
+                  <Home className="h-5 w-5" />
+                </div>
               </TooltipPrimitive.Trigger>
-              <TooltipContent side="right">
-                Ana Sayfa
-              </TooltipContent>
+              <TooltipContent side="right">Genişlet</TooltipContent>
             </Tooltip>
           )}
 
           {!sidebarCollapsed && (
-            <Tooltip>
-              <TooltipPrimitive.Trigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleSidebar}
-                  className="h-9 w-9 rounded-lg"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-              </TooltipPrimitive.Trigger>
-              <TooltipContent side="right">
-                Daralt
-              </TooltipContent>
-            </Tooltip>
+            <button
+              onClick={toggleSidebar}
+              className="flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground shrink-0 ml-1 transition-colors"
+              aria-label="Sidebar'ı daralt"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
           )}
         </div>
 
@@ -226,30 +219,30 @@ export function Sidebar() {
           </nav>
         </ScrollArea>
 
-        {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 border-t border-border bg-muted/50 p-3">
+        {/* Footer Settings */}
+        <div className="mt-auto border-t border-border p-3 bg-muted/30">
           {sidebarCollapsed ? (
             <Tooltip>
               <TooltipPrimitive.Trigger asChild>
-                <Button variant="ghost" size="icon" className="mx-auto w-12 h-12 rounded-lg" asChild>
-                  <Link href="/dashboard/settings/definitions">
-                    <Settings className="h-5 w-5" />
-                  </Link>
-                </Button>
+                <Link 
+                  href="/dashboard/settings/definitions"
+                  className="flex h-12 w-12 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-all mx-auto"
+                >
+                  <Settings className="h-5 w-5" />
+                </Link>
               </TooltipPrimitive.Trigger>
-              <TooltipContent side="right">
-                Ayarlar
-              </TooltipContent>
+              <TooltipContent side="right">Ayarlar</TooltipContent>
             </Tooltip>
           ) : (
-            <Button variant="ghost" className="w-full justify-start gap-3 rounded-lg" asChild>
-              <Link href="/dashboard/settings/definitions">
-                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
-                  <Settings className="h-4 w-4" />
-                </div>
-                <span className="font-semibold">Ayarlar</span>
-              </Link>
-            </Button>
+            <Link 
+              href="/dashboard/settings/definitions"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted/50">
+                <Settings className="h-4 w-4" />
+              </div>
+              <span>Ayarlar</span>
+            </Link>
           )}
         </div>
       </aside>

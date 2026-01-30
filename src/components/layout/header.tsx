@@ -36,12 +36,11 @@ export function Header() {
 
   if (!mounted) {
     return (
-      <header className="fixed top-0 right-0 z-30 flex h-16 items-center justify-between bg-card shadow-card border-b border-border px-4 animate-fade-in"
-        style={{ left: sidebarCollapsed ? '5rem' : '16rem' }}>
+      <header className="fixed top-0 right-0 left-0 md:left-64 z-40 flex h-16 items-center justify-between bg-card shadow-sm border-b border-border px-4 transition-none">
         <div className="flex items-center gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Ara..." className="w-64 pl-9 input-soft" disabled />
+          <div className="relative hidden md:block">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
+            <div className="w-64 h-9 bg-muted/50 rounded-lg animate-pulse" />
           </div>
         </div>
       </header>
@@ -51,10 +50,9 @@ export function Header() {
   return (
     <header
       className={cn(
-        "fixed top-0 z-30 flex h-16 items-center justify-between bg-card shadow-card border-b border-border px-4 transition-all duration-300",
-        "left-0 right-0 md:left-auto md:right-auto",
-        !sidebarCollapsed && "md:left-[16rem]",
-        sidebarCollapsed && "md:left-[5rem]"
+        "fixed top-0 right-0 z-40 flex h-16 items-center justify-between bg-card shadow-sm border-b border-border px-4 transition-all duration-300",
+        "left-0 md:left-20",
+        !sidebarCollapsed && "md:left-64"
       )}
     >
       {/* Left Section */}
