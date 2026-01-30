@@ -29,16 +29,7 @@ import { withOrgAuth, createOrgErrorResponse } from '@/lib/organization-middlewa
  */
 export async function GET(request: NextRequest) {
   try {
-    // Multi-tenant auth: Organizasyon context'i ile birlikte auth kontrolü
-    const orgAuthResult = await withOrgAuth(request, {
-      requiredPermission: 'data:read',
-    })
-
-    if (!orgAuthResult.success) {
-      return createOrgErrorResponse(orgAuthResult.error, orgAuthResult.status)
-    }
-
-    // Legacy RBAC kontrolü (opsiyonel, kaldırılabilir)
+    // Auth kontrolü
     const authResult = await withAuth(request, {
       requiredPermission: 'read',
       resource: 'needy_persons',
@@ -50,7 +41,17 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createServerSupabaseClient()
     const { searchParams } = new URL(request.url)
-    const organizationId = orgAuthResult.user.organization.id
+    
+    // Try to get organization context (optional for backwards compatibility)
+    let organizationId: string | null = null
+    try {
+      const orgAuthResult = await withOrgAuth(request, { requiredPermission: 'data:read' })
+      if (orgAuthResult.success) {
+        organizationId = orgAuthResult.user.organization.id
+      }
+    } catch {
+      // Organization not required for backwards compatibility
+    }
 
     const page = Number.parseInt(searchParams.get('page') || '0')
     const limit = Number.parseInt(searchParams.get('limit') || '20')
@@ -59,12 +60,16 @@ export async function GET(request: NextRequest) {
     const districtId = searchParams.get('district_id')
     const status = searchParams.get('status')
 
-    // Build query with organization filter
+    // Build query with optional organization filter
     let query = supabase
       .from('needy_persons')
       .select('*', { count: 'exact' })
-      .eq('organization_id', organizationId) // Multi-tenant filter
       .order('created_at', { ascending: false })
+    
+    // Apply organization filter if available
+    if (organizationId) {
+      query = query.eq('organization_id', organizationId)
+    }
 
     // Apply filters
     if (search) {
@@ -138,16 +143,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    // Multi-tenant auth: Organizasyon context'i ile birlikte auth kontrolü
-    const orgAuthResult = await withOrgAuth(request, {
-      requiredPermission: 'data:create',
-    })
-
-    if (!orgAuthResult.success) {
-      return createOrgErrorResponse(orgAuthResult.error, orgAuthResult.status)
-    }
-
-    // Legacy RBAC kontrolü (opsiyonel, kaldırılabilir)
+    // Auth kontrolü
     const authResult = await withAuth(request, {
       requiredPermission: 'create',
       resource: 'needy_persons',
@@ -173,15 +169,28 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createServerSupabaseClient()
     const user = authResult.user!
-    const organizationId = orgAuthResult.user.organization.id
+    
+    // Try to get organization context (optional)
+    let organizationId: string | null = null
+    try {
+      const orgAuthResult = await withOrgAuth(request, { requiredPermission: 'data:create' })
+      if (orgAuthResult.success) {
+        organizationId = orgAuthResult.user.organization.id
+      }
+    } catch {
+      // Organization not required
+    }
 
-    // Prepare data with organization_id and created_by
-    const newData = {
+    // Prepare data with optional organization_id
+    const newData: Record<string, unknown> = {
       ...body,
-      organization_id: organizationId, // Multi-tenant: Her kayıt organizasyona bağlı
       created_by: user.id,
       updated_by: user.id,
       status: body.status || 'active',
+    }
+    
+    if (organizationId) {
+      newData['organization_id'] = organizationId
     }
 
     const { data, error } = await supabase

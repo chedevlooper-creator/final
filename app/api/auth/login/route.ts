@@ -4,30 +4,20 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import { env } from '@/lib/env'
+
+// Build-time placeholder values for SSG/prerendering
+const BUILD_PLACEHOLDER_URL = 'https://placeholder.supabase.co'
+const BUILD_PLACEHOLDER_KEY = 'placeholder-anon-key'
+
+function isBuildTime(): boolean {
+  return !env.NEXT_PUBLIC_SUPABASE_URL || !env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+}
 
 /**
  * POST /api/auth/login - User login with email and password
- *
- * Request body:
- * {
- *   "email": string,
- *   "password": string
- * }
- *
- * Response (200):
- * {
- *   "data": {
- *     "user": { id, email, ... },
- *     "session": { access_token, refresh_token, ... }
- *   }
- * }
- *
- * Response (400/401):
- * {
- *   "error": string,
- *   "code": string
- * }
  */
 export async function POST(request: NextRequest) {
   try {
@@ -51,7 +41,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = await createServerSupabaseClient()
+    const cookieStore = await cookies()
+    const url = isBuildTime() ? BUILD_PLACEHOLDER_URL : env.NEXT_PUBLIC_SUPABASE_URL
+    const key = isBuildTime() ? BUILD_PLACEHOLDER_KEY : env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    // Create server client with cookie handling
+    const supabase = createServerClient(
+      url,
+      key,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options)
+            })
+          },
+        },
+      }
+    )
 
     // Attempt to sign in
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -93,7 +103,7 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error) {
-    // Error logged securely without exposing sensitive data
+    console.error('Login error:', error)
     return NextResponse.json(
       { error: 'Giriş yapılırken bir hata oluştu', code: 'INTERNAL_ERROR' },
       { status: 500 }

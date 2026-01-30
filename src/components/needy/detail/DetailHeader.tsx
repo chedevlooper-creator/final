@@ -4,12 +4,9 @@ import { Button } from '@/components/ui/button'
 import { 
   Save, 
   X, 
-  Link2, 
-  History,
   Loader2,
   Trash2
 } from 'lucide-react'
-import Link from 'next/link'
 
 interface DetailHeaderProps {
   id: string
@@ -61,18 +58,6 @@ export function DetailHeader({
 
         {/* Sağ Taraf - Link Butonları */}
         <div className="flex items-center gap-2">
-          <Link href={`/needy/merge/${id}`}>
-            <Button variant="ghost" size="sm">
-              <Link2 className="h-4 w-4 mr-2" />
-              Kart Birleştirme
-            </Button>
-          </Link>
-          <Link href={`/history?tab=needy&id=${id}`}>
-            <Button variant="ghost" size="sm">
-              <History className="h-4 w-4 mr-2" />
-              İşlem Geçmişi
-            </Button>
-          </Link>
           {onDeleteRequest && (
             <Button 
               variant="ghost" 

@@ -30,9 +30,22 @@ export function Header() {
     setMounted(true)
   }, [])
 
-  const initials = user?.email
-    ? user.email.slice(0, 2).toUpperCase()
-    : 'U'
+  // Get initials from profile name first, then email
+  const getInitials = () => {
+    if (profile?.name) {
+      const nameParts = profile.name.trim().split(' ')
+      if (nameParts.length >= 2) {
+        return (nameParts[0][0] + nameParts[1][0]).toUpperCase()
+      }
+      return profile.name.slice(0, 2).toUpperCase()
+    }
+    if (user?.email) {
+      return user.email.slice(0, 2).toUpperCase()
+    }
+    return 'U'
+  }
+  
+  const initials = getInitials()
 
   if (!mounted) {
     return (

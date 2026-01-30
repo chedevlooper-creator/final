@@ -127,28 +127,32 @@ export function useAuth() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Sign in via API route (server-side)
   const signIn = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       })
 
-      if (error) {
+      const result = await response.json()
+
+      if (!response.ok) {
         throw new AuthError(
-          error.message || 'Giriş başarısız',
-          error.status?.toString() || 'SIGN_IN_FAILED'
+          result.error || 'Giriş başarısız',
+          result.code || 'SIGN_IN_FAILED'
         )
       }
 
       toast.success('Giriş başarılı!')
       // Force a full reload to ensure cookies are synchronized with the server middleware
       window.location.href = '/dashboard'
-      return data
+      return result.data
     } catch (error) {
       const message = ErrorHandler.handle(error, {
         action: 'signIn',
-        email: email.substring(0, 3) + '***' // Mask email for logging
+        email: email.substring(0, 3) + '***'
       })
       toast.error(message)
       throw error
@@ -163,7 +167,7 @@ export function useAuth() {
         options: {
           data: {
             name: name || '',
-            role: 'user' // Default role for new users
+            role: 'user'
           }
         }
       })

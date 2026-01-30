@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,7 +14,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
-  const { signIn } = useAuth()
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {}
@@ -41,8 +39,24 @@ export default function LoginPage() {
     }
     setIsLoading(true)
     try {
-      await signIn(email, password)
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Giriş başarısız')
+      }
+
+      toast.success('Giriş başarılı!')
+      // Force reload to sync cookies with middleware
+      window.location.href = '/dashboard'
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Bir hata oluştu'
+      toast.error(message)
       console.error(error)
     } finally {
       setIsLoading(false)

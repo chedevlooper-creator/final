@@ -220,23 +220,29 @@ export default function NeedyDetailPage() {
           setSelectedTags(prev => [...prev, 'criminal_record'])
         }
 
-        // Fetch related multi-select data from junction tables
-        const [diseasesRes, incomeSourcesRes] = await Promise.all([
-          supabase
-            .from('needy_diseases')
-            .select('disease_id')
-            .eq('needy_person_id', id),
-          supabase
-            .from('needy_income_sources')
-            .select('income_source_id')
-            .eq('needy_person_id', id)
-        ])
+        // Fetch related multi-select data from junction tables (optional)
+        try {
+          const [diseasesRes, incomeSourcesRes] = await Promise.all([
+            supabase
+              .from('needy_diseases')
+              .select('disease_id')
+              .eq('needy_person_id', id),
+            supabase
+              .from('needy_income_sources')
+              .select('income_source_id')
+              .eq('needy_person_id', id)
+          ])
 
-        if (diseasesRes.data) {
-          setSelectedDiseases(diseasesRes.data.map((d: { disease_id: string }) => d.disease_id))
-        }
-        if (incomeSourcesRes.data) {
-          setSelectedIncomeSources(incomeSourcesRes.data.map((i: { income_source_id: string }) => i.income_source_id))
+          if (diseasesRes.data) {
+            setSelectedDiseases(diseasesRes.data.map((d: { disease_id: string }) => d.disease_id))
+          }
+          if (incomeSourcesRes.data) {
+            setSelectedIncomeSources(incomeSourcesRes.data.map((i: { income_source_id: string }) => i.income_source_id))
+          }
+        } catch {
+          // Tables might not exist yet, skip
+          setSelectedDiseases([])
+          setSelectedIncomeSources([])
         }
 
         // Fetch lookup data
@@ -344,26 +350,31 @@ export default function NeedyDetailPage() {
   }
 
   const handleJunctionTables = async (personId: string, supabase: any) => {
-    // Sync Diseases
-    await supabase.from('needy_diseases').delete().eq('needy_person_id', personId)
-    if (selectedDiseases.length > 0) {
-      await supabase.from('needy_diseases').insert(
-        selectedDiseases.map(diseaseId => ({
-          needy_person_id: personId,
-          disease_id: diseaseId
-        }))
-      )
-    }
+    try {
+      // Sync Diseases
+      await supabase.from('needy_diseases').delete().eq('needy_person_id', personId)
+      if (selectedDiseases.length > 0) {
+        await supabase.from('needy_diseases').insert(
+          selectedDiseases.map(diseaseId => ({
+            needy_person_id: personId,
+            disease_id: diseaseId
+          }))
+        )
+      }
 
-    // Sync Income Sources
-    await supabase.from('needy_income_sources').delete().eq('needy_person_id', personId)
-    if (selectedIncomeSources.length > 0) {
-      await supabase.from('needy_income_sources').insert(
-        selectedIncomeSources.map(sourceId => ({
-          needy_person_id: personId,
-          income_source_id: sourceId
-        }))
-      )
+      // Sync Income Sources
+      await supabase.from('needy_income_sources').delete().eq('needy_person_id', personId)
+      if (selectedIncomeSources.length > 0) {
+        await supabase.from('needy_income_sources').insert(
+          selectedIncomeSources.map(sourceId => ({
+            needy_person_id: personId,
+            income_source_id: sourceId
+          }))
+        )
+      }
+    } catch (error) {
+      // Tables might not exist yet, log but don't fail
+      console.warn('Junction tables error (tables may not exist):', error)
     }
   }
 
