@@ -65,7 +65,7 @@ const AVAILABILITY_OPTIONS = [
 
 const STATUS_OPTIONS = [
     { value: 'active', label: 'Aktif', color: 'bg-green-100 text-green-700' },
-    { value: 'inactive', label: 'Pasif', color: 'bg-slate-100 text-slate-700' },
+    { value: 'inactive', label: 'Pasif', color: 'bg-muted text-muted-foreground' },
     { value: 'pending', label: 'Beklemede', color: 'bg-yellow-100 text-yellow-700' },
 ]
 
@@ -115,7 +115,7 @@ export default function VolunteerDetailPage() {
                             <h1 className="text-2xl font-bold">{volunteer.first_name} {volunteer.last_name}</h1>
                             <Badge className={statusConfig?.color}>{statusConfig?.label}</Badge>
                         </div>
-                        <p className="text-sm text-slate-500">#{volunteer.volunteer_number}</p>
+                        <p className="text-sm text-muted-foreground">#{volunteer.volunteer_number}</p>
                     </div>
                 </div>
                 <Button onClick={handleSave} disabled={isSaving} className="bg-gradient-to-r from-emerald-500 to-cyan-500">
@@ -133,7 +133,7 @@ export default function VolunteerDetailPage() {
                                 <Briefcase className="h-6 w-6 text-blue-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-slate-500">Toplam Görev</p>
+                                <p className="text-sm text-muted-foreground">Toplam Görev</p>
                                 <p className="text-2xl font-bold">{volunteer.total_missions}</p>
                             </div>
                         </div>
@@ -146,7 +146,7 @@ export default function VolunteerDetailPage() {
                                 <Calendar className="h-6 w-6 text-green-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-slate-500">Toplam Saat</p>
+                                <p className="text-sm text-muted-foreground">Toplam Saat</p>
                                 <p className="text-2xl font-bold">{volunteer.total_hours}</p>
                             </div>
                         </div>
@@ -159,7 +159,7 @@ export default function VolunteerDetailPage() {
                                 <Award className="h-6 w-6 text-purple-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-slate-500">Üyelik</p>
+                                <p className="text-sm text-muted-foreground">Üyelik</p>
                                 <p className="text-lg font-medium">{format(new Date(volunteer.join_date), 'MMM yyyy', { locale: tr })}</p>
                             </div>
                         </div>

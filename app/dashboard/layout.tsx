@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { useUIStore } from '@/stores/ui-store'
 import { cn } from '@/lib/utils'
 import { memo, useState, useEffect } from 'react'
@@ -14,7 +15,7 @@ import { MobileMenu } from '@/components/layout/mobile-menu'
 function DashboardLayoutClient({
   children,
 }: {
-  children: React.ReactNode
+  children: ReactNode
 }) {
   const pathname = usePathname()
   const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed)
@@ -32,11 +33,15 @@ function DashboardLayoutClient({
   return (
     <div className="min-h-screen bg-background" suppressHydrationWarning>
       <SkipToContent />
-      <Sidebar />
+      <aside role="navigation" aria-label="Ana navigasyon">
+        <Sidebar />
+      </aside>
       {!isDetailPage && <Header />}
       <MobileMenu />
       <main
         id="main-content"
+        role="main"
+        aria-label="Ana içerik"
         className={cn(
           'min-h-screen transition-all duration-300 ease-out',
           !isDetailPage && 'pt-16',
@@ -54,7 +59,9 @@ function DashboardLayoutClient({
           </div>
         </div>
       </main>
-      <MobileBottomNav />
+      <nav role="navigation" aria-label="Mobil navigasyon">
+        <MobileBottomNav />
+      </nav>
     </div>
   )
 }

@@ -1,94 +1,113 @@
-import { LucideIcon } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { memo } from 'react'
-import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { LucideIcon } from 'lucide-react'
+import { ReactNode } from 'react'
 
 interface StatCardProps {
   title: string
-  value: string | number | React.ReactNode
-  icon: LucideIcon
-  description?: string
-  trend?: string
-  trendUp?: boolean
+  value: ReactNode
+  subtitle?: string
+  icon?: LucideIcon
+  trend?: {
+    value: string
+    positive?: boolean
+  } | string
+  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'primary' | 'accent'
   className?: string
-  variant?: 'default' | 'primary' | 'accent' | 'success' | 'warning'
 }
 
-export const StatCard = memo(function StatCard({
+const variantStyles = {
+  default: 'bg-card',
+  success: 'bg-green-50/50 border-green-200',
+  warning: 'bg-orange-50/50 border-orange-200',
+  danger: 'bg-red-50/50 border-red-200',
+  info: 'bg-blue-50/50 border-blue-200',
+  primary: 'bg-primary/5 border-primary/20',
+  accent: 'bg-accent/5 border-accent/20',
+}
+
+const iconVariantStyles = {
+  default: 'bg-muted text-muted-foreground',
+  success: 'bg-green-100 text-green-600',
+  warning: 'bg-orange-100 text-orange-600',
+  danger: 'bg-red-100 text-red-600',
+  info: 'bg-blue-100 text-blue-600',
+  primary: 'bg-primary/10 text-primary',
+  accent: 'bg-accent/10 text-accent',
+}
+
+export function StatCard({
   title,
   value,
+  subtitle,
   icon: Icon,
-  description,
   trend,
-  trendUp,
-  className,
   variant = 'default',
+  className,
 }: StatCardProps) {
-  const variantStyles = {
-    default: 'bg-card border-border/50',
-    primary: 'bg-primary/5 border-primary/20',
-    accent: 'bg-accent/5 border-accent/20',
-    success: 'bg-success/5 border-success/20',
-    warning: 'bg-warning/5 border-warning/20',
-  }
-
-  const iconStyles = {
-    default: 'bg-muted text-muted-foreground',
-    primary: 'bg-primary/10 text-primary',
-    accent: 'bg-accent/10 text-accent',
-    success: 'bg-success/10 text-success',
-    warning: 'bg-warning/10 text-warning',
-  }
-
   return (
-    <div
-      className={cn(
-        'card-bento flex items-start gap-4',
-        variantStyles[variant],
-        className
-      )}
-    >
-      <div className={cn(
-        'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl',
-        iconStyles[variant]
-      )}>
-        <Icon className="h-6 w-6" />
-      </div>
-      
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-muted-foreground truncate">
-            {title}
-          </h3>
+    <Card className={cn(variantStyles[variant], className)}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
+          {title}
+        </CardTitle>
+        {Icon && (
+          <div className={cn('flex h-8 w-8 items-center justify-center rounded-lg', iconVariantStyles[variant])}>
+            <Icon className="h-4 w-4" />
+          </div>
+        )}
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-end justify-between">
+          <div>
+            <div className="text-2xl font-bold">{value}</div>
+            {subtitle && (
+              <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
+            )}
+          </div>
           {trend && (
-            <div
-              className={cn(
-                'flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-bold',
-                trendUp 
-                  ? 'bg-success/10 text-success' 
-                  : 'bg-danger/10 text-danger'
-              )}
-            >
-              {trendUp ? (
-                <ArrowUpRight className="h-3 w-3" />
-              ) : (
-                <ArrowDownRight className="h-3 w-3" />
-              )}
-              <span>{trend}</span>
-            </div>
+            <span className={cn(
+              'text-xs font-medium px-2 py-1 rounded-full',
+              typeof trend === 'string' 
+                ? 'bg-muted text-muted-foreground'
+                : trend.positive ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
+            )}>
+              {typeof trend === 'string' ? trend : trend.value}
+            </span>
           )}
         </div>
-        
-        <div className="mt-1 text-2xl font-bold tracking-tight truncate">
-          {value}
-        </div>
-        
-        {description && (
-          <p className="mt-1 text-xs text-muted-foreground truncate">
-            {description}
-          </p>
-        )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
-})
+}
+
+// Compact version for mobile
+export function StatCardCompact({
+  title,
+  value,
+  subtitle,
+  icon: Icon,
+  variant = 'default',
+  className,
+}: Omit<StatCardProps, 'trend'>) {
+  return (
+    <Card className={cn(variantStyles[variant], className)}>
+      <CardContent className="p-4">
+        <div className="flex items-center gap-3">
+          {Icon && (
+            <div className={cn('flex h-10 w-10 items-center justify-center rounded-lg', iconVariantStyles[variant])}>
+              <Icon className="h-5 w-5" />
+            </div>
+          )}
+          <div className="min-w-0">
+            <p className="text-sm text-muted-foreground">{title}</p>
+            <p className="text-xl font-bold truncate">{value}</p>
+            {subtitle && (
+              <p className="text-xs text-muted-foreground truncate">{subtitle}</p>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}

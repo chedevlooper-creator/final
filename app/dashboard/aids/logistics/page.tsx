@@ -97,7 +97,7 @@ export default function LogisticsPage() {
             <div className="grid gap-4 md:grid-cols-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Toplam Teslimat</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Toplam Teslimat</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold">{mockLogistics.length}</p>
@@ -105,7 +105,7 @@ export default function LogisticsPage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Teslim Edildi</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Teslim Edildi</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold text-green-600">
@@ -115,7 +115,7 @@ export default function LogisticsPage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Yolda</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Yolda</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold text-blue-600">
@@ -125,7 +125,7 @@ export default function LogisticsPage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Hazırlanıyor</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Hazırlanıyor</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold text-yellow-600">
@@ -201,7 +201,7 @@ export default function LogisticsPage() {
                                             <TableCell className="font-mono text-sm">{item.aid_number}</TableCell>
                                             <TableCell className="font-medium">{item.needy_person.name}</TableCell>
                                             <TableCell>
-                                                <div className="flex items-center gap-1 text-sm text-slate-500">
+                                                <div className="flex items-center gap-1 text-sm text-muted-foreground">
                                                     <MapPin className="h-3 w-3" />
                                                     {item.needy_person.address}
                                                 </div>
@@ -218,7 +218,7 @@ export default function LogisticsPage() {
                                             <TableCell>
                                                 <Badge className={statusConfig.color}>{statusConfig.label}</Badge>
                                             </TableCell>
-                                            <TableCell className="text-sm text-slate-500">
+                                            <TableCell className="text-sm text-muted-foreground">
                                                 {item.delivery_date
                                                     ? format(new Date(item.delivery_date), 'dd.MM.yyyy', { locale: tr })
                                                     : '-'}

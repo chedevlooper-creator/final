@@ -69,7 +69,7 @@ export default function SMSPage() {
       },
     }
 
-    const config = statusConfig[status] || { label: status, color: 'bg-slate-100', icon: null }
+    const config = statusConfig[status] || { label: status, color: 'bg-muted', icon: null }
     const Icon = config.icon
 
     return (
@@ -88,7 +88,7 @@ export default function SMSPage() {
         <div>
           <p className="font-medium">{row.original.phone}</p>
           {row.original.recipient_name && (
-            <p className="text-xs text-slate-500">{row.original.recipient_name}</p>
+            <p className="text-xs text-muted-foreground">{row.original.recipient_name}</p>
           )}
         </div>
       ),
@@ -109,7 +109,7 @@ export default function SMSPage() {
       accessorKey: 'sent_at',
       header: 'Gönderim Tarihi',
       cell: ({ row }) => (
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-muted-foreground">
           {row.original.sent_at
             ? format(new Date(row.original.sent_at), 'dd MMM yyyy HH:mm', { locale: tr })
             : '-'}
@@ -120,7 +120,7 @@ export default function SMSPage() {
       accessorKey: 'delivered_at',
       header: 'Teslim Tarihi',
       cell: ({ row }) => (
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-muted-foreground">
           {row.original.delivered_at
             ? format(new Date(row.original.delivered_at), 'dd MMM yyyy HH:mm', { locale: tr })
             : '-'}

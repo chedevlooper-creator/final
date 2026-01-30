@@ -63,7 +63,7 @@ const mockPurchaseRequest = {
 }
 
 const STATUS_OPTIONS = [
-    { value: 'draft', label: 'Taslak', color: 'bg-slate-100 text-slate-700' },
+    { value: 'draft', label: 'Taslak', color: 'bg-muted text-muted-foreground' },
     { value: 'pending', label: 'Onay Bekliyor', color: 'bg-yellow-100 text-yellow-700' },
     { value: 'approved', label: 'Onaylandı', color: 'bg-green-100 text-green-700' },
     { value: 'rejected', label: 'Reddedildi', color: 'bg-red-100 text-red-700' },
@@ -124,7 +124,7 @@ export default function PurchaseDetailPage() {
                             <h1 className="text-2xl font-bold">{request.title}</h1>
                             <Badge className={statusConfig?.color}>{statusConfig?.label}</Badge>
                         </div>
-                        <p className="text-sm text-slate-500">#{request.request_number}</p>
+                        <p className="text-sm text-muted-foreground">#{request.request_number}</p>
                     </div>
                 </div>
                 <div className="flex gap-2">
@@ -233,15 +233,15 @@ export default function PurchaseDetailPage() {
                         </CardHeader>
                         <CardContent className="space-y-3">
                             <div className="flex justify-between">
-                                <span className="text-slate-500">Talep Eden:</span>
+                                <span className="text-muted-foreground">Talep Eden:</span>
                                 <span>{request.requester}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-slate-500">Tarih:</span>
+                                <span className="text-muted-foreground">Tarih:</span>
                                 <span>{format(new Date(request.created_at), 'dd.MM.yyyy', { locale: tr })}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-slate-500">Ürün Sayısı:</span>
+                                <span className="text-muted-foreground">Ürün Sayısı:</span>
                                 <span>{request.items.length}</span>
                             </div>
                             <div className="flex justify-between border-t pt-3">

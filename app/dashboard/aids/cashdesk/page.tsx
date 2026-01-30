@@ -110,7 +110,7 @@ export default function CashDeskPage() {
             <div className="grid gap-4 md:grid-cols-3">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Günlük Tahsilat</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Günlük Tahsilat</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold text-green-600">
@@ -120,7 +120,7 @@ export default function CashDeskPage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Günlük Ödeme</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Günlük Ödeme</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold text-red-600">
@@ -130,7 +130,7 @@ export default function CashDeskPage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Kasa Bakiyesi</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Kasa Bakiyesi</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold">
@@ -210,13 +210,13 @@ export default function CashDeskPage() {
                                         <TableCell>
                                             <div>
                                                 <p className="font-medium">{transaction.recipient_name}</p>
-                                                <p className="text-xs text-slate-500">{transaction.description}</p>
+                                                <p className="text-xs text-muted-foreground">{transaction.description}</p>
                                             </div>
                                         </TableCell>
                                         <TableCell className={`font-medium ${transaction.type === 'in' ? 'text-green-600' : 'text-red-600'}`}>
                                             {transaction.type === 'in' ? '+' : '-'}₺{transaction.amount.toLocaleString('tr-TR')}
                                         </TableCell>
-                                        <TableCell className="text-sm text-slate-500">
+                                        <TableCell className="text-sm text-muted-foreground">
                                             {format(new Date(transaction.created_at), 'dd.MM.yyyy HH:mm', { locale: tr })}
                                         </TableCell>
                                         <TableCell className="text-sm">{transaction.created_by}</TableCell>

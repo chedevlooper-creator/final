@@ -51,7 +51,7 @@ export default function VolunteersPage() {
   const getStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
       active: 'bg-green-100 text-green-700',
-      inactive: 'bg-slate-100 text-slate-700',
+      inactive: 'bg-muted text-muted-foreground',
       pending: 'bg-yellow-100 text-yellow-700',
     }
     const statusLabels: Record<string, string> = {
@@ -60,7 +60,7 @@ export default function VolunteersPage() {
       pending: 'Beklemede',
     }
     return (
-      <Badge className={statusColors[status] || 'bg-slate-100'}>
+      <Badge className={statusColors[status] || 'bg-muted'}>
         {statusLabels[status] || status}
       </Badge>
     )
@@ -77,13 +77,13 @@ export default function VolunteersPage() {
           </p>
           <div className="flex gap-2 mt-1">
             {row.original.phone && (
-              <span className="text-xs text-slate-500 flex items-center gap-1">
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
                 <Phone className="h-3 w-3" />
                 {row.original.phone}
               </span>
             )}
             {row.original.email && (
-              <span className="text-xs text-slate-500 flex items-center gap-1">
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
                 <Mail className="h-3 w-3" />
                 {row.original.email}
               </span>
@@ -123,12 +123,12 @@ export default function VolunteersPage() {
           const date = row.original.created_at ? new Date(row.original.created_at) : null
           const isValidDate = date && !isNaN(date.getTime())
           return (
-            <span className="text-sm text-slate-500">
+            <span className="text-sm text-muted-foreground">
               {isValidDate ? format(date!, 'dd MMM yyyy', { locale: tr }) : '-'}
             </span>
           )
         } catch (e) {
-          return <span className="text-sm text-slate-500">-</span>
+          return <span className="text-sm text-muted-foreground">-</span>
         }
       },
     },

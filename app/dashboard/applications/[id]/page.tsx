@@ -108,7 +108,7 @@ function ApplicationForm({
       green: 'bg-green-100 text-green-700',
       red: 'bg-red-100 text-red-700',
       orange: 'bg-orange-100 text-orange-700',
-      gray: 'bg-slate-100 text-slate-700',
+      gray: 'bg-muted text-muted-foreground',
     }
     return (
       <Badge className={colorClasses[statusConfig?.color || 'gray']}>
@@ -121,7 +121,7 @@ function ApplicationForm({
     if (!priorityValue) return null
     const priorityConfig = PRIORITY_LEVELS.find((p) => p.value === priorityValue)
     const colorClasses: Record<string, string> = {
-      gray: 'bg-slate-100 text-slate-600',
+      gray: 'bg-muted text-muted-foreground',
       blue: 'bg-blue-100 text-blue-600',
       orange: 'bg-orange-100 text-orange-600',
       red: 'bg-red-100 text-red-600',
@@ -151,7 +151,7 @@ function ApplicationForm({
               {getStatusBadge(status)}
               {getPriorityBadge(priority)}
             </div>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground">
               {format(new Date(application.created_at), 'dd MMMM yyyy HH:mm', { locale: tr })}
             </p>
           </div>
@@ -185,13 +185,13 @@ function ApplicationForm({
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <Label className="text-sm text-slate-500">Başvuru Türü</Label>
+                  <Label className="text-sm text-muted-foreground">Başvuru Türü</Label>
                   <p className="font-medium">
                     {APPLICATION_TYPES.find((t) => t.value === application.application_type)?.label || application.application_type}
                   </p>
                 </div>
                 <div>
-                  <Label className="text-sm text-slate-500">Talep Edilen Tutar</Label>
+                  <Label className="text-sm text-muted-foreground">Talep Edilen Tutar</Label>
                   <p className="font-medium text-lg">
                     {application.requested_amount
                       ? `₺${application.requested_amount.toLocaleString('tr-TR')}`
@@ -201,7 +201,7 @@ function ApplicationForm({
               </div>
 
               <div>
-                <Label className="text-sm text-slate-500">Açıklama</Label>
+                <Label className="text-sm text-muted-foreground">Açıklama</Label>
                 <p className="mt-1">{application.description || 'Açıklama girilmemiş'}</p>
               </div>
 
@@ -241,7 +241,7 @@ function ApplicationForm({
               <div>
                 <Label htmlFor="approvedAmount">Onaylanan Tutar</Label>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-slate-500">₺</span>
+                  <span className="text-muted-foreground">₺</span>
                   <input
                     type="number"
                     id="approvedAmount"
@@ -294,7 +294,7 @@ function ApplicationForm({
                 </TabsList>
 
                 <TabsContent value="products" className="mt-4">
-                  <div className="text-center py-8 text-slate-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     <Package className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p>Henüz ürün/hizmet eklenmemiş</p>
                     <Button variant="outline" size="sm" className="mt-2">
@@ -304,7 +304,7 @@ function ApplicationForm({
                 </TabsContent>
 
                 <TabsContent value="documents" className="mt-4">
-                  <div className="text-center py-8 text-slate-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     <FileCheck className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p>Henüz doküman yüklenmemiş</p>
                     <Button variant="outline" size="sm" className="mt-2">
@@ -314,7 +314,7 @@ function ApplicationForm({
                 </TabsContent>
 
                 <TabsContent value="purchases" className="mt-4">
-                  <div className="text-center py-8 text-slate-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     <ShoppingCart className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p>Satın alma talebi bulunmuyor</p>
                     <Button variant="outline" size="sm" className="mt-2">
@@ -324,7 +324,7 @@ function ApplicationForm({
                 </TabsContent>
 
                 <TabsContent value="aids" className="mt-4">
-                  <div className="text-center py-8 text-slate-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     <Gift className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p>Yardım kaydı bulunmuyor</p>
                     <Button variant="outline" size="sm" className="mt-2">
@@ -351,10 +351,10 @@ function ApplicationForm({
                         <p className="text-xs text-yellow-600">Devam ediyor</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg opacity-50">
+                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg opacity-50">
                       <AlertCircle className="h-5 w-5 text-slate-400" />
                       <div className="flex-1">
-                        <p className="font-medium text-slate-500">Onay Bekliyor</p>
+                        <p className="font-medium text-muted-foreground">Onay Bekliyor</p>
                       </div>
                     </div>
                   </div>
@@ -385,19 +385,19 @@ function ApplicationForm({
               </div>
               {application.needy_person?.identity_number && (
                 <div>
-                  <Label className="text-xs text-slate-500">Kimlik No</Label>
+                  <Label className="text-xs text-muted-foreground">Kimlik No</Label>
                   <p className="font-mono">{application.needy_person.identity_number}</p>
                 </div>
               )}
               {application.needy_person?.phone && (
                 <div>
-                  <Label className="text-xs text-slate-500">Telefon</Label>
+                  <Label className="text-xs text-muted-foreground">Telefon</Label>
                   <p>{application.needy_person.phone}</p>
                 </div>
               )}
               {application.needy_person?.address && (
                 <div>
-                  <Label className="text-xs text-slate-500">Adres</Label>
+                  <Label className="text-xs text-muted-foreground">Adres</Label>
                   <p className="text-sm">{application.needy_person.address}</p>
                 </div>
               )}
@@ -454,11 +454,11 @@ function ApplicationForm({
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-500">Oluşturulma:</span>
+                <span className="text-muted-foreground">Oluşturulma:</span>
                 <span>{format(new Date(application.created_at), 'dd.MM.yyyy HH:mm', { locale: tr })}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Güncelleme:</span>
+                <span className="text-muted-foreground">Güncelleme:</span>
                 <span>{format(new Date(application.updated_at), 'dd.MM.yyyy HH:mm', { locale: tr })}</span>
               </div>
             </CardContent>
@@ -502,7 +502,7 @@ export default function ApplicationDetailPage() {
   if (!application) {
     return (
       <div className="text-center py-12">
-        <p className="text-slate-500">Başvuru bulunamadı</p>
+        <p className="text-muted-foreground">Başvuru bulunamadı</p>
         <Link href="/applications">
           <Button variant="link">Listeye Dön</Button>
         </Link>

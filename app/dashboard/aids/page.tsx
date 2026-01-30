@@ -65,7 +65,7 @@ export default function AidsListPage() {
       pending: 'bg-yellow-100 text-yellow-700',
       delivered: 'bg-green-100 text-green-700',
       returned: 'bg-red-100 text-red-700',
-      cancelled: 'bg-slate-100 text-slate-700',
+      cancelled: 'bg-muted text-muted-foreground',
     }
     const statusLabels: Record<string, string> = {
       pending: 'Bekliyor',
@@ -74,7 +74,7 @@ export default function AidsListPage() {
       cancelled: 'İptal',
     }
     return (
-      <Badge className={statusColors[status] || 'bg-slate-100'}>
+      <Badge className={statusColors[status] || 'bg-muted'}>
         {statusLabels[status] || status}
       </Badge>
     )
@@ -96,7 +96,7 @@ export default function AidsListPage() {
             {row.original.needy_person?.first_name} {row.original.needy_person?.last_name}
           </p>
           {row.original.needy_person?.phone && (
-            <p className="text-xs text-slate-500">{row.original.needy_person.phone}</p>
+            <p className="text-xs text-muted-foreground">{row.original.needy_person.phone}</p>
           )}
         </div>
       ),
@@ -134,12 +134,12 @@ export default function AidsListPage() {
         try {
           const date = row.original.aid_date ? new Date(row.original.aid_date) : null
           return (
-            <span className="text-sm text-slate-500">
+            <span className="text-sm text-muted-foreground">
               {date && !isNaN(date.getTime()) ? format(date, 'dd MMM yyyy', { locale: tr }) : '-'}
             </span>
           )
         } catch (e) {
-          return <span className="text-sm text-slate-500">-</span>
+          return <span className="text-sm text-muted-foreground">-</span>
         }
       },
     },

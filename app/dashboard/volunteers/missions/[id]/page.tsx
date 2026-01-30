@@ -76,7 +76,7 @@ const MISSION_TYPES = [
 ]
 
 const STATUS_OPTIONS = [
-    { value: 'draft', label: 'Taslak', color: 'bg-slate-100 text-slate-700' },
+    { value: 'draft', label: 'Taslak', color: 'bg-muted text-muted-foreground' },
     { value: 'scheduled', label: 'Planlandı', color: 'bg-blue-100 text-blue-700' },
     { value: 'ongoing', label: 'Devam Ediyor', color: 'bg-yellow-100 text-yellow-700' },
     { value: 'completed', label: 'Tamamlandı', color: 'bg-green-100 text-green-700' },
@@ -130,7 +130,7 @@ export default function MissionDetailPage() {
                             <h1 className="text-2xl font-bold">{mission.title}</h1>
                             <Badge className={statusConfig?.color}>{statusConfig?.label}</Badge>
                         </div>
-                        <p className="text-sm text-slate-500">#{mission.mission_number}</p>
+                        <p className="text-sm text-muted-foreground">#{mission.mission_number}</p>
                     </div>
                 </div>
                 <Button onClick={handleSave} disabled={isSaving} className="bg-gradient-to-r from-emerald-500 to-cyan-500">
@@ -148,7 +148,7 @@ export default function MissionDetailPage() {
                                 <Calendar className="h-6 w-6 text-blue-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-slate-500">Tarih</p>
+                                <p className="text-sm text-muted-foreground">Tarih</p>
                                 <p className="font-medium">{format(new Date(mission.date), 'dd MMMM yyyy', { locale: tr })}</p>
                             </div>
                         </div>
@@ -161,7 +161,7 @@ export default function MissionDetailPage() {
                                 <Clock className="h-6 w-6 text-green-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-slate-500">Saat</p>
+                                <p className="text-sm text-muted-foreground">Saat</p>
                                 <p className="font-medium">{mission.start_time} - {mission.end_time}</p>
                             </div>
                         </div>
@@ -174,7 +174,7 @@ export default function MissionDetailPage() {
                                 <Users className="h-6 w-6 text-purple-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-slate-500">Gönüllü</p>
+                                <p className="text-sm text-muted-foreground">Gönüllü</p>
                                 <p className="font-medium">{confirmedCount} / {mission.required_volunteers}</p>
                             </div>
                         </div>
@@ -187,7 +187,7 @@ export default function MissionDetailPage() {
                                 <MapPin className="h-6 w-6 text-orange-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-slate-500">Konum</p>
+                                <p className="text-sm text-muted-foreground">Konum</p>
                                 <p className="font-medium truncate">{mission.location}</p>
                             </div>
                         </div>
@@ -284,7 +284,7 @@ export default function MissionDetailPage() {
                                     <div key={v.id} className="flex items-center justify-between p-3 border rounded-lg">
                                         <div>
                                             <p className="font-medium">{v.name}</p>
-                                            <p className="text-xs text-slate-500">{v.phone}</p>
+                                            <p className="text-xs text-muted-foreground">{v.phone}</p>
                                         </div>
                                         <Badge className={v.confirmed ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}>
                                             {v.confirmed ? 'Onayladı' : 'Bekliyor'}
@@ -296,10 +296,10 @@ export default function MissionDetailPage() {
                             {/* Progress */}
                             <div className="mt-4 pt-4 border-t">
                                 <div className="flex justify-between text-sm mb-2">
-                                    <span className="text-slate-500">Doluluk</span>
+                                    <span className="text-muted-foreground">Doluluk</span>
                                     <span className="font-medium">{confirmedCount}/{mission.required_volunteers}</span>
                                 </div>
-                                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                <div className="h-2 bg-muted rounded-full overflow-hidden">
                                     <div
                                         className="h-full bg-emerald-500 rounded-full"
                                         style={{ width: `${(confirmedCount / mission.required_volunteers) * 100}%` }}

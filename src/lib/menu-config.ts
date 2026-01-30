@@ -17,7 +17,7 @@ import {
   Gift,
   Package,
   Warehouse,
-  Box,
+  Container,
   MapPin,
   LucideIcon,
 } from 'lucide-react'
@@ -66,7 +66,7 @@ export const menuItems: MenuGroup[] = [
       { title: 'Tüm Bağışlar', href: '/dashboard/donations', icon: DollarSign },
       { title: 'Nakit Bağışlar', href: '/dashboard/donations/cash', icon: Banknote },
       { title: 'Kurban', href: '/dashboard/donations/sacrifice', icon: Gift },
-      { title: 'Kumbaralar', href: '/dashboard/donations/boxes', icon: Box },
+      { title: 'Kumbaralar', href: '/dashboard/donations/boxes', icon: Container },
       { title: 'Toplama Rotaları', href: '/dashboard/donations/routes', icon: MapPin },
     ]
   },

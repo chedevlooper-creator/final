@@ -130,7 +130,7 @@ export default function SacrificeDetailPage() {
                             <h1 className="text-2xl font-bold">Kurban #{sacrifice.sacrifice_number}</h1>
                             <Badge className={statusConfig?.color}>{statusConfig?.label}</Badge>
                         </div>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-muted-foreground">
                             {SACRIFICE_TYPES.find((t) => t.value === sacrifice.sacrifice_type)?.label} - {sacrifice.share_count} Hisse
                         </p>
                     </div>
@@ -146,7 +146,7 @@ export default function SacrificeDetailPage() {
                 <Card>
                     <CardContent className="pt-6">
                         <div className="text-center">
-                            <p className="text-sm text-slate-500">Tutar</p>
+                            <p className="text-sm text-muted-foreground">Tutar</p>
                             <p className="text-2xl font-bold text-green-600">₺{sacrifice.amount.toLocaleString('tr-TR')}</p>
                         </div>
                     </CardContent>
@@ -154,7 +154,7 @@ export default function SacrificeDetailPage() {
                 <Card>
                     <CardContent className="pt-6">
                         <div className="text-center">
-                            <p className="text-sm text-slate-500">Atanan Hisse</p>
+                            <p className="text-sm text-muted-foreground">Atanan Hisse</p>
                             <p className="text-2xl font-bold text-blue-600">{assignedShares}/{sacrifice.share_count}</p>
                         </div>
                     </CardContent>
@@ -162,7 +162,7 @@ export default function SacrificeDetailPage() {
                 <Card>
                     <CardContent className="pt-6">
                         <div className="text-center">
-                            <p className="text-sm text-slate-500">Dağıtım</p>
+                            <p className="text-sm text-muted-foreground">Dağıtım</p>
                             <p className="text-lg font-medium">{sacrifice.distribution_region}</p>
                         </div>
                     </CardContent>
@@ -170,7 +170,7 @@ export default function SacrificeDetailPage() {
                 <Card>
                     <CardContent className="pt-6">
                         <div className="text-center">
-                            <p className="text-sm text-slate-500">Kayıt Tarihi</p>
+                            <p className="text-sm text-muted-foreground">Kayıt Tarihi</p>
                             <p className="text-lg font-medium">{format(new Date(sacrifice.created_at), 'dd.MM.yyyy', { locale: tr })}</p>
                         </div>
                     </CardContent>
@@ -288,7 +288,7 @@ export default function SacrificeDetailPage() {
                                     <TableCell className="font-medium">{share.name}</TableCell>
                                     <TableCell>{share.type}</TableCell>
                                     <TableCell>
-                                        <Badge className={share.status === 'assigned' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-700'}>
+                                        <Badge className={share.status === 'assigned' ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground'}>
                                             {share.status === 'assigned' ? 'Atandı' : 'Boş'}
                                         </Badge>
                                     </TableCell>

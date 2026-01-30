@@ -52,7 +52,7 @@ export default function PurchasePage() {
 
   const getStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
-      draft: 'bg-slate-100 text-slate-700',
+      draft: 'bg-muted text-muted-foreground',
       pending: 'bg-yellow-100 text-yellow-700',
       approved: 'bg-green-100 text-green-700',
       rejected: 'bg-red-100 text-red-700',
@@ -66,7 +66,7 @@ export default function PurchasePage() {
       completed: 'Tamamlandı',
     }
     return (
-      <Badge className={statusColors[status] || 'bg-slate-100'}>
+      <Badge className={statusColors[status] || 'bg-muted'}>
         {statusLabels[status] || status}
       </Badge>
     )
@@ -82,7 +82,7 @@ export default function PurchasePage() {
       accessorKey: 'request_number',
       header: 'Talep No',
       cell: ({ row }) => (
-        <span className="font-mono text-sm text-slate-600">
+        <span className="font-mono text-sm text-muted-foreground">
           {row.original.request_number || '-'}
         </span>
       ),
@@ -117,12 +117,12 @@ export default function PurchasePage() {
         try {
           const date = row.original.requested_date ? new Date(row.original.requested_date) : null
           return (
-            <span className="text-sm text-slate-500">
+            <span className="text-sm text-muted-foreground">
               {date && !isNaN(date.getTime()) ? format(date, 'dd MMM yyyy', { locale: tr }) : '-'}
             </span>
           )
         } catch (e) {
-          return <span className="text-sm text-slate-500">-</span>
+          return <span className="text-sm text-muted-foreground">-</span>
         }
       },
     },

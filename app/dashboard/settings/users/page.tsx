@@ -55,7 +55,7 @@ export default function UsersPage() {
       admin: 'bg-red-100 text-red-700',
       manager: 'bg-purple-100 text-purple-700',
       user: 'bg-blue-100 text-blue-700',
-      viewer: 'bg-slate-100 text-slate-700',
+      viewer: 'bg-muted text-muted-foreground',
     }
     const roleLabels: Record<string, string> = {
       admin: 'Yönetici',
@@ -64,7 +64,7 @@ export default function UsersPage() {
       viewer: 'Görüntüleyici',
     }
     return (
-      <Badge className={roleColors[role] || 'bg-slate-100'}>
+      <Badge className={roleColors[role] || 'bg-muted'}>
         <Shield className="mr-1 h-3 w-3" />
         {roleLabels[role] || role}
       </Badge>
@@ -74,7 +74,7 @@ export default function UsersPage() {
   const getStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
       active: 'bg-green-100 text-green-700',
-      inactive: 'bg-slate-100 text-slate-700',
+      inactive: 'bg-muted text-muted-foreground',
       suspended: 'bg-red-100 text-red-700',
     }
     const statusLabels: Record<string, string> = {
@@ -83,7 +83,7 @@ export default function UsersPage() {
       suspended: 'Askıya Alındı',
     }
     return (
-      <Badge className={statusColors[status] || 'bg-slate-100'}>
+      <Badge className={statusColors[status] || 'bg-muted'}>
         {statusLabels[status] || status}
       </Badge>
     )
@@ -99,12 +99,12 @@ export default function UsersPage() {
             {row.original.full_name || 'İsimsiz Kullanıcı'}
           </p>
           <div className="flex gap-2 mt-1">
-            <span className="text-xs text-slate-500 flex items-center gap-1">
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
               <Mail className="h-3 w-3" />
               {row.original.email}
             </span>
             {row.original.phone && (
-              <span className="text-xs text-slate-500 flex items-center gap-1">
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
                 <Phone className="h-3 w-3" />
                 {row.original.phone}
               </span>
@@ -127,7 +127,7 @@ export default function UsersPage() {
       accessorKey: 'last_login',
       header: 'Son Giriş',
       cell: ({ row }) => (
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-muted-foreground">
           {row.original.last_login
             ? format(new Date(row.original.last_login), 'dd MMM yyyy HH:mm', { locale: tr })
             : 'Hiç giriş yapmadı'}
@@ -138,7 +138,7 @@ export default function UsersPage() {
       accessorKey: 'created_at',
       header: 'Kayıt Tarihi',
       cell: ({ row }) => (
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-muted-foreground">
           {format(new Date(row.original.created_at), 'dd MMM yyyy', { locale: tr })}
         </span>
       ),

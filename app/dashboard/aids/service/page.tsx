@@ -107,7 +107,7 @@ export default function ServicePage() {
             <div className="grid gap-4 md:grid-cols-3">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Toplam Sevk</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Toplam Sevk</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold">{mockServices.length}</p>
@@ -115,7 +115,7 @@ export default function ServicePage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Devam Eden</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Devam Eden</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold text-blue-600">
@@ -125,7 +125,7 @@ export default function ServicePage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Tamamlanan</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Tamamlanan</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold text-green-600">
@@ -203,18 +203,18 @@ export default function ServicePage() {
                                             <TableCell>
                                                 <div>
                                                     <p className="font-medium">{service.needy_person.name}</p>
-                                                    <p className="text-xs text-slate-500">{service.needy_person.phone}</p>
+                                                    <p className="text-xs text-muted-foreground">{service.needy_person.phone}</p>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant="outline">{serviceConfig?.label}</Badge>
                                             </TableCell>
                                             <TableCell className="text-sm">{service.institution}</TableCell>
-                                            <TableCell className="text-sm text-slate-500">{service.description}</TableCell>
+                                            <TableCell className="text-sm text-muted-foreground">{service.description}</TableCell>
                                             <TableCell>
                                                 <Badge className={statusConfig.color}>{statusConfig.label}</Badge>
                                             </TableCell>
-                                            <TableCell className="text-sm text-slate-500">
+                                            <TableCell className="text-sm text-muted-foreground">
                                                 {service.appointment_date
                                                     ? format(new Date(service.appointment_date), 'dd.MM.yyyy HH:mm', { locale: tr })
                                                     : '-'}

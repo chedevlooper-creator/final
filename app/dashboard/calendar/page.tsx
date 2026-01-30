@@ -51,7 +51,7 @@ export default function CalendarPage() {
       event: 'bg-purple-100 text-purple-700',
       reminder: 'bg-orange-100 text-orange-700',
     }
-    return colors[type] || 'bg-slate-100 text-slate-700'
+    return colors[type] || 'bg-muted text-muted-foreground'
   }
 
   const weekDays = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
@@ -107,7 +107,7 @@ export default function CalendarPage() {
             {/* Hafta günleri */}
             <div className="grid grid-cols-7 gap-1 mb-2">
               {weekDays.map((day) => (
-                <div key={day} className="text-center text-sm font-medium text-slate-500 p-2">
+                <div key={day} className="text-center text-sm font-medium text-muted-foreground p-2">
                   {day}
                 </div>
               ))}
@@ -124,7 +124,7 @@ export default function CalendarPage() {
                   <div
                     key={day.toISOString()}
                     className={`min-h-[80px] border rounded-lg p-2 ${
-                      isCurrentMonth ? 'bg-white' : 'bg-slate-50'
+                      isCurrentMonth ? 'bg-white' : 'bg-muted/50'
                     } ${isToday ? 'ring-2 ring-emerald-500' : ''}`}
                   >
                     <div
@@ -145,7 +145,7 @@ export default function CalendarPage() {
                         </Badge>
                       ))}
                       {dayEvents.length > 2 && (
-                        <div className="text-xs text-slate-500">
+                        <div className="text-xs text-muted-foreground">
                           +{dayEvents.length - 2} daha
                         </div>
                       )}
@@ -170,12 +170,12 @@ export default function CalendarPage() {
                   .map((event) => (
                     <div
                       key={event.id}
-                      className="p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+                      className="p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <p className="font-medium text-sm">{event.title}</p>
-                          <p className="text-xs text-slate-500 mt-1">
+                          <p className="text-xs text-muted-foreground mt-1">
                             {format(new Date(event.date), 'dd MMM yyyy', { locale: tr })}
                             {event.time && ` • ${event.time}`}
                           </p>
@@ -187,7 +187,7 @@ export default function CalendarPage() {
                     </div>
                   ))
               ) : (
-                <p className="text-center text-slate-500 text-sm py-8">
+                <p className="text-center text-muted-foreground text-sm py-8">
                   Yaklaşan etkinlik bulunmuyor
                 </p>
               )}

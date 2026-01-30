@@ -105,7 +105,7 @@ export default function CashAidsPage() {
             <div className="grid gap-4 md:grid-cols-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Toplam Kayıt</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Toplam Kayıt</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold">{mockCashAids.length}</p>
@@ -113,7 +113,7 @@ export default function CashAidsPage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Toplam Tutar</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Toplam Tutar</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold">₺{totalAmount.toLocaleString('tr-TR')}</p>
@@ -121,7 +121,7 @@ export default function CashAidsPage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Teslim Edilen</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Teslim Edilen</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold text-green-600">{deliveredCount}</p>
@@ -129,7 +129,7 @@ export default function CashAidsPage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Bekleyen</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Bekleyen</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold text-yellow-600">
@@ -203,7 +203,7 @@ export default function CashAidsPage() {
                                         <TableCell>
                                             <div>
                                                 <p className="font-medium">{aid.needy_person.name}</p>
-                                                <p className="text-xs text-slate-500">{aid.needy_person.phone}</p>
+                                                <p className="text-xs text-muted-foreground">{aid.needy_person.phone}</p>
                                             </div>
                                         </TableCell>
                                         <TableCell>
@@ -217,12 +217,12 @@ export default function CashAidsPage() {
                                                 {aid.status === 'delivered' ? 'Teslim Edildi' : 'Beklemede'}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="text-sm text-slate-500">
+                                        <TableCell className="text-sm text-muted-foreground">
                                             {aid.delivery_date
                                                 ? format(new Date(aid.delivery_date), 'dd.MM.yyyy', { locale: tr })
                                                 : '-'}
                                         </TableCell>
-                                        <TableCell className="text-sm text-slate-500">
+                                        <TableCell className="text-sm text-muted-foreground">
                                             {aid.next_date || '-'}
                                         </TableCell>
                                     </TableRow>

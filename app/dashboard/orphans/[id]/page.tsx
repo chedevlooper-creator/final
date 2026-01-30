@@ -261,7 +261,7 @@ export default function OrphanDetailPage() {
             blue: 'bg-blue-100 text-blue-700',
             green: 'bg-green-100 text-green-700',
             orange: 'bg-orange-100 text-orange-700',
-            gray: 'bg-slate-100 text-slate-700',
+            gray: 'bg-muted text-muted-foreground',
         }
         return (
             <Badge className={colorClasses[statusConfig?.color || 'gray']}>
@@ -315,7 +315,7 @@ export default function OrphanDetailPage() {
                             {orphan && getStatusBadge(form.watch('status') || 'preparing')}
                         </div>
                         {orphan && (
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-muted-foreground">
                                 Dosya No: {orphan.file_number} • {calculateAge(orphan.date_of_birth)} yaş
                             </p>
                         )}
@@ -438,7 +438,7 @@ export default function OrphanDetailPage() {
                                             {orphan.sponsor.first_name} {orphan.sponsor.last_name}
                                         </p>
                                         {orphan.sponsor.phone && (
-                                            <p className="text-sm text-slate-500">{orphan.sponsor.phone}</p>
+                                            <p className="text-sm text-muted-foreground">{orphan.sponsor.phone}</p>
                                         )}
                                     </CardContent>
                                 </Card>
@@ -699,7 +699,7 @@ export default function OrphanDetailPage() {
 
                                         {/* Documents Tab */}
                                         <TabsContent value="documents" className="mt-6">
-                                            <div className="text-center py-12 text-slate-500">
+                                            <div className="text-center py-12 text-muted-foreground">
                                                 <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
                                                 <p>Henüz doküman yüklenmemiş</p>
                                                 <Button variant="outline" size="sm" className="mt-4">

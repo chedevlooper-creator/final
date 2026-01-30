@@ -66,7 +66,7 @@ export default function MissionsPage() {
       cancelled: 'İptal',
     }
     return (
-      <Badge className={statusColors[status] || 'bg-slate-100'}>
+      <Badge className={statusColors[status] || 'bg-muted'}>
         {statusLabels[status] || status}
       </Badge>
     )
@@ -89,7 +89,7 @@ export default function MissionsPage() {
         <div>
           <p className="font-medium">{row.original.title}</p>
           {row.original.location && (
-            <p className="text-xs text-slate-500">{row.original.location}</p>
+            <p className="text-xs text-muted-foreground">{row.original.location}</p>
           )}
         </div>
       ),
@@ -103,7 +103,7 @@ export default function MissionsPage() {
             {row.original.volunteer?.first_name} {row.original.volunteer?.last_name}
           </p>
           {row.original.volunteer?.phone && (
-            <p className="text-xs text-slate-500">{row.original.volunteer.phone}</p>
+            <p className="text-xs text-muted-foreground">{row.original.volunteer.phone}</p>
           )}
         </div>
       ),
@@ -112,7 +112,7 @@ export default function MissionsPage() {
       accessorKey: 'mission_date',
       header: 'Görev Tarihi',
       cell: ({ row }) => (
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-muted-foreground">
           {format(new Date(row.original.mission_date), 'dd MMM yyyy', { locale: tr })}
         </span>
       ),

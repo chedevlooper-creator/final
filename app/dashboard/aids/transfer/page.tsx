@@ -116,7 +116,7 @@ export default function BankTransferPage() {
             <div className="grid gap-4 md:grid-cols-3">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Bekleyen Emirler</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Bekleyen Emirler</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold text-yellow-600">{pendingCount}</p>
@@ -124,7 +124,7 @@ export default function BankTransferPage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Bekleyen Tutar</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Bekleyen Tutar</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold">₺{pendingAmount.toLocaleString('tr-TR')}</p>
@@ -132,7 +132,7 @@ export default function BankTransferPage() {
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-slate-500">Bugün Tamamlanan</CardTitle>
+                        <CardTitle className="text-sm text-muted-foreground">Bugün Tamamlanan</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-2xl font-bold text-green-600">
@@ -210,7 +210,7 @@ export default function BankTransferPage() {
                                             <TableCell>
                                                 <div>
                                                     <p className="font-medium">{transfer.recipient_name}</p>
-                                                    <p className="text-xs text-slate-500">{transfer.description}</p>
+                                                    <p className="text-xs text-muted-foreground">{transfer.description}</p>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="font-mono text-xs">{transfer.iban}</TableCell>
@@ -222,7 +222,7 @@ export default function BankTransferPage() {
                                                     {statusConfig.label}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="text-sm text-slate-500">
+                                            <TableCell className="text-sm text-muted-foreground">
                                                 {format(new Date(transfer.created_at), 'dd.MM.yyyy HH:mm', { locale: tr })}
                                             </TableCell>
                                         </TableRow>

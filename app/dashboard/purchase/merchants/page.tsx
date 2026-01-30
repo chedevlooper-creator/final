@@ -41,14 +41,14 @@ export default function MerchantsPage() {
   const getStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
       active: 'bg-green-100 text-green-700',
-      inactive: 'bg-slate-100 text-slate-700',
+      inactive: 'bg-muted text-muted-foreground',
     }
     const statusLabels: Record<string, string> = {
       active: 'Aktif',
       inactive: 'Pasif',
     }
     return (
-      <Badge className={statusColors[status] || 'bg-slate-100'}>
+      <Badge className={statusColors[status] || 'bg-muted'}>
         {statusLabels[status] || status}
       </Badge>
     )
@@ -62,7 +62,7 @@ export default function MerchantsPage() {
         <div>
           <p className="font-medium">{row.original.name}</p>
           {row.original.tax_number && (
-            <p className="text-xs text-slate-500">Vergi No: {row.original.tax_number}</p>
+            <p className="text-xs text-muted-foreground">Vergi No: {row.original.tax_number}</p>
           )}
         </div>
       ),
@@ -77,13 +77,13 @@ export default function MerchantsPage() {
           )}
           <div className="flex flex-col gap-1">
             {row.original.phone && (
-              <span className="text-xs text-slate-500 flex items-center gap-1">
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
                 <Phone className="h-3 w-3" />
                 {row.original.phone}
               </span>
             )}
             {row.original.email && (
-              <span className="text-xs text-slate-500 flex items-center gap-1">
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
                 <Mail className="h-3 w-3" />
                 {row.original.email}
               </span>
@@ -100,7 +100,7 @@ export default function MerchantsPage() {
           {row.original.address && (
             <>
               <MapPin className="h-3 w-3 text-slate-400 mt-0.5 shrink-0" />
-              <p className="text-xs text-slate-500 truncate">{row.original.address}</p>
+              <p className="text-xs text-muted-foreground truncate">{row.original.address}</p>
             </>
           )}
         </div>

@@ -54,13 +54,13 @@ const mockUser = {
 const ROLE_OPTIONS = [
     { value: 'admin', label: 'Yönetici', color: 'bg-purple-100 text-purple-700' },
     { value: 'manager', label: 'Müdür', color: 'bg-blue-100 text-blue-700' },
-    { value: 'user', label: 'Kullanıcı', color: 'bg-slate-100 text-slate-700' },
+    { value: 'user', label: 'Kullanıcı', color: 'bg-muted text-muted-foreground' },
     { value: 'viewer', label: 'Görüntüleyici', color: 'bg-green-100 text-green-700' },
 ]
 
 const STATUS_OPTIONS = [
     { value: 'active', label: 'Aktif', color: 'bg-green-100 text-green-700' },
-    { value: 'inactive', label: 'Pasif', color: 'bg-slate-100 text-slate-700' },
+    { value: 'inactive', label: 'Pasif', color: 'bg-muted text-muted-foreground' },
     { value: 'blocked', label: 'Bloke', color: 'bg-red-100 text-red-700' },
 ]
 
@@ -132,7 +132,7 @@ export default function UserDetailPage() {
                             <Badge className={roleConfig?.color}>{roleConfig?.label}</Badge>
                             <Badge className={statusConfig?.color}>{statusConfig?.label}</Badge>
                         </div>
-                        <p className="text-sm text-slate-500">@{user.username}</p>
+                        <p className="text-sm text-muted-foreground">@{user.username}</p>
                     </div>
                 </div>
                 <Button onClick={handleSave} disabled={isSaving} className="bg-gradient-to-r from-emerald-500 to-cyan-500">
@@ -254,11 +254,11 @@ export default function UserDetailPage() {
                         </CardHeader>
                         <CardContent className="space-y-3 text-sm">
                             <div className="flex justify-between">
-                                <span className="text-slate-500">Son Giriş</span>
+                                <span className="text-muted-foreground">Son Giriş</span>
                                 <span>{format(new Date(user.last_login), 'dd.MM.yyyy HH:mm', { locale: tr })}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-slate-500">Oluşturulma</span>
+                                <span className="text-muted-foreground">Oluşturulma</span>
                                 <span>{format(new Date(user.created_at), 'dd.MM.yyyy', { locale: tr })}</span>
                             </div>
                         </CardContent>

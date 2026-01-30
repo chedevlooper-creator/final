@@ -136,7 +136,7 @@ export default function BulkMessagesPage() {
                 rows={8}
                 maxLength={messageType === 'sms' ? 160 : 1000}
               />
-              <p className="text-xs text-slate-500 text-right">
+              <p className="text-xs text-muted-foreground text-right">
                 {message.length} / {messageType === 'sms' ? 160 : 1000} karakter
               </p>
             </div>
@@ -180,7 +180,7 @@ export default function BulkMessagesPage() {
               </div>
             </div>
 
-            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+            <div className="p-3 rounded-lg bg-slate-50 border border-border">
               <p className="text-xs text-slate-600">
                 <strong>Not:</strong> Toplu mesaj gönderimi öncesi mesaj içeriğini kontrol edin.
                 SMS gönderimi için kredi gereklidir.
