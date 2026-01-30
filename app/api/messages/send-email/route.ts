@@ -7,21 +7,36 @@
 
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth } from '@/lib/permission-middleware'
+import { withOrgAuth, createOrgErrorResponse } from '@/lib/organization-middleware'
 import { getEmailProvider, type EmailOptions } from '@/lib/messaging/email.provider'
+import { rateLimit, getUserKey, createRateLimitResponse } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimitResult = await rateLimit(request, {
+      identifier: 'email',
+      limit: 50,
+      window: 60 * 60 * 1000,
+      keyGenerator: getUserKey,
+    })
+
+    if (!rateLimitResult.success) {
+      return createRateLimitResponse(
+        rateLimitResult,
+        'Saatlik email gönderme limitine ulaşıldı. Lütfen daha sonra tekrar deneyin.'
+      )
+    }
+
     // RBAC: Email gönderme için create permission gerekli
-    const authResult = await withAuth(request, {
-      requiredPermission: 'create',
-      resource: 'donations',
+    const authResult = await withOrgAuth(request, {
+      requiredPermission: 'data:create',
     })
 
     if (!authResult.success) {
-      return authResult.response!
+      return createOrgErrorResponse(authResult.error, authResult.status)
     }
 
+    const orgId = authResult.user.organization.id
     const supabase = await createServerSupabaseClient()
 
     const body = await request.json()
@@ -59,6 +74,7 @@ export async function POST(request: NextRequest) {
           message_type: messageType || 'bulk',
           status: 'pending',
           sent_at: new Date().toISOString(),
+          organization_id: orgId,
         }))
       )
       .select()
@@ -112,13 +128,16 @@ export async function POST(request: NextRequest) {
     const successCount = emailResults.filter((r) => r.success).length
     const failCount = emailResults.filter((r) => !r.success).length
 
-    return NextResponse.json({
-      success: true,
-      queued: emailData?.length || 0,
-      sent: successCount,
-      failed: failCount,
-      message: `Email processing completed: ${successCount} sent, ${failCount} failed`,
-    })
+    return NextResponse.json(
+      {
+        success: true,
+        queued: emailData?.length || 0,
+        sent: successCount,
+        failed: failCount,
+        message: `Email processing completed: ${successCount} sent, ${failCount} failed`,
+      },
+      { headers: rateLimitResult.headers }
+    )
   } catch (error) {
     console.error('Email send error:', error)
     return NextResponse.json(

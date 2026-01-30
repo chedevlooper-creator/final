@@ -3,7 +3,25 @@
  * 
  * This file contains shared types used across the application
  * to avoid using 'any' and ensure type safety.
+ * 
+ * NOT: RBAC tipleri (UserRole, OrganizationRole, vb.) artık
+ * @/types/organization.types.ts dosyasından export edilmektedir.
  */
+
+// RBAC Tipleri - Tek kaynak gerçek (single source of truth)
+export type { 
+  UserRole, 
+  OrganizationRole,
+  OrganizationPermission,
+  Permission,
+  OrganizationContext,
+  AuthenticatedUserWithOrg,
+  AuthenticatedUser
+} from '@/types/organization.types'
+
+// ============================================
+// BAŞVURU TİPLERİ
+// ============================================
 
 /**
  * Application Status Types
@@ -22,10 +40,18 @@ export type ApplicationType =
   | 'education'
   | 'other'
 
+// ============================================
+// YARDIM ALANI TİPLERİ
+// ============================================
+
 /**
  * Needy Person Status
  */
 export type NeedyPersonStatus = 'active' | 'inactive' | 'pending' | 'rejected'
+
+// ============================================
+// BAĞIŞ TİPLERİ
+// ============================================
 
 /**
  * Donation Status
@@ -36,6 +62,15 @@ export type DonationStatus = 'pending' | 'completed' | 'cancelled'
  * Donation Type
  */
 export type DonationType = 'cash' | 'in_kind' | 'sacrifice' | 'zakat' | 'other'
+
+/**
+ * Payment Method
+ */
+export type PaymentMethod = 'cash' | 'bank_transfer' | 'credit_card' | 'online'
+
+// ============================================
+// ARAYÜZ TANIMLARI
+// ============================================
 
 /**
  * Application Interface
@@ -108,6 +143,10 @@ export interface DonationStats {
   total: number
 }
 
+// ============================================
+// API TİPLERİ
+// ============================================
+
 /**
  * API Response Wrapper
  */
@@ -141,7 +180,10 @@ export interface PaginatedResponse<T> {
   totalPages: number
 }
 
-// Global Constants
+// ============================================
+// SABİTLER
+// ============================================
+
 export const CURRENCIES = [
   { value: 'TRY', label: '₺ TRY', symbol: '₺' },
   { value: 'USD', label: '$ USD', symbol: '$' },
@@ -155,6 +197,10 @@ export const PAYMENT_METHODS = [
   { value: 'credit_card', label: 'Kredi Kartı' },
   { value: 'online', label: 'Online Ödeme' },
 ] as const
+
+// ============================================
+// YARDIMCI TİPLER
+// ============================================
 
 /**
  * Query Options
@@ -202,22 +248,6 @@ export interface ToastNotification {
 }
 
 /**
- * User Role
- */
-export type UserRole = 'admin' | 'moderator' | 'user' | 'viewer'
-
-/**
- * User Interface
- */
-export interface User {
-  id: string
-  email: string
-  role: UserRole
-  created_at: string
-  last_sign_in?: string | null
-}
-
-/**
  * Event Type
  */
 export type EventType = 'meeting' | 'distribution' | 'visit' | 'other'
@@ -235,3 +265,22 @@ export interface Event {
   location?: string | null
   status: 'planned' | 'ongoing' | 'completed' | 'cancelled'
 }
+
+// ============================================
+// KULLANICI TİPLERİ (Eski sistem için)
+// ============================================
+
+/**
+ * @deprecated OrganizationRole kullanın
+ * Bu tip geriye uyumluluk için korunmuştur.
+ */
+export interface User {
+  id: string
+  email: string
+  role: import('@/types/organization.types').UserRole
+  created_at: string
+  last_sign_in?: string | null
+}
+
+// React tipi için
+import type React from 'react'

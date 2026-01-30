@@ -1,25 +1,45 @@
 /**
  * Permission Middleware - Server-side Permission Control
  * 
- * Bu middleware, API route'larında yetkilendirme kontrolü yapar.
- * Client-side permission checks ek güvenlik sağlar ama yeterli değildir.
- * Her zaman server-side kontrol yapılmalıdır.
+ * BU DOSYA: Eski (single-tenant) sistem için yetkilendirme middleware'i
+ * 
+ * ⚠️ ÖNEMLİ: Bu middleware eski sistem için geriye uyumluluk sağlar.
+ * Yeni multi-tenant kodda @/lib/organization-middleware.ts'deki
+ * withOrgAuth() kullanılmalıdır.
+ * 
+ * FARKLAR:
+ * - withAuth:    Eski sistem, profiles tablosundan rol okur
+ * - withOrgAuth: Yeni sistem, organization_members tablosundan rol okur
  */
 
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import type { Permission, UserRole } from '@/lib/rbac'
-import { ROLE_PERMISSIONS, RESOURCE_PERMISSIONS } from '@/lib/rbac'
+import type { 
+  OrganizationRole, 
+  OrganizationPermission,
+  UserRole,
+  Permission 
+} from '@/types/organization.types'
+import { 
+  hasOrgPermission, 
+  ORG_ROLE_PERMISSIONS,
+  ROLE_PERMISSIONS 
+} from '@/types/organization.types'
+
+// ============================================
+// TİP TANIMLARI
+// ============================================
 
 /**
- * Kullanıcı profili ve yetkileri
+ * Authenticated User
+ * @deprecated AuthenticatedUserWithOrg kullanın (organization-middleware.ts)
  */
 export interface AuthenticatedUser {
   id: string
   email: string
-  role: UserRole
+  role: UserRole | OrganizationRole
   name?: string
   avatar_url?: string
 }
@@ -34,8 +54,14 @@ export interface MiddlewareResult {
   response?: NextResponse
 }
 
+// ============================================
+// YARDIMCI FONKSİYONLAR
+// ============================================
+
 /**
  * Request'ten authenticated user al
+ * Eski sistem: profiles tablosundan rol okur
+ * @deprecated withOrgAuth kullanın (organization-middleware.ts)
  */
 export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
   try {
@@ -64,7 +90,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
       return null
     }
 
-    // Kullanıcının profil bilgilerini al
+    // Kullanıcının profil bilgilerini al (eski sistem)
     const { data: profile } = await supabase
       .from('profiles')
       .select('*')
@@ -74,7 +100,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
     return {
       id: user.id,
       email: user.email!,
-      role: profile?.['role'] || user.user_metadata?.['role'] || 'viewer',
+      role: (profile?.['role'] || user.user_metadata?.['role'] || 'viewer') as OrganizationRole,
       name: profile?.['name'] || user.user_metadata?.['name'],
       avatar_url: profile?.['avatar_url'] || user.user_metadata?.['avatar_url']
     }
@@ -85,48 +111,76 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
 }
 
 /**
- * Permission kontrolü yap
+ * Eski sistem için izin kontrolü
+ * Yeni izinleri eski izinlere map eder
+ * @deprecated hasOrgPermission kullanın
  */
 export function checkPermission(
-  userRole: UserRole,
+  userRole: OrganizationRole,
   requiredPermission: Permission,
   resource?: string
 ): boolean {
-  // Admin her şeyi yapabilir
-  if (userRole === 'admin') {
+  // Owner her şeyi yapabilir
+  if (userRole === 'owner') {
     return true
   }
 
-  // Rolün genel yetkilerini kontrol et
-  const rolePermissions = ROLE_PERMISSIONS[userRole] || []
-  
-  if (resource && resource in RESOURCE_PERMISSIONS) {
-    // Kaynak özelinde yetki kontrolü
-    const resourceKey = resource as keyof typeof RESOURCE_PERMISSIONS
-    const resourcePerms = RESOURCE_PERMISSIONS[resourceKey]
-    const userResourcePerms = resourcePerms?.[userRole] as readonly string[] | undefined
-    if (userResourcePerms?.includes(requiredPermission)) {
-      return true
-    }
+  // Admin de eski sistemde her şeyi yapabilir
+  if (userRole === 'admin' && !resource) {
+    return true
   }
 
-  // Genel yetki kontrolü
-  return rolePermissions.includes(requiredPermission)
+  // Eski izinleri yeni izinlere map et
+  const permissionMap: Record<Permission, OrganizationPermission[]> = {
+    create: ['data:create'],
+    read: ['data:read'],
+    update: ['data:update'],
+    delete: ['data:delete'],
+    manage_users: ['members:manage'],
+    manage_settings: ['settings:manage'],
+    view_reports: ['reports:view'],
+    export_data: ['reports:export'],
+    approve_applications: ['data:update'],
+    manage_finances: ['data:delete'] // En yakın eşdeğer
+  }
+
+  const mappedPerms = permissionMap[requiredPermission]
+  if (!mappedPerms) return false
+
+  return mappedPerms.some(p => hasOrgPermission(userRole, p))
 }
 
+// ============================================
+// MIDDLEWARE FONKSİYONLARI
+// ============================================
+
 /**
- * API route middleware - permission kontrolü
+ * API route middleware - permission kontrolü (ESKİ SİSTEM)
+ * 
+ * ⚠️ GERİYE UYUMLULUK: Bu fonksiyon eski sistem için korunmaktadır.
+ * Yeni multi-tenant kodda withOrgAuth() kullanın.
  * 
  * Kullanımı:
  * ```ts
+ * // Eski sistem (single-tenant)
  * export async function POST(req: Request) {
  *   const middleware = await withAuth(req)
  *   if (!middleware.success) {
  *     return middleware.response
  *   }
- *   
- *   // İşleme devam et
  *   const user = middleware.user!
+ *   // İşleme devam et...
+ * }
+ * 
+ * // Yeni sistem (multi-tenant)
+ * export async function POST(req: NextRequest) {
+ *   const { withOrgAuth, createOrgErrorResponse } = await import('@/lib/organization-middleware')
+ *   const authResult = await withOrgAuth(req, { requiredPermission: 'data:create' })
+ *   if (!authResult.success) {
+ *     return createOrgErrorResponse(authResult.error, authResult.status)
+ *   }
+ *   const { user } = authResult
+ *   // İşleme devam et...
  * }
  * ```
  */
@@ -135,7 +189,7 @@ export async function withAuth(
   options?: {
     requiredPermission?: Permission
     resource?: string
-    allowedRoles?: UserRole[]
+    allowedRoles?: (UserRole | OrganizationRole)[]
   }
 ): Promise<MiddlewareResult> {
   try {
@@ -167,7 +221,7 @@ export async function withAuth(
     // Permission kontrolü
     if (options?.requiredPermission) {
       const hasPermission = checkPermission(
-        user.role,
+        user.role as OrganizationRole,
         options.requiredPermission,
         options.resource
       )
@@ -193,7 +247,6 @@ export async function withAuth(
       user
     }
   } catch (_error) {
-    // Auth middleware error logged securely without exposing sensitive data
     return {
       success: false,
       error: 'Internal server error',
@@ -208,6 +261,7 @@ export async function withAuth(
 /**
  * Multiple permission kontrolü
  * Kullanıcının TÜM yetkilere sahip olup olmadığını kontrol eder
+ * @deprecated withOrgAuth kullanın
  */
 export async function withAllPermissions(
   request?: NextRequest,
@@ -224,7 +278,7 @@ export async function withAllPermissions(
   }
 
   const hasAllPermissions = requiredPermissions.every(permission =>
-    checkPermission(result.user!.role, permission, resource)
+    checkPermission(result.user!.role as OrganizationRole, permission, resource)
   )
 
   if (!hasAllPermissions) {
@@ -248,6 +302,7 @@ export async function withAllPermissions(
 /**
  * Any permission kontrolü
  * Kullanıcının HERHANGİ BİR yetkiye sahip olup olmadığını kontrol eder
+ * @deprecated withOrgAuth kullanın
  */
 export async function withAnyPermission(
   request?: NextRequest,
@@ -264,7 +319,7 @@ export async function withAnyPermission(
   }
 
   const hasAnyPermission = requiredPermissions.some(permission =>
-    checkPermission(result.user!.role, permission, resource)
+    checkPermission(result.user!.role as OrganizationRole, permission, resource)
   )
 
   if (!hasAnyPermission) {
@@ -287,8 +342,9 @@ export async function withAnyPermission(
 
 /**
  * Rol bazlı middleware helper
+ * @deprecated withOrgAuth kullanın
  */
-export function requireRole(...allowedRoles: UserRole[]) {
+export function requireRole(...allowedRoles: (UserRole | OrganizationRole)[]) {
   return async (request?: NextRequest) => {
     return withAuth(request, { allowedRoles })
   }
@@ -296,6 +352,7 @@ export function requireRole(...allowedRoles: UserRole[]) {
 
 /**
  * Permission bazlı middleware helper
+ * @deprecated withOrgAuth kullanın
  */
 export function requirePermission(permission: Permission, resource?: string) {
   return async (request?: NextRequest) => {
@@ -305,18 +362,64 @@ export function requirePermission(permission: Permission, resource?: string) {
 
 /**
  * Admin-only middleware
+ * @deprecated withOrgAuth kullanın (admin ve owner erişimi için)
  */
 export async function requireAdmin(request?: NextRequest): Promise<MiddlewareResult> {
   return withAuth(request, { 
-    allowedRoles: ['admin']
+    allowedRoles: ['admin', 'owner']
   })
 }
 
 /**
  * Moderators ve Admin için middleware
+ * @deprecated withOrgAuth kullanın
  */
 export async function requireModerator(request?: NextRequest): Promise<MiddlewareResult> {
   return withAuth(request, { 
-    allowedRoles: ['admin', 'moderator']
+    allowedRoles: ['admin', 'owner', 'moderator']
   })
+}
+
+// ============================================
+// YENİ SİSTEM İÇİN YARDIMCI FONKSİYONLAR
+// ============================================
+
+/**
+ * Yeni sistem için izin kontrol middleware'i
+ * Bu fonksiyon withOrgAuth'a yönlendirir
+ * 
+ * Kullanım:
+ * ```ts
+ * const result = await withPermission(request, 'data:create')
+ * ```
+ */
+export async function withPermission(
+  request: NextRequest,
+  requiredPermission: OrganizationPermission
+): Promise<MiddlewareResult> {
+  const { withOrgAuth } = await import('@/lib/organization-middleware')
+  
+  const result = await withOrgAuth(request, { requiredPermission })
+  
+  if (!result.success) {
+    return {
+      success: false,
+      error: result.error,
+      response: NextResponse.json(
+        { error: result.error },
+        { status: result.status }
+      )
+    }
+  }
+  
+  return {
+    success: true,
+    user: {
+      id: result.user.id,
+      email: result.user.email,
+      role: result.user.organization.role,
+      name: result.user.name,
+      avatar_url: result.user.avatar_url
+    }
+  }
 }

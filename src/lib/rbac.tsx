@@ -1,141 +1,115 @@
 /**
  * Role-Based Access Control (RBAC) System
  * 
- * Bu dosya, kullanıcı rolleri ve izinlerini yönetir.
+ * BU DOSYA: React bileşenleri için RBAC yardımcıları sağlar
+ * Tek kaynak gerçek: @/types/organization.types.ts
+ * 
+ * NOT: Yeni kodda bu dosyadaki tipleri değil, doğrudan 
+ * @/types/organization.types.ts'den import edin.
  */
 
 import React from 'react'
-import type { UserRole } from '@/types/common'
+import type {
+  OrganizationRole,
+  OrganizationPermission,
+  UserRole,
+  Permission
+} from '@/types/organization.types'
+import {
+  ORG_ROLE_PERMISSIONS,
+  RESOURCE_PERMISSIONS,
+  ROLE_PERMISSIONS
+} from '@/types/organization.types'
 
-// Re-export UserRole for convenience
-export type { UserRole } from '@/types/common'
+// ============================================
+// RE-EXPORTS (Tek kaynak gerçek)
+// ============================================
+
+export type { OrganizationRole, OrganizationPermission }
+export type { UserRole, Permission }
+
+// Role permission mappings (re-export from source)
+export { ORG_ROLE_PERMISSIONS, ROLE_PERMISSIONS, RESOURCE_PERMISSIONS }
+
+// ============================================
+// YENİ ORGANİZASYON TABANLI FONKSİYONLAR
+// ============================================
 
 /**
- * Permission types
+ * Organizasyon izni kontrolü
+ * @param role - Kullanıcı rolü
+ * @param permission - Kontrol edilecek izin
+ * @returns İzin varsa true
  */
-export type Permission = 
-  | 'create'
-  | 'read'
-  | 'update'
-  | 'delete'
-  | 'manage_users'
-  | 'manage_settings'
-  | 'view_reports'
-  | 'export_data'
-  | 'approve_applications'
-  | 'manage_finances'
-
-/**
- * Role permissions mapping
- * Her rolün sahip olduğu izinler
- */
-export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
-  admin: [
-    'create',
-    'read',
-    'update',
-    'delete',
-    'manage_users',
-    'manage_settings',
-    'view_reports',
-    'export_data',
-    'approve_applications',
-    'manage_finances'
-  ],
-  moderator: [
-    'create',
-    'read',
-    'update',
-    'view_reports',
-    'export_data',
-    'approve_applications'
-  ],
-  user: [
-    'create',
-    'read',
-    'update'
-  ],
-  viewer: [
-    'read'
-  ]
+export function hasOrgPermission(
+  role: OrganizationRole,
+  permission: OrganizationPermission
+): boolean {
+  // owner her zaman tüm izinlere sahiptir
+  if (role === 'owner') return true
+  return ORG_ROLE_PERMISSIONS[role]?.includes(permission) ?? false
 }
 
 /**
- * Resource-specific permissions
- * Kaynak bazlı izinler
+ * Rol hiyerarşisi karşılaştırması
+ * @returns Negatif: role1 daha düşük, Pozitif: role1 daha yüksek, 0: eşit
  */
-export const RESOURCE_PERMISSIONS = {
-  needy_persons: {
-    admin: ['create', 'read', 'update', 'delete'],
-    moderator: ['create', 'read', 'update'],
-    user: ['create', 'read', 'update'],
-    viewer: ['read']
-  },
-  donations: {
-    admin: ['create', 'read', 'update', 'delete'],
-    moderator: ['create', 'read', 'update'],
-    user: ['create', 'read'],
-    viewer: ['read']
-  },
-  applications: {
-    admin: ['create', 'read', 'update', 'delete', 'approve'],
-    moderator: ['create', 'read', 'update', 'approve'],
-    user: ['create', 'read', 'update'],
-    viewer: ['read']
-  },
-  reports: {
-    admin: ['read', 'export'],
-    moderator: ['read', 'export'],
-    user: ['read'],
-    viewer: ['read']
-  },
-  settings: {
-    admin: ['read', 'update'],
-    moderator: ['read'],
-    user: [],
-    viewer: []
-  },
-  users: {
-    admin: ['create', 'read', 'update', 'delete'],
-    moderator: ['read'],
-    user: [],
-    viewer: []
-  },
-  tasks: {
-    admin: ['create', 'read', 'update', 'delete'],
-    moderator: ['create', 'read', 'update'],
-    user: ['read', 'update'],
-    viewer: ['read']
-  },
-  activity_logs: {
-    admin: ['create', 'read', 'update', 'delete'],
-    moderator: ['read'],
-    user: ['read'],
-    viewer: []
-  },
-  organization_members: {
-    admin: ['create', 'read', 'update', 'delete'],
-    moderator: ['read'],
-    user: ['read'],
-    viewer: ['read']
-  }
-} as const
+export function compareRoles(role1: OrganizationRole, role2: OrganizationRole): number {
+  const hierarchy: OrganizationRole[] = ['viewer', 'user', 'moderator', 'admin', 'owner']
+  return hierarchy.indexOf(role1) - hierarchy.indexOf(role2)
+}
 
 /**
- * Check if user has specific permission
+ * Rolün minimum gerekli rolü karşılayıp karşılamadığını kontrol eder
+ */
+export function hasMinimumRole(
+  userRole: OrganizationRole,
+  requiredRole: OrganizationRole
+): boolean {
+  return compareRoles(userRole, requiredRole) >= 0
+}
+
+// ============================================
+// GERİYE UYUMLULUK FONKSİYONLARI (Eski Sistem)
+// ============================================
+
+/**
+ * Eski sistem için izin kontrolü
+ * @deprecated hasOrgPermission kullanın
  */
 export function hasPermission(
-  role: UserRole, 
+  role: UserRole | OrganizationRole,
   permission: Permission
 ): boolean {
-  return ROLE_PERMISSIONS[role]?.includes(permission) ?? false
+  // OrganizationRole için mapping
+  const orgRole = role as OrganizationRole
+  const permMap: Record<Permission, OrganizationPermission[]> = {
+    create: ['data:create'],
+    read: ['data:read'],
+    update: ['data:update'],
+    delete: ['data:delete'],
+    manage_users: ['members:manage'],
+    manage_settings: ['settings:manage'],
+    view_reports: ['reports:view'],
+    export_data: ['reports:export'],
+    approve_applications: ['data:update'],
+    manage_finances: ['data:delete'] // En yakın eşdeğer
+  }
+  
+  const orgPerms = permMap[permission]
+  if (!orgPerms) return false
+  
+  // owner her zaman true
+  if (orgRole === 'owner') return true
+  
+  return orgPerms.some(p => ORG_ROLE_PERMISSIONS[orgRole]?.includes(p as OrganizationPermission))
 }
 
 /**
- * Check if user has permission for specific resource
+ * Kaynak bazlı izin kontrolü
  */
 export function hasResourcePermission(
-  role: UserRole,
+  role: OrganizationRole,
   resource: keyof typeof RESOURCE_PERMISSIONS,
   action: string
 ): boolean {
@@ -144,17 +118,25 @@ export function hasResourcePermission(
 }
 
 /**
- * Get all permissions for a role
+ * Tüm izinleri getir
  */
-export function getRolePermissions(role: UserRole): Permission[] {
+export function getRolePermissions(role: OrganizationRole): OrganizationPermission[] {
+  return ORG_ROLE_PERMISSIONS[role] || []
+}
+
+/**
+ * Eski sistem için izinleri getir
+ * @deprecated getRolePermissions kullanın
+ */
+export function getLegacyRolePermissions(role: UserRole): Permission[] {
   return ROLE_PERMISSIONS[role] || []
 }
 
 /**
- * Check if user can perform action on resource
+ * Kullanıcının aksiyon yapıp yapamayacağını kontrol et
  */
 export function canPerformAction(
-  role: UserRole,
+  role: OrganizationRole,
   resource: string,
   action: string
 ): boolean {
@@ -165,24 +147,53 @@ export function canPerformAction(
   )
 }
 
-/**
- * Permission check for UI rendering
- */
-export function usePermissions(role: UserRole = 'viewer') {
-  return {
-    // General permissions
-    canCreate: hasPermission(role, 'create'),
-    canRead: hasPermission(role, 'read'),
-    canUpdate: hasPermission(role, 'update'),
-    canDelete: hasPermission(role, 'delete'),
-    canManageUsers: hasPermission(role, 'manage_users'),
-    canManageSettings: hasPermission(role, 'manage_settings'),
-    canViewReports: hasPermission(role, 'view_reports'),
-    canExportData: hasPermission(role, 'export_data'),
-    canApproveApplications: hasPermission(role, 'approve_applications'),
-    canManageFinances: hasPermission(role, 'manage_finances'),
+// ============================================
+// REACT HOOK ve BİLEŞENLERİ
+// ============================================
 
-    // Resource-specific permissions
+/**
+ * Permission check for UI rendering (Hook)
+ * 
+ * Kullanım:
+ * ```tsx
+ * const permissions = usePermissions('admin')
+ * {permissions.canCreate && <Button>Ekle</Button>}
+ * {permissions.donations.canDelete && <Button>Sil</Button>}
+ * ```
+ */
+export function usePermissions(role: OrganizationRole = 'viewer') {
+  return {
+    // Yeni granular izinler
+    orgPermissions: {
+      canManageOrg: hasOrgPermission(role, 'org:manage'),
+      canDeleteOrg: hasOrgPermission(role, 'org:delete'),
+      canViewBilling: hasOrgPermission(role, 'org:billing'),
+      canManageMembers: hasOrgPermission(role, 'members:manage'),
+      canInviteMembers: hasOrgPermission(role, 'members:invite'),
+      canCreateData: hasOrgPermission(role, 'data:create'),
+      canReadData: hasOrgPermission(role, 'data:read'),
+      canUpdateData: hasOrgPermission(role, 'data:update'),
+      canDeleteData: hasOrgPermission(role, 'data:delete'),
+      canViewReports: hasOrgPermission(role, 'reports:view'),
+      canExportReports: hasOrgPermission(role, 'reports:export'),
+      canCreateReports: hasOrgPermission(role, 'reports:create'),
+      canManageSettings: hasOrgPermission(role, 'settings:manage'),
+    },
+
+    // Eski sistem izinleri (geriye uyumluluk)
+    canCreate: hasOrgPermission(role, 'data:create'),
+    canRead: hasOrgPermission(role, 'data:read'),
+    canUpdate: hasOrgPermission(role, 'data:update'),
+    canDelete: hasOrgPermission(role, 'data:delete'),
+    canManageUsers: hasOrgPermission(role, 'members:manage'),
+    canManageSettings: hasOrgPermission(role, 'settings:manage'),
+    canViewReports: hasOrgPermission(role, 'reports:view'),
+    canViewReportsLegacy: hasOrgPermission(role, 'reports:view'),
+    canExportData: hasOrgPermission(role, 'reports:export'),
+    canApproveApplications: hasResourcePermission(role, 'applications', 'approve'),
+    canManageFinances: hasOrgPermission(role, 'data:delete'),
+
+    // Kaynak bazlı izinler
     needyPersons: {
       canCreate: hasResourcePermission(role, 'needy_persons', 'create'),
       canRead: hasResourcePermission(role, 'needy_persons', 'read'),
@@ -208,6 +219,7 @@ export function usePermissions(role: UserRole = 'viewer') {
     reports: {
       canRead: hasResourcePermission(role, 'reports', 'read'),
       canExport: hasResourcePermission(role, 'reports', 'export'),
+      canCreate: hasResourcePermission(role, 'reports', 'create'),
     },
 
     settings: {
@@ -243,22 +255,58 @@ export function usePermissions(role: UserRole = 'viewer') {
       canDelete: hasResourcePermission(role, 'organization_members', 'delete'),
     },
 
-    // Current role
-    role
+    // Mevcut rol
+    role,
+    
+    // Rol karşılaştırma yardımcıları
+    isOwner: role === 'owner',
+    isAdmin: role === 'admin' || role === 'owner',
+    isModerator: role === 'moderator' || role === 'admin' || role === 'owner',
+    isUser: role === 'user',
+    isViewer: role === 'viewer',
+    hasMinimumRole: (requiredRole: OrganizationRole) => hasMinimumRole(role, requiredRole)
   }
 }
 
 /**
  * Higher-order component for permission-based rendering
+ * 
+ * Kullanım:
+ * ```tsx
+ * const AdminOnlyComponent = withPermission(MyComponent, 'settings:manage')
+ * ```
  */
 export function withPermission<P extends object>(
   WrappedComponent: React.ComponentType<P>,
-  requiredPermission: Permission
+  requiredPermission: OrganizationPermission
 ) {
-  return function PermissionWrapper(props: P & { role: UserRole }) {
+  return function PermissionWrapper(props: P & { role: OrganizationRole }) {
     const { role, ...rest } = props
     
-    if (!hasPermission(role, requiredPermission)) {
+    if (!hasOrgPermission(role, requiredPermission)) {
+      return null
+    }
+
+    return <WrappedComponent {...rest as P} />
+  }
+}
+
+/**
+ * Rol bazlı HOC
+ * 
+ * Kullanım:
+ * ```tsx
+ * const AdminOnlyComponent = withRole(MyComponent, 'admin')
+ * ```
+ */
+export function withRole<P extends object>(
+  WrappedComponent: React.ComponentType<P>,
+  minimumRole: OrganizationRole
+) {
+  return function RoleWrapper(props: P & { role: OrganizationRole }) {
+    const { role, ...rest } = props
+    
+    if (!hasMinimumRole(role, minimumRole)) {
       return null
     }
 
@@ -268,6 +316,13 @@ export function withPermission<P extends object>(
 
 /**
  * Permission check helper for conditional rendering
+ * 
+ * Kullanım:
+ * ```tsx
+ * <IfPermission role={userRole} permission="data:create">
+ *   <Button>Ekle</Button>
+ * </IfPermission>
+ * ```
  */
 export function IfPermission({
   role,
@@ -277,8 +332,8 @@ export function IfPermission({
   children,
   fallback = null
 }: {
-  role: UserRole
-  permission?: Permission
+  role: OrganizationRole
+  permission?: OrganizationPermission
   resource?: keyof typeof RESOURCE_PERMISSIONS
   action?: string
   children: React.ReactNode
@@ -287,10 +342,35 @@ export function IfPermission({
   let hasAccess = false
 
   if (permission) {
-    hasAccess = hasPermission(role, permission)
+    hasAccess = hasOrgPermission(role, permission)
   } else if (resource && action) {
     hasAccess = hasResourcePermission(role, resource, action)
   }
 
+  return <>{hasAccess ? children : fallback}</>
+}
+
+/**
+ * Rol bazlı koşullu render bileşeni
+ * 
+ * Kullanım:
+ * ```tsx
+ * <IfRole role={userRole} minimumRole="admin">
+ *   <AdminPanel />
+ * </IfRole>
+ * ```
+ */
+export function IfRole({
+  role,
+  minimumRole,
+  children,
+  fallback = null
+}: {
+  role: OrganizationRole
+  minimumRole: OrganizationRole
+  children: React.ReactNode
+  fallback?: React.ReactNode
+}) {
+  const hasAccess = hasMinimumRole(role, minimumRole)
   return <>{hasAccess ? children : fallback}</>
 }

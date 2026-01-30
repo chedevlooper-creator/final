@@ -8,7 +8,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/permission-middleware'
-import { withOrgAuth, createOrgErrorResponse } from '@/lib/organization-middleware'
+import { withOrgAuth } from '@/lib/organization-middleware'
+import { ErrorLogger, createApiErrorResponse, handleDatabaseError } from '@/lib/errors'
+import { rateLimit, getUserKey, createRateLimitResponse } from '@/lib/rate-limit'
+import { entityLoggers } from '@/lib/activity-logger'
 
 /**
  * GET /api/needy - Get list of needy persons with pagination and filters
@@ -94,10 +97,7 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await query.range(from, to)
 
     if (error) {
-      return NextResponse.json(
-        { error: error.message, code: 'DATABASE_ERROR' },
-        { status: 400 }
-      )
+      return handleDatabaseError(error, 'GET /api/needy')
     }
 
     const totalPages = count ? Math.ceil(count / limit) : 0
@@ -109,14 +109,11 @@ export async function GET(request: NextRequest) {
         limit,
         count: count || 0,
         totalPages,
-        organization_id: organizationId, // Include org context in response
+        organization_id: organizationId,
       },
     })
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Bir hata oluştu', code: 'INTERNAL_ERROR' },
-      { status: 500 }
-    )
+    return createApiErrorResponse(error, 500, { route: 'GET /api/needy' })
   }
 }
 
@@ -143,6 +140,20 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimitResult = await rateLimit(request, {
+      identifier: 'needy-create',
+      limit: 100,
+      window: 60 * 60 * 1000,
+      keyGenerator: getUserKey,
+    })
+
+    if (!rateLimitResult.success) {
+      return createRateLimitResponse(
+        rateLimitResult,
+        'Saatlik kayıt oluşturma limitine ulaşıldı. Lütfen daha sonra tekrar deneyin.'
+      )
+    }
+
     // Auth kontrolü
     const authResult = await withAuth(request, {
       requiredPermission: 'create',
@@ -200,18 +211,20 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      return NextResponse.json(
-        { error: error.message, code: 'DATABASE_ERROR' },
-        { status: 400 }
-      )
+      return handleDatabaseError(error, 'POST /api/needy')
     }
+
+    // Audit log - yardım kaydı oluşturuldu
+    await entityLoggers.create(
+      'needy_person',
+      data.id,
+      `${body.first_name} ${body.last_name}`,
+      { ...body, organization_id: organizationId }
+    )
 
     return NextResponse.json({ data }, { status: 201 })
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Bir hata oluştu', code: 'INTERNAL_ERROR' },
-      { status: 500 }
-    )
+    return createApiErrorResponse(error, 500, { route: 'POST /api/needy' })
   }
 }
 

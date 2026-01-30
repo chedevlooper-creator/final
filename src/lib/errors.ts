@@ -8,6 +8,8 @@
  * @since 2026-01-18
  */
 
+import { NextResponse } from 'next/server'
+
 /**
  * Error Severity Levels
  */
@@ -123,7 +125,7 @@ export class AuthorizationError extends AppError {
       'FORBIDDEN',
       403,
       details,
-      ErrorSeverity.MEDIUM,
+      ErrorSeverity.HIGH,
       [
         { label: 'Geri Dön', action: () => window.history.back(), icon: '↩️' },
         { label: 'Ana Sayfaya Dön', action: () => window.location.href = '/', icon: '🏠' }
@@ -384,6 +386,7 @@ export class ErrorHandler {
     'CONFLICT': 'Bu kayıt zaten mevcut',
     'RATE_LIMIT_EXCEEDED': 'Çok fazla deneme yaptınız. Lütfen bir süre bekleyin',
     'DATABASE_ERROR': 'Veritabanı hatası. Lütfen daha sonra tekrar deneyin',
+    'INTERNAL_ERROR': 'İşlem sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin',
     'UNKNOWN_ERROR': 'Beklenmeyen bir hata oluştu',
   }
 
@@ -533,4 +536,107 @@ export class ErrorHandler {
     }
     return ErrorSeverity.MEDIUM
   }
+}
+
+/**
+ * Sanitize error for client response
+ * Removes sensitive information like stack traces, internal paths, database details
+ */
+export function sanitizeError(error: unknown): { error: string; code: string; details?: unknown } {
+  const isDevelopment = process.env['NODE_ENV'] === 'development'
+
+  // Validation errors can show details (400)
+  if (error instanceof ValidationError) {
+    return {
+      error: error.message,
+      code: error.code,
+      ...(isDevelopment && { details: error.details }),
+    }
+  }
+
+  // AppError with known types - return safe message
+  if (error instanceof AppError) {
+    return {
+      error: ErrorHandler.getUserMessage(error),
+      code: error.code,
+    }
+  }
+
+  // Zod validation errors - show only in development
+  if (error instanceof Error && error.name === 'ZodError') {
+    return {
+      error: 'Geçersiz veri formatı',
+      code: 'VALIDATION_ERROR',
+      ...(isDevelopment && { 
+        details: (error as { errors?: unknown }).errors 
+      }),
+    }
+  }
+
+  // Generic error - never expose details in production
+  return {
+    error: 'İşlem sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
+    code: 'INTERNAL_ERROR',
+  }
+}
+
+/**
+ * API Error Response Handler
+ * Creates a safe error response for API routes
+ */
+export function createApiErrorResponse(
+  error: unknown, 
+  statusCode: number = 500,
+  logContext?: Record<string, unknown>
+): NextResponse {
+  // Log the detailed error on server side only
+  if (error instanceof Error) {
+    ErrorLogger.error(error, logContext)
+  } else {
+    ErrorLogger.error(new Error(String(error)), logContext)
+  }
+
+  // Return sanitized error to client
+  const sanitized = sanitizeError(error)
+  return NextResponse.json(sanitized, { status: statusCode })
+}
+
+/**
+ * Database error handler for API routes
+ * Handles Supabase/database errors safely
+ */
+export function handleDatabaseError(
+  error: { message: string; code?: string; details?: unknown },
+  operation: string
+): NextResponse {
+  ErrorLogger.error(new Error(`Database error during ${operation}: ${error.message}`), {
+    code: error.code,
+    details: error.details,
+    operation,
+  })
+
+  return NextResponse.json(
+    { 
+      error: 'Veritabanı hatası. Lütfen daha sonra tekrar deneyin.', 
+      code: 'DATABASE_ERROR' 
+    },
+    { status: 500 }
+  )
+}
+
+/**
+ * Validation error handler for API routes
+ */
+export function handleValidationError(
+  message: string,
+  fields?: string[]
+): NextResponse {
+  return NextResponse.json(
+    { 
+      error: message, 
+      code: 'VALIDATION_ERROR',
+      ...(fields && { fields }),
+    },
+    { status: 400 }
+  )
 }

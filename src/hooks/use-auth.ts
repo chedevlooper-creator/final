@@ -6,13 +6,13 @@ import { User } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { AuthError, ErrorHandler } from '@/lib/errors'
 import { toast } from 'sonner'
-import type { UserRole } from '@/types/common'
+import type { OrganizationRole } from '@/types/organization.types'
 import { usePermissions } from '@/lib/rbac'
 
 interface UserProfile {
   id: string
   email: string
-  role: UserRole
+  role: OrganizationRole
   name?: string
   avatar_url?: string
 }
@@ -25,10 +25,10 @@ export function useAuth() {
   const supabase = createClient()
 
   // Get user role from metadata or profile
-  const userRole: UserRole = useMemo(() => {
+  const userRole: OrganizationRole = useMemo(() => {
     // First check user metadata (for quick access)
     if (user?.user_metadata?.['role']) {
-      return user.user_metadata['role'] as UserRole
+      return user.user_metadata['role'] as OrganizationRole
     }
 
     // Then check profile state
@@ -37,7 +37,7 @@ export function useAuth() {
     }
 
     // Default to viewer
-    return 'viewer'
+    return 'viewer' as OrganizationRole
   }, [user, profile])
 
   // Get permissions based on role
@@ -277,9 +277,10 @@ export function useAuth() {
     canPerform,
 
     // Convenience booleans
-    isAdmin: userRole === 'admin',
+    isAdmin: userRole === 'admin' || userRole === 'owner',
     isModerator: userRole === 'moderator',
     isUser: userRole === 'user',
     isViewer: userRole === 'viewer',
+    isOwner: userRole === 'owner',
   }
 }

@@ -2,14 +2,14 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
-import { UserRole } from '@/types/common'
+import type { OrganizationRole } from '@/types/organization.types'
 
 // User profile data for creating/updating
 export interface UserProfileData {
   email: string
   name?: string
   avatar_url?: string
-  role?: UserRole
+  role?: OrganizationRole
 }
 
 export interface UserFilters {

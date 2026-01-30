@@ -1,6 +1,36 @@
 /**
  * Organization Middleware
  * Multi-tenant API erişimi için organizasyon context yönetimi
+ * 
+ * BU DOSYA: Yeni multi-tenant sistem için yetkilendirme middleware'i
+ * 
+ * ⚠️ ÖNEMLİ: Bu middleware yeni multi-tenant sistem içindir.
+ * Eski single-tenant kodda @/lib/permission-middleware.ts'deki
+ * withAuth() kullanılmaya devam edilebilir.
+ * 
+ * FARKLAR:
+ * - withAuth:    Eski sistem, profiles tablosundan rol okur
+ * - withOrgAuth: Yeni sistem, organization_members tablosundan rol okur,
+ *                organizasyon context'i ve subscription kontrolü yapar
+ * 
+ * YENİ SİSTEM KULLANIMI:
+ * ```ts
+ * import { withOrgAuth, createOrgErrorResponse } from '@/lib/organization-middleware'
+ * 
+ * export async function GET(request: NextRequest) {
+ *   const authResult = await withOrgAuth(request, { 
+ *     requiredPermission: 'data:read' 
+ *   })
+ *   
+ *   if (!authResult.success) {
+ *     return createOrgErrorResponse(authResult.error, authResult.status)
+ *   }
+ *   
+ *   const { user } = authResult
+ *   const orgId = user.organization.id
+ *   // ...
+ * }
+ * ```
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -8,10 +38,15 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import type {
   OrganizationContext,
   OrganizationRole,
-  AuthenticatedUserWithOrg
+  AuthenticatedUserWithOrg,
+  OrganizationPermission
 } from '@/types/organization.types'
+import { hasOrgPermission, hasMinimumRole } from '@/types/organization.types'
 
-// Organizasyon context'li auth sonucu
+// ============================================
+// TİP TANIMLARI
+// ============================================
+
 export interface OrgAuthResult {
   success: true
   user: AuthenticatedUserWithOrg
@@ -25,16 +60,30 @@ export interface OrgAuthError {
 
 export type OrgAuthResponse = OrgAuthResult | OrgAuthError
 
+// ============================================
+// ANA MIDDLEWARE FONKSİYONU
+// ============================================
+
+export interface WithOrgAuthOptions {
+  /** Minimum gerekli rol (hiyerarşik kontrol) */
+  requiredRole?: OrganizationRole
+  /** Spesifik izin kontrolü */
+  requiredPermission?: OrganizationPermission
+  /** Organizasyon ID'si header'dan zorunlu mu? */
+  requireOrgHeader?: boolean
+}
+
 /**
  * Organizasyon context'i ile birlikte auth kontrolü
  * Tüm multi-tenant API route'larında kullanılmalı
+ * 
+ * @param request - Next.js request objesi
+ * @param options - Yetkilendirme seçenekleri
+ * @returns OrgAuthResponse - Başarılı veya hata durumu
  */
 export async function withOrgAuth(
   request: NextRequest,
-  options?: {
-    requiredRole?: OrganizationRole
-    requiredPermission?: string
-  }
+  options: WithOrgAuthOptions = {}
 ): Promise<OrgAuthResponse> {
   const supabase = await createServerSupabaseClient()
 
@@ -51,6 +100,14 @@ export async function withOrgAuth(
 
   // 2. Header'dan organizasyon ID'sini al (opsiyonel, yoksa default kullan)
   const orgIdFromHeader = request.headers.get('x-organization-id')
+
+  if (options.requireOrgHeader && !orgIdFromHeader) {
+    return {
+      success: false,
+      error: 'Organizasyon ID\'si gerekli (x-organization-id header)',
+      status: 400
+    }
+  }
 
   // 3. Kullanıcının organizasyon üyeliklerini getir
   const { data: memberships, error: memberError } = await supabase
@@ -150,11 +207,7 @@ export async function withOrgAuth(
   const userRole = activeMembership.role as OrganizationRole
 
   if (options?.requiredRole) {
-    const roleHierarchy: OrganizationRole[] = ['viewer', 'user', 'moderator', 'admin', 'owner']
-    const userRoleIndex = roleHierarchy.indexOf(userRole)
-    const requiredRoleIndex = roleHierarchy.indexOf(options.requiredRole)
-
-    if (userRoleIndex < requiredRoleIndex) {
+    if (!hasMinimumRole(userRole, options.requiredRole)) {
       return {
         success: false,
         error: 'Bu işlem için yetkiniz yok',
@@ -165,7 +218,6 @@ export async function withOrgAuth(
 
   // 8. Permission kontrolü (opsiyonel)
   if (options?.requiredPermission) {
-    const { hasOrgPermission } = await import('@/types/organization.types')
     if (!hasOrgPermission(userRole, options.requiredPermission)) {
       return {
         success: false,
@@ -221,8 +273,12 @@ export async function withOrgAuth(
   }
 }
 
+// ============================================
+// YARDIMCI FONKSİYONLAR
+// ============================================
+
 /**
- * Organizasyon context'i gerektiren route'lar için yardımcı
+ * Organizasyon context'i gerektiren route'lar için hata yanıtı oluştur
  */
 export function createOrgErrorResponse(error: string, status: number): NextResponse {
   return NextResponse.json(
@@ -232,7 +288,67 @@ export function createOrgErrorResponse(error: string, status: number): NextRespo
 }
 
 /**
+ * Rol bazlı middleware helper
+ * Belirli bir rol veya üstü gerektirir
+ * 
+ * Kullanım:
+ * ```ts
+ * export const GET = requireOrgRole('admin')(async (request) => {
+ *   // Sadece admin ve owner erişebilir
+ * })
+ * ```
+ */
+export function requireOrgRole(minimumRole: OrganizationRole) {
+  return async (request: NextRequest): Promise<OrgAuthResponse> => {
+    return withOrgAuth(request, { requiredRole: minimumRole })
+  }
+}
+
+/**
+ * İzin bazlı middleware helper
+ * Belirli bir izin gerektirir
+ * 
+ * Kullanım:
+ * ```ts
+ * export const POST = requireOrgPermission('data:create')(async (request) => {
+ *   // data:create izni olanlar erişebilir
+ * })
+ * ```
+ */
+export function requireOrgPermission(permission: OrganizationPermission) {
+  return async (request: NextRequest): Promise<OrgAuthResponse> => {
+    return withOrgAuth(request, { requiredPermission: permission })
+  }
+}
+
+/**
+ * Owner-only middleware
+ */
+export async function requireOwner(request: NextRequest): Promise<OrgAuthResponse> {
+  return withOrgAuth(request, { requiredRole: 'owner' })
+}
+
+/**
+ * Admin ve Owner için middleware
+ */
+export async function requireAdmin(request: NextRequest): Promise<OrgAuthResponse> {
+  return withOrgAuth(request, { requiredRole: 'admin' })
+}
+
+// ============================================
+// VERİ FİLTRELEME YARDIMCILARI
+// ============================================
+
+/**
  * Supabase query'sine organizasyon filtresi ekle
+ * 
+ * Kullanım:
+ * ```ts
+ * const { data } = await supabase
+ *   .from('needy_persons')
+ *   .select('*')
+ *   .eq('organization_id', orgId)
+ * ```
  */
 export function addOrgFilter<T extends { eq: (column: string, value: string) => T }>(
   query: T,
@@ -245,6 +361,12 @@ export function addOrgFilter<T extends { eq: (column: string, value: string) => 
  * Organizasyon bazlı query helper
  * @param organizationId - Organizasyon ID'si
  * @returns Supabase client ve organizasyon ID'si
+ * 
+ * Kullanım:
+ * ```ts
+ * const { supabase, withOrgId } = await createOrgQuery(orgId)
+ * await supabase.from('table').insert(withOrgId(data))
+ * ```
  */
 export async function createOrgQuery(organizationId: string) {
   const supabase = await createServerSupabaseClient()
@@ -262,15 +384,29 @@ export async function createOrgQuery(organizationId: string) {
       records.map(record => ({
         ...record,
         organization_id: organizationId
-      }))
+      })),
+    // Query'ye organizasyon filtresi ekle
+    filterByOrg: <T extends { eq: (column: string, value: string) => T }>(query: T) =>
+      query.eq('organization_id', organizationId)
   }
 }
+
+// ============================================
+// KULLANIM ÖRNEKLERİ
+// ============================================
 
 /**
  * API route'larında kullanım örneği:
  *
+ * ```ts
+ * import { NextRequest, NextResponse } from 'next/server'
+ * import { withOrgAuth, createOrgErrorResponse } from '@/lib/organization-middleware'
+ * import { createServerSupabaseClient } from '@/lib/supabase/server'
+ * 
  * export async function GET(request: NextRequest) {
- *   const authResult = await withOrgAuth(request)
+ *   const authResult = await withOrgAuth(request, {
+ *     requiredPermission: 'data:read'
+ *   })
  *
  *   if (!authResult.success) {
  *     return createOrgErrorResponse(authResult.error, authResult.status)
@@ -278,6 +414,7 @@ export async function createOrgQuery(organizationId: string) {
  *
  *   const { user } = authResult
  *   const orgId = user.organization.id
+ *   const userRole = user.organization.role
  *
  *   const supabase = await createServerSupabaseClient()
  *   const { data } = await supabase
@@ -287,4 +424,5 @@ export async function createOrgQuery(organizationId: string) {
  *
  *   return NextResponse.json({ data })
  * }
+ * ```
  */

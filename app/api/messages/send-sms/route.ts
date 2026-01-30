@@ -9,9 +9,24 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { withAuth } from '@/lib/permission-middleware'
 import { getSMSProvider } from '@/lib/messaging/sms.provider'
+import { rateLimit, getUserKey, createRateLimitResponse } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimitResult = await rateLimit(request, {
+      identifier: 'sms',
+      limit: 20,
+      window: 60 * 60 * 1000,
+      keyGenerator: getUserKey,
+    })
+
+    if (!rateLimitResult.success) {
+      return createRateLimitResponse(
+        rateLimitResult,
+        'Saatlik SMS gönderme limitine ulaşıldı. Lütfen daha sonra tekrar deneyin.'
+      )
+    }
+
     // RBAC: SMS gönderme için create permission gerekli
     const authResult = await withAuth(request, {
       requiredPermission: 'create',
@@ -97,13 +112,16 @@ export async function POST(request: NextRequest) {
     const successCount = smsResults.filter((r) => r.success).length
     const failCount = smsResults.filter((r) => !r.success).length
 
-    return NextResponse.json({
-      success: true,
-      queued: smsData?.length || 0,
-      sent: successCount,
-      failed: failCount,
-      message: `SMS processing completed: ${successCount} sent, ${failCount} failed`,
-    })
+    return NextResponse.json(
+      {
+        success: true,
+        queued: smsData?.length || 0,
+        sent: successCount,
+        failed: failCount,
+        message: `SMS processing completed: ${successCount} sent, ${failCount} failed`,
+      },
+      { headers: rateLimitResult.headers }
+    )
   } catch (error) {
     console.error('SMS send error:', error)
     return NextResponse.json(

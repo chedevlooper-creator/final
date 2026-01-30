@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/permission-middleware'
 import { z } from 'zod'
+import { createApiErrorResponse, sanitizeError } from '@/lib/errors'
+
+const isDevelopment = process.env['NODE_ENV'] === 'development'
 
 // Görev oluşturma şeması
 const createTaskSchema = z.object({
@@ -39,7 +42,10 @@ export async function GET(request: NextRequest) {
       .rpc('get_user_organization_id')
 
     if (!userOrg) {
-      return NextResponse.json({ error: 'Organizasyon bulunamadı' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Organizasyon bulunamadı', code: 'NOT_FOUND' }, 
+        { status: 400 }
+      )
     }
 
     let query = supabase
@@ -80,11 +86,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data })
   } catch (error) {
-    console.error('Görevler listelenirken hata:', error)
-    return NextResponse.json(
-      { error: 'Görevler listelenirken bir hata oluştu' },
-      { status: 500 }
-    )
+    return createApiErrorResponse(error, 500, { route: 'GET /api/tasks' })
   }
 }
 
@@ -116,7 +118,7 @@ export async function POST(request: NextRequest) {
 
     if (!memberData || !['owner', 'admin'].includes(memberData.role)) {
       return NextResponse.json(
-        { error: 'Bu işlem için yetkiniz yok' },
+        { error: 'Bu işlem için yetkiniz yok', code: 'FORBIDDEN' },
         { status: 403 }
       )
     }
@@ -172,16 +174,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ data: task }, { status: 201 })
   } catch (error) {
     if (error instanceof z.ZodError) {
+      // Zod hatalarında sadece development ortamında detay göster
       return NextResponse.json(
-        { error: 'Validasyon hatası', details: error.errors },
+        { 
+          error: 'Validasyon hatası', 
+          code: 'VALIDATION_ERROR',
+          ...(isDevelopment && { details: error.errors }),
+        },
         { status: 400 }
       )
     }
 
-    console.error('Görev oluşturulurken hata:', error)
-    return NextResponse.json(
-      { error: 'Görev oluşturulurken bir hata oluştu' },
-      { status: 500 }
-    )
+    return createApiErrorResponse(error, 500, { route: 'POST /api/tasks' })
   }
 }

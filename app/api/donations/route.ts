@@ -6,6 +6,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/permission-middleware'
+import { createApiErrorResponse, handleDatabaseError } from '@/lib/errors'
+import { rateLimit, getUserKey, createRateLimitResponse } from '@/lib/rate-limit'
+import { entityLoggers } from '@/lib/activity-logger'
 
 /**
  * GET /api/donations - Get list of donations with pagination and filters
@@ -73,10 +76,7 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await query.range(from, to)
 
     if (error) {
-      return NextResponse.json(
-        { error: error.message, code: 'DATABASE_ERROR' },
-        { status: 400 }
-      )
+      return handleDatabaseError(error, 'GET /api/donations')
     }
 
     const totalPages = count ? Math.ceil(count / limit) : 0
@@ -91,10 +91,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Bir hata oluştu', code: 'INTERNAL_ERROR' },
-      { status: 500 }
-    )
+    return createApiErrorResponse(error, 500, { route: 'GET /api/donations' })
   }
 }
 
@@ -122,6 +119,20 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimitResult = await rateLimit(request, {
+      identifier: 'donation-create',
+      limit: 200,
+      window: 60 * 60 * 1000,
+      keyGenerator: getUserKey,
+    })
+
+    if (!rateLimitResult.success) {
+      return createRateLimitResponse(
+        rateLimitResult,
+        'Saatlik bağış kaydı oluşturma limitine ulaşıldı. Lütfen daha sonra tekrar deneyin.'
+      )
+    }
+
     // RBAC: Donations create için create yetkisi gerekli
     const authResult = await withAuth(request, {
       requiredPermission: 'create',
@@ -185,18 +196,20 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      return NextResponse.json(
-        { error: error.message, code: 'DATABASE_ERROR' },
-        { status: 400 }
-      )
+      return handleDatabaseError(error, 'POST /api/donations')
     }
+
+    // Audit log - bağış kaydı oluşturuldu
+    await entityLoggers.create(
+      'donation',
+      data.id,
+      body.donor_name || 'İsimsiz Bağışçı',
+      { ...newData, id: data.id }
+    )
 
     return NextResponse.json({ data }, { status: 201 })
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Bir hata oluştu', code: 'INTERNAL_ERROR' },
-      { status: 500 }
-    )
+    return createApiErrorResponse(error, 500, { route: 'POST /api/donations' })
   }
 }
 

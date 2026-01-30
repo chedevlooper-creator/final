@@ -63,7 +63,12 @@ function getQueryClient() {
   }
 }
 
-export function Providers({ children }: { children: React.ReactNode }) {
+interface ProvidersProps {
+  children: React.ReactNode
+  nonce?: string
+}
+
+export function Providers({ children, nonce }: ProvidersProps) {
   const [queryClient] = useState(getQueryClient)
   const [mounted, setMounted] = useState(false)
 

@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { MeetingStatus } from '@/types/meeting.types';
 import { withAuth } from '@/lib/permission-middleware';
+import { ErrorLogger, createApiErrorResponse, handleDatabaseError } from '@/lib/errors';
 
 /**
  * GET /api/meetings - Toplantı listesini getir
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await query;
     
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      return handleDatabaseError(error, 'GET /api/meetings');
     }
     
     return NextResponse.json({
@@ -62,8 +63,7 @@ export async function GET(request: NextRequest) {
       totalPages: Math.ceil((count || 0) / limit)
     });
   } catch (error) {
-    // Error logged securely without exposing sensitive data
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return createApiErrorResponse(error, 500, { route: 'GET /api/meetings' });
   }
 }
 
@@ -90,16 +90,25 @@ export async function POST(request: NextRequest) {
     
     // Validation
     if (!title || title.trim().length < 3) {
-      return NextResponse.json({ error: 'Toplantı başlığı en az 3 karakter olmalıdır' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Toplantı başlığı en az 3 karakter olmalıdır', code: 'VALIDATION_ERROR' }, 
+        { status: 400 }
+      );
     }
     
     if (!meeting_date) {
-      return NextResponse.json({ error: 'Toplantı tarihi gerekli' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Toplantı tarihi gerekli', code: 'VALIDATION_ERROR' }, 
+        { status: 400 }
+      );
     }
     
     const meetingDate = new Date(meeting_date);
     if (isNaN(meetingDate.getTime())) {
-      return NextResponse.json({ error: 'Geçersiz tarih' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Geçersiz tarih', code: 'VALIDATION_ERROR' }, 
+        { status: 400 }
+      );
     }
     
     // Create meeting
@@ -117,7 +126,7 @@ export async function POST(request: NextRequest) {
       .single();
     
     if (meetingError) {
-      return NextResponse.json({ error: meetingError.message }, { status: 400 });
+      return handleDatabaseError(meetingError, 'POST /api/meetings - create meeting');
     }
     
     // Add participants if provided
@@ -133,13 +142,16 @@ export async function POST(request: NextRequest) {
         .insert(participants);
 
       if (participantsError) {
-        // Participants error - logged securely
+        ErrorLogger.error(
+          new Error(`Failed to add participants: ${participantsError.message}`),
+          { meetingId: meeting.id, participantCount: participants.length }
+        );
+        // Continue - meeting is created, participants can be added later
       }
     }
 
     return NextResponse.json(meeting, { status: 201 });
   } catch (error) {
-    // Error logged securely without exposing sensitive data
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return createApiErrorResponse(error, 500, { route: 'POST /api/meetings' });
   }
 }

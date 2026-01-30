@@ -7,6 +7,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { env } from '@/lib/env'
+import { rateLimit, getIPKey, createRateLimitResponse } from '@/lib/rate-limit'
+import { entityLoggers } from '@/lib/activity-logger'
 
 // Build-time placeholder values for SSG/prerendering
 const BUILD_PLACEHOLDER_URL = 'https://placeholder.supabase.co'
@@ -21,6 +23,20 @@ function isBuildTime(): boolean {
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimitResult = await rateLimit(request, {
+      identifier: 'login',
+      limit: 5,
+      window: 15 * 60 * 1000,
+      keyGenerator: getIPKey,
+    })
+
+    if (!rateLimitResult.success) {
+      return createRateLimitResponse(
+        rateLimitResult,
+        'Çok fazla giriş denemesi. Lütfen 15 dakika sonra tekrar deneyin.'
+      )
+    }
+
     const body = await request.json()
     const { email, password } = body
 
@@ -83,25 +99,40 @@ export async function POST(request: NextRequest) {
       .eq('id', data.user.id)
       .single()
 
+    // Audit log - başarılı giriş
+    await entityLoggers.create(
+      'session',
+      data.user.id,
+      profile?.name || data.user.email || 'Kullanıcı',
+      { 
+        email: data.user.email,
+        role: profile?.role || 'viewer',
+        login_time: new Date().toISOString()
+      }
+    )
+
     // Return user data with profile
-    return NextResponse.json({
-      data: {
-        user: {
-          id: data.user.id,
-          email: data.user.email,
-          role: profile?.role || 'viewer',
-          name: profile?.['name'] || data.user.user_metadata?.['name'],
-          avatar_url: profile?.['avatar_url'] || data.user.user_metadata?.['avatar_url'],
-        },
-        session: {
-          access_token: data.session.access_token,
-          refresh_token: data.session.refresh_token,
-          expires_at: data.session.expires_at,
-          expires_in: data.session.expires_in,
-          token_type: data.session.token_type,
+    return NextResponse.json(
+      {
+        data: {
+          user: {
+            id: data.user.id,
+            email: data.user.email,
+            role: profile?.role || 'viewer',
+            name: profile?.['name'] || data.user.user_metadata?.['name'],
+            avatar_url: profile?.['avatar_url'] || data.user.user_metadata?.['avatar_url'],
+          },
+          session: {
+            access_token: data.session.access_token,
+            refresh_token: data.session.refresh_token,
+            expires_at: data.session.expires_at,
+            expires_in: data.session.expires_in,
+            token_type: data.session.token_type,
+          },
         },
       },
-    })
+      { headers: rateLimitResult.headers }
+    )
   } catch (error) {
     console.error('Login error:', error)
     return NextResponse.json(

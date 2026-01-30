@@ -89,6 +89,9 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Note: CSP header is set dynamically in middleware with nonce
+        // Other security headers are also applied via middleware
+        // This config serves as a fallback for static pages
         source: '/(.*)',
         headers: Object.entries(securityHeaders).map(([key, value]) => ({
           key,

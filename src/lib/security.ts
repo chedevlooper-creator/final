@@ -9,14 +9,33 @@
  * - Next.js: https://nextjs.org/docs/app/building-your-application/configuring/headers
  */
 
-import { randomBytes } from 'crypto'
-
 /**
  * Generate a cryptographic nonce for CSP
  * Should be called once per request and passed to both headers and components
+ * 
+ * Uses Web Crypto API for Edge Runtime compatibility
  */
 export function generateCSPNonce(): string {
-  return randomBytes(16).toString('base64')
+  // Use Web Crypto API (available in both Node.js and Edge Runtime)
+  const array = new Uint8Array(16)
+  crypto.getRandomValues(array)
+  return btoa(String.fromCharCode(...array))
+}
+
+/**
+ * Get Supabase domain from environment
+ */
+function getSupabaseDomain(): string {
+  const url = process.env['NEXT_PUBLIC_SUPABASE_URL']
+  if (url) {
+    try {
+      const domain = new URL(url).hostname
+      return domain
+    } catch {
+      // Fall through to default
+    }
+  }
+  return '*.supabase.co'
 }
 
 /**
@@ -34,6 +53,9 @@ export function buildCSPHeader(
   // In development, allow unsafe-inline for hot reload
   const isDev = process.env['NODE_ENV'] !== 'production'
 
+  // Get Supabase domain
+  const supabaseDomain = getSupabaseDomain()
+
   // Nonce-based CSP for production, unsafe-inline for development
   const scriptSrc = nonce
     ? ` 'nonce-${nonce}'`
@@ -50,31 +72,34 @@ export function buildCSPHeader(
     "default-src 'self'",
 
     // Scripts - prefer nonce-based, fallback to unsafe-inline
+    // 'self' for Next.js scripts, nonce for inline scripts
     `script-src 'self'${scriptSrc}`,
 
-    // Styles - need unsafe-inline for CSS-in-JS libraries
+    // Styles - nonce-based + unsafe-inline for CSS-in-JS libraries
     `style-src 'self'${styleSrc}`,
 
-    // Images - allow Supabase storage and data URIs
-    "img-src 'self' data: blob: https://*.supabase.co https://*.githubusercontent.com",
+    // Images - allow Supabase storage, data URIs, and blob
+    `img-src 'self' data: blob: https://${supabaseDomain} https://*.supabase.co https://*.githubusercontent.com`,
 
     // Fonts - allow self and data URIs
     "font-src 'self' data:",
 
-    // API connections - allow Supabase, Vercel, and Sentry
-    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel-scripts.com https://*.sentry.io",
+    // API connections - allow Supabase (HTTP + WebSocket), Vercel scripts, and Sentry
+    `connect-src 'self' https://${supabaseDomain} wss://${supabaseDomain} https://*.supabase.co wss://*.supabase.co https://*.vercel-scripts.com https://*.sentry.io`,
 
-    // Media - restrict to same origin
-    "media-src 'self'",
+    // Media - restrict to same origin and Supabase storage
+    `media-src 'self' https://${supabaseDomain} https://*.supabase.co`,
 
     // Objects - disallow plugins (Flash, Java, etc.)
     "object-src 'none'",
 
     // Child/frame sources - disallow embedding
     "child-src 'none'",
+
+    // Frames - disallow embedding from other sources
     "frame-src 'none'",
 
-    // Prevent framing of this site
+    // Prevent framing of this site (clickjacking protection)
     "frame-ancestors 'none'",
 
     // Restrict base URI to prevent base tag hijacking
@@ -82,6 +107,12 @@ export function buildCSPHeader(
 
     // Restrict form submissions to same origin
     "form-action 'self'",
+
+    // Manifest - allow self
+    "manifest-src 'self'",
+
+    // Worker scripts - allow self and blob (for Next.js)
+    "worker-src 'self' blob:",
 
     // Require HTTPS for all resources in production
     ...(isDev ? [] : ['upgrade-insecure-requests']),
@@ -221,4 +252,111 @@ export const corsConfig = {
 
   // Max age for preflight cache (24 hours)
   maxAge: 86400,
+}
+
+/**
+ * Check if an origin is allowed
+ */
+export function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return false
+
+  const allowedOrigins = Array.isArray(corsConfig.origin)
+    ? corsConfig.origin
+    : [corsConfig.origin]
+
+  return allowedOrigins.includes(origin)
+}
+
+/**
+ * Get allowed origin for response
+ */
+export function getAllowedOrigin(requestOrigin: string | null): string | null {
+  if (!requestOrigin) return null
+
+  if (isAllowedOrigin(requestOrigin)) {
+    return requestOrigin
+  }
+
+  // In development, allow any localhost origin
+  if (process.env['NODE_ENV'] !== 'production' && requestOrigin.match(/^http:\/\/localhost:\d+$/)) {
+    return requestOrigin
+  }
+
+  return null
+}
+
+/**
+ * Create a response with CORS headers
+ * Use this in API routes for proper CORS support
+ */
+export function createCORSResponse(
+  body: BodyInit | null,
+  init: ResponseInit & { request?: Request },
+  corsOptions?: { allowCredentials?: boolean }
+): Response {
+  const requestOrigin = init.request?.headers.get('origin') ?? null
+  const allowedOrigin = getAllowedOrigin(requestOrigin)
+
+  const headers = new Headers(init.headers)
+
+  // Set CORS headers
+  if (allowedOrigin) {
+    headers.set('Access-Control-Allow-Origin', allowedOrigin)
+  }
+
+  headers.set('Access-Control-Allow-Methods', corsConfig.methods.join(', '))
+  headers.set('Access-Control-Allow-Headers', corsConfig.allowedHeaders.join(', '))
+  headers.set('Access-Control-Expose-Headers', corsConfig.exposedHeaders.join(', '))
+  headers.set('Access-Control-Max-Age', corsConfig.maxAge.toString())
+
+  if (corsConfig.credentials && corsOptions?.allowCredentials !== false) {
+    headers.set('Access-Control-Allow-Credentials', 'true')
+  }
+
+  // Add security headers
+  Object.entries(securityHeaders).forEach(([key, value]) => {
+    if (!headers.has(key)) {
+      headers.set(key, value)
+    }
+  })
+
+  // Add request ID for tracing
+  if (!headers.has('X-Request-Id')) {
+    headers.set('X-Request-Id', `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`)
+  }
+
+  return new Response(body, {
+    ...init,
+    headers,
+  })
+}
+
+/**
+ * Handle OPTIONS preflight request
+ * Use this in API routes for OPTIONS handler
+ */
+export function handleCorsPreflight(request: Request, allowedMethods: string[] = corsConfig.methods): Response {
+  const requestOrigin = request.headers.get('origin')
+  const allowedOrigin = getAllowedOrigin(requestOrigin)
+
+  const headers = new Headers()
+
+  if (allowedOrigin) {
+    headers.set('Access-Control-Allow-Origin', allowedOrigin)
+  }
+
+  headers.set('Access-Control-Allow-Methods', allowedMethods.join(', '))
+  headers.set('Access-Control-Allow-Headers', corsConfig.allowedHeaders.join(', '))
+  headers.set('Access-Control-Max-Age', corsConfig.maxAge.toString())
+
+  if (corsConfig.credentials) {
+    headers.set('Access-Control-Allow-Credentials', 'true')
+  }
+
+  headers.set('X-Request-Id', `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`)
+
+  return new Response(null, {
+    status: 204,
+    headers,
+  })
 }

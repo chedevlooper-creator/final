@@ -131,11 +131,26 @@ export const menuItems: MenuGroup[] = [
     ]
   },
   {
-    title: 'Sistem',
+    title: 'Üyelik Yönetimi',
+    icon: UserCheck,
+    items: [
+      { title: 'Üyeler', href: '/dashboard/memberships', icon: Users },
+      { title: 'Aidat Takibi', href: '/dashboard/memberships/payments', icon: Banknote },
+    ]
+  },
+  {
+    title: 'Proje Yönetimi',
+    icon: ClipboardList,
+    items: [
+      { title: 'Programlar', href: '/dashboard/programs', icon: ClipboardList },
+      { title: 'Aktiviteler', href: '/dashboard/programs/activities', icon: Calendar },
+    ]
+  },
+  {
+    title: 'Ayarlar',
     icon: Settings,
     items: [
-      { title: 'Tanımlamalar', href: '/dashboard/settings/definitions', icon: Settings },
-      { title: 'Kullanıcılar', href: '/dashboard/settings/users', icon: Users },
+      { title: 'Tüm Ayarlar', href: '/dashboard/settings/organization', icon: Settings },
     ]
   },
 ]
