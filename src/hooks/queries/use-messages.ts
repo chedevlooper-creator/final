@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
+import { safeJsonParse } from '@/lib/utils'
 
 export interface SMSFilters {
   phone?: string
@@ -62,11 +63,11 @@ export function useSendBulkSMS() {
       })
 
       if (!response.ok) {
-        const error = await response.json()
+        const error = await safeJsonParse<{ error?: string }>(response)
         throw new Error(error.error || 'Failed to send SMS')
       }
 
-      return response.json()
+      return safeJsonParse(response)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sms'] })
@@ -91,11 +92,11 @@ export function useSendBulkEmail() {
       })
 
       if (!response.ok) {
-        const error = await response.json()
+        const error = await safeJsonParse<{ error?: string }>(response)
         throw new Error(error.error || 'Failed to send email')
       }
 
-      return response.json()
+      return safeJsonParse(response)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['emails'] })
@@ -117,15 +118,15 @@ export function useRecipients(recipientType: string) {
       const response = await fetch(`/api/messages/recipients?type=${recipientType}`)
       
       if (!response.ok) {
-        const error = await response.json()
+        const error = await safeJsonParse<{ error?: string }>(response)
         throw new Error(error.error || 'Failed to fetch recipients')
       }
       
-      return response.json() as Promise<{
+      return safeJsonParse<{
         recipients: Recipient[]
         count: number
         type: string
-      }>
+      }>(response)
     },
     enabled: !!recipientType,
   })

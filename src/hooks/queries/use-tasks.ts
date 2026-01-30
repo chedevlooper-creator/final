@@ -11,6 +11,7 @@ import type {
   ActivityFilter,
   TeamMemberStats
 } from '@/types/task.types'
+import { safeJsonParse } from '@/lib/utils'
 
 // Tüm görevleri getir (admin/owner için)
 export function useTasks(filters?: TaskFilter) {
@@ -25,8 +26,8 @@ export function useTasks(filters?: TaskFilter) {
 
       const response = await fetch(`/api/tasks?${params.toString()}`)
       if (!response.ok) throw new Error('Görevler alınamadı')
-      const result = await response.json()
-      return result.data as Task[]
+      const result = await safeJsonParse<{ data: Task[] }>(response)
+      return result.data
     },
   })
 }
@@ -38,8 +39,8 @@ export function useTask(id: string) {
     queryFn: async () => {
       const response = await fetch(`/api/tasks/${id}`)
       if (!response.ok) throw new Error('Görev alınamadı')
-      const result = await response.json()
-      return result.data as Task
+      const result = await safeJsonParse<{ data: Task }>(response)
+      return result.data
     },
     enabled: !!id,
   })
@@ -57,11 +58,11 @@ export function useCreateTask() {
         body: JSON.stringify(data),
       })
       if (!response.ok) {
-        const error = await response.json()
+        const error = await safeJsonParse<{ error?: string }>(response)
         throw new Error(error.error || 'Görev oluşturulamadı')
       }
-      const result = await response.json()
-      return result.data as Task
+      const result = await safeJsonParse<{ data: Task }>(response)
+      return result.data
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
@@ -81,11 +82,11 @@ export function useUpdateTask() {
         body: JSON.stringify(data),
       })
       if (!response.ok) {
-        const error = await response.json()
+        const error = await safeJsonParse<{ error?: string }>(response)
         throw new Error(error.error || 'Görev güncellenemedi')
       }
-      const result = await response.json()
-      return result.data as Task
+      const result = await safeJsonParse<{ data: Task }>(response)
+      return result.data
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
@@ -104,7 +105,7 @@ export function useDeleteTask() {
         method: 'DELETE',
       })
       if (!response.ok) {
-        const error = await response.json()
+        const error = await safeJsonParse<{ error?: string }>(response)
         throw new Error(error.error || 'Görev silinemedi')
       }
       return true
@@ -125,8 +126,8 @@ export function useMyTasks(status?: string) {
 
       const response = await fetch(`/api/my-tasks?${params.toString()}`)
       if (!response.ok) throw new Error('Görevler alınamadı')
-      const result = await response.json()
-      return result.data as MyTaskAssignment[]
+      const result = await safeJsonParse<{ data: MyTaskAssignment[] }>(response)
+      return result.data
     },
   })
 }
@@ -143,10 +144,10 @@ export function useCompleteTask() {
         body: JSON.stringify(data),
       })
       if (!response.ok) {
-        const error = await response.json()
+        const error = await safeJsonParse<{ error?: string }>(response)
         throw new Error(error.error || 'Görev tamamlanamadı')
       }
-      const result = await response.json()
+      const result = await safeJsonParse<{ data: unknown }>(response)
       return result.data
     },
     onSuccess: () => {
@@ -163,8 +164,8 @@ export function useTeamStats() {
     queryFn: async () => {
       const response = await fetch('/api/dashboard/team-stats')
       if (!response.ok) throw new Error('Takım istatistikleri alınamadı')
-      const result = await response.json()
-      return result.data as TeamStatsResponse
+      const result = await safeJsonParse<{ data: TeamStatsResponse }>(response)
+      return result.data
     },
   })
 }
@@ -176,8 +177,8 @@ export function useTeamMembers() {
     queryFn: async () => {
       const response = await fetch('/api/dashboard/team')
       if (!response.ok) throw new Error('Takım üyeleri alınamadı')
-      const result = await response.json()
-      return result.data as TeamMemberStats['user'][]
+      const result = await safeJsonParse<{ data: TeamMemberStats['user'][] }>(response)
+      return result.data
     },
   })
 }
@@ -199,7 +200,7 @@ export function useActivityLogs(filters?: ActivityFilter, limit = 50, offset = 0
 
       const response = await fetch(`/api/activities?${params.toString()}`)
       if (!response.ok) throw new Error('Aktivite logları alınamadı')
-      return await response.json() as { data: ActivityLog[]; pagination: { total: number; hasMore: boolean } }
+      return await safeJsonParse<{ data: ActivityLog[]; pagination: { total: number; hasMore: boolean } }>(response)
     },
   })
 }

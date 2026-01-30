@@ -56,7 +56,7 @@ function addCORSHeaders(request: NextRequest, response: NextResponse): void {
   }
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Handle CORS preflight requests
   if (request.method === 'OPTIONS') {
     const response = new NextResponse(null, { status: 204 })

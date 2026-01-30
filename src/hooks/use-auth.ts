@@ -8,6 +8,7 @@ import { AuthError, ErrorHandler } from '@/lib/errors'
 import { toast } from 'sonner'
 import type { OrganizationRole } from '@/types/organization.types'
 import { usePermissions } from '@/lib/rbac'
+import { safeJsonParse } from '@/lib/utils'
 
 interface UserProfile {
   id: string
@@ -136,7 +137,7 @@ export function useAuth() {
         body: JSON.stringify({ email, password }),
       })
 
-      const result = await response.json()
+      const result = await safeJsonParse<{ error?: string; code?: string; data?: unknown }>(response)
 
       if (!response.ok) {
         throw new AuthError(

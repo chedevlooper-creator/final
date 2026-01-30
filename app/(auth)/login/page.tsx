@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Heart, Loader2, Eye, EyeOff, Mail, Lock } from 'lucide-react'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
+import { cn, safeJsonParse } from '@/lib/utils'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -45,7 +45,7 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       })
 
-      const result = await response.json()
+      const result = await safeJsonParse<{ error?: string; data?: unknown }>(response)
 
       if (!response.ok) {
         throw new Error(result.error || 'Giriş başarısız')

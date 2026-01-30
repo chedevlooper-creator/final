@@ -18,6 +18,11 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
+  // Skip auth check for API routes - they handle their own auth
+  if (request.nextUrl.pathname.startsWith('/api')) {
+    return supabaseResponse
+  }
+
   // Use placeholder values during build/SSG to allow prerendering
   const url = isBuildTime() ? BUILD_PLACEHOLDER_URL : env.NEXT_PUBLIC_SUPABASE_URL
   const key = isBuildTime() ? BUILD_PLACEHOLDER_KEY : env.NEXT_PUBLIC_SUPABASE_ANON_KEY

@@ -210,3 +210,52 @@ export const statusLabels: Record<string, string> = {
   completed: 'Tamamlandı',
   cancelled: 'İptal Edildi',
 }
+
+/**
+ * Safe JSON parsing from Response
+ * Handles cases where server returns HTML instead of JSON (e.g., auth redirects)
+ */
+export async function safeJsonParse<T = unknown>(response: Response): Promise<T> {
+  const contentType = response.headers.get('content-type') || ''
+  const text = await response.text()
+  
+  // First, try to parse as JSON if content-type indicates JSON
+  if (contentType.includes('application/json')) {
+    try {
+      return JSON.parse(text) as T
+    } catch {
+      throw new Error('Geçersiz JSON yanıtı')
+    }
+  }
+  
+  // Check if response is HTML (indicates redirect or error page)
+  const trimmedText = text.trim()
+  if (trimmedText.startsWith('<!DOCTYPE') || trimmedText.startsWith('<html') || 
+      trimmedText.startsWith('<HTML') || contentType.includes('text/html')) {
+    throw new Error(
+      response.status === 401 || response.status === 403
+        ? 'Oturum süresi dolmuş. Lütfen tekrar giriş yapın.'
+        : 'Sunucu hatası: Beklenmeyen yanıt formatı'
+    )
+  }
+  
+  // Try to parse as JSON anyway (for responses without proper content-type)
+  try {
+    return JSON.parse(text) as T
+  } catch {
+    throw new Error('Geçersiz JSON yanıtı')
+  }
+}
+
+/**
+ * Safe fetch wrapper that handles JSON parsing errors
+ */
+export async function safeFetch<T = unknown>(
+  url: string, 
+  options?: RequestInit
+): Promise<{ data: T; response: Response }> {
+  const response = await fetch(url, options)
+  const data = await safeJsonParse<T>(response)
+  return { data, response }
+}
+
