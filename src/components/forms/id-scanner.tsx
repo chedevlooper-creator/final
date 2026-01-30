@@ -44,28 +44,88 @@ export function IdScanner({ onScanComplete, open, onOpenChange }: IdScannerProps
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment')
   const [scanProgress, setScanProgress] = useState(0)
   const [cameraError, setCameraError] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+  const [cameraReady, setCameraReady] = useState(false)
+
+  // Mobil cihaz kontrolü
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent || navigator.vendor
+      const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase())
+      setIsMobile(isMobileDevice)
+    }
+    checkMobile()
+  }, [])
+
+  // iOS Safari için webkit-playsinline attribute ekle
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.setAttribute('webkit-playsinline', 'true')
+    }
+  }, [])
 
   // Kamerayı başlat
   const startCamera = useCallback(async () => {
     try {
       setCameraError(null)
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
+      setCameraReady(false)
+      
+      // Önce mevcut stream'i durdur
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop())
+      }
+
+      // Mobil için optimize edilmiş ayarlar
+      const constraints: MediaStreamConstraints = {
+        video: isMobile ? {
+          facingMode: { ideal: facingMode },
+          width: { ideal: 1280, max: 1920 },
+          height: { ideal: 720, max: 1080 },
+        } : {
           facingMode,
           width: { ideal: 1920 },
           height: { ideal: 1080 },
         },
-      })
+        audio: false,
+      }
+
+      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints)
       setStream(mediaStream)
+      
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream
+        // Video yüklenene kadar bekle
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play().then(() => {
+            setCameraReady(true)
+          }).catch((err) => {
+            console.error('Video play error:', err)
+            // iOS Safari için otomatik play engellenmişse sessizce devam et
+            setCameraReady(true)
+          })
+        }
       }
     } catch (error) {
       console.error('Kamera erişim hatası:', error)
-      setCameraError('Kamera erişimi sağlanamadı. Lütfen kamera izinlerini kontrol edin.')
-      toast.error('Kamera erişimi sağlanamadı')
+      
+      // Daha detaylı hata mesajları
+      let errorMessage = 'Kamera erişimi sağlanamadı.'
+      if (error instanceof Error) {
+        if (error.name === 'NotAllowedError') {
+          errorMessage = 'Kamera izni reddedildi. Tarayıcı ayarlarından kamera iznini verin.'
+        } else if (error.name === 'NotFoundError') {
+          errorMessage = 'Kamera bulunamadı. Cihazınızda kamera olduğundan emin olun.'
+        } else if (error.name === 'NotReadableError') {
+          errorMessage = 'Kamera başka bir uygulama tarafından kullanılıyor olabilir.'
+        } else if (error.name === 'OverconstrainedError') {
+          errorMessage = 'Kamera ayarları desteklenmiyor. Lütfen dosya yüklemeyi deneyin.'
+        }
+      }
+      
+      setCameraError(errorMessage)
+      toast.error(errorMessage)
     }
-  }, [facingMode])
+  }, [facingMode, isMobile, stream])
 
   // Kamerayı durdur
   const stopCamera = useCallback(() => {
@@ -89,11 +149,66 @@ export function IdScanner({ onScanComplete, open, onOpenChange }: IdScannerProps
     }
   }, [open, startCamera, stopCamera])
 
-  // Kamera değiştir
-  const switchCamera = async () => {
-    stopCamera()
-    setFacingMode((prev) => (prev === 'environment' ? 'user' : 'environment'))
-  }
+  // Kamera değiştir (mobil için düzeltilmiş)
+  const switchCamera = useCallback(async () => {
+    // Önce mevcut stream'i durdur
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop())
+      setStream(null)
+    }
+    setCameraReady(false)
+    
+    // FacingMode'u değiştir
+    const newFacingMode = facingMode === 'environment' ? 'user' : 'environment'
+    setFacingMode(newFacingMode)
+    
+    // Yeni kamerayı başlat
+    try {
+      const constraints: MediaStreamConstraints = {
+        video: {
+          facingMode: { exact: newFacingMode },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: false,
+      }
+      
+      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints)
+      setStream(mediaStream)
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play().then(() => {
+            setCameraReady(true)
+          }).catch(() => {
+            setCameraReady(true)
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Kamera değiştirme hatası:', error)
+      // Exact constraint başarısız olursa ideal ile dene
+      try {
+        const fallbackConstraints: MediaStreamConstraints = {
+          video: {
+            facingMode: { ideal: newFacingMode },
+          },
+          audio: false,
+        }
+        const mediaStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints)
+        setStream(mediaStream)
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream
+          setCameraReady(true)
+        }
+      } catch (_fallbackError) {
+        toast.error('Kamera değiştirilemedi')
+        // Orijinal kamerayı yeniden aç
+        startCamera()
+      }
+    }
+  }, [facingMode, stream, startCamera])
 
   // Fotoğraf çek
   const capturePhoto = () => {
@@ -372,7 +487,15 @@ export function IdScanner({ onScanComplete, open, onOpenChange }: IdScannerProps
                   playsInline
                   muted
                   className="w-full h-full object-cover"
+                  style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'none' }}
                 />
+                {/* Kamera hazır değilse loading göster */}
+                {!cameraReady && !cameraError && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <span className="ml-2 text-sm">Kamera açılıyor...</span>
+                  </div>
+                )}
                 {/* Tarama çerçevesi */}
                 <div className="absolute inset-4 border-2 border-dashed border-primary/50 rounded-lg pointer-events-none">
                   <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-primary rounded-tl-lg" />
@@ -428,20 +551,23 @@ export function IdScanner({ onScanComplete, open, onOpenChange }: IdScannerProps
                   type="button"
                   size="lg"
                   onClick={capturePhoto}
-                  disabled={!stream}
+                  disabled={!stream || !cameraReady}
                   className="rounded-full w-16 h-16"
                 >
                   <Camera className="h-6 w-6" />
                 </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={switchCamera}
-                  title="Kamera değiştir"
-                >
-                  <SwitchCamera className="h-4 w-4" />
-                </Button>
+                {isMobile && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={switchCamera}
+                    disabled={!cameraReady}
+                    title="Kamera değiştir"
+                  >
+                    <SwitchCamera className="h-4 w-4" />
+                  </Button>
+                )}
               </>
             ) : (
               <>
