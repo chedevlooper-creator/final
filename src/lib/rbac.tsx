@@ -100,6 +100,24 @@ export const RESOURCE_PERMISSIONS = {
     moderator: ['read'],
     user: [],
     viewer: []
+  },
+  tasks: {
+    admin: ['create', 'read', 'update', 'delete'],
+    moderator: ['create', 'read', 'update'],
+    user: ['read', 'update'],
+    viewer: ['read']
+  },
+  activity_logs: {
+    admin: ['create', 'read', 'update', 'delete'],
+    moderator: ['read'],
+    user: ['read'],
+    viewer: []
+  },
+  organization_members: {
+    admin: ['create', 'read', 'update', 'delete'],
+    moderator: ['read'],
+    user: ['read'],
+    viewer: ['read']
   }
 } as const
 
@@ -202,6 +220,27 @@ export function usePermissions(role: UserRole = 'viewer') {
       canRead: hasResourcePermission(role, 'users', 'read'),
       canUpdate: hasResourcePermission(role, 'users', 'update'),
       canDelete: hasResourcePermission(role, 'users', 'delete'),
+    },
+
+    tasks: {
+      canCreate: hasResourcePermission(role, 'tasks', 'create'),
+      canRead: hasResourcePermission(role, 'tasks', 'read'),
+      canUpdate: hasResourcePermission(role, 'tasks', 'update'),
+      canDelete: hasResourcePermission(role, 'tasks', 'delete'),
+    },
+
+    activityLogs: {
+      canCreate: hasResourcePermission(role, 'activity_logs', 'create'),
+      canRead: hasResourcePermission(role, 'activity_logs', 'read'),
+      canUpdate: hasResourcePermission(role, 'activity_logs', 'update'),
+      canDelete: hasResourcePermission(role, 'activity_logs', 'delete'),
+    },
+
+    organizationMembers: {
+      canCreate: hasResourcePermission(role, 'organization_members', 'create'),
+      canRead: hasResourcePermission(role, 'organization_members', 'read'),
+      canUpdate: hasResourcePermission(role, 'organization_members', 'update'),
+      canDelete: hasResourcePermission(role, 'organization_members', 'delete'),
     },
 
     // Current role

@@ -19,6 +19,9 @@ import {
   Warehouse,
   Container,
   MapPin,
+  ClipboardList,
+  Activity,
+  CheckSquare,
   LucideIcon,
 } from 'lucide-react'
 
@@ -92,6 +95,15 @@ export const menuItems: MenuGroup[] = [
     items: [
       { title: 'Gönüllüler', href: '/dashboard/volunteers', icon: UserCheck },
       { title: 'Görevlendirmeler', href: '/dashboard/volunteers/missions', icon: Calendar },
+    ]
+  },
+  {
+    title: 'Görev Yönetimi',
+    icon: ClipboardList,
+    items: [
+      { title: 'Görevlerim', href: '/dashboard/my-tasks', icon: CheckSquare },
+      { title: 'Takım Görevleri', href: '/dashboard/tasks', icon: ClipboardList },
+      { title: 'Takım Aktivitesi', href: '/dashboard/team-activity', icon: Activity },
     ]
   },
   {
