@@ -47,13 +47,11 @@ export function PhotosTab({ needyPersonId: _needyPersonId, onClose: _onClose }: 
   const handleDelete = async (_id: string) => {
     if (confirm('Bu fotoğrafı silmek istediğinizden emin misiniz?')) {
       // TODO: Implement delete functionality
-      console.log('Delete photo:', _id)
     }
   }
 
   const handleSetPrimary = async (_id: string) => {
     // TODO: Implement set primary functionality
-    console.log('Set primary:', _id)
   }
 
   return (

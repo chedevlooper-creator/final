@@ -418,7 +418,6 @@ export function IdScanner({ onScanComplete, open, onOpenChange }: IdScannerProps
       })
 
       const text = result.data.text
-      console.log('OCR Result:', text) // Debug için
 
       // Belge türünü tespit et
       let parsedData: ScannedIdData

@@ -40,7 +40,8 @@ const nextConfig: NextConfig = {
   compress: true, // Enable gzip compression
 
   // Output configuration for Docker deployment
-  output: 'standalone',
+  // Not: Vercel'de otomatik olarak çalışır, yerel build'de klasör adı sorunu var
+  // output: 'standalone',
 
   // Experimental features for better performance
   experimental: {
