@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useNeedyList, useDeleteNeedy } from '@/hooks/queries/use-needy'
-import { PageHeader } from '@/components/common/page-header'
 import { DataTable } from '@/components/common/data-table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -303,29 +302,33 @@ export default function NeedyListPage() {
   return (
     <PageTransition>
       <div className="space-y-4">
-        <PageHeader
-          title="İhtiyaç Sahipleri"
-          description="Sistemdeki tüm ihtiyaç sahiplerini yönetin"
-          icon={Users}
-          actions={
-            <Button
-              size="sm"
-              className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
-              onClick={() => {
-                window.location.hash = '#!/crea/relief/needy/add'
-              }}
-            >
-              <Plus className="h-4 w-4 mr-1" />
-              Yeni Ekle
-            </Button>
-          }
-        />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent shadow-glow shrink-0">
+              <Users className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">İhtiyaç Sahipleri</h1>
+              <p className="text-sm text-muted-foreground">Sistemdeki tüm ihtiyaç sahiplerini yönetin</p>
+            </div>
+          </div>
+          <Button
+            size="sm"
+            className="bg-gradient-to-r from-primary to-accent hover:opacity-90 w-full sm:w-auto"
+            onClick={() => {
+              window.location.hash = '#!/crea/relief/needy/add'
+            }}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Yeni Ekle
+          </Button>
+        </div>
 
         {/* Filter Bar */}
         <div className="bg-card border border-border rounded-xl shadow-soft">
           {/* Main Search Row */}
-          <div className="flex flex-wrap items-center gap-2 p-3">
-            <div className="relative flex-1 min-w-[200px]">
+          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 p-3">
+            <div className="relative flex-1 min-w-0 sm:min-w-[200px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               <Input
                 placeholder="İsim ara..."
@@ -375,13 +378,13 @@ export default function NeedyListPage() {
             </Button>
 
             {/* Results Count */}
-            <div className="ml-auto flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="sm:ml-auto flex items-center gap-2 text-sm text-muted-foreground">
               <span className="font-medium text-foreground">{data?.count || 0}</span>
               <span>kayıt</span>
               {data?.count && data.count > 20 && (
                 <>
-                  <span>•</span>
-                  <span>Sayfa {page + 1} / {Math.ceil((data?.count || 0) / 20)}</span>
+                  <span className="hidden sm:inline">•</span>
+                  <span className="hidden sm:inline">Sayfa {page + 1} / {Math.ceil((data?.count || 0) / 20)}</span>
                 </>
               )}
             </div>

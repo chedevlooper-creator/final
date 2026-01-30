@@ -60,19 +60,22 @@ export default function DonationBoxesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Bağış Kumbaraları</h1>
-          <p className="text-muted-foreground mt-1">Fiziksel bağış kutuları takip sistemi</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Bağış Kumbaraları</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">Fiziksel bağış kutuları takip sistemi</p>
         </div>
-        <Button onClick={() => { setEditingBox(null); setDialogOpen(true) }}>
+        <Button 
+          onClick={() => { setEditingBox(null); setDialogOpen(true) }}
+          className="w-full sm:w-auto"
+        >
           <Plus className="mr-2 h-4 w-4" />
           Yeni Kumbara
         </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Toplam Kumbara</CardTitle>
@@ -138,8 +141,8 @@ export default function DonationBoxesPage() {
         <TabsContent value="list" className="space-y-4">
           <Card>
             <CardHeader>
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="relative flex-1 min-w-[200px]">
+              <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3">
+                <div className="relative w-full sm:flex-1 sm:min-w-[200px]">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Kumbara ara..."
@@ -149,7 +152,7 @@ export default function DonationBoxesPage() {
                   />
                 </div>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-[150px]">
+                  <SelectTrigger className="w-full sm:w-[150px]">
                     <SelectValue placeholder="Durum" />
                   </SelectTrigger>
                   <SelectContent>
@@ -160,7 +163,7 @@ export default function DonationBoxesPage() {
                   </SelectContent>
                 </Select>
                 <Select value={locationTypeFilter} onValueChange={setLocationTypeFilter}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-full sm:w-[180px]">
                     <SelectValue placeholder="Lokasyon Tipi" />
                   </SelectTrigger>
                   <SelectContent>
@@ -178,71 +181,127 @@ export default function DonationBoxesPage() {
               ) : filteredBoxes?.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">Kumbara bulunamadı</div>
               ) : (
-                <div className="border rounded-md">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b bg-muted/50">
-                        <th className="px-4 py-3 text-left text-sm font-medium">Kumbara</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium">Lokasyon</th>
-                        <th className="px-4 py-3 text-center text-sm font-medium">QR Kod</th>
-                        <th className="px-4 py-3 text-center text-sm font-medium">Durum</th>
-                        <th className="px-4 py-3 text-right text-sm font-medium">Son Toplama</th>
-                        <th className="px-4 py-3 text-right text-sm font-medium">İşlem</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredBoxes?.map((box) => (
-                        <tr key={box.id} className="border-b hover:bg-muted/50">
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
+                <>
+                  {/* Desktop Table */}
+                  <div className="hidden md:block border rounded-md overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b bg-muted/50">
+                          <th className="px-4 py-3 text-left text-sm font-medium">Kumbara</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium">Lokasyon</th>
+                          <th className="px-4 py-3 text-center text-sm font-medium">QR Kod</th>
+                          <th className="px-4 py-3 text-center text-sm font-medium">Durum</th>
+                          <th className="px-4 py-3 text-right text-sm font-medium">Son Toplama</th>
+                          <th className="px-4 py-3 text-right text-sm font-medium">İşlem</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredBoxes?.map((box) => (
+                          <tr key={box.id} className="border-b hover:bg-muted/50">
+                            <td className="px-4 py-3">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded bg-muted flex items-center justify-center shrink-0">
+                                  <Box className="h-5 w-5 text-muted-foreground" />
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="font-medium truncate">{box.name}</p>
+                                  <p className="text-xs text-muted-foreground">{box.code}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center gap-1 text-sm">
+                                <MapPin className="h-3 w-3 text-muted-foreground shrink-0" />
+                                <span className="truncate">{box.location_name}</span>
+                              </div>
+                              <p className="text-xs text-muted-foreground">{box.district}, {box.city}</p>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <div className="flex justify-center">
+                                <QRCodeDisplay 
+                                  qrCodeUrl={box.qr_code_url} 
+                                  boxCode={box.code}
+                                  boxName={box.name}
+                                  size="sm"
+                                />
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <Badge variant={statusLabels[box.status]?.variant || 'default'}>
+                                {statusLabels[box.status]?.label}
+                              </Badge>
+                            </td>
+                            <td className="px-4 py-3 text-right text-sm">
+                              {box.last_collection_date ? (
+                                <span>{new Date(box.last_collection_date).toLocaleDateString('tr-TR')}</span>
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <Button variant="ghost" size="sm" onClick={() => { setEditingBox(box.id); setDialogOpen(true) }}>
+                                Düzenle
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  {/* Mobile Cards */}
+                  <div className="md:hidden space-y-3">
+                    {filteredBoxes?.map((box) => (
+                      <Card key={box.id} className="overflow-hidden">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-10 h-10 rounded bg-muted flex items-center justify-center shrink-0">
                                 <Box className="h-5 w-5 text-muted-foreground" />
                               </div>
-                              <div>
-                                <p className="font-medium">{box.name}</p>
+                              <div className="min-w-0">
+                                <p className="font-medium truncate">{box.name}</p>
                                 <p className="text-xs text-muted-foreground">{box.code}</p>
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                                  <MapPin className="h-3 w-3 shrink-0" />
+                                  <span className="truncate">{box.location_name}</span>
+                                </div>
                               </div>
                             </div>
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-1 text-sm">
-                              <MapPin className="h-3 w-3 text-muted-foreground" />
-                              {box.location_name}
-                            </div>
-                            <p className="text-xs text-muted-foreground">{box.district}, {box.city}</p>
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <div className="flex justify-center">
-                              <QRCodeDisplay 
-                                qrCodeUrl={box.qr_code_url} 
-                                boxCode={box.code}
-                                boxName={box.name}
-                                size="sm"
-                              />
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <Badge variant={statusLabels[box.status]?.variant || 'default'}>
+                            <Badge variant={statusLabels[box.status]?.variant || 'default'} className="shrink-0">
                               {statusLabels[box.status]?.label}
                             </Badge>
-                          </td>
-                          <td className="px-4 py-3 text-right text-sm">
-                            {box.last_collection_date ? (
-                              <span>{new Date(box.last_collection_date).toLocaleDateString('tr-TR')}</span>
-                            ) : (
-                              <span className="text-muted-foreground">-</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <Button variant="ghost" size="sm" onClick={() => { setEditingBox(box.id); setDialogOpen(true) }}>
+                          </div>
+                          
+                          <div className="flex items-center justify-between mt-3 pt-3 border-t">
+                            <QRCodeDisplay 
+                              qrCodeUrl={box.qr_code_url} 
+                              boxCode={box.code}
+                              boxName={box.name}
+                              size="sm"
+                            />
+                            <div className="text-right">
+                              <p className="text-xs text-muted-foreground">Son Toplama</p>
+                              <p className="text-sm">
+                                {box.last_collection_date 
+                                  ? new Date(box.last_collection_date).toLocaleDateString('tr-TR')
+                                  : '-'
+                                }
+                              </p>
+                            </div>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => { setEditingBox(box.id); setDialogOpen(true) }}
+                            >
                               Düzenle
                             </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>

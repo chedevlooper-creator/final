@@ -56,12 +56,15 @@ export default function WarehousesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Depo Yönetimi</h1>
-          <p className="text-muted-foreground mt-1">Depo tanımları ve konum yönetimi</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Depo Yönetimi</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">Depo tanımları ve konum yönetimi</p>
         </div>
-        <Button onClick={() => { setEditingWarehouse(null); setDialogOpen(true) }}>
+        <Button 
+          onClick={() => { setEditingWarehouse(null); setDialogOpen(true) }}
+          className="w-full sm:w-auto"
+        >
           <Plus className="mr-2 h-4 w-4" />
           Yeni Depo
         </Button>
@@ -72,7 +75,7 @@ export default function WarehousesPage() {
           <div className="flex items-center gap-4">
             <Input
               placeholder="Depo ara..."
-              className="max-w-sm"
+              className="w-full sm:max-w-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />

@@ -42,12 +42,12 @@ export default function ItemsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Ürün Yönetimi</h1>
-          <p className="text-muted-foreground mt-1">Envanter kalemleri ve stok takibi</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Ürün Yönetimi</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">Envanter kalemleri ve stok takibi</p>
         </div>
-        <Button asChild>
+        <Button asChild className="w-full sm:w-auto">
           <Link href="/dashboard/inventory/items/new">
             <Plus className="mr-2 h-4 w-4" />
             Yeni Ürün
@@ -57,8 +57,8 @@ export default function ItemsPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="relative flex-1 min-w-[200px]">
+          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
+            <div className="relative flex-1 min-w-0 sm:min-w-[200px]">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Ürün ara..."
@@ -68,7 +68,7 @@ export default function ItemsPage() {
               />
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Kategori" />
               </SelectTrigger>
               <SelectContent>
@@ -79,7 +79,7 @@ export default function ItemsPage() {
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="w-full sm:w-[150px]">
                 <SelectValue placeholder="Stok Durumu" />
               </SelectTrigger>
               <SelectContent>

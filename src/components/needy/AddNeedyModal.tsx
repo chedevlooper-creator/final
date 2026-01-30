@@ -189,34 +189,41 @@ export function AddNeedyModal({ open, onOpenChange }: AddNeedyModalProps) {
           <DialogTitle className="text-lg font-semibold">
             Yeni İhtiyaç Sahibi Ekle
           </DialogTitle>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <Button
               type="button"
               variant="outline"
+              size="icon"
               onClick={() => setScannerOpen(true)}
-              className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+              className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 sm:w-auto sm:px-3"
+              title="Kamera ile Tara"
             >
-              <Camera className="h-4 w-4 mr-2" />
-              Kamera ile Tara
+              <Camera className="h-4 w-4" />
+              <span className="hidden sm:inline ml-2">Kamera ile Tara</span>
             </Button>
             <Button
               onClick={form.handleSubmit(onSubmit)}
               disabled={!isFormValid || isLoading}
-              className="bg-emerald-600 hover:bg-emerald-700"
+              size="icon"
+              className="bg-emerald-600 hover:bg-emerald-700 sm:w-auto sm:px-3"
+              title="Kaydet"
             >
               {isLoading ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <Save className="h-4 w-4 mr-2" />
+                <Save className="h-4 w-4" />
               )}
-              Kaydet
+              <span className="hidden sm:inline ml-2">Kaydet</span>
             </Button>
             <Button
               variant="outline"
+              size="icon"
               onClick={() => onOpenChange(false)}
+              className="sm:w-auto sm:px-3"
+              title="Kapat"
             >
-              <X className="h-4 w-4 mr-2" />
-              Kapat
+              <X className="h-4 w-4" />
+              <span className="hidden sm:inline ml-2">Kapat</span>
             </Button>
           </div>
         </DialogHeader>
