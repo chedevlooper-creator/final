@@ -164,12 +164,12 @@ export default function DashboardPage() {
                 <span className="hidden sm:inline">İhtiyaç Sahipleri</span>
               </Button>
             </Link>
-            <Link href="/dashboard/applications">
-              <Button className="btn-primary gap-2">
+            <Button className="gap-2" asChild>
+              <Link href="/dashboard/applications">
                 <Plus className="h-4 w-4" />
                 <span className="hidden sm:inline">Yeni Başvuru</span>
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         }
       />
@@ -202,9 +202,9 @@ export default function DashboardPage() {
               recentApplications.map((app: Application, index: number) => {
                 const statusBadge = getStatusBadge(app.status)
                 return (
-                  <div
+                  <button
                     key={app.id}
-                    className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+                    className="w-full flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-left"
                     onClick={() => router.push(`/dashboard/applications/${app.id}`)}
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
@@ -222,7 +222,7 @@ export default function DashboardPage() {
                     <Badge variant={statusBadge.variant} className="text-xs font-semibold">
                       {statusBadge.label}
                     </Badge>
-                  </div>
+                  </button>
                 )
               })
             ) : (
@@ -244,8 +244,12 @@ export default function DashboardPage() {
         <BentoCard>
           <SectionHeader title="Hızlı İşlemler" icon={Calendar} />
           <div className="grid grid-cols-1 gap-3">
-            <Link href="/dashboard/needy">
-              <Button variant="outline" className="w-full justify-start gap-3 h-auto py-3">
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-3 h-auto py-3"
+              asChild
+            >
+              <Link href="/dashboard/needy">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <Users className="h-5 w-5 text-primary" />
                 </div>
@@ -253,10 +257,14 @@ export default function DashboardPage() {
                   <p className="font-semibold text-sm">İhtiyaç Sahibi Ekle</p>
                   <p className="text-xs text-muted-foreground">Yeni kayıt oluştur</p>
                 </div>
-              </Button>
-            </Link>
-            <Link href="/dashboard/applications">
-              <Button variant="outline" className="w-full justify-start gap-3 h-auto py-3">
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-3 h-auto py-3"
+              asChild
+            >
+              <Link href="/dashboard/applications">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
                   <FileText className="h-5 w-5 text-accent" />
                 </div>
@@ -264,10 +272,14 @@ export default function DashboardPage() {
                   <p className="font-semibold text-sm">Yardım Başvurusu</p>
                   <p className="text-xs text-muted-foreground">Yeni başvuru al</p>
                 </div>
-              </Button>
-            </Link>
-            <Link href="/dashboard/donations">
-              <Button variant="outline" className="w-full justify-start gap-3 h-auto py-3">
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-3 h-auto py-3"
+              asChild
+            >
+              <Link href="/dashboard/donations">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10">
                   <DollarSign className="h-5 w-5 text-success" />
                 </div>
@@ -275,8 +287,8 @@ export default function DashboardPage() {
                   <p className="font-semibold text-sm">Bağış Kaydet</p>
                   <p className="text-xs text-muted-foreground">Yeni bağış gir</p>
                 </div>
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </BentoCard>
       </div>

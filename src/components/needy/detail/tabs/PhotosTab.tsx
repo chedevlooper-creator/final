@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import {
@@ -19,39 +19,80 @@ import {
 } from '@/components/ui/dialog'
 import { Trash2, Upload, Camera, Image as ImageIcon, Star, StarOff, X } from 'lucide-react'
 import { Photo, PHOTO_TYPE_OPTIONS, PhotoType } from '@/types/linked-records.types'
+import { useNeedyPhotos, useDeletePhoto, useSetPrimaryPhoto, useUploadPhoto } from '@/hooks/queries/use-needy-photos'
+import { toast } from 'sonner'
 
 interface PhotosTabProps {
   needyPersonId: string
   onClose: () => void
 }
 
-export function PhotosTab({ needyPersonId: _needyPersonId, onClose: _onClose }: PhotosTabProps) {
+export function PhotosTab({ needyPersonId, onClose: _onClose }: PhotosTabProps) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null)
-  const [photos] = useState<Photo[]>([])
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [formData, setFormData] = useState({
     photo_type: 'general' as PhotoType,
     description: '',
   })
 
+  const { data: photos = [], isLoading } = useNeedyPhotos(needyPersonId)
+  const deleteMutation = useDeletePhoto()
+  const setPrimaryMutation = useSetPrimaryPhoto()
+  const uploadMutation = useUploadPhoto()
+
   const handleAdd = () => {
     setFormData({ photo_type: 'general', description: '' })
     setIsAddModalOpen(true)
   }
 
-  const handleSave = async () => {
-    setIsAddModalOpen(false)
-  }
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
 
-  const handleDelete = async (_id: string) => {
-    if (confirm('Bu fotoğrafı silmek istediğinizden emin misiniz?')) {
-      // TODO: Implement delete functionality
+    setIsUploading(true)
+    try {
+      await uploadMutation.mutateAsync({
+        needyPersonId,
+        file,
+        photoType: formData.photo_type,
+      })
+      toast.success('Fotoğraf yüklendi')
+      setIsAddModalOpen(false)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Fotoğraf yüklenirken hata oluştu'
+      toast.error(message)
+    } finally {
+      setIsUploading(false)
     }
   }
 
-  const handleSetPrimary = async (_id: string) => {
-    // TODO: Implement set primary functionality
+  const handleSave = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Bu fotoğrafı silmek istediğinizden emin misiniz?')) {
+      try {
+        await deleteMutation.mutateAsync({ id, needyPersonId })
+        toast.success('Fotoğraf silindi')
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Fotoğraf silinirken hata oluştu'
+        toast.error(message)
+      }
+    }
+  }
+
+  const handleSetPrimary = async (id: string) => {
+    try {
+      await setPrimaryMutation.mutateAsync({ id, needyPersonId })
+      toast.success('Profil fotoğrafı güncellendi')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Fotoğraf güncellenirken hata oluştu'
+      toast.error(message)
+    }
   }
 
   return (
@@ -188,9 +229,16 @@ export function PhotosTab({ needyPersonId: _needyPersonId, onClose: _onClose }: 
             <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>
               İptal
             </Button>
-            <Button onClick={handleSave}>
-              Yükle
+            <Button onClick={handleSave} disabled={isUploading}>
+              {isUploading ? 'Yükleniyor...' : 'Yükle'}
             </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileSelect}
+            />
           </DialogFooter>
         </DialogContent>
       </Dialog>

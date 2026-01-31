@@ -91,6 +91,8 @@
     --shadow-card: 0 1px 3px 0 hsl(var(--shadow-color) / 0.05), 0 1px 2px -1px hsl(var(--shadow-color) / 0.05);
     --shadow-elevated: 0 4px 12px 0 hsl(var(--shadow-color) / 0.08);
     --shadow-inner: inset 0 1px 2px 0 hsl(var(--shadow-color) / 0.05);
+    --shadow-glow: 0 0 20px -5px hsl(var(--primary) / 0.3), 0 0 8px -2px hsl(var(--accent) / 0.2);
+    --shadow-glow-sm: 0 0 12px -3px hsl(var(--primary) / 0.25);
   }
 }
 
@@ -129,22 +131,45 @@
     transition: all 0.2s ease;
   }
   
+  .card-bento {
+    @apply bg-card rounded-lg p-6;
+    box-shadow: var(--shadow-card);
+    border: 1px solid hsl(var(--border));
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
   .card-bento:hover {
     box-shadow: var(--shadow-md);
-    border-color: hsl(var(--border));
+    border-color: hsl(var(--primary) / 0.2);
+    transform: translateY(-2px);
   }
-  
+
+  .card-bento:focus-visible {
+    outline: 2px solid hsl(var(--primary) / 0.5);
+    outline-offset: 2px;
+  }
+
   .card-interactive {
     @apply bg-card rounded-lg p-6 cursor-pointer;
     box-shadow: var(--shadow-card);
     border: 1px solid hsl(var(--border));
-    transition: all 0.15s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .card-interactive:hover {
     box-shadow: var(--shadow-md);
     border-color: hsl(var(--primary) / 0.3);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+  }
+
+  .card-interactive:focus-visible {
+    outline: 2px solid hsl(var(--primary) / 0.5);
+    outline-offset: 2px;
+  }
+
+  .card-interactive:active {
+    transform: translateY(0);
+    transition-duration: 0.1s;
   }
   
   /* ========================================
@@ -154,11 +179,18 @@
     @apply bg-card rounded-lg p-5;
     box-shadow: var(--shadow-card);
     border: 1px solid hsl(var(--border));
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .stat-card:hover {
     box-shadow: var(--shadow-md);
+    border-color: hsl(var(--primary) / 0.2);
+    transform: translateY(-2px);
+  }
+
+  .stat-card:focus-visible {
+    outline: 2px solid hsl(var(--primary) / 0.5);
+    outline-offset: 2px;
   }
   
   .stat-value {
@@ -463,5 +495,128 @@
   
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* ========================================
+     ACCESSIBILITY - Erişilebilirlik
+     ======================================== */
+
+  /* Skip to content link */
+  .skip-to-content {
+    @apply sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg focus:shadow-lg;
+  }
+
+  /* Screen reader only */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  .not-sr-only {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .card-bento,
+    .card-interactive,
+    .stat-card {
+      border-width: 2px;
+    }
+
+    .focus-ring:focus-visible {
+      box-shadow: 0 0 0 3px hsl(var(--background)), 0 0 0 5px hsl(var(--primary));
+    }
+  }
+
+  /* ========================================
+     RESPONSIVE UTILITIES
+     ======================================== */
+
+  /* Fluid typography */
+  .text-fluid-sm {
+    font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  }
+
+  .text-fluid-base {
+    font-size: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+  }
+
+  .text-fluid-lg {
+    font-size: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+  }
+
+  .text-fluid-xl {
+    font-size: clamp(1.25rem, 1rem + 1vw, 1.5rem);
+  }
+
+  .text-fluid-2xl {
+    font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
+  }
+
+  /* Container queries support */
+  .container-responsive {
+    container-type: inline-size;
+  }
+
+  /* Aspect ratios for charts/images */
+  .aspect-chart {
+    aspect-ratio: 16 / 9;
+  }
+
+  .aspect-chart-square {
+    aspect-ratio: 1 / 1;
+  }
+
+  @supports not (aspect-ratio: 1 / 1) {
+    .aspect-chart::before,
+    .aspect-chart-square::before {
+      float: left;
+      padding-top: 56.25%;
+      content: "";
+    }
+
+    .aspect-chart-square::before {
+      padding-top: 100%;
+    }
+
+    .aspect-chart::after,
+    .aspect-chart-square::after {
+      display: block;
+      content: "";
+      clear: both;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+
+    .print-only {
+      display: block !important;
+    }
+
+    .card-bento,
+    .card-interactive {
+      box-shadow: none;
+      border: 1px solid #ccc;
+      break-inside: avoid;
+    }
   }
 }

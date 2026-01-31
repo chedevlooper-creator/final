@@ -16,6 +16,13 @@ export async function GET(request: NextRequest) {
   const supabase = await createServerSupabaseClient()
   const { user } = authResult
 
+  if (!user) {
+    return NextResponse.json(
+      { error: 'Kullanıcı bilgisi alınamadı' },
+      { status: 401 }
+    )
+  }
+
   try {
     // Kullanıcının organizasyonunu ve rolünü kontrol et
     const { data: memberData } = await supabase

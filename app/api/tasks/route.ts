@@ -104,6 +104,13 @@ export async function POST(request: NextRequest) {
   const supabase = await createServerSupabaseClient()
   const { user } = authResult
 
+  if (!user) {
+    return NextResponse.json(
+      { error: 'Kullanıcı bilgisi alınamadı' },
+      { status: 401 }
+    )
+  }
+
   try {
     const body = await request.json()
     const validatedData = createTaskSchema.parse(body)

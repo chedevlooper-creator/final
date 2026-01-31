@@ -2,7 +2,6 @@
 
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -23,27 +22,8 @@ import {
 } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { Plus, Trash2 } from 'lucide-react'
-
-const PRIORITY_OPTIONS = [
-    { value: 'low', label: 'Düşük' },
-    { value: 'medium', label: 'Normal' },
-    { value: 'high', label: 'Yüksek' },
-    { value: 'urgent', label: 'Acil' },
-]
-
-const purchaseFormSchema = z.object({
-    title: z.string().min(3, 'Başlık en az 3 karakter olmalı'),
-    priority: z.string().default('medium'),
-    description: z.string().optional(),
-    items: z.array(z.object({
-        name: z.string().min(1, 'Ürün adı gerekli'),
-        quantity: z.number().min(1, 'Miktar en az 1 olmalı'),
-        unit: z.string().default('Adet'),
-        unit_price: z.number().min(0, 'Fiyat geçerli olmalı'),
-    })).min(1, 'En az 1 ürün ekleyiniz'),
-})
-
-type PurchaseFormValues = z.infer<typeof purchaseFormSchema>
+import { purchaseSchema, PurchaseFormValues, PRIORITY_OPTIONS } from '@/lib/validations/purchase'
+import { useCreatePurchaseRequest } from '@/hooks/queries/use-purchase'
 
 interface PurchaseFormProps {
     defaultValues?: Partial<PurchaseFormValues>
@@ -52,7 +32,7 @@ interface PurchaseFormProps {
 
 export function PurchaseForm({ defaultValues, onSuccess }: PurchaseFormProps) {
     const form = useForm<PurchaseFormValues>({
-        resolver: zodResolver(purchaseFormSchema),
+        resolver: zodResolver(purchaseSchema),
         defaultValues: {
             title: '',
             priority: 'medium',
@@ -66,13 +46,16 @@ export function PurchaseForm({ defaultValues, onSuccess }: PurchaseFormProps) {
         name: 'items',
     })
 
-    const onSubmit = async (_data: PurchaseFormValues) => {
+    const createMutation = useCreatePurchaseRequest()
+
+    const onSubmit = async (data: PurchaseFormValues) => {
         try {
-            // TODO: API call with _data
+            await createMutation.mutateAsync(data)
             toast.success('Satın alma talebi oluşturuldu')
             onSuccess?.()
-        } catch {
-            toast.error('Talep oluşturulurken hata oluştu')
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Talep oluşturulurken hata oluştu'
+            toast.error(message)
         }
     }
 
@@ -215,7 +198,9 @@ export function PurchaseForm({ defaultValues, onSuccess }: PurchaseFormProps) {
                 </div>
 
                 <div className="flex justify-end gap-2 pt-4">
-                    <Button type="submit">Talebi Oluştur</Button>
+                    <Button type="submit" disabled={createMutation.isPending}>
+                        {createMutation.isPending ? 'Kaydediliyor...' : 'Talebi Oluştur'}
+                    </Button>
                 </div>
             </form>
         </Form>

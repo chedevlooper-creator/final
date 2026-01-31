@@ -50,6 +50,9 @@ import {
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
+import { createClient } from '@/lib/supabase/client'
+
+const supabase = createClient()
 
 // Mock data flag
 const USE_MOCK_DATA = process.env['NEXT_PUBLIC_USE_MOCK_DATA'] === 'true'
@@ -220,7 +223,38 @@ export default function OrphanDetailPage() {
                         notes: mockOrphan.notes,
                     })
                 } else {
-                    // TODO: Real API call
+                    const { data, error } = await supabase
+                        .from('orphans')
+                        .select('*')
+                        .eq('id', id)
+                        .single()
+                    
+                    if (error) throw error
+                    
+                    if (data) {
+                        form.reset({
+                            file_number: data.file_number,
+                            type: data.type,
+                            first_name: data.first_name,
+                            last_name: data.last_name,
+                            first_name_original: data.first_name_original,
+                            last_name_original: data.last_name_original,
+                            gender: data.gender,
+                            date_of_birth: data.date_of_birth,
+                            identity_number: data.identity_number,
+                            nationality_id: data.nationality_id,
+                            country_id: data.country_id,
+                            status: data.status,
+                            guardian_name: data.guardian_name,
+                            guardian_relation: data.guardian_relation,
+                            guardian_phone: data.guardian_phone,
+                            address: data.address,
+                            school_id: data.school_id,
+                            grade: data.grade,
+                            education_status: data.education_status,
+                            notes: data.notes,
+                        })
+                    }
                 }
             } catch (error) {
                 console.error('Error:', error)

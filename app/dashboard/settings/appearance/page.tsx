@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { 
@@ -211,7 +212,7 @@ export default function AppearanceSettingsPage() {
             </div>
             <Switch
               checked={settings.sidebarCollapsed}
-              onCheckedChange={(checked) => setSettings({ ...settings, sidebarCollapsed: checked })}
+              onCheckedChange={(checked: boolean) => setSettings({ ...settings, sidebarCollapsed: checked })}
             />
           </div>
           <div className="flex items-center justify-between">
@@ -221,7 +222,7 @@ export default function AppearanceSettingsPage() {
             </div>
             <Switch
               checked={settings.compactMode}
-              onCheckedChange={(checked) => setSettings({ ...settings, compactMode: checked })}
+              onCheckedChange={(checked: boolean) => setSettings({ ...settings, compactMode: checked })}
             />
           </div>
           <div className="flex items-center justify-between">
@@ -231,7 +232,7 @@ export default function AppearanceSettingsPage() {
             </div>
             <Switch
               checked={settings.animationsEnabled}
-              onCheckedChange={(checked) => setSettings({ ...settings, animationsEnabled: checked })}
+              onCheckedChange={(checked: boolean) => setSettings({ ...settings, animationsEnabled: checked })}
             />
           </div>
           <div className="flex items-center justify-between">
@@ -241,7 +242,7 @@ export default function AppearanceSettingsPage() {
             </div>
             <Switch
               checked={settings.highContrast}
-              onCheckedChange={(checked) => setSettings({ ...settings, highContrast: checked })}
+              onCheckedChange={(checked: boolean) => setSettings({ ...settings, highContrast: checked })}
             />
           </div>
         </CardContent>

@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "supabase-yardim-paneli": {
-      "type": "http",
-      "url": "https://mcp.supabase.com/mcp?project_ref=jdrncdqyymlwcyvnnzoj&read_only=true&features=database,docs,debugging,development"
-    }
-  }
-}

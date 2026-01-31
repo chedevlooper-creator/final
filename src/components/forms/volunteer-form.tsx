@@ -2,7 +2,6 @@
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -22,27 +21,8 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
-
-const AVAILABILITY_OPTIONS = [
-    { value: 'weekdays', label: 'Hafta İçi' },
-    { value: 'weekends', label: 'Hafta Sonu' },
-    { value: 'evenings', label: 'Akşamları' },
-    { value: 'flexible', label: 'Esnek' },
-]
-
-const volunteerFormSchema = z.object({
-    first_name: z.string().min(2, 'Ad en az 2 karakter olmalı'),
-    last_name: z.string().min(2, 'Soyad en az 2 karakter olmalı'),
-    phone: z.string().min(10, 'Geçerli telefon numarası giriniz'),
-    email: z.string().email('Geçerli e-posta giriniz').optional().or(z.literal('')),
-    profession: z.string().optional(),
-    availability: z.string().optional(),
-    skills: z.string().optional(),
-    address: z.string().optional(),
-    notes: z.string().optional(),
-})
-
-type VolunteerFormValues = z.infer<typeof volunteerFormSchema>
+import { volunteerSchema, VolunteerFormValues, AVAILABILITY_OPTIONS } from '@/lib/validations/volunteer'
+import { useCreateVolunteer } from '@/hooks/queries/use-volunteers'
 
 interface VolunteerFormProps {
     defaultValues?: Partial<VolunteerFormValues>
@@ -51,7 +31,7 @@ interface VolunteerFormProps {
 
 export function VolunteerForm({ defaultValues, onSuccess }: VolunteerFormProps) {
     const form = useForm<VolunteerFormValues>({
-        resolver: zodResolver(volunteerFormSchema),
+        resolver: zodResolver(volunteerSchema),
         defaultValues: {
             first_name: '',
             last_name: '',
@@ -62,13 +42,21 @@ export function VolunteerForm({ defaultValues, onSuccess }: VolunteerFormProps) 
         },
     })
 
-    const onSubmit = async (_data: VolunteerFormValues) => {
+    const createMutation = useCreateVolunteer()
+
+    const onSubmit = async (data: VolunteerFormValues) => {
         try {
-            // TODO: API call with _data
+            // Convert skills from comma-separated string to array
+            const formattedData = {
+                ...data,
+                skills: data.skills ? data.skills.split(',').map(s => s.trim()).filter(Boolean) : null,
+            }
+            await createMutation.mutateAsync(formattedData)
             toast.success('Gönüllü kaydı oluşturuldu')
             onSuccess?.()
-        } catch {
-            toast.error('Kayıt oluşturulurken hata oluştu')
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Kayıt oluşturulurken hata oluştu'
+            toast.error(message)
         }
     }
 
@@ -209,7 +197,9 @@ export function VolunteerForm({ defaultValues, onSuccess }: VolunteerFormProps) 
                 />
 
                 <div className="flex justify-end gap-2 pt-4">
-                    <Button type="submit">Kaydet</Button>
+                    <Button type="submit" disabled={createMutation.isPending}>
+                        {createMutation.isPending ? 'Kaydediliyor...' : 'Kaydet'}
+                    </Button>
                 </div>
             </form>
         </Form>

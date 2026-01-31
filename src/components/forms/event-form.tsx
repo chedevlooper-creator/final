@@ -2,7 +2,6 @@
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -22,26 +21,8 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
-
-const EVENT_TYPES = [
-    { value: 'charity', label: 'Yardım Etkinliği' },
-    { value: 'education', label: 'Eğitim' },
-    { value: 'meeting', label: 'Toplantı' },
-    { value: 'campaign', label: 'Kampanya' },
-]
-
-const eventFormSchema = z.object({
-    title: z.string().min(3, 'Başlık en az 3 karakter olmalı'),
-    event_type: z.string().min(1, 'Tür seçiniz'),
-    description: z.string().optional(),
-    location: z.string().optional(),
-    address: z.string().optional(),
-    start_date: z.string().min(1, 'Başlangıç tarihi seçiniz'),
-    end_date: z.string().optional(),
-    capacity: z.number().optional(),
-})
-
-type EventFormValues = z.infer<typeof eventFormSchema>
+import { eventSchema, EventFormValues, EVENT_TYPES } from '@/lib/validations/event'
+import { useCreateEvent } from '@/hooks/queries/use-events'
 
 interface EventFormProps {
     defaultValues?: Partial<EventFormValues>
@@ -50,7 +31,7 @@ interface EventFormProps {
 
 export function EventForm({ defaultValues, onSuccess }: EventFormProps) {
     const form = useForm<EventFormValues>({
-        resolver: zodResolver(eventFormSchema),
+        resolver: zodResolver(eventSchema),
         defaultValues: {
             title: '',
             event_type: 'charity',
@@ -59,13 +40,16 @@ export function EventForm({ defaultValues, onSuccess }: EventFormProps) {
         },
     })
 
-    const onSubmit = async (_data: EventFormValues) => {
+    const createMutation = useCreateEvent()
+
+    const onSubmit = async (data: EventFormValues) => {
         try {
-            // TODO: API call with _data
+            await createMutation.mutateAsync(data)
             toast.success('Etkinlik oluşturuldu')
             onSuccess?.()
-        } catch {
-            toast.error('Etkinlik oluşturulurken hata oluştu')
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Etkinlik oluşturulurken hata oluştu'
+            toast.error(message)
         }
     }
 
@@ -197,7 +181,9 @@ export function EventForm({ defaultValues, onSuccess }: EventFormProps) {
                 />
 
                 <div className="flex justify-end gap-2 pt-4">
-                    <Button type="submit">Kaydet</Button>
+                    <Button type="submit" disabled={createMutation.isPending}>
+                        {createMutation.isPending ? 'Kaydediliyor...' : 'Kaydet'}
+                    </Button>
                 </div>
             </form>
         </Form>

@@ -26,7 +26,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 export default function ProgramBeneficiariesPage() {
   const router = useRouter()
   const params = useParams()
-  const programId = params.id as string
+  const programId = params['id'] as string
   const supabase = createClient()
   const queryClient = useQueryClient()
   const [searchQuery, setSearchQuery] = useState('')

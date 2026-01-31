@@ -39,6 +39,7 @@ interface DataTableProps<TData, TValue> {
   totalCount?: number
   onPageChange?: (page: number) => void
   onRowClick?: (data: TData) => void
+  emptyMessage?: string
 }
 
 function DataTableInner<TData, TValue>({
@@ -52,6 +53,7 @@ function DataTableInner<TData, TValue>({
   totalCount,
   onPageChange,
   onRowClick,
+  emptyMessage = 'Kayıt bulunamadı.',
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -158,7 +160,7 @@ function DataTableInner<TData, TValue>({
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                    Kayıt bulunamadı.
+                    {emptyMessage}
                   </TableCell>
                 </TableRow>
               )}

@@ -32,6 +32,7 @@ export default function OrganizationSettingsPage() {
   const supabase = createClient()
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [organizationId, setOrganizationId] = useState<string>('')
   
   const [organization, setOrganization] = useState({
     name: '',
@@ -81,6 +82,7 @@ export default function OrganizationSettingsPage() {
         .single()
 
       if (org) {
+        setOrganizationId(member.organization_id)
         setOrganization({
           ...organization,
           ...org,
@@ -114,7 +116,7 @@ export default function OrganizationSettingsPage() {
           settings: organization.settings,
           updated_at: new Date().toISOString()
         })
-        .eq('id', organization.id)
+        .eq('id', organizationId)
 
       if (error) throw error
 

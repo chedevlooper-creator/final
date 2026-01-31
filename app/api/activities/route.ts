@@ -16,6 +16,13 @@ export async function GET(request: NextRequest) {
   const supabase = await createServerSupabaseClient()
   const { user } = authResult
 
+  if (!user) {
+    return NextResponse.json(
+      { error: 'Kullanıcı bilgisi alınamadı' },
+      { status: 401 }
+    )
+  }
+
   try {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('user_id')

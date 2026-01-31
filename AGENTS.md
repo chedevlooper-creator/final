@@ -1,218 +1,227 @@
-# AGENTS.md - AI Coding Agent Guide
+# 🤖 AGENTS.md - Yardım Yönetim Paneli
 
-> Comprehensive guide for AI coding agents working on this codebase
-
-## Project Overview
-
-**Yardım Yönetim Paneli** (Help Management Dashboard) is a comprehensive NGO/charitable organization management system built with Next.js 16, TypeScript, and Supabase. The platform enables NGOs to manage aid operations, donations, volunteers, orphans, financial records, and applications in a single integrated platform.
-
-### Key Features
-- **Needy Persons Management**: Track individuals and families requiring assistance
-- **Donation Management**: Handle cash, in-kind, zakat, and sacrifice donations
-- **Volunteer Coordination**: Manage volunteers, assign tasks, track performance
-- **Orphan/Student Tracking**: Educational status monitoring and sponsor matching
-- **Financial Management**: Income/expense tracking, budgeting, reports
-- **Application Workflow**: Online applications with approval workflows
-- **Event Calendar**: Meeting planning, distribution events, reminders
-- **Reporting**: Detailed statistics with Excel/PDF export
-
-### Language & Localization
-- **Documentation Language**: Turkish (all comments, documentation, UI labels)
-- **UI Language**: Turkish
-- **Database Field Names**: English with Turkish display labels
+> Bu dosya, AI kodlama asistanları için proje hakkında kapsamlı bilgiler içerir.
 
 ---
 
-## Technology Stack
+## 📋 Proje Özeti
 
-### Core Framework
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Next.js | 16.1.3 | React framework with App Router |
-| React | 19.2.3 | UI library |
-| TypeScript | 5.x | Type-safe development (strict mode) |
-| Tailwind CSS | 3.4.19 | Utility-first styling |
+**Yardım Yönetim Paneli**, sivil toplum kuruluşlarının yardım operasyonlarını dijital ortamda yönetmelerini sağlayan kapsamlı bir web uygulamasıdır. İhtiyaç sahiplerinin takibinden bağış yönetimine, gönüllü koordinasyonundan finansal raporlamaya kadar tüm süreçleri tek bir platformda birleştirir.
+
+### 🎯 Hedef Kullanıcılar
+- Yardım kuruluşları
+- Sivil toplum organizasyonları
+- Hayır kurumları
+- Vakıflar ve dernekler
+
+---
+
+## 🛠 Teknoloji Stack
+
+### Frontend
+| Teknoloji | Versiyon | Amaç |
+|-----------|----------|------|
+| Next.js | 16.1.3 | App Router, Server Components |
+| React | 19.2.3 | UI rendering |
+| TypeScript | 5.x | Type-safe development |
+| Tailwind CSS | 3.4 | Utility-first styling |
+| Radix UI | Latest | Accessible component primitives |
+| Framer Motion | 12.x | Animations |
 
 ### Backend & Database
-| Technology | Purpose |
-|------------|---------|
-| Supabase | PostgreSQL database, Auth, Storage |
-| @supabase/ssr | Server-side rendering support |
-| @supabase/supabase-js | Client SDK |
-
-### State Management & Data Fetching
-| Technology | Purpose |
-|------------|---------|
-| TanStack Query | Server state management, caching |
+| Teknoloji | Amaç |
+|-----------|------|
+| Supabase | PostgreSQL, Auth, Storage |
+| TanStack Query | Data fetching & caching |
 | Zustand | Client state management |
-| React Hook Form | Form state management |
-| Zod | Schema validation |
 
-### UI Components
-| Technology | Purpose |
-|------------|---------|
-| Radix UI | Accessible component primitives |
-| shadcn/ui | UI component library |
-| Lucide React | Icons |
-| Framer Motion | Animations |
-| Recharts | Charts and graphs |
-
-### Development Tools
-| Technology | Purpose |
-|------------|---------|
-| Vitest | Unit testing |
-| ESLint | Linting |
-| Sentry | Error tracking |
-| PostHog | Analytics (optional) |
+### DevOps & Monitoring
+| Teknoloji | Amaç |
+|-----------|------|
+| Sentry | Error tracking & performance |
+| Vercel | Hosting & deployment |
+| GitHub Actions | CI/CD pipelines |
 
 ---
 
-## Project Structure
+## 📁 Klasör Yapısı
 
 ```
 ├── app/                          # Next.js App Router
-│   ├── (auth)/                   # Auth group (login page)
-│   ├── api/                      # API routes
-│   │   ├── auth/                 # Authentication endpoints
-│   │   ├── dashboard/            # Dashboard stats
-│   │   ├── donations/            # Donation management
-│   │   ├── finance/              # Financial operations
-│   │   ├── meetings/             # Meeting management
-│   │   ├── messages/             # Email/SMS messaging
-│   │   ├── needy/                # Needy persons CRUD
-│   │   └── ...                   # Other API routes
-│   ├── dashboard/                # Main dashboard pages
-│   │   ├── account/              # User account settings
-│   │   ├── aids/                 # Aid management modules
-│   │   ├── applications/         # Application tracking
-│   │   ├── calendar/             # Event calendar
-│   │   ├── donations/            # Donation modules
-│   │   ├── events/               # Event management
-│   │   ├── finance/              # Financial modules
-│   │   ├── inventory/            # Inventory management
-│   │   ├── messages/             # Messaging center
-│   │   ├── needy/                # Needy persons list/detail
-│   │   ├── orphans/              # Orphan/student tracking
-│   │   ├── purchase/             # Purchase management
-│   │   ├── reports/              # Reporting module
-│   │   ├── settings/             # System settings
-│   │   └── volunteers/           # Volunteer management
+│   ├── (auth)/                   # Auth route group (parantez = URL'de görünmez)
+│   │   └── login/                # Login sayfası
+│   ├── api/                      # API Routes (Route Handlers)
+│   │   ├── auth/                 # Authentication API
+│   │   ├── needy/                # İhtiyaç sahipleri API
+│   │   ├── donations/            # Bağış API
+│   │   ├── finance/              # Finans API
+│   │   └── ...                   # Diğer API endpointleri
+│   ├── dashboard/                # Korumalı dashboard alanı
+│   │   ├── needy/                # İhtiyaç sahipleri modülü
+│   │   ├── donations/            # Bağış yönetimi
+│   │   ├── finance/              # Finans modülü
+│   │   ├── volunteers/           # Gönüllü yönetimi
+│   │   └── settings/             # Sistem ayarları
 │   ├── layout.tsx                # Root layout
-│   ├── globals.css               # Global styles
-│   └── page.tsx                  # Landing page
+│   ├── page.tsx                  # Ana sayfa
+│   ├── globals.css               # Global stiller
+│   ├── error.tsx                 # Error boundary
+│   └── not-found.tsx             # 404 sayfası
 │
-├── src/                          # Source code
-│   ├── __tests__/                # Unit tests
+├── src/
+│   ├── components/               # React bileşenleri
+│   │   ├── ui/                   # UI primitives (shadcn/ui)
+│   │   ├── charts/               # Grafik bileşenleri
+│   │   ├── forms/                # Form bileşenleri
+│   │   ├── layout/               # Layout bileşenleri
+│   │   ├── needy/                # İhtiyaç sahibi modülü
+│   │   └── upload/               # Dosya yükleme
+│   │
+│   ├── hooks/                    # Custom React hooks
+│   │   ├── queries/              # TanStack Query hooks (22+ dosya)
+│   │   ├── mutations/            # Mutation hooks
+│   │   ├── use-auth.ts
+│   │   └── use-notifications.ts
+│   │
+│   ├── lib/                      # Utilities & Services
+│   │   ├── supabase/             # Supabase client config
+│   │   │   ├── client.ts         # Browser client
+│   │   │   ├── server.ts         # Server client
+│   │   │   └── middleware.ts     # Middleware client
+│   │   ├── validations/          # Zod schemas
+│   │   ├── mernis/               # TC Kimlik doğrulama
+│   │   ├── messaging/            # Email/SMS providers
+│   │   ├── rbac.tsx              # Role-based access control
+│   │   ├── security.ts           # Security headers
+│   │   └── utils.ts              # General utilities
+│   │
+│   ├── stores/                   # Zustand stores
+│   │   └── ui-store.ts
+│   │
+│   ├── types/                    # TypeScript definitions
+│   │   ├── database.types.ts
+│   │   ├── needy.types.ts
+│   │   └── organization.types.ts
+│   │
+│   ├── __tests__/                # Test files
 │   │   ├── api/                  # API route tests
 │   │   ├── components/           # Component tests
 │   │   └── lib/                  # Utility tests
 │   │
-│   ├── app/                      # Server actions
-│   │   └── actions/              # Next.js server actions
-│   │
-│   ├── components/               # React components
-│   │   ├── charts/               # Chart components
-│   │   ├── common/               # Shared components
-│   │   ├── donation-boxes/       # Donation box components
-│   │   ├── forms/                # Form components
-│   │   ├── inventory/            # Inventory components
-│   │   ├── layout/               # Layout components
-│   │   ├── needy/                # Needy person components
-│   │   ├── navigation/           # Navigation components
-│   │   ├── notification/         # Notification components
-│   │   ├── performance/          # Performance monitoring
-│   │   ├── ui/                   # shadcn/ui primitives
-│   │   └── upload/               # File upload components
-│   │
-│   ├── hooks/                    # Custom React hooks
-│   │   ├── mutations/            # TanStack Query mutations
-│   │   ├── queries/              # TanStack Query hooks
-│   │   ├── use-auth.ts           # Authentication hook
-│   │   ├── use-notifications.ts
-│   │   └── use-toast.ts
-│   │
-│   ├── lib/                      # Utilities & services
-│   │   ├── supabase/             # Supabase clients
-│   │   │   ├── client.ts         # Browser client (singleton)
-│   │   │   ├── server.ts         # Server client
-│   │   │   └── middleware.ts     # Auth middleware
-│   │   ├── validations/          # Zod validation schemas
-│   │   ├── audit.ts              # Audit logging
-│   │   ├── env.ts                # Environment variables
-│   │   ├── errors.ts             # Error handling
-│   │   ├── rbac.tsx              # Role-based access control
-│   │   ├── security.ts           # Security headers
-│   │   └── utils.ts              # Utility functions
-│   │
-│   ├── stores/                   # Zustand stores
-│   │   └── ui-store.ts           # UI state management
-│   │
-│   └── types/                    # TypeScript definitions
-│       ├── common.ts             # Shared types
-│       ├── database.types.ts     # Database types
-│       ├── needy.types.ts        # Needy person types
-│       └── ...                   # Other domain types
+│   └── middleware.ts             # Next.js middleware
 │
 ├── supabase/
-│   └── migrations/               # Database migrations (22 files)
+│   └── migrations/               # Database migrations (24+ dosya)
 │
-├── docs/                         # Documentation
-├── .env.example                  # Environment template
+├── docs/                         # Dokümantasyon
+│   ├── ARCHITECTURE.md           # Sistem mimarisi
+│   ├── SETUP.md                  # Kurulum rehberi
+│   ├── SECURITY.md               # Güvenlik dokümantasyonu
+│   └── CONTRIBUTING.md           # Katkı rehberi
+│
+├── package.json                  # Dependencies & scripts
 ├── next.config.ts                # Next.js configuration
-├── tailwind.config.ts            # Tailwind configuration
 ├── tsconfig.json                 # TypeScript configuration
+├── tailwind.config.ts            # Tailwind configuration
 ├── vitest.config.ts              # Vitest configuration
-└── eslint.config.js              # ESLint configuration
+├── eslint.config.js              # ESLint configuration
+└── .env.example                  # Environment variables template
 ```
 
 ---
 
-## Essential Commands
+## 🏗️ Mimarisi
+
+### Multi-Tenant Yapı
+Sistem çoklu dernek (multi-tenant) yapısını destekler. Her dernek kendi verilerini izole olarak yönetir.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     ORGANIZATION LAYER                       │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
+│  │   Dernek A  │    │   Dernek B  │    │   Dernek C  │     │
+│  │  (org-123)  │    │  (org-456)  │    │  (org-789)  │     │
+│  └──────┬──────┘    └──────┬──────┘    └──────┬──────┘     │
+│         └───────────────────┼───────────────────┘           │
+│                             ▼                               │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │                  DATA ISOLATION                      │    │
+│  │  needy_persons.organization_id                      │    │
+│  │  donations.organization_id                          │    │
+│  │  orphans.organization_id                            │    │
+│  │  RLS Policy: WHERE organization_id = current_org()  │    │
+│  └─────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Authentication Flow
+```
+Browser Request
+       │
+       ▼
+┌─────────────────┐
+│   Middleware    │ ── Auth check, org context
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Server Component│ ── Fetch data directly from DB
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   HTML Stream   │ ── Streaming SSR
+└─────────────────┘
+```
+
+---
+
+## 🏃 Build ve Test Komutları
 
 ### Development
 ```bash
-npm run dev              # Start development server (Turbopack)
-npm run build            # Production build
-npm run start            # Production server
-npm run lint             # ESLint check
-npx tsc --noEmit         # TypeScript type check
+npm run dev           # Development server (Turbopack)
+npm run build         # Production build
+npm run start         # Production server
 ```
 
 ### Testing
 ```bash
-npm run test             # Run all tests
-npm run test:ui          # Test with Vitest UI
-npm run test:coverage    # Coverage report
-
-# Run specific test file
-npx vitest src/__tests__/api/auth.test.ts
-
-# Run tests matching pattern
-npx vitest --run "needy"
-
-# Run specific test by name
-npx vitest -t "should create needy person"
+npm run test              # Run all tests
+npm run test:ui           # Run with UI
+npm run test:coverage     # Coverage report
 ```
 
-### Build & Analysis
+### Code Quality
 ```bash
-npm run analyze          # Bundle analyzer (ANALYZE=true)
+npm run lint              # ESLint check
+npx tsc --noEmit          # TypeScript type check
+```
+
+### Analysis
+```bash
+npm run analyze           # Bundle analyzer
 ```
 
 ---
 
-## Code Style Guidelines
+## 📏 Code Style Kuralları
 
-### File Naming Conventions
-| Type | Pattern | Example |
-|------|---------|---------|
-| Components | kebab-case | `my-component.tsx` |
-| Hooks | camelCase with `use` prefix | `use-my-hook.ts` |
-| Utils | kebab-case | `my-utils.ts` |
-| Types | kebab-case | `my-types.ts` |
-| API Routes | kebab-case | `route.ts` |
+### Dosya İsimlendirme
+```
+# Components
+my-component.tsx              # ✅ kebab-case
+my-component/index.tsx       # ✅
 
-### Import Order
+# Hooks
+use-my-hook.ts               # ✅ kebab-case
+
+# Utils
+my-utils.ts                  # ✅ kebab-case
+```
+
+### Import Sırası
 ```typescript
 // 1. External libraries
 import { useState } from 'react'
@@ -222,290 +231,258 @@ import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
 
-// 3. Type imports (separate if needed)
-import type { MyType } from '@/types/common'
-
-// 4. Relative imports
+// 3. Relative imports
 import { MyComponent } from './my-component'
 ```
 
-### TypeScript Guidelines
-- **Strict mode enabled** - never use `any`
-- Use `interface` for object shapes
-- Use `type` for unions/intersections
-- Nullable types: `string | null` (not `undefined` for DB fields)
-- Component props: `interface ComponentProps { ... }`
+### TypeScript Standartları
+```typescript
+// ✅ İyi - Interface kullanımı
+interface UserProps {
+  name: string
+  age: number
+  email?: string
+}
 
-### Component Structure
+function getUser(id: string): Promise<User> {
+  return supabase.from('users').select('*').eq('id', id).single()
+}
+
+// ❌ Kötü - Tip güvenliği yok
+function getUser(id) {
+  return supabase.from('users').select('*').eq('id', id).single()
+}
+```
+
+### React Component Standartları
 ```tsx
-'use client'  // Only for client components
-
-import { useState } from 'react'
-import { toast } from 'sonner'
-
-interface ComponentProps {
-  title: string
+// ✅ İyi - Props interface ile
+interface ButtonProps {
+  children: React.ReactNode
   variant?: 'primary' | 'secondary'
-  onSuccess?: () => void
+  onClick?: () => void
 }
 
-export function Component({ title, variant = 'primary', onSuccess }: ComponentProps) {
-  const [loading, setLoading] = useState(false)
-
-  const handleClick = async () => {
-    try {
-      setLoading(true)
-      // logic
-      onSuccess?.()
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Bir hata oluştu'
-      toast.error(message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return <div>{title}</div>
+export function Button({ children, variant = 'primary', onClick }: ButtonProps) {
+  return (
+    <button className={cn('btn', `btn-${variant}`)} onClick={onClick}>
+      {children}
+    </button>
+  )
 }
 ```
 
 ---
 
-## Data Fetching Patterns
+## 🔄 Git Workflow
 
-### TanStack Query Hooks
-
-```typescript
-// src/hooks/queries/use-entity.ts
-export function useEntityList(filters?: EntityFilters) {
-  const supabase = createClient()
-
-  return useQuery({
-    queryKey: ['entity', 'list', filters],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('entities')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      return data || []
-    },
-    staleTime: 10 * 60 * 1000,  // 10 min
-    gcTime: 30 * 60 * 1000,     // 30 min
-  })
-}
+### Branch İsimlendirme
+```
+feature/feature-name          # Yeni özellik
+bugfix/bug-description        # Bug düzeltmesi
+hotfix/critical-fix           # Acil düzeltme
+docs/documentation-update     # Dokümantasyon
+refactor/refactor-desc        # Refactoring
 ```
 
-### Mutations with Cache Updates
+### Commit Convention (Conventional Commits)
+```
+<type>(<scope>): <description>
 
-```typescript
-export function useCreateEntity() {
-  const queryClient = useQueryClient()
-  const supabase = createClient()
+[optional body]
 
-  return useMutation({
-    mutationFn: async (values: EntityValues) => {
-      const { data, error } = await supabase
-        .from('entities')
-        .insert(values)
-        .select()
-        .single()
+[optional footer]
+```
 
-      if (error) throw error
-      return data
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['entity', 'list'] })
-      toast.success('Kayıt oluşturuldu')
-    },
-    onError: (error) => {
-      const message = error instanceof Error ? error.message : 'Bir hata oluştu'
-      toast.error(message)
-    },
-  })
-}
+**Types:**
+| Type | Açıklama |
+|------|----------|
+| `feat` | Yeni özellik |
+| `fix` | Bug düzeltmesi |
+| `docs` | Dokümantasyon |
+| `style` | Formatting |
+| `refactor` | Kod refactoring |
+| `test` | Test ekleme/düzeltme |
+| `chore` | Build, config değişiklikleri |
+| `perf` | Performance improvement |
+
+**Örnekler:**
+```bash
+git commit -m "feat(needy): add bulk import feature"
+git commit -m "fix(auth): resolve login redirect issue"
+git commit -m "docs: update API documentation"
 ```
 
 ---
 
-## Form Validation Patterns
+## 🧪 Testing Stratejisi
 
-### Zod Schema Validation
-
-```typescript
-// src/lib/validations/entity.ts
-import { z } from 'zod'
-
-export const entitySchema = z.object({
-  name: z.string().min(2).max(100),
-  email: z.string().email().optional(),
-  status: z.enum(['active', 'inactive', 'pending']),
-})
-
-export type EntityFormValues = z.infer<typeof entitySchema>
-
-// Component usage
-const form = useForm<EntityFormValues>({
-  resolver: zodResolver(entitySchema),
-  defaultValues: { name: '', status: 'active' },
-})
+### Test Dosya Konumları
+```
+src/__tests__/
+├── api/                    # API Route tests
+│   ├── auth.test.ts
+│   ├── donations.test.ts
+│   └── needy.test.ts
+├── components/             # Component tests
+│   └── utils.test.ts
+└── lib/                    # Utility tests
+    ├── messaging.test.ts
+    └── rbac.test.ts
 ```
 
----
-
-## Supabase Client Usage
-
-### Client Selection Guide
-
-| Context | Import Path | Usage |
-|---------|-------------|-------|
-| Client Components | `@/lib/supabase/client` | Browser-side data fetching |
-| Server Components | `@/lib/supabase/server` | Server-side data fetching |
-| Admin Operations | `@/lib/supabase/client` with `createAdminClient()` | Privileged operations (server-only) |
-
-### Client Component Example
+### Test Pattern
 ```typescript
-'use client'
-import { createClient } from '@/lib/supabase/client'
-
-export function useEntity() {
-  const supabase = createClient() // Singleton pattern
-  // ...
-}
-```
-
-### Server Component Example
-```typescript
-import { createServerSupabaseClient } from '@/lib/supabase/server'
-
-export default async function Page() {
-  const supabase = await createServerSupabaseClient()
-  const { data } = await supabase.from('entities').select()
-  // ...
-}
-```
-
----
-
-## RBAC (Role-Based Access Control)
-
-### User Roles
-| Role | Permissions |
-|------|-------------|
-| `admin` | Full access, user management, settings |
-| `moderator` | CRUD operations, reports, application approval |
-| `user` | Create and edit records |
-| `viewer` | Read-only access |
-
-### Permission Checking in Components
-
-```typescript
-import { usePermissions } from '@/lib/rbac'
-
-const { canRead, canCreate, canUpdate, canDelete } = usePermissions('needy_persons')
-
-// Conditional rendering
-{canCreate && <Button>Yeni Ekle</Button>}
-```
-
-### API Route Protection
-
-```typescript
-import { withAuth } from '@/lib/permission-middleware'
-
-export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, {
-    requiredPermission: 'create',
-    resource: 'needy_persons',
-  })
-  
-  if (!authResult.success) return authResult.response!
-  
-  // Handle request...
-}
-```
-
----
-
-## Error Handling Patterns
-
-### Component Error Handling
-```typescript
-const handleSubmit = async () => {
-  try {
-    await createMutation.mutateAsync(values)
-  } catch (error) {
-    // Error already handled in mutation onError
-  }
-}
-```
-
-### API Route Error Handling
-```typescript
-export async function POST(request: NextRequest) {
-  try {
-    // ... logic
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Bir hata oluştu'
-    return NextResponse.json({ error: message }, { status: 500 })
-  }
-}
-```
-
----
-
-## Testing Guidelines
-
-### Test File Structure
-- Located in `src/__tests__/`
-- Mirror source structure
-- Naming: `*.test.ts` or `*.test.tsx`
-
-### Mocking Pattern
-```typescript
+// src/__tests__/api/needy.test.ts
 import { describe, it, expect, vi } from 'vitest'
+import { POST } from '../../../app/api/needy/route'
 
-// Mock Supabase
+// Mock dependencies
 vi.mock('@/lib/supabase/server', () => ({
-  createServerSupabaseClient: () => ({
+  createClient: () => ({
     from: () => ({
       insert: () => ({
         select: () => ({
-          single: () => ({ data: mockData, error: null }),
+          single: () => ({
+            data: { id: '123', first_name: 'Ahmet' },
+            error: null,
+          }),
         }),
       }),
     }),
   }),
 }))
 
-// Mock Auth middleware
-vi.mock('@/lib/permission-middleware', () => ({
-  withAuth: vi.fn(() => Promise.resolve({
-    success: true,
-    user: { id: 'user-1', role: 'admin' },
-  })),
-}))
-```
+describe('POST /api/needy', () => {
+  it('should create a new needy person', async () => {
+    const request = new Request('http://localhost/api/needy', {
+      method: 'POST',
+      body: JSON.stringify({ first_name: 'Ahmet', last_name: 'Yılmaz' }),
+    })
 
-### Running Tests
-```bash
-# Single test file
-npx vitest src/__tests__/api/needy.test.ts
+    const response = await POST(request)
+    const data = await response.json()
 
-# Watch mode
-npx vitest --watch
-
-# Coverage
-npm run test:coverage
+    expect(response.status).toBe(201)
+    expect(data.data).toBeDefined()
+  })
+})
 ```
 
 ---
 
-## Environment Variables
+## 🔐 Güvenlik
 
-### Required Variables
+### RBAC (Role-Based Access Control)
+
+| Rol | Yetkiler |
+|-----|----------|
+| `admin` | Tam erişim, kullanıcı yönetimi, sistem ayarları |
+| `moderator` | CRUD işlemleri, raporlama, başvuru onayı |
+| `user` | Kayıt oluşturma ve düzenleme |
+| `viewer` | Sadece görüntüleme |
+
+### RBAC Kullanımı
+```typescript
+// Hook kullanımı
+import { usePermissions } from '@/lib/rbac'
+
+function MyComponent() {
+  const permissions = usePermissions(user.role)
+  
+  return (
+    <div>
+      {permissions.canDelete && <DeleteButton />}
+      {permissions.donations.canCreate && <AddDonationButton />}
+    </div>
+  )
+}
+
+// Conditional rendering
+import { IfPermission } from '@/lib/rbac'
+
+<IfPermission role={role} resource="settings" action="update">
+  <SettingsForm />
+</IfPermission>
+```
+
+### Row Level Security (RLS)
+Tüm veritabanı tablolarında RLS aktiftir.
+
+```sql
+-- Tenant izolasyonu
+CREATE POLICY "tenant_isolation" ON needy_persons
+  FOR ALL TO authenticated
+  USING (organization_id = get_user_organization_id());
+```
+
+### Güvenlik Checklist
+- [ ] `.env.local` `.gitignore`'da
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` sadece server-side
+- [ ] Tüm formlar Zod ile validate ediliyor
+- [ ] RLS tüm tablolarda aktif
+- [ ] Security headers yapılandırıldı
+- [ ] XSS/CSRF koruması mevcut
+
+---
+
+## 🗄️ Veritabanı
+
+### Migration Dosyaları
+```
+supabase/migrations/
+├── 001_initial_schema.sql
+├── 002_extended_needy_schema.sql
+├── 003_linked_records_schema.sql
+├── ...
+└── 20260131_program_management.sql
+```
+
+### Migration Çalıştırma
 ```bash
+# Supabase CLI ile
+supabase db push
+
+# Veya SQL Editor'da manuel olarak
+```
+
+---
+
+## 🔌 API Routes
+
+### Route Handler Yapısı
+```typescript
+// app/api/needy/route.ts
+import { withOrgAuth } from '@/lib/organization-middleware'
+
+export async function GET(request: Request) {
+  // 1. Authentication & Authorization
+  const auth = await withOrgAuth(request)
+  if (!auth.success) return auth.response
+  
+  // 2. Query params parsing
+  const { searchParams } = new URL(request.url)
+  const page = parseInt(searchParams.get('page') || '1')
+  
+  // 3. Database query
+  const supabase = await createServerSupabaseClient()
+  const { data, error, count } = await supabase
+    .from('needy_persons')
+    .select('*', { count: 'exact' })
+    .eq('organization_id', auth.user.organization.id)
+    .range((page - 1) * 20, page * 20 - 1)
+  
+  // 4. Response
+  return Response.json({ data, pagination: { page, total: count } })
+}
+```
+
+---
+
+## ⚙️ Environment Variables
+
+### Zorunlu Değişkenler
+```env
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
@@ -513,187 +490,131 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 # Application
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-NODE_ENV=development
 ```
 
-### Optional Variables
-```bash
+### Opsiyonel Değişkenler
+```env
 # Sentry
 NEXT_PUBLIC_SENTRY_DSN=https://...@sentry.io/...
+SENTRY_AUTH_TOKEN=your-token
 
-# MERNIS (Identity Verification)
-MERNIS_SERVICE_URL=https://tckimlik.nvi.gov.tr/...
-MERNIS_USERNAME=your_username
-MERNIS_PASSWORD=your_password
+# PostHog
+NEXT_PUBLIC_POSTHOG_KEY=phc_...
 
-# Email (SMTP)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password
-
-# Security
-CRON_SECRET=your-random-cron-secret
-NEXTAUTH_SECRET=your-random-secret
+# MERNIS
+MERNIS_SERVICE_URL=https://tckimlik.nvi.gov.tr
+MERNIS_USERNAME=your-username
+MERNIS_PASSWORD=your-password
 ```
 
 ---
 
-## Security Considerations
+## 🚀 Deployment
 
-### Security Headers
-Configured in `next.config.ts` via `securityHeaders`:
-- X-Frame-Options: DENY
-- X-Content-Type-Options: nosniff
-- Content-Security-Policy
-- Strict-Transport-Security (production)
-
-### CSP (Content Security Policy)
-Nonce-based CSP support available via `buildCSPHeader()` function in `src/lib/security.ts`.
-
-### Authentication Flow
-1. Supabase Auth handles authentication
-2. Session stored in HTTP-only cookies
-3. Middleware validates session on protected routes
-4. RBAC checks on both client and server
-
-### Important Security Notes
-- **Never expose** `SUPABASE_SERVICE_ROLE_KEY` to client
-- Always validate permissions server-side
-- Use parameterized queries (Supabase handles this)
-- RLS policies active on all tables
-
----
-
-## Deployment
-
-### Platform
-- **Primary**: Vercel
-- **Regions**: `iad1` (US East)
-
-### Build Configuration
-```json
-{
-  "buildCommand": "npm run build",
-  "installCommand": "npm ci",
-  "framework": "nextjs",
-  "outputDirectory": ".next"
-}
-```
-
-### Pre-Deployment Checklist
-1. ✅ Type check: `npx tsc --noEmit`
-2. ✅ Lint: `npm run lint`
-3. ✅ Tests: `npm run test`
-4. ✅ Build test: `npm run build`
-5. ✅ Environment variables set in Vercel dashboard
-6. ✅ Database migrations applied
-
-### Cron Jobs
-```json
-{
-  "crons": [
-    {
-      "path": "/api/cron",
-      "schedule": "0 10 * * *"
-    }
-  ]
-}
-```
-
----
-
-## Design System
-
-### Colors (Corporate NGO Theme)
-- **Primary**: Corporate Navy Blue (`hsl(222 47% 31%)`)
-- **Secondary**: Dark Gray (`hsl(215 25% 27%)`)
-- **Accent**: Gold (`hsl(38 92% 40%)`)
-- **Success**: Green
-- **Warning**: Orange
-- **Danger**: Red
-
-### Typography
-- **Font Family**: Inter, system-ui, sans-serif
-- **Base Size**: 16px
-
-### Border Radius
-- Default: `0.5rem`
-- Small: `0.375rem`
-- Large: `0.75rem`
-- Full: `9999px`
-
-### Shadows
-- Card: `0 1px 3px 0 hsl(var(--shadow-color) / 0.05)`
-- Elevated: `0 4px 12px 0 hsl(var(--shadow-color) / 0.08)`
-- Soft: `0 2px 8px 0 hsl(var(--shadow-color) / 0.06)`
-
----
-
-## Performance Guidelines
-
-### Caching Strategy
-- **Query Cache**: 10 minutes stale time
-- **GC Time**: 30 minutes
-- **Image Cache**: 24 hours (static assets)
-
-### Optimizations
-- Turbopack for development
-- Tree shaking enabled
-- Image optimization with Next.js Image
-- Lazy loading for routes
-- Code splitting by route
-
-### Bundle Analysis
+### Vercel Deployment
 ```bash
-ANALYZE=true npm run build
+# Local build test
+npm run lint
+npm run build
+
+# Vercel CLI
+npm i -g vercel
+vercel --prod
+```
+
+### Vercel Settings
+- **Framework Preset:** Next.js
+- **Build Command:** `npm run build`
+- **Output Directory:** `.next`
+- **Node Version:** 24.x
+
+---
+
+## 📊 State Management
+
+| State Type | Tool | Use Case |
+|------------|------|----------|
+| Server State | TanStack Query | Database data, API responses |
+| Client State | Zustand | UI state, form state, preferences |
+| Form State | React Hook Form | Form inputs, validation |
+| URL State | Next.js Router | Filters, pagination, tabs |
+| Auth State | Supabase + Context | User session, permissions |
+
+### TanStack Query Configuration
+```typescript
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 10 * 60 * 1000,       // 10 minutes
+      gcTime: 30 * 60 * 1000,          // 30 minutes
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    },
+  },
+})
 ```
 
 ---
 
-## Important Notes
+## 📝 Validation
 
-1. **Language**: All code comments and documentation in Turkish
-2. **Type Safety**: Never use `any` - strict TypeScript enforced
-3. **Forms**: Always use Zod schemas with react-hook-form
-4. **Queries**: Create TanStack Query hooks in `src/hooks/queries/`
-5. **API Routes**: Use `withAuth` middleware for protected endpoints
-6. **RBAC**: Add permission checks for all UI changes
-7. **No Comments**: Do not add code comments unless specifically requested
-8. **Error Messages**: User-facing messages in Turkish
-9. **Date Format**: Turkish locale (DD.MM.YYYY)
-10. **Currency**: Turkish Lira (TRY) default
+### Zod Schema Örneği
+```typescript
+// src/lib/validations/needy.ts
+import { z } from 'zod'
 
----
-
-## Troubleshooting
-
-### Common Issues
-
-**Build fails with TypeScript errors:**
-```bash
-npx tsc --noEmit  # Check errors
+export const needyPersonSchema = z.object({
+  first_name: z.string()
+    .min(2, 'Ad en az 2 karakter olmalı')
+    .max(50, 'Ad en fazla 50 karakter olabilir'),
+  
+  identity_number: z.string()
+    .length(11, 'TC Kimlik No 11 haneli olmalı')
+    .regex(/^\d+$/, 'Sadece rakam içermelidir')
+    .optional(),
+  
+  email: z.string()
+    .email('Geçerli email adresi giriniz')
+    .optional(),
+});
 ```
 
-**Supabase connection issues:**
-- Check environment variables
-- Verify RLS policies
-- Check connection limits
-
-**Cache issues:**
-- Clear `.next` folder
-- Restart dev server
-
 ---
 
-## Resources
+## 🔗 Faydalı Linkler
 
 - [Next.js Docs](https://nextjs.org/docs)
 - [Supabase Docs](https://supabase.com/docs)
-- [Tailwind CSS Docs](https://tailwindcss.com/docs)
-- [TanStack Query Docs](https://tanstack.com/query/latest)
-- [shadcn/ui Docs](https://ui.shadcn.com)
+- [TanStack Query](https://tanstack.com/query/latest)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+- [Radix UI](https://www.radix-ui.com/)
 
 ---
 
-*Last updated: 2026-01-30*
+## 🆘 Sorun Giderme
+
+### Sık Karşılaşılan Hatalar
+
+**"Module not found" Hatası**
+```bash
+rm -rf node_modules .next
+npm install
+npm run dev
+```
+
+**TypeScript Hataları**
+```bash
+npx tsc --noEmit
+rm -rf .next
+npm run dev
+```
+
+**Port Çakışması**
+```bash
+lsof -i :3000
+npm run dev -- -p 3001
+```
+
+---
+
+> **Not:** Bu proje MIT lisansı altında lisanslanmıştır. Daha fazla bilgi için [CONTRIBUTING.md](./docs/CONTRIBUTING.md) dosyasına bakın.

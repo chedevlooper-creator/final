@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/permission-middleware'
 
+interface TeamMember {
+  user_id: string
+  role: string
+  joined_at: string
+  user: {
+    id: string
+    name: string | null
+    email: string
+    avatar_url: string | null
+  } | null
+}
+
 // GET - Organizasyon üyelerini listele (görev atama için)
 export async function GET(request: NextRequest) {
   const authResult = await withAuth(request, {
@@ -15,6 +27,13 @@ export async function GET(request: NextRequest) {
 
   const supabase = await createServerSupabaseClient()
   const { user } = authResult
+
+  if (!user) {
+    return NextResponse.json(
+      { error: 'Kullanıcı bilgisi alınamadı' },
+      { status: 401 }
+    )
+  }
 
   try {
     // Kullanıcının organizasyonunu kontrol et
@@ -49,6 +68,7 @@ export async function GET(request: NextRequest) {
       .eq('organization_id', memberData.organization_id)
       .eq('is_active', true)
       .order('joined_at', { ascending: false })
+      .returns<TeamMember[]>()
 
     if (error) throw error
 

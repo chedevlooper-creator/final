@@ -183,7 +183,6 @@ export default function NotificationsSettingsPage() {
                         <Switch 
                           checked={notification.email} 
                           disabled={!settings.email_enabled}
-                          size="sm"
                         />
                       </div>
                       <div className="flex items-center gap-2">
@@ -191,7 +190,6 @@ export default function NotificationsSettingsPage() {
                         <Switch 
                           checked={notification.push} 
                           disabled={!settings.push_enabled}
-                          size="sm"
                         />
                       </div>
                       <div className="flex items-center gap-2">
@@ -199,7 +197,6 @@ export default function NotificationsSettingsPage() {
                         <Switch 
                           checked={notification.sms} 
                           disabled={!settings.sms_enabled}
-                          size="sm"
                         />
                       </div>
                     </div>

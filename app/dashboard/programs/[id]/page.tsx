@@ -71,7 +71,7 @@ const categoryLabels: Record<string, string> = {
 export default function ProgramDetailPage() {
   const router = useRouter()
   const params = useParams()
-  const programId = params.id as string
+  const programId = params['id'] as string
   const supabase = createClient()
   const [activeTab, setActiveTab] = useState('overview')
 
@@ -177,7 +177,7 @@ export default function ProgramDetailPage() {
     )
   }
 
-  const statusConfig_item = statusConfig[program.status] || statusConfig.planning
+  const statusConfig_item = statusConfig[program.status] || statusConfig['planning']
   const budgetUtilization = program.budget_allocated > 0 
     ? Math.round((program.budget_spent / program.budget_allocated) * 100) 
     : 0
